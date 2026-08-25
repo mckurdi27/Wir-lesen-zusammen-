@@ -1,0 +1,157 @@
+{
+    "ay_kodu": "04",
+    "ay_adi": "Rebiülahir",
+    "aciklama": "Hicri takvimin dördüncü ayıdır.",
+    "gunler": {
+        "1": {
+            "hicri_tarih": "1 Rebiülahir",
+            "ayet": { "meal": "Allah hiç kimseye gücünün yetmeyeceğinden başkasını yüklemez...", "kaynak": "Bakara Suresi, 286" },
+            "hadis": { "meal": "Kolaylaştırın, zorlaştırmayın; müjdeleyin, nefret ettirmeyin.", "kaynak": "Buhârî, İlim 11" }
+        },
+        "2": {
+            "hicri_tarih": "2 Rebiülahir",
+            "ayet": { "meal": "De ki: Ey kendi aleyhlerine aşırı giden kullarım! Allah'ın rahmetinden ümidinizi kesmeyin...", "kaynak": "Zümer Suresi, 53" },
+            "hadis": { "meal": "Allah Teâlâ, kulunun tevbesinden, çölde kaybettiği devesini bulan kimsenin sevincinden çok daha fazla sevinir.", "kaynak": "Müslim, Tevbe 1" }
+        },
+        "3": {
+            "hicri_tarih": "3 Rebiülahir",
+            "ayet": { "meal": "Ey iman edenler! Allah'tan korkun ve herkes yarına ne hazırladığına baksın.", "kaynak": "Haşr Suresi, 18" },
+            "hadis": { "meal": "Akıllı kişi, nefsine hakim olan ve ölüm sonrası için çalışandır.", "kaynak": "Tirmizî, Sıfatü'l-Kıyâme 25" }
+        },
+        "4": {
+            "hicri_tarih": "4 Rebiülahir",
+            "ayet": { "meal": "Rabbinizin bağışına ve takva sahipleri için hazırlanmış olan cennete koşun.", "kaynak": "Âl-i İmrân Suresi, 133" },
+            "hadis": { "meal": "Cennetin kapıları pazartesi ve perşembe günleri açılır...", "kaynak": "Müslim, Birr 35" }
+        },
+        "5": {
+            "hicri_tarih": "5 Rebiülahir",
+            "ayet": { "meal": "Müminler o kimselerdir ki, Allah anıldığı zaman kalpleri ürperir...", "kaynak": "Enfâl Suresi, 2" },
+            "hadis": { "meal": "Kalbinde hardal tanesi kadar kibir olan kimse cennete giremez.", "kaynak": "Müslim, İman 147" }
+        },
+        "6": {
+            "hicri_tarih": "6 Rebiülahir",
+            "ayet": { "meal": "Yavrucuğum! Yaptığın iş bir hardal tanesi ağırlığınca olsa ve...", "kaynak": "Lokman Suresi, 16" },
+            "hadis": { "meal": "Hiçbir iyiliği küçümsemeyin; yarım hurma sadaka ile bile olsa.", "kaynak": "Müslim, Birr 144" }
+        },
+        "7": {
+            "hicri_tarih": "7 Rebiülahir",
+            "ayet": { "meal": "Eğer şükrederseniz, elbette size nimetimi artırırım.", "kaynak": "İbrahim Suresi, 7" },
+            "hadis": { "meal": "İnsanlara teşekkür etmeyen, Allah'a şükretmez.", "kaynak": "Tirmizî, Birr 35" }
+        },
+        "8": {
+            "hicri_tarih": "8 Rebiülahir",
+            "ayet": { "meal": "Ey iman edenler! Allah'ı çokça zikredin.", "kaynak": "Ahzâb Suresi, 41" },
+            "hadis": { "meal": "Dilin Allah'ın zikriyle ıslak kalmaya devam etsin.", "kaynak": "Tirmizî, Deavât 4" }
+        },
+        "9": {
+            "hicri_tarih": "9 Rebiülahir",
+            "ayet": { "meal": "O, hanginizin daha güzel amel yapacağını sınamak için ölümü ve hayatı yarattı.", "kaynak": "Mülk Suresi, 2" },
+            "hadis": { "meal": "Amellerin en hayırlısı, az da olsa devamlı olanıdır.", "kaynak": "Buhârî, Rikāk 18" }
+        },
+        "10": {
+            "hicri_tarih": "10 Rebiülahir",
+            "ayet": { "meal": "Ey insanlar! Şüphesiz Allah'ın vaadi haktır...", "kaynak": "Fâtır Suresi, 5" },
+            "hadis": { "meal": "Bizi aldatan bizden değildir.", "kaynak": "Müslim, İman 164" }
+        },
+        "11": {
+            "hicri_tarih": "11 Rebiülahir",
+            "ayet": { "meal": "Kim sabreder ve bağışlarsa, şüphesiz bu hareket, azmedilecek işlerdendir.", "kaynak": "Şûrâ Suresi, 43" },
+            "hadis": { "meal": "Sabır, ilk sarsıntı anında gösterilendir.", "kaynak": "Buhârî, Cenâiz 32" }
+        },
+        "12": {
+            "hicri_tarih": "12 Rebiülahir",
+            "ayet": { "meal": "Şüphesiz benim namazım, ibadetim, hayatım ve ölümüm alemlerin Rabbi olan Allah içindir.", "kaynak": "En'âm Suresi, 162" },
+            "hadis": { "meal": "Kulun Rabbine en yakın olduğu an secde halidir.", "kaynak": "Müslim, Salât 215" }
+        },
+        "13": {
+            "hicri_tarih": "13 Rebiülahir",
+            "ayet": { "meal": "Kendi elinizle kendinizi tehlikeye atmayın. İyilik edin, şüphesiz Allah iyilik edenleri sever.", "kaynak": "Bakara Suresi, 195" },
+            "hadis": { "meal": "İslam'da zarar vermek de zarara mukabele etmek de yoktur.", "kaynak": "İbn Mâce, Ahkâm 17" }
+        },
+        "14": {
+            "hicri_tarih": "14 Rebiülahir",
+            "ayet": { "meal": "Şüphesiz Allah, adaleti, iyilik yapmayı, yakınlara bakmayı emreder.", "kaynak": "Nahl Suresi, 90" },
+            "hadis": { "meal": "Komşusu açken tok yatan mümin bizden değildir.", "kaynak": "Hâkim, Müstedrek, 4/167" }
+        },
+        "15": {
+            "hicri_tarih": "15 Rebiülahir",
+            "ayet": { "meal": "Bir toplum kendilerindekini değiştirmedikçe Allah onların durumunu değiştirmez.", "kaynak": "Ra'd Suresi, 11" },
+            "hadis": { "meal": "Bir kötülük gördüğünüzde onu elinizle, gücünüz yetmezse dilinizle değiştirin...", "kaynak": "Müslim, İman 78" }
+        },
+        "16": {
+            "hicri_tarih": "16 Rebiülahir",
+            "ayet": { "meal": "Kim takva sahibi olursa, Allah ona bir çıkış yolu ihsan eder.", "kaynak": "Talâk Suresi, 2" },
+            "hadis": { "meal": "Şüpheli şeylerden kaçının; zira dinini ve namusunu korumuş olur.", "kaynak": "Buhârî, İman 39" }
+        },
+        "17": {
+            "hicri_tarih": "17 Rebiülahir",
+            "ayet": { "meal": "Rabbiniz, 'Bana dua edin, duanıza icabet edeyim' buyurmuştur.", "kaynak": "Mü'min Suresi, 60" },
+            "hadis": { "meal": "Dua ibadettir.", "kaynak": "Ebû Dâvûd, Vitir 23" }
+        },
+        "18": {
+            "hicri_tarih": "18 Rebiülahir",
+            "ayet": { "meal": "İyilikle kötülük bir olmaz. Sen kötülüğü en güzel şekilde sav.", "kaynak": "Fussilet Suresi, 34" },
+            "hadis": { "meal": "İnsanlara merhamet etmeyene Allah merhamet etmez.", "kaynak": "Buhârî, Tevhîd 2" }
+        },
+        "19": {
+            "hicri_tarih": "19 Rebiülahir",
+            "ayet": { "meal": "Şüphesiz zorlukla beraber bir kolaylık vardır.", "kaynak": "İnşirah Suresi, 6" },
+            "hadis": { "meal": "Müminin her işi hayırdır; bu durum yalnız mümine mahsustur.", "kaynak": "Müslim, Zühd 64" }
+        },
+        "20": {
+            "hicri_tarih": "20 Rebiülahir",
+            "ayet": { "meal": "Her canlı ölümü tadacaktır.", "kaynak": "Âl-i İmrân Suresi, 185" },
+            "hadis": { "meal": "Lezzetleri baltalayan ölümü çokça hatırlayın.", "kaynak": "Tirmizî, Zühd 4" }
+        },
+        "21": {
+            "hicri_tarih": "21 Rebiülahir",
+            "ayet": { "meal": "Rabbim! İlmimi artır de.", "kaynak": "Tâhâ Suresi, 114" },
+            "hadis": { "meal": "İlim talep etmek her Müslümana farzdır.", "kaynak": "İbn Mâce, Mukaddime 17" }
+        },
+        "22": {
+            "hicri_tarih": "22 Rebiülahir",
+            "ayet": { "meal": "Ve de ki: Çalışın! Amelinizi Allah, Resulü ve müminler görecektir.", "kaynak": "Tevbe Suresi, 105" },
+            "hadis": { "meal": "Allah, sizden birinizin yaptığı işi ve çalışmayı en güzel şekilde yapmasını sever.", "kaynak": "Beyhakî, Şuabü'l-Îmân, 4/334" }
+        },
+        "23": {
+            "hicri_tarih": "23 Rebiülahir",
+            "ayet": { "meal": "Kim Allah'a tevekkül ederse, O, ona yeter.", "kaynak": "Talâk Suresi, 3" },
+            "hadis": { "meal": "Eğer siz Allah'a gereği gibi tevekkül etseydiniz, kuşları rızıklandırdığı gibi sizi de rızıklandırırdı.", "kaynak": "Tirmizî, Zühd 33" }
+        },
+        "24": {
+            "hicri_tarih": "24 Rebiülahir",
+            "ayet": { "meal": "De ki: Doğruluk geldi, batıl yok oldu.", "kaynak": "İsrâ Suresi, 81" },
+            "hadis": { "meal": "Doğruluktan ayrılmayın; çünkü doğruluk iyiliğe, iyilik de cennete götürür.", "kaynak": "Buhârî, Edeb 69" }
+        },
+        "25": {
+            "hicri_tarih": "25 Rebiülahir",
+            "ayet": { "meal": "Yeryüzünde yürüyen hiçbir canlı yoktur ki rızkı Allah'a ait olmasın.", "kaynak": "Hûd Suresi, 6" },
+            "hadis": { "meal": "Hiç kimse elinin emeğinden daha hayırlı bir yemek yememiştir.", "kaynak": "Buhârî, Büyû' 15" }
+        },
+        "26": {
+            "hicri_tarih": "26 Rebiülahir",
+            "ayet": { "meal": "Ahiret hayatı şüphesiz daha hayırlıdır ve daha kalıcıdır.", "kaynak": "A'lâ Suresi, 17" },
+            "hadis": { "meal": "Dünya ahiretin tarlasıdır.", "kaynak": "Aclûnî, Keşfü'l-Hafâ, 1/412" }
+        },
+        "27": {
+            "hicri_tarih": "27 Rebiülahir",
+            "ayet": { "meal": "Şüphesiz Allah, adaletli davrananları sever.", "kaynak": "Hucurât Suresi, 9" },
+            "hadis": { "meal": "Adil olanlar nurdan minberler üzerine oturacaklardır.", "kaynak": "Müslim, İmâre 18" }
+        },
+        "28": {
+            "hicri_tarih": "28 Rebiülahir",
+            "ayet": { "meal": "Hayırda yarışın.", "kaynak": "Bakara Suresi, 148" },
+            "hadis": { "meal": "İnsanların en hayırlısı, insanlara faydalı olandır.", "kaynak": "Dârakutnî, Sünen" }
+        },
+        "29": {
+            "hicri_tarih": "29 Rebiülahir",
+            "ayet": { "meal": "O tövbeleri çok kabul eden ve çok merhamet edendir.", "kaynak": "Şûrâ Suresi, 25" },
+            "hadis": { "meal": "Günahından tövbe eden hiç günah işlememiş gibidir.", "kaynak": "İbn Mâce, Zühd 30" }
+        },
+        "30": {
+            "hicri_tarih": "30 Rebiülahir",
+            "ayet": { "meal": "Rabbinin adına zikret ve bütün benliğinle O'na yönel.", "kaynak": "Müzzemmil Suresi, 8" },
+            "hadis": { "meal": "Müminin silahı dua, dinin direği namazdır.", "kaynak": "Hakim, Müstedrek, 1/492" }
+        }
+    }
+}
