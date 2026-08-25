@@ -141,12 +141,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                 year: 'numeric'
             });
             const parts = formatter.formatToParts(new Date());
-            let gun = "", ay = "";
+            let gun = "1", ay = "3";
             for (const part of parts) {
-                if (part.type === 'day') gun = part.value;
-                if (part.type === 'month') ay = part.value;
+                if (part.type === 'day' && !isNaN(part.value)) gun = part.value;
+                if (part.type === 'month' && !isNaN(part.value)) ay = part.value;
             }
-            return { ayKodu: String(ay).padStart(2, '0'), gunNumarasi: parseInt(gun, 10) };
+            let ayNum = parseInt(ay, 10);
+            if (isNaN(ayNum) || ayNum < 1 || ayNum > 12) ayNum = 3;
+            let gunNum = parseInt(gun, 10);
+            if (isNaN(gunNum) || gunNum < 1 || gunNum > 30) gunNum = 1;
+
+            return { ayKodu: String(ayNum).padStart(2, '0'), gunNumarasi: gunNum };
         } catch (hata) {
             return { ayKodu: "03", gunNumarasi: 12 };
         }
@@ -160,7 +165,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             { ayet: "Beni anın ki ben de sizi anayım. (Bakara, 152)", hadis: "Mümin, başka bir mümine karşı birbirini destekleyen binalar gibidir.", german: { quote: "Wissen ist Macht.", translation: "Bilgi güçtür." } },
             { ayet: "Şüphesiz Allah muhsinlerle beraberdir. (Ankebût, 69)", hadis: "Kolaylaştırınız, zorlaştırmayınız; müjdeleyiniz, nefret ettirmeyiniz.", german: { quote: "Übung macht den Meister.", translation: "Pratik ustayı yapar." } }
         ];
-        return havuz[(gunNo - 1) % havuz.length];
+        let safeIndex = Math.max(0, (gunNo - 1)) % havuz.length;
+        return havuz[safeIndex];
     }
 
     async function fetchHijriMonthData(ayKodu) {
@@ -184,47 +190,58 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function getHijriInspiration() {
-        const todayMiladiStr = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        const hicriInfo = bugunkuHicriTarihiAl();
-        let hDay = hicriInfo.gunNumarasi;
-        let hMonth = hicriInfo.ayKodu;
-        
-        let todayHijriStr = "1448 H.";
         try {
-            const displayFormatter = new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura', { day: 'numeric', month: 'numeric', year: 'numeric' });
-            todayHijriStr = displayFormatter.format(new Date()) + " H.";
-        } catch (e) {}
+            const todayMiladiStr = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const hicriInfo = bugunkuHicriTarihiAl();
+            let hDay = hicriInfo.gunNumarasi;
+            let hMonth = hicriInfo.ayKodu;
+            
+            let todayHijriStr = "1448 H.";
+            try {
+                const displayFormatter = new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura', { day: 'numeric', month: 'numeric', year: 'numeric' });
+                todayHijriStr = displayFormatter.format(new Date()) + " H.";
+            } catch (e) {}
 
-        let jsonData = await fetchHijriMonthData(hMonth);
-        let item = null;
-        if (jsonData) {
-            item = jsonData[String(hDay)] || jsonData[hDay] || jsonData[String(hDay).padStart(2, '0')];
+            let jsonData = await fetchHijriMonthData(hMonth);
+            let item = null;
+            if (jsonData) {
+                item = jsonData[String(hDay)] || jsonData[hDay] || jsonData[String(hDay).padStart(2, '0')];
+            }
+
+            let fallback = getFallbackInspiration(hDay);
+            let verseText = fallback.ayet;
+            let hadishText = fallback.hadis;
+            let germanQuote = fallback.german.quote;
+            let germanTrans = fallback.german.translation;
+
+            if (item) {
+                if (item.ayet) {
+                    let meal = typeof item.ayet === 'object' ? (item.ayet.meal || item.ayet.text || "") : String(item.ayet);
+                    let kaynak = typeof item.ayet === 'object' ? (item.ayet.kaynak || item.ayet.source || "") : "";
+                    verseText = kaynak ? `${meal} (${kaynak})` : meal;
+                }
+                let h = item.hadis || item.hadish;
+                if (h) {
+                    let meal = typeof h === 'object' ? (h.meal || h.text || "") : String(h);
+                    let kaynak = typeof h === 'object' ? (h.kaynak || h.source || "") : "";
+                    hadishText = kaynak ? `${meal} (${kaynak})` : meal;
+                }
+                if (item.german) {
+                    germanQuote = item.german.quote || germanQuote;
+                    germanTrans = item.german.translation || germanTrans;
+                }
+            }
+            return { fullDateStr: todayHijriStr, miladiDateStr: todayMiladiStr, verse: verseText, hadish: hadishText, german: { quote: germanQuote, translation: germanTrans } };
+        } catch (err) {
+            let fallback = getFallbackInspiration(1);
+            return {
+                fullDateStr: "1448 H.",
+                miladiDateStr: new Date().toLocaleDateString('tr-TR'),
+                verse: fallback.ayet,
+                hadish: fallback.hadis,
+                german: fallback.german
+            };
         }
-
-        let fallback = getFallbackInspiration(hDay);
-        let verseText = fallback.ayet;
-        let hadishText = fallback.hadis;
-        let germanQuote = fallback.german.quote;
-        let germanTrans = fallback.german.translation;
-
-        if (item) {
-            if (item.ayet) {
-                let meal = typeof item.ayet === 'object' ? (item.ayet.meal || item.ayet.text || "") : String(item.ayet);
-                let kaynak = typeof item.ayet === 'object' ? (item.ayet.kaynak || item.ayet.source || "") : "";
-                verseText = kaynak ? `${meal} (${kaynak})` : meal;
-            }
-            let h = item.hadis || item.hadish;
-            if (h) {
-                let meal = typeof h === 'object' ? (h.meal || h.text || "") : String(h);
-                let kaynak = typeof h === 'object' ? (h.kaynak || h.source || "") : "";
-                hadishText = kaynak ? `${meal} (${kaynak})` : meal;
-            }
-            if (item.german) {
-                germanQuote = item.german.quote || germanQuote;
-                germanTrans = item.german.translation || germanTrans;
-            }
-        }
-        return { fullDateStr: todayHijriStr, miladiDateStr: todayMiladiStr, verse: verseText, hadish: hadishText, german: { quote: germanQuote, translation: germanTrans } };
     }
 
     function renderMainTitleHeader() {
