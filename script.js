@@ -455,7 +455,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                                 `<button id="unlock-name-btn" style="padding: 8px 15px; background: #e74c3c; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">Oturumu Kapat</button>` :
                                 `<button id="lock-name-btn" style="padding: 8px 15px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">🔑 Kilitle</button>`
                             }
-                            <button id="admin-toggle-btn-custom" style="padding: 8px 12px; background: ${isAdmin ? '#c0392b' : '#34495e'}; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">${isAdmin ? '🔓 Yönetici: AÇIK' : '🔐 Yönetici Modu'}</button>
                         </div>
                     </div>
                 </div>
@@ -474,8 +473,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     await loadGroupData();
                 }
             });
-
-            document.getElementById("admin-toggle-btn-custom").addEventListener("click", () => triggerAdminToggle());
 
             if (loggedInMember) {
                 document.getElementById("unlock-name-btn").addEventListener("click", () => {
