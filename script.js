@@ -87,7 +87,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const container = document.querySelector(".container");
     const booksGrid = document.getElementById("books-grid");
-    const bulkShareArea = document.getElementById("bulk-share-area");
 
     let currentGroup = "grup_1";
     let isAdmin = false;
@@ -145,6 +144,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             monthlyInspirationCache[ayKodu] = data;
             return data;
         } catch (e) {
+            console.error("Hicri veri okunamadı:", e);
             return null;
         }
     }
@@ -164,10 +164,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         let jsonData = await fetchHijriMonthData(hMonth);
         let item = null;
         if (jsonData) {
-            item = jsonData[String(hDay)] || jsonData[hDay] || jsonData[String(hDay).padStart(2, '0')];
-            if (!item) {
-                for (let key in jsonData) {
-                    if (parseInt(key, 10) === parseInt(hDay, 10)) { item = jsonData[key]; break; }
+            if (Array.isArray(jsonData)) {
+                item = jsonData[hDay - 1] || jsonData[hDay] || jsonData[String(hDay)];
+            } else {
+                item = jsonData[String(hDay)] || jsonData[hDay] || jsonData[String(hDay).padStart(2, '0')];
+                if (!item) {
+                    for (let key in jsonData) {
+                        if (parseInt(key, 10) === parseInt(hDay, 10)) { item = jsonData[key]; break; }
+                    }
                 }
             }
         }
@@ -408,8 +412,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         let allGroups = getAllGroupKeys();
         let groupsHtml = allGroups.map(g => `<option value="${g}" ${g === currentGroup ? "selected" : ""}>${g.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
-        
-        // Datalist seçenekleri (Hem listeden seçebilme hem klavyeden yazabilme olanağı sunar)
         let memberDatalistOptions = appData.members.map(m => `<option value="${m}">`).join('');
 
         if (!isAdmin) {
@@ -507,7 +509,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
             }
         } else {
-            // Yönetici Modu AÇIK olduğunda görünen panel
             let membersHtml = appData.members.map(m => `
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; margin-bottom: 4px; border-radius: 4px; font-size: 13px; border: 1px solid var(--border-color);">
                     <span>• ${m}</span>
@@ -809,7 +810,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 body.style.display = cardEl.classList.contains("open") ? "block" : "none";
             });
 
-            // PDF yolunu encodeURI ile güvenli hale getirdik
             cardEl.querySelector(".book-pdf-btn").addEventListener("click", (e) => {
                 e.stopPropagation();
                 const rawPdf = bookPdfMap[e.target.getAttribute("data-bookid")];
