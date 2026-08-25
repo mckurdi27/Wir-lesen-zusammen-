@@ -111,8 +111,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const container = document.querySelector(".container");
     const booksGrid = document.getElementById("books-grid");
     const adminToggleBtn = document.getElementById("admin-toggle-btn");
-    const bulkShareArea = document.getElementById("bulk-share-area");
-    const bulkWhatsappBtn = document.getElementById("bulk-whatsapp-btn");
 
     let currentGroup = "grup_1";
     let isAdmin = false;
@@ -436,26 +434,26 @@ document.addEventListener("DOMContentLoaded", async () => {
         let groupsHtml = allGroups.map(g => `<option value="${g}" ${g === currentGroup ? "selected" : ""}>${g.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
 
         if (!isAdmin) {
+            let membersOptions = '<option value="">-- İsminizi Seçin --</option>' + appData.members.map(m => `<option value="${m}" ${m === loggedInMember ? "selected" : ""}>${m}</option>`).join('');
+
             controlsContainer.innerHTML = `
                 <div style="padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 6px rgba(0,0,0,0.04); margin-bottom: 20px;">
-                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
-                        <label style="font-weight: bold; font-size: 14px;">👥 Grup Seçin:</label>
-                        <select id="user-group-select" style="padding: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 14px; flex: 1; min-width: 150px;">
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px;">
+                        <label style="font-weight: bold; font-size: 13px; min-width: 65px;">👥 Grup:</label>
+                        <select id="user-group-select" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 140px;">
                             ${groupsHtml}
                         </select>
-                        <button id="user-new-group-btn" style="padding: 8px 12px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold;">+ Yeni Grup</button>
+                        <button id="user-new-group-btn" style="padding: 6px 10px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">+ Yeni Grup</button>
                     </div>
-                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: space-between;">
-                        <div style="display: flex; gap: 10px; align-items: center; flex: 1; min-width: 220px;">
-                            <label style="font-weight: bold; font-size: 14px;">👤 İsminiz:</label>
-                            <input type="text" id="user-name-input" value="${loggedInMember}" placeholder="Adınızı yazın..." style="padding: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 14px; flex: 1;" ${loggedInMember ? "disabled" : ""}>
-                        </div>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            ${loggedInMember ? 
-                                `<button id="unlock-name-btn" style="padding: 8px 15px; background: #e74c3c; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">Oturumu Kapat</button>` :
-                                `<button id="lock-name-btn" style="padding: 8px 15px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">🔑 Kilitle</button>`
-                            }
-                        </div>
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px;">
+                        <label style="font-weight: bold; font-size: 13px; min-width: 65px;">👤 İsminiz:</label>
+                        <select id="user-member-select" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 140px;">
+                            ${membersOptions}
+                        </select>
+                        <button id="user-add-member-btn" style="padding: 6px 10px; background: #2980b9; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">+ Üye Ekle</button>
+                    </div>
+                    <div id="bulk-share-area" style="display: ${loggedInMember ? 'block' : 'none'}; margin-top: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
+                        <button id="bulk-whatsapp-btn" style="width: 100%; padding: 8px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">💬 Tüm Seçtiklerimi WhatsApp'ta Paylaş</button>
                     </div>
                 </div>
             `;
@@ -474,30 +472,61 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             });
 
-            if (loggedInMember) {
-                document.getElementById("unlock-name-btn").addEventListener("click", () => {
-                    if (confirm("Oturumu kapatmak istiyor musunuz?")) {
-                        loggedInMember = "";
-                        localStorage.removeItem(`hatim_session_${currentGroup}`);
+            document.getElementById("user-member-select").addEventListener("change", (e) => {
+                loggedInMember = e.target.value;
+                if (loggedInMember) {
+                    localStorage.setItem(`hatim_session_${currentGroup}`, loggedInMember);
+                } else {
+                    localStorage.removeItem(`hatim_session_${currentGroup}`);
+                }
+                renderMainInterface();
+                renderBooks();
+            });
+
+            document.getElementById("user-add-member-btn").addEventListener("click", async () => {
+                let mName = prompt("Eklenecek üye adı:");
+                if (mName && mName.trim()) {
+                    let clean = mName.trim();
+                    if (!appData.members.includes(clean)) {
+                        appData.members.push(clean);
+                        loggedInMember = clean;
+                        saveGroupData();
+                        localStorage.setItem(`hatim_session_${currentGroup}`, loggedInMember);
                         renderMainInterface();
                         renderBooks();
+                    } else {
+                        alert("Bu isim zaten var.");
+                        loggedInMember = clean;
+                        document.getElementById("user-member-select").value = clean;
+                        localStorage.setItem(`hatim_session_${currentGroup}`, loggedInMember);
+                        renderBooks();
                     }
-                });
-            } else {
-                document.getElementById("lock-name-btn").addEventListener("click", () => {
-                    let nameVal = document.getElementById("user-name-input").value.trim();
-                    if (!nameVal) { alert("Lütfen isminizi yazın."); return; }
-                    loggedInMember = nameVal;
-                    if (!appData.members.includes(loggedInMember)) {
-                        appData.members.push(loggedInMember);
-                        saveGroupData();
-                    }
-                    localStorage.setItem(`hatim_session_${currentGroup}`, loggedInMember);
-                    renderMainInterface();
-                    renderBooks();
-                    alert(`Oturum "${loggedInMember}" adına kilitlendi.`);
+                }
+            });
+
+            const bulkBtn = document.getElementById("bulk-whatsapp-btn");
+            if (bulkBtn) {
+                bulkBtn.addEventListener("click", () => {
+                    if (!loggedInMember) { alert("Lütfen önce isminizi seçin."); return; }
+                    let summary = [];
+                    appData.books.forEach(book => {
+                        let baseArray = appData.bookPages[book.id];
+                        let defModes = bookModesDefs[book.id];
+                        let primaryKey = book.type === "bab" ? "on_bab" : "yirmi_sayfa";
+                        if (!defModes[primaryKey]) primaryKey = Object.keys(defModes)[0];
+                        let taken = [];
+                        defModes[primaryKey].getItems().forEach(pi => {
+                            let st = getRangeStatus(baseArray, pi.start, pi.end);
+                            if (st.owner === loggedInMember) taken.push(pi.name);
+                        });
+                        if (taken.length > 0) summary.push(`• ${book.name}: *${taken.join(", ")}*`);
+                    });
+                    if (summary.length === 0) { alert("Üzerinizde hisse bulunmuyor."); return; }
+                    let msg = `*[${currentGroup.replace(/_/g, ' ').toUpperCase()}] ${loggedInMember} Hisseleri*\n\n` + summary.join("\n");
+                    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
                 });
             }
+
         } else {
             let membersHtml = appData.members.map(m => `
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; margin-bottom: 4px; border-radius: 4px; font-size: 13px; border: 1px solid var(--border-color);">
@@ -614,7 +643,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
             });
         }
-        checkBulkShareVisibility();
     }
 
     async function triggerAdminToggle() {
@@ -644,10 +672,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     adminToggleBtn.addEventListener("click", () => triggerAdminToggle());
-
-    function checkBulkShareVisibility() {
-        bulkShareArea.style.display = loggedInMember ? "block" : "none";
-    }
 
     function renderAnalysisSection() {
         let analysisContainer = document.getElementById("analysis-section");
@@ -937,7 +961,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function handleItemClick(bookIndex, modeKey, itemIndex) {
-        if (!loggedInMember) { alert("Lütfen önce isminizi yazıp oturumu kilitleyin!"); return; }
+        if (!loggedInMember) { alert("Lütfen önce isminizi seçin!"); return; }
         const book = appData.books[bookIndex];
         let baseArray = appData.bookPages[book.id];
         let item = bookModesDefs[book.id][modeKey].getItems()[itemIndex];
@@ -962,26 +986,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
     }
-
-    bulkWhatsappBtn.addEventListener("click", () => {
-        if (!loggedInMember) { alert("Lütfen önce oturum açın."); return; }
-        let summary = [];
-        appData.books.forEach(book => {
-            let baseArray = appData.bookPages[book.id];
-            let defModes = bookModesDefs[book.id];
-            let primaryKey = book.type === "bab" ? "on_bab" : "yirmi_sayfa";
-            if (!defModes[primaryKey]) primaryKey = Object.keys(defModes)[0];
-            let taken = [];
-            defModes[primaryKey].getItems().forEach(pi => {
-                let st = getRangeStatus(baseArray, pi.start, pi.end);
-                if (st.owner === loggedInMember) taken.push(pi.name);
-            });
-            if (taken.length > 0) summary.push(`• ${book.name}: *${taken.join(", ")}*`);
-        });
-        if (summary.length === 0) { alert("Üzerinizde hisse bulunmuyor."); return; }
-        let msg = `*[${currentGroup.replace(/_/g, ' ').toUpperCase()}] ${loggedInMember} Hisseleri*\n\n` + summary.join("\n");
-        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
-    });
 
     function shareBookToWhatsApp(bookIndex) {
         const book = appData.books[bookIndex];
