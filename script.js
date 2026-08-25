@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     injectOrientalStyles();
 
-    const container = document.querySelector(".container");
+    const container = document.querySelector(".container") || document.body;
     const booksGrid = document.getElementById("books-grid");
     const adminToggleBtn = document.getElementById("admin-toggle-btn");
     const bulkShareArea = document.getElementById("bulk-share-area");
@@ -194,7 +194,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         let todayHijriStr = "1448 H.";
         try {
-            // 'en' kullanarak 'MÖ' hatasını (AH -> BC çevirisini) engelliyoruz
             const displayFormatter = new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura', { day: 'numeric', month: 'numeric', year: 'numeric' });
             todayHijriStr = displayFormatter.format(new Date()) + " H.";
         } catch (e) {}
@@ -270,7 +269,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             inspirationContainer = document.createElement("div");
             inspirationContainer.id = "daily-inspiration-section";
             const mainTitleSec = document.getElementById("main-title-ornate-section");
-            container.insertBefore(inspirationContainer, mainTitleSec.nextSibling);
+            if (mainTitleSec && mainTitleSec.nextSibling) {
+                container.insertBefore(inspirationContainer, mainTitleSec.nextSibling);
+            } else {
+                container.appendChild(inspirationContainer);
+            }
         }
 
         inspirationContainer.style.cssText = `
@@ -438,7 +441,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             controlsContainer = document.createElement("div");
             controlsContainer.className = "controls";
             const inspSec = document.getElementById("daily-inspiration-section");
-            container.insertBefore(controlsContainer, inspSec.nextSibling);
+            if (inspSec && inspSec.nextSibling) {
+                container.insertBefore(controlsContainer, inspSec.nextSibling);
+            } else {
+                container.appendChild(controlsContainer);
+            }
         }
 
         let allGroups = getAllGroupKeys();
@@ -632,15 +639,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function triggerAdminToggle() {
         if (isAdmin) {
             isAdmin = false;
-            adminToggleBtn.textContent = "🔐 Yönetici Modu: Kapalı";
-            adminToggleBtn.classList.remove("active");
+            if (adminToggleBtn) {
+                adminToggleBtn.textContent = "🔐 Yönetici Modu: Kapalı";
+                adminToggleBtn.classList.remove("active");
+            }
             alert("Yönetici modu kapatıldı.");
         } else {
             const enteredPassword = prompt("Yönetici şifresi:");
             if (enteredPassword === ADMIN_PASSWORD) {
                 isAdmin = true;
-                adminToggleBtn.textContent = "🔓 Yönetici Modu: AÇIK";
-                adminToggleBtn.classList.add("active");
+                if (adminToggleBtn) {
+                    adminToggleBtn.textContent = "🔓 Yönetici Modu: AÇIK";
+                    adminToggleBtn.classList.add("active");
+                }
                 alert("Yönetici modu açıldı.");
             } else if (enteredPassword !== null) {
                 alert("Hatalı şifre!");
@@ -655,10 +666,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         renderBooks();
     }
 
-    adminToggleBtn.addEventListener("click", () => triggerAdminToggle());
+    if (adminToggleBtn) {
+        adminToggleBtn.addEventListener("click", () => triggerAdminToggle());
+    }
 
     function checkBulkShareVisibility() {
-        bulkShareArea.style.display = loggedInMember ? "block" : "none";
+        if (bulkShareArea) {
+            bulkShareArea.style.display = loggedInMember ? "block" : "none";
+        }
     }
 
     function renderAnalysisSection() {
@@ -668,7 +683,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             analysisContainer.id = "analysis-section";
             analysisContainer.style.cssText = "margin-bottom: 20px; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05);";
             const controlsSec = document.querySelector(".controls");
-            controlsSec.parentNode.insertBefore(analysisContainer, controlsSec.nextSibling);
+            if (controlsSec && controlsSec.nextSibling) {
+                controlsSec.parentNode.insertBefore(analysisContainer, controlsSec.nextSibling);
+            } else {
+                container.appendChild(analysisContainer);
+            }
         }
 
         let totalBooks = appData.books.length;
@@ -724,6 +743,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function renderBooks() {
+        if (!booksGrid) return;
         const openBookIds = Array.from(document.querySelectorAll(".book-card.open")).map(el => el.getAttribute("data-book-id"));
         booksGrid.innerHTML = "";
 
@@ -975,25 +995,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    bulkWhatsappBtn.addEventListener("click", () => {
-        if (!loggedInMember) { alert("Lütfen önce oturum açın."); return; }
-        let summary = [];
-        appData.books.forEach(book => {
-            let baseArray = appData.bookPages[book.id];
-            let defModes = bookModesDefs[book.id];
-            let primaryKey = book.type === "bab" ? "on_bab" : "yirmi_sayfa";
-            if (!defModes[primaryKey]) primaryKey = Object.keys(defModes)[0];
-            let taken = [];
-            defModes[primaryKey].getItems().forEach(pi => {
-                let st = getRangeStatus(baseArray, pi.start, pi.end);
-                if (st.owner === loggedInMember) taken.push(pi.name);
+    if (bulkWhatsappBtn) {
+        bulkWhatsappBtn.addEventListener("click", () => {
+            if (!loggedInMember) { alert("Lütfen önce oturum açın."); return; }
+            let summary = [];
+            appData.books.forEach(book => {
+                let baseArray = appData.bookPages[book.id];
+                let defModes = bookModesDefs[book.id];
+                let primaryKey = book.type === "bab" ? "on_bab" : "yirmi_sayfa";
+                if (!defModes[primaryKey]) primaryKey = Object.keys(defModes)[0];
+                let taken = [];
+                defModes[primaryKey].getItems().forEach(pi => {
+                    let st = getRangeStatus(baseArray, pi.start, pi.end);
+                    if (st.owner === loggedInMember) taken.push(pi.name);
+                });
+                if (taken.length > 0) summary.push(`• ${book.name}: *${taken.join(", ")}*`);
             });
-            if (taken.length > 0) summary.push(`• ${book.name}: *${taken.join(", ")}*`);
+            if (summary.length === 0) { alert("Üzerinizde hisse bulunmuyor."); return; }
+            let msg = `*[${currentGroup.replace(/_/g, ' ').toUpperCase()}] ${loggedInMember} Hisseleri*\n\n` + summary.join("\n");
+            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
         });
-        if (summary.length === 0) { alert("Üzerinizde hisse bulunmuyor."); return; }
-        let msg = `*[${currentGroup.replace(/_/g, ' ').toUpperCase()}] ${loggedInMember} Hisseleri*\n\n` + summary.join("\n");
-        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
-    });
+    }
 
     function shareBookToWhatsApp(bookIndex) {
         const book = appData.books[bookIndex];
