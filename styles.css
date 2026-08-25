@@ -1,0 +1,332 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: #f4f6f8;
+    color: #333;
+    padding: 12px;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    margin-bottom: 15px;
+}
+
+header h1 {
+    font-size: 1.3rem;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+header p {
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+/* Üst Kontrol Paneli */
+.control-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.control-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.control-row.member-row {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 8px;
+}
+
+.group-selector-area, .member-select-area {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.group-selector-area select, .member-select-area select {
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e0;
+    background: #fff;
+    font-size: 0.85rem;
+    max-width: 160px;
+}
+
+.secondary-btn {
+    background: #edf2f7;
+    border: 1px solid #cbd5e0;
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.secondary-btn:hover {
+    background: #e2e8f0;
+}
+
+.admin-btn {
+    background: #e2e8f0;
+    color: #4a5568;
+    border: 1px solid #cbd5e0;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.admin-btn.active {
+    background: #c53030;
+    color: #fff;
+    border-color: #9b2c2c;
+}
+
+.bulk-wa-btn {
+    background-color: #25d366;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.bulk-wa-btn:hover {
+    background-color: #20ba5a;
+}
+
+/* 2 Sütunlu Grid */
+.books-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.book-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    transition: all 0.2s ease;
+}
+
+.book-header {
+    background: #f8fafc;
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid transparent;
+}
+
+.book-card.open .book-header {
+    border-bottom-color: #e2e8f0;
+    background: #edf2f7;
+}
+
+.book-title-area {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.book-name {
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #2d3748;
+}
+
+.book-stats {
+    font-size: 0.72rem;
+    color: #718096;
+}
+
+.book-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.book-whatsapp-btn {
+    background-color: #25d366;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.toggle-icon {
+    font-size: 0.8rem;
+    color: #4a5568;
+    transition: transform 0.2s;
+}
+
+.book-card.open .toggle-icon {
+    transform: rotate(180deg);
+}
+
+.book-body {
+    display: none;
+    padding: 12px;
+    background: #fff;
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.book-card.open .book-body {
+    display: block;
+}
+
+.sub-modes {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.sub-btn {
+    background: #edf2f7;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #4a5568;
+    cursor: pointer;
+}
+
+.sub-btn.active {
+    background: #3182ce;
+    color: #fff;
+}
+
+.items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.part-row {
+    background: #fdfdfd;
+    border: 1px solid #edf2f7;
+    border-radius: 6px;
+    padding: 7px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.part-row:hover {
+    background: #f7fafc;
+    border-color: #cbd5e0;
+}
+
+.part-row.taken {
+    background-color: #ebf8ff;
+    border-color: #bee3f8;
+}
+
+.part-row.read {
+    background-color: #f0fff4;
+    border-color: #c6f6d5;
+}
+
+.part-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.part-name {
+    font-weight: bold;
+    font-size: 0.8rem;
+    color: #2d3748;
+}
+
+.part-status {
+    font-size: 0.7rem;
+    color: #718096;
+}
+
+.part-row.taken .part-status {
+    color: #2b6cb0;
+}
+
+.part-row.read .part-status {
+    color: #22543d;
+    font-weight: 600;
+}
+
+.action-hint {
+    font-size: 0.65rem;
+    color: #a0aec0;
+    background: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #edf2f7;
+}
+
+footer {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #a0aec0;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+@media (max-width: 600px) {
+    .books-grid {
+        grid-template-columns: 1fr;
+    }
+    .control-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+

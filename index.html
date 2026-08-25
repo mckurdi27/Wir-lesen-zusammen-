@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ortak Hatim ve Dua Takip Sistemi</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📖 Ortak Hatim ve Dua Takip Sistemi</h1>
+            <p>Grubunuzu seçin, isminizi belirleyin ve parçalara tıklayarak kolayca alın.</p>
+            
+            <!-- Yönetici ve Grup Kontrol Paneli -->
+            <div class="control-panel">
+                <div class="control-row">
+                    <div class="group-selector-area">
+                        <label for="group-select">👥 Grup:</label>
+                        <select id="group-select">
+                            <option value="grup1">Grup 1</option>
+                            <option value="grup2">Grup 2</option>
+                        </select>
+                        <button id="new-group-btn" class="secondary-btn" title="Yeni grup ekle">+ Yeni Grup</button>
+                    </div>
+                    <div class="admin-toggle-area">
+                        <button id="admin-toggle-btn" class="admin-btn">🔐 Yönetici Modu: Kapalı</button>
+                    </div>
+                </div>
+
+                <!-- Üye Seçim ve Toplu Paylaşım Paneli -->
+                <div class="control-row member-row">
+                    <div class="member-select-area">
+                        <label for="member-select">👤 İsminiz:</label>
+                        <select id="member-select">
+                            <option value="">-- Önce İsminizi Seçin --</option>
+                        </select>
+                        <button id="add-member-btn" class="secondary-btn" title="Yönetici üye ekleyebilir">+ Üye Ekle</button>
+                    </div>
+                    <div class="bulk-share-area" id="bulk-share-area" style="display: none;">
+                        <button id="bulk-whatsapp-btn" class="bulk-wa-btn">💬 Tüm Seçtiklerimi WhatsApp'ta Paylaş</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Kitaplar Grid Alanı -->
+        <main id="books-grid" class="books-grid">
+            <!-- JavaScript ile dinamik doldurulacak -->
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Ortak Paylaşım Sistemi | Mobil Uyumlu</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+

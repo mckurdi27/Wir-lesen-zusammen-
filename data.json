@@ -1,0 +1,79 @@
+{
+  "title": "Ortak Hatim ve Dua Takip Sistemi",
+  "categories": [
+    {
+      "id": "kuran",
+      "name": "Kur'ân-ı Kerîm (30 Cüz)",
+      "parts": [
+        {"id": 1, "name": "1. Cüz", "owner": "", "isRead": false},
+        {"id": 2, "name": "2. Cüz", "owner": "", "isRead": false},
+        {"id": 3, "name": "3. Cüz", "owner": "", "isRead": false},
+        {"id": 4, "name": "4. Cüz", "owner": "", "isRead": false},
+        {"id": 5, "name": "5. Cüz", "owner": "", "isRead": false},
+        {"id": 6, "name": "6. Cüz", "owner": "", "isRead": false},
+        {"id": 7, "name": "7. Cüz", "owner": "", "isRead": false},
+        {"id": 8, "name": "8. Cüz", "owner": "", "isRead": false},
+        {"id": 9, "name": "9. Cüz", "owner": "", "isRead": false},
+        {"id": 10, "name": "10. Cüz", "owner": "", "isRead": false},
+        {"id": 11, "name": "11. Cüz", "owner": "", "isRead": false},
+        {"id": 12, "name": "12. Cüz", "owner": "", "isRead": false},
+        {"id": 13, "name": "13. Cüz", "owner": "", "isRead": false},
+        {"id": 14, "name": "14. Cüz", "owner": "", "isRead": false},
+        {"id": 15, "name": "15. Cüz", "owner": "", "isRead": false},
+        {"id": 16, "name": "16. Cüz", "owner": "", "isRead": false},
+        {"id": 17, "name": "17. Cüz", "owner": "", "isRead": false},
+        {"id": 18, "name": "18. Cüz", "owner": "", "isRead": false},
+        {"id": 19, "name": "19. Cüz", "owner": "", "isRead": false},
+        {"id": 20, "name": "20. Cüz", "owner": "", "isRead": false},
+        {"id": 21, "name": "21. Cüz", "owner": "", "isRead": false},
+        {"id": 22, "name": "22. Cüz", "owner": "", "isRead": false},
+        {"id": 23, "name": "23. Cüz", "owner": "", "isRead": false},
+        {"id": 24, "name": "24. Cüz", "owner": "", "isRead": false},
+        {"id": 25, "name": "25. Cüz", "owner": "", "isRead": false},
+        {"id": 26, "name": "26. Cüz", "owner": "", "isRead": false},
+        {"id": 27, "name": "27. Cüz", "owner": "", "isRead": false},
+        {"id": 28, "name": "28. Cüz", "owner": "", "isRead": false},
+        {"id": 29, "name": "29. Cüz", "owner": "", "isRead": false},
+        {"id": 30, "name": "30. Cüz", "owner": "", "isRead": false}
+      ]
+    },
+    {
+      "id": "cevsen",
+      "name": "Cevşen-i Kebir",
+      "parts": [
+        {"id": 1, "name": "1. Bölüm (1-10. Bab)", "owner": "", "isRead": false},
+        {"id": 2, "name": "2. Bölüm (11-20. Bab)", "owner": "", "isRead": false},
+        {"id": 3, "name": "3. Bölüm (21-30. Bab)", "owner": "", "isRead": false},
+        {"id": 4, "name": "4. Bölüm (31-40. Bab)", "owner": "", "isRead": false},
+        {"id": 5, "name": "5. Bölüm (41-50. Bab)", "owner": "", "isRead": false},
+        {"id": 6, "name": "6. Bölüm (51-60. Bab)", "owner": "", "isRead": false},
+        {"id": 7, "name": "7. Bölüm (61-70. Bab)", "owner": "", "isRead": false},
+        {"id": 8, "name": "8. Bölüm (71-80. Bab)", "owner": "", "isRead": false},
+        {"id": 9, "name": "9. Bölüm (81-90. Bab)", "owner": "", "isRead": false},
+        {"id": 10, "name": "10. Bölüm (91-100. Bab)", "owner": "", "isRead": false}
+      ]
+    },
+    {
+      "id": "tevhidname",
+      "name": "Tevhidnâme",
+      "parts": [
+        {"id": 1, "name": "1. Kısım", "owner": "", "isRead": false},
+        {"id": 2, "name": "2. Kısım", "owner": "", "isRead": false},
+        {"id": 3, "name": "3. Kısım", "owner": "", "isRead": false},
+        {"id": 4, "name": "4. Kısım", "owner": "", "isRead": false},
+        {"id": 5, "name": "5. Kısım", "owner": "", "isRead": false}
+      ]
+    },
+    {
+      "id": "el_kulub",
+      "name": "El-Kulûbu’d Dâria",
+      "parts": [
+        {"id": 1, "name": "1. Bölüm", "owner": "", "isRead": false},
+        {"id": 2, "name": "2. Bölüm", "owner": "", "isRead": false},
+        {"id": 3, "name": "3. Bölüm", "owner": "", "isRead": false},
+        {"id": 4, "name": "4. Bölüm", "owner": "", "isRead": false},
+        {"id": 5, "name": "5. Bölüm", "owner": "", "isRead": false}
+      ]
+    }
+  ]
+}
