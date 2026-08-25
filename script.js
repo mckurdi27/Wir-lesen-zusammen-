@@ -1,11 +1,10 @@
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
     // Oryantal Motifler ve Tema (Açık & Koyu Mod) Stillerini Enjekte Etme
     function injectOrientalStyles() {
         if (document.getElementById("oriental-motif-styles")) return;
         const styleEl = document.createElement("style");
         styleEl.id = "oriental-motif-styles";
         styleEl.innerHTML = `
-            /* --- AÇIK MOD: Krem, Şampanya ve Altın Yaldız Motifleri --- */
             :root {
                 --bg-primary: #fdfbf7;
                 --card-bg: #ffffff;
@@ -21,7 +20,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 font-family: 'Georgia', serif;
             }
 
-            /* --- KOYU MOD: Gece Mavisi ve Parlayan Altın Vektör Konsepti --- */
             @media (prefers-color-scheme: dark) {
                 :root {
                     --bg-primary: #0b1329;
@@ -116,7 +114,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     let isAdmin = false;
     let appData = null;
     let loggedInMember = "";
-    let monthlyInspirationCache = {};
 
     const ADMIN_PASSWORD = "1234";
 
@@ -133,115 +130,35 @@ document.addEventListener("DOMContentLoaded", async () => {
         "dilekce_ar": "pdfs/Bir Kırık Dilekçe Ar.pdf"
     };
 
-    function bugunkuHicriTarihiAl() {
-        try {
-            const formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
-                day: 'numeric',
-                month: 'numeric',
-                year: 'numeric'
-            });
-            const parts = formatter.formatToParts(new Date());
-            let gun = "1", ay = "3";
-            for (const part of parts) {
-                if (part.type === 'day' && !isNaN(part.value)) gun = part.value;
-                if (part.type === 'month' && !isNaN(part.value)) ay = part.value;
-            }
-            let ayNum = parseInt(ay, 10);
-            if (isNaN(ayNum) || ayNum < 1 || ayNum > 12) ayNum = 3;
-            let gunNum = parseInt(gun, 10);
-            if (isNaN(gunNum) || gunNum < 1 || gunNum > 30) gunNum = 1;
-
-            return { ayKodu: String(ayNum).padStart(2, '0'), gunNumarasi: gunNum };
-        } catch (hata) {
-            return { ayKodu: "03", gunNumarasi: 12 };
-        }
-    }
-
-    function getFallbackInspiration(gunNo) {
+    // Dahili İlham ve Hikmet Veri Havuzu (Harici dosya hatasını tamamen önler)
+    function getDailyInspirationData() {
         const havuz = [
             { ayet: "Şüphesiz güçlükle beraber bir kolaylık vardır. (İnşirah, 5-6)", hadis: "İki nimet vardır ki, insanların çoğu bunların kıymetini bilmekte aldanmıştır.", german: { quote: "Übung macht den Meister.", translation: "Pratik ustayı yapar." } },
             { ayet: "Sabredenlere mükafatları hesapsız olarak ödenir. (Zümer, 10)", hadis: "Amellerin en hayırlısı az da olsa devamlı olanıdır.", german: { quote: "Wer rastet, der rostet.", translation: "Duran paslanır." } },
             { ayet: "Rabbiniz size rahmet etmeyi kendi üzerine yazdı. (En'âm, 54)", hadis: "İnsanlara teşekkür etmeyen Allah'a şükretmez.", german: { quote: "Aller Anfang ist schwer.", translation: "Her başlangıç zordur." } },
             { ayet: "Beni anın ki ben de sizi anayım. (Bakara, 152)", hadis: "Mümin, başka bir mümine karşı birbirini destekleyen binalar gibidir.", german: { quote: "Wissen ist Macht.", translation: "Bilgi güçtür." } },
-            { ayet: "Şüphesiz Allah muhsinlerle beraberdir. (Ankebût, 69)", hadis: "Kolaylaştırınız, zorlaştırmayınız; müjdeleyiniz, nefret ettirmeyiniz.", german: { quote: "Übung macht den Meister.", translation: "Pratik ustayı yapar." } }
+            { ayet: "Şüphesiz Allah muhsinlerle beraberdir. (Ankebût, 69)", hadis: "Kolaylaştırınız, zorlaştırmayınız; müjdeleyiniz, nefret ettirmeyiniz.", german: { quote: "Übung macht den Meister.", translation: "Pratik ustayı yapar." } },
+            { ayet: "Dualarınız olmasa ne ehemmiyetiniz var? (Furkan, 77)", hadis: "Kulların Allah'a en yakın olduğu an secde anıdır.", german: { quote: "Wer Wind sät, wird Sturm ernten.", translation: "Rüzgâr eken fırtına biçer." } },
+            { ayet: "Sabır ve namazla yardım dileyiniz. (Bakara, 45)", hadis: "Tebessüm etmek sadakadır.", german: { quote: "Morgenstunde hat Gold im Munde.", translation: "Erken kalkan yol alır." } }
         ];
-        let safeIndex = Math.max(0, (gunNo - 1)) % havuz.length;
-        return havuz[safeIndex];
-    }
 
-    async function fetchHijriMonthData(ayKodu) {
-        if (monthlyInspirationCache[ayKodu]) return monthlyInspirationCache[ayKodu];
-        const fileMap = {
-            "01": "json/01-muharrem.json", "02": "json/02-sefer.json", "03": "json/03-rebiulevvel.json",
-            "04": "json/04-rebiulahir.json", "05": "json/05-cemaziyelevvel.json", "06": "json/06-cemaziyelahir.json",
-            "07": "json/07-recep.json", "08": "json/08-saban.json", "09": "json/09-ramazan.json",
-            "10": "json/10-sevval.json", "11": "json/11-zilkade.json", "12": "json/12-zilhicce.json"
+        let dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+        let selected = havuz[dayOfYear % havuz.length];
+        
+        let miladiStr = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        let hicriStr = "1448 H.";
+        try {
+            const formatter = new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura', { day: 'numeric', month: 'numeric', year: 'numeric' });
+            hicriStr = formatter.format(new Date()) + " H.";
+        } catch (e) {}
+
+        return {
+            miladiDateStr: miladiStr,
+            fullDateStr: hicriStr,
+            verse: selected.ayet,
+            hadish: selected.hadis,
+            german: selected.german
         };
-        let filePath = fileMap[ayKodu] || "json/03-rebiulevvel.json";
-        try {
-            let response = await fetch(filePath);
-            if (!response.ok) throw new Error(`${filePath} yüklenemedi`);
-            let data = await response.json();
-            monthlyInspirationCache[ayKodu] = data;
-            return data;
-        } catch (e) {
-            return null;
-        }
-    }
-
-    async function getHijriInspiration() {
-        try {
-            const todayMiladiStr = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            const hicriInfo = bugunkuHicriTarihiAl();
-            let hDay = hicriInfo.gunNumarasi;
-            let hMonth = hicriInfo.ayKodu;
-            
-            let todayHijriStr = "1448 H.";
-            try {
-                const displayFormatter = new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura', { day: 'numeric', month: 'numeric', year: 'numeric' });
-                todayHijriStr = displayFormatter.format(new Date()) + " H.";
-            } catch (e) {}
-
-            let jsonData = await fetchHijriMonthData(hMonth);
-            let item = null;
-            if (jsonData) {
-                item = jsonData[String(hDay)] || jsonData[hDay] || jsonData[String(hDay).padStart(2, '0')];
-            }
-
-            let fallback = getFallbackInspiration(hDay);
-            let verseText = fallback.ayet;
-            let hadishText = fallback.hadis;
-            let germanQuote = fallback.german.quote;
-            let germanTrans = fallback.german.translation;
-
-            if (item) {
-                if (item.ayet) {
-                    let meal = typeof item.ayet === 'object' ? (item.ayet.meal || item.ayet.text || "") : String(item.ayet);
-                    let kaynak = typeof item.ayet === 'object' ? (item.ayet.kaynak || item.ayet.source || "") : "";
-                    verseText = kaynak ? `${meal} (${kaynak})` : meal;
-                }
-                let h = item.hadis || item.hadish;
-                if (h) {
-                    let meal = typeof h === 'object' ? (h.meal || h.text || "") : String(h);
-                    let kaynak = typeof h === 'object' ? (h.kaynak || h.source || "") : "";
-                    hadishText = kaynak ? `${meal} (${kaynak})` : meal;
-                }
-                if (item.german) {
-                    germanQuote = item.german.quote || germanQuote;
-                    germanTrans = item.german.translation || germanTrans;
-                }
-            }
-            return { fullDateStr: todayHijriStr, miladiDateStr: todayMiladiStr, verse: verseText, hadish: hadishText, german: { quote: germanQuote, translation: germanTrans } };
-        } catch (err) {
-            let fallback = getFallbackInspiration(1);
-            return {
-                fullDateStr: "1448 H.",
-                miladiDateStr: new Date().toLocaleDateString('tr-TR'),
-                verse: fallback.ayet,
-                hadish: fallback.hadis,
-                german: fallback.german
-            };
-        }
     }
 
     function renderMainTitleHeader() {
@@ -275,8 +192,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         `;
     }
 
-    async function renderDailyInspiration() {
-        const inspirationData = await getHijriInspiration();
+    function renderDailyInspiration() {
+        const inspirationData = getDailyInspirationData();
         let inspirationContainer = document.getElementById("daily-inspiration-section");
         if (!inspirationContainer) {
             inspirationContainer = document.createElement("div");
@@ -296,6 +213,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             border-left: 4px solid #27ae60;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            background: var(--card-bg);
         `;
 
         inspirationContainer.innerHTML = `
@@ -403,7 +321,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return keys;
     }
 
-    async function loadGroupData() {
+    function loadGroupData() {
         const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
         appData = savedData ? JSON.parse(savedData) : { members: ["Ahmet", "Mehmet", "Ayşe"] };
         if (!appData.members || !Array.isArray(appData.members)) appData.members = ["Ahmet", "Mehmet", "Ayşe"];
@@ -437,7 +355,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         saveGroupData();
         
         renderMainTitleHeader();
-        await renderDailyInspiration();
+        renderDailyInspiration();
         renderMainInterface();
         renderAnalysisSection();
         renderBooks();
@@ -496,21 +414,21 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </div>
             `;
 
-            document.getElementById("user-group-select").addEventListener("change", async (e) => {
+            document.getElementById("user-group-select").addEventListener("change", (e) => {
                 currentGroup = e.target.value;
-                await loadGroupData();
+                loadGroupData();
             });
 
-            document.getElementById("user-new-group-btn").addEventListener("click", async () => {
+            document.getElementById("user-new-group-btn").addEventListener("click", () => {
                 let newG = prompt("Yeni grup adını girin:");
                 if (newG && newG.trim()) {
                     currentGroup = newG.trim().toLowerCase().replace(/\s+/g, '_');
                     saveGroupData();
-                    await loadGroupData();
+                    loadGroupData();
                 }
             });
 
-            document.getElementById("user-add-name-btn").addEventListener("click", async () => {
+            document.getElementById("user-add-name-btn").addEventListener("click", () => {
                 let mName = prompt("Listeye eklenecek adınızı yazın:");
                 if (mName && mName.trim()) {
                     let clean = mName.trim();
@@ -585,23 +503,23 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </div>
             `;
 
-            document.getElementById("admin-group-select").addEventListener("change", async (e) => {
+            document.getElementById("admin-group-select").addEventListener("change", (e) => {
                 currentGroup = e.target.value;
-                await loadGroupData();
+                loadGroupData();
             });
 
             document.getElementById("admin-toggle-btn-custom").addEventListener("click", () => triggerAdminToggle());
 
-            document.getElementById("admin-add-group").addEventListener("click", async () => {
+            document.getElementById("admin-add-group").addEventListener("click", () => {
                 let newG = prompt("Yeni grup adı:");
                 if (newG && newG.trim()) {
                     currentGroup = newG.trim().toLowerCase().replace(/\s+/g, '_');
                     saveGroupData();
-                    await loadGroupData();
+                    loadGroupData();
                 }
             });
 
-            document.getElementById("admin-edit-group").addEventListener("click", async () => {
+            document.getElementById("admin-edit-group").addEventListener("click", () => {
                 let newName = prompt("Grubun yeni adı:", currentGroup.replace(/_/g, ' '));
                 if (newName && newName.trim()) {
                     let newKey = newName.trim().toLowerCase().replace(/\s+/g, '_');
@@ -609,45 +527,45 @@ document.addEventListener("DOMContentLoaded", async () => {
                         localStorage.setItem(`hatim_group_${newKey}`, JSON.stringify(appData));
                         localStorage.removeItem(`hatim_group_${currentGroup}`);
                         currentGroup = newKey;
-                        await loadGroupData();
+                        loadGroupData();
                     }
                 }
             });
 
-            document.getElementById("admin-delete-group").addEventListener("click", async () => {
+            document.getElementById("admin-delete-group").addEventListener("click", () => {
                 if (confirm(`"${currentGroup}" grubunu silmek istiyor musunuz?`)) {
                     localStorage.removeItem(`hatim_group_${currentGroup}`);
                     let keys = getAllGroupKeys();
                     currentGroup = keys[0];
-                    await loadGroupData();
+                    loadGroupData();
                 }
             });
 
-            document.getElementById("admin-add-member").addEventListener("click", async () => {
+            document.getElementById("admin-add-member").addEventListener("click", () => {
                 let mName = prompt("Eklenecek üye adı:");
                 if (mName && mName.trim()) {
                     let clean = mName.trim();
                     if (!appData.members.includes(clean)) {
                         appData.members.push(clean);
                         saveGroupData();
-                        await loadGroupData();
+                        loadGroupData();
                     } else alert("Bu isim zaten var.");
                 }
             });
 
             document.querySelectorAll(".admin-remove-member").forEach(btn => {
-                btn.addEventListener("click", async (e) => {
+                btn.addEventListener("click", (e) => {
                     let nameToRemove = e.target.getAttribute("data-name");
                     if (confirm(`"${nameToRemove}" adlı üyeyi çıkartmak istiyor musunuz?`)) {
                         appData.members = appData.members.filter(m => m !== nameToRemove);
                         saveGroupData();
-                        await loadGroupData();
+                        loadGroupData();
                     }
                 });
             });
 
             document.querySelectorAll(".admin-edit-member").forEach(btn => {
-                btn.addEventListener("click", async (e) => {
+                btn.addEventListener("click", (e) => {
                     let oldName = e.target.getAttribute("data-name");
                     let editedName = prompt("Yeni ad:", oldName);
                     if (editedName && editedName.trim() && editedName.trim() !== oldName) {
@@ -659,7 +577,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                                 appData.bookPages[bId].forEach(p => { if (p.owner === oldName) p.owner = cleanNew; });
                             });
                             saveGroupData();
-                            await loadGroupData();
+                            loadGroupData();
                         }
                     }
                 });
@@ -668,7 +586,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         checkBulkShareVisibility();
     }
 
-    async function triggerAdminToggle() {
+    function triggerAdminToggle() {
         if (isAdmin) {
             isAdmin = false;
             if (adminToggleBtn) {
@@ -693,7 +611,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
         renderMainInterface();
-        await renderDailyInspiration();
+        renderDailyInspiration();
         renderAnalysisSection();
         renderBooks();
     }
@@ -1097,5 +1015,5 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    await loadGroupData();
+    loadGroupData();
 });
