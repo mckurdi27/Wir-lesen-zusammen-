@@ -1,10 +1,11 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    // Oryantal Motifler ve Tema Stillerini Enjekte Etme
+    // Oryantal Motifler ve Tema (Açık & Koyu Mod) Stillerini Enjekte Etme
     function injectOrientalStyles() {
         if (document.getElementById("oriental-motif-styles")) return;
         const styleEl = document.createElement("style");
         styleEl.id = "oriental-motif-styles";
         styleEl.innerHTML = `
+            /* --- AÇIK MOD: Krem, Şampanya ve Altın Yaldız Motifleri --- */
             :root {
                 --bg-primary: #fdfbf7;
                 --card-bg: #ffffff;
@@ -13,11 +14,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 --text-main: #3e2723;
                 --border-color: #e3dcd2;
             }
+
             body {
                 background-color: var(--bg-primary);
                 color: var(--text-main);
                 font-family: 'Georgia', serif;
             }
+
+            /* --- KOYU MOD: Gece Mavisi ve Parlayan Altın Vektör Konsepti --- */
             @media (prefers-color-scheme: dark) {
                 :root {
                     --bg-primary: #0b1329;
@@ -31,7 +35,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                     background-color: #0b1329 !important;
                     color: #f1f5f9 !important;
                 }
-                .container { background-color: #0b1329 !important; }
+                .container {
+                    background-color: #0b1329 !important;
+                }
                 #main-title-ornate-section {
                     background: linear-gradient(135deg, #131b31 0%, #0b1329 100%) !important;
                     border-color: #d4af37 !important;
@@ -52,9 +58,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                     color: #f6e05e !important;
                     border-bottom: 1px solid #22304a !important;
                 }
-                .book-name { color: #f6e05e !important; }
-                .book-body { background: #131b31 !important; }
-                .sub-modes { background: #131b31 !important; border-bottom-color: #22304a !important; }
+                .book-name {
+                    color: #f6e05e !important;
+                }
+                .book-body {
+                    background: #131b31 !important;
+                }
+                .sub-modes {
+                    background: #131b31 !important;
+                    border-bottom-color: #22304a !important;
+                }
                 .sub-btn {
                     background: #0b1329 !important;
                     color: #cbd5e1 !important;
@@ -70,15 +83,25 @@ document.addEventListener("DOMContentLoaded", async () => {
                     border: 1px solid #22304a !important;
                     color: #e2e8f0 !important;
                 }
-                .part-row.taken { background: #28220b !important; border-color: #b78103 !important; }
-                .part-row.read { background: #064e3b !important; border-color: #059669 !important; }
+                .part-row.taken {
+                    background: #28220b !important;
+                    border-color: #b78103 !important;
+                }
+                .part-row.read {
+                    background: #064e3b !important;
+                    border-color: #059669 !important;
+                }
             }
+
+            /* Ortak Oryantal Çerçeve Dokunuşları */
             .book-card {
                 border: 2px solid var(--gold-primary) !important;
                 border-radius: 12px !important;
                 overflow: hidden;
             }
-            .book-header { border-bottom: 2px solid var(--gold-primary); }
+            .book-header {
+                border-bottom: 2px solid var(--gold-primary);
+            }
         `;
         document.head.appendChild(styleEl);
     }
@@ -87,6 +110,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const container = document.querySelector(".container");
     const booksGrid = document.getElementById("books-grid");
+    const adminToggleBtn = document.getElementById("admin-toggle-btn");
+    const bulkShareArea = document.getElementById("bulk-share-area");
+    const bulkWhatsappBtn = document.getElementById("bulk-whatsapp-btn");
 
     let currentGroup = "grup_1";
     let isAdmin = false;
@@ -144,7 +170,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             monthlyInspirationCache[ayKodu] = data;
             return data;
         } catch (e) {
-            console.error("Hicri veri okunamadı:", e);
             return null;
         }
     }
@@ -164,20 +189,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         let jsonData = await fetchHijriMonthData(hMonth);
         let item = null;
         if (jsonData) {
-            if (Array.isArray(jsonData)) {
-                item = jsonData[hDay - 1] || jsonData[hDay] || jsonData[String(hDay)];
-            } else {
-                item = jsonData[String(hDay)] || jsonData[hDay] || jsonData[String(hDay).padStart(2, '0')];
-                if (!item) {
-                    for (let key in jsonData) {
-                        if (parseInt(key, 10) === parseInt(hDay, 10)) { item = jsonData[key]; break; }
-                    }
+            item = jsonData[String(hDay)] || jsonData[hDay] || jsonData[String(hDay).padStart(2, '0')];
+            if (!item) {
+                for (let key in jsonData) {
+                    if (parseInt(key, 10) === parseInt(hDay, 10)) { item = jsonData[key]; break; }
                 }
             }
         }
 
-        let verseText = "Bugüne ait ayet bulunamadı.";
-        let hadishText = "Bugüne ait hadis bulunamadı.";
+        let verseText = "Şüphesiz güçlükle beraber bir kolaylık vardır. (İnşirah, 5-6)";
+        let hadishText = "İki nimet vardır ki, insanların çoğu bunların kıymetini bilmekte aldanmıştır.";
         let germanQuote = "Übung macht den Meister.";
         let germanTrans = "Pratik ustayı yapar.";
 
@@ -201,24 +222,31 @@ document.addEventListener("DOMContentLoaded", async () => {
         return { fullDateStr: todayHijriStr, miladiDateStr: todayMiladiStr, verse: verseText, hadish: hadishText, german: { quote: germanQuote, translation: germanTrans } };
     }
 
+    // Oryantal Çerçeveli Başlık Alanı
     function renderMainTitleHeader() {
         let titleSection = document.getElementById("main-title-ornate-section");
         if (!titleSection) {
             titleSection = document.createElement("div");
             titleSection.id = "main-title-ornate-section";
             titleSection.style.cssText = `
-                margin-bottom: 20px; padding: 22px;
+                margin-bottom: 20px;
+                padding: 22px;
                 background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%);
-                border: 2px solid #d4af37; border-top: 6px solid #8a6d3b;
-                border-radius: 12px; box-shadow: 0 4px 15px rgba(138, 109, 59, 0.2);
-                text-align: center; position: relative;
+                border: 2px solid #d4af37;
+                border-top: 6px solid #8a6d3b;
+                border-radius: 12px;
+                box-shadow: 0 4px 15px rgba(138, 109, 59, 0.2);
+                text-align: center;
+                position: relative;
             `;
             container.insertBefore(titleSection, container.firstChild);
         }
 
         titleSection.innerHTML = `
             <div style="font-size: 21px; font-weight: bold; font-family: 'Georgia', serif; margin-bottom: 6px; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
-                <span>⚜️ 📖</span><span>Ortak Hatim ve Duada Buluşuyoruz</span><span>📖 ⚜️</span>
+                <span>⚜️ 📖</span>
+                <span>Ortak Hatim ve Duada Buluşuyoruz</span>
+                <span>📖 ⚜️</span>
             </div>
             <div style="font-size: 13px; opacity: 0.85; font-style: italic;">
                 Grubunuzu seçin, isminizi belirleyin ve manevi iklimde ortak hatim halkamıza katılın.
@@ -237,8 +265,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         inspirationContainer.style.cssText = `
-            margin-bottom: 20px; padding: 16px; border: 1px solid #e3dcd2;
-            border-left: 4px solid #27ae60; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+            padding: 16px;
+            border: 1px solid #e3dcd2;
+            border-left: 4px solid #27ae60;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         `;
 
         inspirationContainer.innerHTML = `
@@ -359,18 +391,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!appData.bookHistory) appData.bookHistory = {};
 
         const todayStr = new Date().toLocaleDateString("tr-TR");
-        
         defaultBooksTemplate.forEach(defBook => {
-            if (!appData.bookPages[defBook.id]) {
-                appData.bookPages[defBook.id] = Array(defBook.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
-            } else {
-                appData.bookPages[defBook.id] = appData.bookPages[defBook.id].map(p => {
-                    if (typeof p === 'string') return { owner: p, isRead: false };
-                    else if (p && typeof p === 'object') return { owner: p.owner || "", isRead: !!p.isRead };
-                    return { owner: "", isRead: false };
-                });
-            }
-
+            if (!appData.bookPages[defBook.id]) appData.bookPages[defBook.id] = Array(defBook.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
             if (!appData.bookHatims[defBook.id]) appData.bookHatims[defBook.id] = { hatimNo: 1, startDate: todayStr, prayerDone: false };
             if (!appData.bookHistory[defBook.id]) appData.bookHistory[defBook.id] = [];
         });
@@ -412,11 +434,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         let allGroups = getAllGroupKeys();
         let groupsHtml = allGroups.map(g => `<option value="${g}" ${g === currentGroup ? "selected" : ""}>${g.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
-        let memberDatalistOptions = appData.members.map(m => `<option value="${m}">`).join('');
 
         if (!isAdmin) {
             controlsContainer.innerHTML = `
-                <div style="padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); box-shadow: 0 2px 6px rgba(0,0,0,0.04); margin-bottom: 20px;">
+                <div style="padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 6px rgba(0,0,0,0.04); margin-bottom: 20px;">
                     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
                         <label style="font-weight: bold; font-size: 14px;">👥 Grup Seçin:</label>
                         <select id="user-group-select" style="padding: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 14px; flex: 1; min-width: 150px;">
@@ -425,23 +446,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <button id="user-new-group-btn" style="padding: 8px 12px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold;">+ Yeni Grup</button>
                     </div>
                     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: space-between;">
-                        <div style="display: flex; gap: 10px; align-items: center; flex: 1; min-width: 250px;">
+                        <div style="display: flex; gap: 10px; align-items: center; flex: 1; min-width: 220px;">
                             <label style="font-weight: bold; font-size: 14px;">👤 İsminiz:</label>
-                            <input type="text" id="user-name-input" list="member-datalist" value="${loggedInMember}" placeholder="İsim seçin veya yazın..." style="padding: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 14px; flex: 1;" ${loggedInMember ? "disabled" : ""}>
-                            <datalist id="member-datalist">
-                                ${memberDatalistOptions}
-                            </datalist>
+                            <input type="text" id="user-name-input" value="${loggedInMember}" placeholder="Adınızı yazın..." style="padding: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 14px; flex: 1;" ${loggedInMember ? "disabled" : ""}>
                         </div>
                         <div style="display: flex; gap: 8px; align-items: center;">
                             ${loggedInMember ? 
                                 `<button id="unlock-name-btn" style="padding: 8px 15px; background: #e74c3c; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">Oturumu Kapat</button>` :
                                 `<button id="lock-name-btn" style="padding: 8px 15px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">🔑 Kilitle</button>`
                             }
-                            <button id="admin-toggle-btn-custom" style="padding: 8px 12px; background: #34495e; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">🔐 Yönetici Modu</button>
+                            <button id="admin-toggle-btn-custom" style="padding: 8px 12px; background: ${isAdmin ? '#c0392b' : '#34495e'}; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">${isAdmin ? '🔓 Yönetici: AÇIK' : '🔐 Yönetici Modu'}</button>
                         </div>
-                    </div>
-                    <div id="bulk-share-wrapper" style="margin-top: 12px; border-top: 1px dashed var(--border-color); padding-top: 10px; display: ${loggedInMember ? 'block' : 'none'};">
-                        <button id="bulk-whatsapp-btn" style="width: 100%; padding: 8px; background: #25D366; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px;">💬 Tüm Seçtiklerimi WhatsApp'ta Paylaş</button>
                     </div>
                 </div>
             `;
@@ -462,29 +477,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             document.getElementById("admin-toggle-btn-custom").addEventListener("click", () => triggerAdminToggle());
 
-            let bulkBtn = document.getElementById("bulk-whatsapp-btn");
-            if (bulkBtn) {
-                bulkBtn.addEventListener("click", () => {
-                    if (!loggedInMember) { alert("Lütfen önce oturum açın."); return; }
-                    let summary = [];
-                    appData.books.forEach(book => {
-                        let baseArray = appData.bookPages[book.id];
-                        let defModes = bookModesDefs[book.id];
-                        let primaryKey = book.type === "bab" ? "on_bab" : "yirmi_sayfa";
-                        if (!defModes[primaryKey]) primaryKey = Object.keys(defModes)[0];
-                        let taken = [];
-                        defModes[primaryKey].getItems().forEach(pi => {
-                            let st = getRangeStatus(baseArray, pi.start, pi.end);
-                            if (st.owner === loggedInMember) taken.push(pi.name);
-                        });
-                        if (taken.length > 0) summary.push(`• ${book.name}: *${taken.join(", ")}*`);
-                    });
-                    if (summary.length === 0) { alert("Üzerinizde hisse bulunmuyor."); return; }
-                    let msg = `*[${currentGroup.replace(/_/g, ' ').toUpperCase()}] ${loggedInMember} Hisseleri*\n\n` + summary.join("\n");
-                    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
-                });
-            }
-
             if (loggedInMember) {
                 document.getElementById("unlock-name-btn").addEventListener("click", () => {
                     if (confirm("Oturumu kapatmak istiyor musunuz?")) {
@@ -497,15 +489,16 @@ document.addEventListener("DOMContentLoaded", async () => {
             } else {
                 document.getElementById("lock-name-btn").addEventListener("click", () => {
                     let nameVal = document.getElementById("user-name-input").value.trim();
-                    if (!nameVal) { alert("Lütfen isminizi yazın veya seçin."); return; }
+                    if (!nameVal) { alert("Lütfen isminizi yazın."); return; }
                     loggedInMember = nameVal;
                     if (!appData.members.includes(loggedInMember)) {
                         appData.members.push(loggedInMember);
+                        saveGroupData();
                     }
-                    saveGroupData();
                     localStorage.setItem(`hatim_session_${currentGroup}`, loggedInMember);
                     renderMainInterface();
                     renderBooks();
+                    alert(`Oturum "${loggedInMember}" adına kilitlendi.`);
                 });
             }
         } else {
@@ -520,10 +513,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             `).join('');
 
             controlsContainer.innerHTML = `
-                <div style="background: rgba(212, 175, 55, 0.1); border: 2px solid var(--gold-primary); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                <div style="background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold-primary); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                         <h3 style="color: var(--gold-dark); font-size: 15px; margin: 0;">🛠️ Yönetici Kontrol Paneli</h3>
-                        <button id="admin-toggle-btn-custom" style="padding: 6px 12px; background: #c0392b; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">🔓 Yöneticiyi Kapat</button>
+                        <button id="admin-toggle-btn-custom" style="padding: 6px 12px; background: #c0392b; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">🔓 Kapat</button>
                     </div>
                     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
                         <label style="font-weight: bold; font-size: 13px;">Grup:</label>
@@ -624,15 +617,22 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
             });
         }
+        checkBulkShareVisibility();
     }
 
     async function triggerAdminToggle() {
         if (isAdmin) {
             isAdmin = false;
+            adminToggleBtn.textContent = "🔐 Yönetici Modu: Kapalı";
+            adminToggleBtn.classList.remove("active");
+            alert("Yönetici modu kapatıldı.");
         } else {
             const enteredPassword = prompt("Yönetici şifresi:");
             if (enteredPassword === ADMIN_PASSWORD) {
                 isAdmin = true;
+                adminToggleBtn.textContent = "🔓 Yönetici Modu: AÇIK";
+                adminToggleBtn.classList.add("active");
+                alert("Yönetici modu açıldı.");
             } else if (enteredPassword !== null) {
                 alert("Hatalı şifre!");
                 return;
@@ -646,12 +646,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         renderBooks();
     }
 
+    adminToggleBtn.addEventListener("click", () => triggerAdminToggle());
+
+    function checkBulkShareVisibility() {
+        bulkShareArea.style.display = loggedInMember ? "block" : "none";
+    }
+
     function renderAnalysisSection() {
         let analysisContainer = document.getElementById("analysis-section");
         if (!analysisContainer) {
             analysisContainer = document.createElement("div");
             analysisContainer.id = "analysis-section";
-            analysisContainer.style.cssText = "margin-bottom: 20px; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.05);";
+            analysisContainer.style.cssText = "margin-bottom: 20px; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05);";
             const controlsSec = document.querySelector(".controls");
             controlsSec.parentNode.insertBefore(analysisContainer, controlsSec.nextSibling);
         }
@@ -737,7 +743,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             cardEl.className = `book-card ${openBookIds.includes(book.id) ? "open" : ""}`;
             cardEl.setAttribute("data-book-id", book.id);
 
-            let modesHtml = `<div class="sub-modes" style="position: sticky; top: 0; z-index: 5; padding-bottom: 6px; border-bottom: 1px solid var(--border-color); background: var(--card-bg);">`;
+            let modesHtml = `<div class="sub-modes" style="position: sticky; top: 0; z-index: 5; padding-bottom: 6px; border-bottom: 1px solid var(--border-color);">`;
             modeKeys.forEach(mKey => {
                 const mObj = defModes[mKey];
                 const activeClass = mKey === book.currentMode ? "active" : "";
@@ -812,12 +818,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             cardEl.querySelector(".book-pdf-btn").addEventListener("click", (e) => {
                 e.stopPropagation();
-                const rawPdf = bookPdfMap[e.target.getAttribute("data-bookid")];
-                if (rawPdf) {
-                    window.open(encodeURI(rawPdf), "_blank");
-                } else {
-                    alert("Bu kitap için PDF bulunamadı.");
-                }
+                const pdfPath = bookPdfMap[e.target.getAttribute("data-bookid")];
+                if (pdfPath) window.open(pdfPath, "_blank");
+                else alert("Bu kitap için PDF bulunamadı.");
             });
 
             cardEl.querySelectorAll(".finish-hatim-btn").forEach(btn => {
@@ -865,7 +868,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 
                 if (st.statusType === "read") { statusClass = "read"; statusText = `✓ Okundu: ${st.owner}`; actionText = "Okundu"; }
                 else if (st.statusType === "taken") { statusClass = "taken"; statusText = `Alan: ${st.owner}`; actionText = isAdmin ? "Yönet" : "Bırak"; }
-                else if (st.statusType === "mixed") { statusClass = "taken"; statusText = `Kısmen: ${st.owner}`; actionText = isAdmin ? "Yönet" : "Dolu"; }
+                else if (st.statusType === "mixed") { statusClass = "taken"; statusText = `Kısmen Alınmış`; actionText = isAdmin ? "Yönet" : "Dolu"; }
 
                 row.className = `part-row ${statusClass}`;
                 row.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; margin-bottom: 4px; border-radius: 4px; font-size: 13px; cursor: pointer;";
@@ -889,9 +892,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const rowPdfBtn = row.querySelector(".row-pdf-btn");
                 if (rowPdfBtn) rowPdfBtn.addEventListener("click", (e) => {
                     e.stopPropagation();
-                    const rawPdf = bookPdfMap[e.target.getAttribute("data-bookid")];
-                    let page = e.target.getAttribute("data-page");
-                    window.open(encodeURI(`${rawPdf}#page=${page}`), "_blank");
+                    window.open(`${bookPdfMap[e.target.getAttribute("data-bookid")]}#page=${e.target.getAttribute("data-page")}`, "_blank");
                 });
 
                 const markReadBtn = row.querySelector(".mark-read-btn");
@@ -939,7 +940,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function handleItemClick(bookIndex, modeKey, itemIndex) {
-        if (!loggedInMember) { alert("Lütfen önce isminizi seçip veya yazıp kilitleyin!"); return; }
+        if (!loggedInMember) { alert("Lütfen önce isminizi yazıp oturumu kilitleyin!"); return; }
         const book = appData.books[bookIndex];
         let baseArray = appData.bookPages[book.id];
         let item = bookModesDefs[book.id][modeKey].getItems()[itemIndex];
@@ -965,6 +966,26 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    bulkWhatsappBtn.addEventListener("click", () => {
+        if (!loggedInMember) { alert("Lütfen önce oturum açın."); return; }
+        let summary = [];
+        appData.books.forEach(book => {
+            let baseArray = appData.bookPages[book.id];
+            let defModes = bookModesDefs[book.id];
+            let primaryKey = book.type === "bab" ? "on_bab" : "yirmi_sayfa";
+            if (!defModes[primaryKey]) primaryKey = Object.keys(defModes)[0];
+            let taken = [];
+            defModes[primaryKey].getItems().forEach(pi => {
+                let st = getRangeStatus(baseArray, pi.start, pi.end);
+                if (st.owner === loggedInMember) taken.push(pi.name);
+            });
+            if (taken.length > 0) summary.push(`• ${book.name}: *${taken.join(", ")}*`);
+        });
+        if (summary.length === 0) { alert("Üzerinizde hisse bulunmuyor."); return; }
+        let msg = `*[${currentGroup.replace(/_/g, ' ').toUpperCase()}] ${loggedInMember} Hisseleri*\n\n` + summary.join("\n");
+        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+    });
+
     function shareBookToWhatsApp(bookIndex) {
         const book = appData.books[bookIndex];
         let baseArray = appData.bookPages[book.id];
@@ -986,7 +1007,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!sec) {
             sec = document.createElement("div");
             sec.id = "admin-message-section";
-            sec.style.cssText = "margin-top: 30px; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.05);";
+            sec.style.cssText = "margin-top: 30px; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05);";
             sec.innerHTML = `
                 <h3 style="margin-bottom: 10px; font-size: 15px;">📢 Yöneticiye Mesaj Gönder</h3>
                 <textarea id="admin-msg-input" placeholder="Mesajınızı buraya yazın..." style="width: 100%; height: 60px; padding: 10px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 4px; margin-bottom: 10px;"></textarea>
