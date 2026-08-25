@@ -154,6 +154,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    // Dahili İlham Veritabanı (JSON dosyaları olmasa bile güne göre değişir)
+    function getFallbackInspiration(gunNo) {
+        const havuz = [
+            { ayet: "Şüphesiz güçlükle beraber bir kolaylık vardır. (İnşirah, 5-6)", hadis: "İki nimet vardır ki, insanların çoğu bunların kıymetini bilmekte aldanmıştır.", german: { quote: "Übung macht den Meister.", translation: "Pratik ustayı yapar." } },
+            { ayet: "Sabredenlere mükafatları hesapsız olarak ödenir. (Zümer, 10)", hadis: "Amellerin en hayırlısı az da olsa devamlı olanıdır.", german: { quote: "Wer rastet, der rostet.", translation: "Duran paslanır." } },
+            { ayet: "Rabbiniz size rahmet etmeyi kendi üzerine yazdı. (En'âm, 54)", hadis: "İnsanlara teşekkür etmeyen Allah'a şükretmez.", german: { quote: "Aller Anfang ist schwer.", translation: "Her başlangıç zordur." } },
+            { ayet: "Beni anın ki ben de sizi anayım. (Bakara, 152)", hadis: "Mümin, başka bir mümine karşı birbirini destekleyen binalar gibidir.", german: { quote: "Wissen ist Macht.", translation: "Bilgi güçtür." } },
+            { ayet: "Şüphesiz Allah muhsinlerle beraberdir. (Ankebût, 69)", hadis: "Kolaylaştırınız, zorlaştırmayınız; müjdeleyiniz, nefret ettirmeyiniz.", german: { quote: "Übung macht den Meister.", translation: "Pratik ustayı yapar." } }
+        ];
+        return havuz[(gunNo - 1) % havuz.length];
+    }
+
     async function fetchHijriMonthData(ayKodu) {
         if (monthlyInspirationCache[ayKodu]) return monthlyInspirationCache[ayKodu];
         const fileMap = {
@@ -180,27 +192,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         let hDay = hicriInfo.gunNumarasi;
         let hMonth = hicriInfo.ayKodu;
         
-        let todayHijriStr = `${hDay}.${hMonth}.1448`;
+        let todayHijriStr = "1448 H.";
         try {
-            const displayFormatter = new Intl.DateTimeFormat('tr-TR-u-ca-islamic-umalqura', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            todayHijriStr = displayFormatter.format(new Date());
+            // 'en' kullanarak 'MÖ' hatasını (AH -> BC çevirisini) engelliyoruz
+            const displayFormatter = new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura', { day: 'numeric', month: 'numeric', year: 'numeric' });
+            todayHijriStr = displayFormatter.format(new Date()) + " H.";
         } catch (e) {}
 
         let jsonData = await fetchHijriMonthData(hMonth);
         let item = null;
         if (jsonData) {
             item = jsonData[String(hDay)] || jsonData[hDay] || jsonData[String(hDay).padStart(2, '0')];
-            if (!item) {
-                for (let key in jsonData) {
-                    if (parseInt(key, 10) === parseInt(hDay, 10)) { item = jsonData[key]; break; }
-                }
-            }
         }
 
-        let verseText = "Şüphesiz güçlükle beraber bir kolaylık vardır. (İnşirah, 5-6)";
-        let hadishText = "İki nimet vardır ki, insanların çoğu bunların kıymetini bilmekte aldanmıştır.";
-        let germanQuote = "Übung macht den Meister.";
-        let germanTrans = "Pratik ustayı yapar.";
+        let fallback = getFallbackInspiration(hDay);
+        let verseText = fallback.ayet;
+        let hadishText = fallback.hadis;
+        let germanQuote = fallback.german.quote;
+        let germanTrans = fallback.german.translation;
 
         if (item) {
             if (item.ayet) {
