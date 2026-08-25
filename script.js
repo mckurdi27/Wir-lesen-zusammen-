@@ -93,7 +93,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             }
 
-            /* Ortak Oryantal Çerçeve Dokunuşları */
             .book-card {
                 border: 2px solid var(--gold-primary) !important;
                 border-radius: 12px !important;
@@ -109,7 +108,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     injectOrientalStyles();
 
     const container = document.querySelector(".container") || document.body;
-    const booksGrid = document.getElementById("books-grid");
     const adminToggleBtn = document.getElementById("admin-toggle-btn");
     const bulkShareArea = document.getElementById("bulk-share-area");
     const bulkWhatsappBtn = document.getElementById("bulk-whatsapp-btn");
@@ -154,7 +152,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    // Dahili İlham Veritabanı (JSON dosyaları olmasa bile güne göre değişir)
     function getFallbackInspiration(gunNo) {
         const havuz = [
             { ayet: "Şüphesiz güçlükle beraber bir kolaylık vardır. (İnşirah, 5-6)", hadis: "İki nimet vardır ki, insanların çoğu bunların kıymetini bilmekte aldanmıştır.", german: { quote: "Übung macht den Meister.", translation: "Pratik ustayı yapar." } },
@@ -230,7 +227,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         return { fullDateStr: todayHijriStr, miladiDateStr: todayMiladiStr, verse: verseText, hadish: hadishText, german: { quote: germanQuote, translation: germanTrans } };
     }
 
-    // Oryantal Çerçeveli Başlık Alanı
     function renderMainTitleHeader() {
         let titleSection = document.getElementById("main-title-ornate-section");
         if (!titleSection) {
@@ -393,7 +389,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function loadGroupData() {
         const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
         appData = savedData ? JSON.parse(savedData) : { members: ["Ahmet", "Mehmet", "Ayşe"] };
-        if (!appData.members) appData.members = [];
+        if (!appData.members || !Array.isArray(appData.members)) appData.members = ["Ahmet", "Mehmet", "Ayşe"];
 
         const savedSession = localStorage.getItem(`hatim_session_${currentGroup}`);
         loggedInMember = (savedSession && appData.members.includes(savedSession)) ? savedSession : "";
@@ -452,19 +448,26 @@ document.addEventListener("DOMContentLoaded", async () => {
         let groupsHtml = allGroups.map(g => `<option value="${g}" ${g === currentGroup ? "selected" : ""}>${g.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
 
         if (!isAdmin) {
+            // İsimleri listeleme ve seçme için dropdown (açılır liste)
+            let memberOptions = `<option value="">-- İsminizi Seçin --</option>` + 
+                appData.members.map(m => `<option value="${m}" ${m === loggedInMember ? "selected" : ""}>${m}</option>`).join('');
+
             controlsContainer.innerHTML = `
-                <div style="padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 6px rgba(0,0,0,0.04); margin-bottom: 20px;">
+                <div style="padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); box-shadow: 0 2px 6px rgba(0,0,0,0.04); margin-bottom: 20px;">
                     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
-                        <label style="font-weight: bold; font-size: 14px;">👥 Grup Seçin:</label>
+                        <label style="font-weight: bold; font-size: 14px; min-width: 90px;">👥 Grup Seçin:</label>
                         <select id="user-group-select" style="padding: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 14px; flex: 1; min-width: 150px;">
                             ${groupsHtml}
                         </select>
                         <button id="user-new-group-btn" style="padding: 8px 12px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold;">+ Yeni Grup</button>
                     </div>
                     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: space-between;">
-                        <div style="display: flex; gap: 10px; align-items: center; flex: 1; min-width: 220px;">
-                            <label style="font-weight: bold; font-size: 14px;">👤 İsminiz:</label>
-                            <input type="text" id="user-name-input" value="${loggedInMember}" placeholder="Adınızı yazın..." style="padding: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 14px; flex: 1;" ${loggedInMember ? "disabled" : ""}>
+                        <div style="display: flex; gap: 10px; align-items: center; flex: 1; min-width: 250px;">
+                            <label style="font-weight: bold; font-size: 14px; min-width: 90px;">👤 İsminiz:</label>
+                            <select id="user-name-select" style="padding: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 14px; flex: 1;" ${loggedInMember ? "disabled" : ""}>
+                                ${memberOptions}
+                            </select>
+                            <button id="user-add-name-btn" title="Listeye Yeni İsim Ekle" style="padding: 8px 10px; background: #2980b9; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold;">+ Ekle</button>
                         </div>
                         <div style="display: flex; gap: 8px; align-items: center;">
                             ${loggedInMember ? 
@@ -491,6 +494,23 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             });
 
+            document.getElementById("user-add-name-btn").addEventListener("click", async () => {
+                let mName = prompt("Listeye eklenecek adınızı yazın:");
+                if (mName && mName.trim()) {
+                    let clean = mName.trim();
+                    if (!appData.members.includes(clean)) {
+                        appData.members.push(clean);
+                        saveGroupData();
+                        loggedInMember = clean;
+                        localStorage.setItem(`hatim_session_${currentGroup}`, loggedInMember);
+                        renderMainInterface();
+                        renderBooks();
+                    } else {
+                        alert("Bu isim zaten listede var.");
+                    }
+                }
+            });
+
             document.getElementById("admin-toggle-btn-custom").addEventListener("click", () => triggerAdminToggle());
 
             if (loggedInMember) {
@@ -504,17 +524,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
             } else {
                 document.getElementById("lock-name-btn").addEventListener("click", () => {
-                    let nameVal = document.getElementById("user-name-input").value.trim();
-                    if (!nameVal) { alert("Lütfen isminizi yazın."); return; }
+                    let selectEl = document.getElementById("user-name-select");
+                    let nameVal = selectEl.value;
+                    if (!nameVal) { alert("Lütfen açılır listeden isminizi seçin veya '+ Ekle' butonu ile isminizi ekleyin."); return; }
                     loggedInMember = nameVal;
-                    if (!appData.members.includes(loggedInMember)) {
-                        appData.members.push(loggedInMember);
-                        saveGroupData();
-                    }
                     localStorage.setItem(`hatim_session_${currentGroup}`, loggedInMember);
                     renderMainInterface();
                     renderBooks();
-                    alert(`Oturum "${loggedInMember}" adına kilitlendi.`);
                 });
             }
         } else {
@@ -681,7 +697,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!analysisContainer) {
             analysisContainer = document.createElement("div");
             analysisContainer.id = "analysis-section";
-            analysisContainer.style.cssText = "margin-bottom: 20px; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05);";
+            analysisContainer.style.cssText = "margin-bottom: 20px; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.05);";
             const controlsSec = document.querySelector(".controls");
             if (controlsSec && controlsSec.nextSibling) {
                 controlsSec.parentNode.insertBefore(analysisContainer, controlsSec.nextSibling);
@@ -743,7 +759,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function renderBooks() {
-        if (!booksGrid) return;
+        let booksGrid = document.getElementById("books-grid");
+        if (!booksGrid) {
+            booksGrid = document.createElement("div");
+            booksGrid.id = "books-grid";
+            const analysisSec = document.getElementById("analysis-section");
+            if (analysisSec && analysisSec.nextSibling) {
+                container.insertBefore(booksGrid, analysisSec.nextSibling);
+            } else {
+                container.appendChild(booksGrid);
+            }
+        }
+
         const openBookIds = Array.from(document.querySelectorAll(".book-card.open")).map(el => el.getAttribute("data-book-id"));
         booksGrid.innerHTML = "";
 
@@ -771,12 +798,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             const cardEl = document.createElement("div");
             cardEl.className = `book-card ${openBookIds.includes(book.id) ? "open" : ""}`;
             cardEl.setAttribute("data-book-id", book.id);
+            cardEl.style.cssText = "margin-bottom: 15px; border-radius: 12px; overflow: hidden; background: var(--card-bg); border: 2px solid var(--gold-primary);";
 
-            let modesHtml = `<div class="sub-modes" style="position: sticky; top: 0; z-index: 5; padding-bottom: 6px; border-bottom: 1px solid var(--border-color);">`;
+            let modesHtml = `<div class="sub-modes" style="position: sticky; top: 0; z-index: 5; padding-bottom: 6px; border-bottom: 1px solid var(--border-color); display: flex; gap: 4px; flex-wrap: wrap;">`;
             modeKeys.forEach(mKey => {
                 const mObj = defModes[mKey];
                 const activeClass = mKey === book.currentMode ? "active" : "";
-                modesHtml += `<button class="sub-btn ${activeClass}" data-book="${bookIndex}" data-mode="${mKey}">${mObj.name}</button>`;
+                modesHtml += `<button class="sub-btn ${activeClass}" data-book="${bookIndex}" data-mode="${mKey}" style="padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 4px; border: 1px solid var(--border-color); background: ${mKey === book.currentMode ? 'var(--gold-primary)' : 'var(--card-bg)'}; color: ${mKey === book.currentMode ? '#0b1329' : 'var(--text-main)'}; font-weight: bold;">${mObj.name}</button>`;
             });
             modesHtml += `</div>`;
 
@@ -813,7 +841,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             `;
 
             cardEl.innerHTML = `
-                <div class="book-header" style="padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                <div class="book-header" style="padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: linear-gradient(to right, #f4ebd0, #fdfbf7);">
                     <div class="book-title-area">
                         <span class="book-name" style="font-weight: bold; font-size: 15px;">${book.name} <span style="color: #27ae60; font-size: 12px;">(${currentHatimInfo.hatimNo}. Hatim)</span></span>
                         <span class="book-stats" style="font-size: 12px; opacity: 0.8; display: block; margin-top: 2px;">Alınan: ${takenCount} / ${totalCount}</span>
@@ -900,7 +928,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 else if (st.statusType === "mixed") { statusClass = "taken"; statusText = `Kısmen Alınmış`; actionText = isAdmin ? "Yönet" : "Dolu"; }
 
                 row.className = `part-row ${statusClass}`;
-                row.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; margin-bottom: 4px; border-radius: 4px; font-size: 13px; cursor: pointer;";
+                row.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; margin-bottom: 4px; border-radius: 4px; font-size: 13px; cursor: pointer; border: 1px solid var(--border-color);";
                 let targetPage = item.start + 1;
                 let hasPdf = bookPdfMap[book.id] ? true : false;
 
@@ -921,7 +949,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const rowPdfBtn = row.querySelector(".row-pdf-btn");
                 if (rowPdfBtn) rowPdfBtn.addEventListener("click", (e) => {
                     e.stopPropagation();
-                    window.open(`${bookPdfMap[e.target.getAttribute("data-bookid")]}#page=${e.target.getAttribute("data-page")}`, "_blank");
+                    window.open(`${bookPdfMap[e.target.getAttribute("data-bookid"]}#page=${e.target.getAttribute("data-page")}`, "_blank");
                 });
 
                 const markReadBtn = row.querySelector(".mark-read-btn");
@@ -969,7 +997,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function handleItemClick(bookIndex, modeKey, itemIndex) {
-        if (!loggedInMember) { alert("Lütfen önce isminizi yazıp oturumu kilitleyin!"); return; }
+        if (!loggedInMember) { alert("Lütfen önce isminizi seçip oturumu kilitleyin!"); return; }
         const book = appData.books[bookIndex];
         let baseArray = appData.bookPages[book.id];
         let item = bookModesDefs[book.id][modeKey].getItems()[itemIndex];
@@ -1038,10 +1066,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!sec) {
             sec = document.createElement("div");
             sec.id = "admin-message-section";
-            sec.style.cssText = "margin-top: 30px; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05);";
+            sec.style.cssText = "margin-top: 30px; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.05);";
             sec.innerHTML = `
                 <h3 style="margin-bottom: 10px; font-size: 15px;">📢 Yöneticiye Mesaj Gönder</h3>
-                <textarea id="admin-msg-input" placeholder="Mesajınızı buraya yazın..." style="width: 100%; height: 60px; padding: 10px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 4px; margin-bottom: 10px;"></textarea>
+                <textarea id="admin-msg-input" placeholder="Mesajınızı buraya yazın..." style="width: 100%; height: 60px; padding: 10px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 4px; margin-bottom: 10px;"></duplicate>
                 <button id="send-admin-msg-btn" style="background: #25D366; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">💬 WhatsApp ile Gönder</button>
             `;
             container.appendChild(sec);
