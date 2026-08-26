@@ -400,6 +400,7 @@
                     });
                 }
 
+                // Ensure bookPages match totalUnits
                 appData.books.forEach(b => {
                     if (!appData.bookPages[b.id]) {
                         appData.bookPages[b.id] = Array(b.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
@@ -1215,6 +1216,7 @@
                                 <button id="admin-set-password" style="background: #8e44ad; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">🔑 Şifre Belirle / Kaldır</button>
                             </div>
                             
+                            <!-- ESER VE SAYFA DÜZENLEME BÖLÜMÜ -->
                             <div style="border-top: 1px solid var(--border-color); padding-top: 10px; margin-bottom: 12px;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                     <span style="font-weight: bold; font-size: 13px;">📚 Eserler ve Sayfa/Birim Yönetimi:</span>
@@ -1258,6 +1260,7 @@
                         });
                     }
 
+                    // Eser Ekleme Butonu
                     const addBookBtn = document.getElementById("admin-add-book-btn");
                     if (addBookBtn) {
                         addBookBtn.addEventListener("click", () => {
@@ -1291,6 +1294,7 @@
                         });
                     }
 
+                    // Eser Düzenleme Butonları
                     document.querySelectorAll(".admin-edit-book").forEach(btn => {
                         btn.addEventListener("click", (e) => {
                             let bId = e.target.getAttribute("data-id");
@@ -1306,6 +1310,7 @@
                             if (newName.trim()) bookObj.name = newName.trim();
                             if (!isNaN(newUnits) && newUnits > 0) {
                                 bookObj.totalUnits = newUnits;
+                                // Adjust bookPages array length
                                 if (!appData.bookPages[bId]) {
                                     appData.bookPages[bId] = Array(newUnits).fill(null).map(() => ({ owner: "", isRead: false }));
                                 } else if (appData.bookPages[bId].length < newUnits) {
@@ -1322,6 +1327,7 @@
                         });
                     });
 
+                    // Eser Silme Butonları
                     document.querySelectorAll(".admin-remove-book").forEach(btn => {
                         btn.addEventListener("click", (e) => {
                             let bId = e.target.getAttribute("data-id");
@@ -1736,54 +1742,81 @@
                             renderBooks();
                         });
 
-                        row.addEventListener("click", () => {
-                            if (!loggedInMember) {
-                                alert("Lütfen önce yukarıdan isminizi seçin.");
-                                return;
-                            }
-                            if (st.statusType === "free") {
-                                for (let i = item.start; i < item.end; i++) {
-                                    baseArray[i].owner = loggedInMember;
-                                    baseArray[i].isRead = false;
-                                }
-                                saveGroupData();
-                                renderAnalysisSection();
-                                renderBooks();
-                            } else if (st.statusType === "taken" && (st.owner === loggedInMember || isAdmin)) {
-                                for (let i = item.start; i < item.end; i++) {
-                                    baseArray[i].owner = "";
-                                    baseArray[i].isRead = false;
-                                }
-                                saveGroupData();
-                                renderAnalysisSection();
-                                renderBooks();
-                            } else if (st.statusType === "mixed" && isAdmin) {
-                                for (let i = item.start; i < item.end; i++) {
-                                    baseArray[i].owner = "";
-                                    baseArray[i].isRead = false;
-                                }
-                                saveGroupData();
-                                renderAnalysisSection();
-                                renderBooks();
-                            } else {
-                                alert(`Bu hisse "${st.owner}" üzerindedir. İşlem yapma yetkiniz yok.`);
-                            }
-                        });
-
+                        row.addEventListener("click", () => handleItemClick(bookIndex, book.currentMode, itemIndex));
                         listContainer.appendChild(row);
                     });
                 });
 
-                cardEl.querySelectorAll(".sub-btn").forEach(btn => {
+                document.querySelectorAll(".sub-btn").forEach(btn => {
                     btn.addEventListener("click", (e) => {
-                        let bIdx = parseInt(e.target.getAttribute("data-book"), 10);
-                        let mKey = e.target.getAttribute("data-mode");
-                        appData.books[bIdx].currentMode = mKey;
+                        e.stopPropagation();
+                        appData.books[e.target.getAttribute("data-book")].currentMode = e.target.getAttribute("data-mode");
                         saveGroupData();
                         renderBooks();
                     });
                 });
-            });
+
+                document.querySelectorAll(".book-whatsapp-btn").forEach(btn => {
+                    btn.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        shareBookToWhatsApp(e.target.getAttribute("data-whatsapp"));
+                    });
+                });
+            }
+
+            function handleItemClick(bookIndex, modeKey, itemIndex) {
+                if (!loggedInMember) {
+                    alert("Lütfen önce isminizi seçin!");
+                    return;
+                }
+                const book = appData.books[bookIndex];
+                let baseArray = appData.bookPages[book.id];
+                let item = bookModesDefs[book.id][modeKey].getItems()[itemIndex];
+                let st = getRangeStatus(baseArray, item.start, item.end);
+
+                if (st.statusType === "free") {
+                    for (let i = item.start; i < item.end; i++) baseArray[i] = { owner: loggedInMember, isRead: false };
+                    saveGroupData();
+                    renderAnalysisSection();
+                    renderBooks();
+                } else {
+                    if (isAdmin) {
+                        if (confirm(`[Yönetici] Bu hisseyi boşa çıkarmak istiyor musunuz?`)) {
+                            for (let i = item.start; i < item.end; i++) baseArray[i] = { owner: "", isRead: false };
+                            saveGroupData();
+                            renderAnalysisSection();
+                            renderBooks();
+                        }
+                    } else {
+                        if (st.owner === loggedInMember) {
+                            if (confirm(`Bu hisseyi bırakmak ister misiniz?`)) {
+                                for (let i = item.start; i < item.end; i++) baseArray[i] = { owner: "", isRead: false };
+                                saveGroupData();
+                                renderAnalysisSection();
+                                renderBooks();
+                            }
+                        } else alert(`Bu kısım başka bir üyeye (${st.owner}) ait.`);
+                    }
+                }
+            }
+
+            function shareBookToWhatsApp(bookIndex) {
+                const book = appData.books[bookIndex];
+                let baseArray = appData.bookPages[book.id];
+                let defModes = bookModesDefs[book.id];
+                let primaryKey = book.type === "bab" ? "on_bab" : "yirmi_sayfa";
+                if (!defModes[primaryKey]) primaryKey = Object.keys(defModes)[0];
+                let active = [];
+                defModes[primaryKey].getItems().forEach(pi => {
+                    let st = getRangeStatus(baseArray, pi.start, pi.end);
+                    if (st.owner) active.push(`• *${st.owner}*, *${pi.name}*'nü ${st.isRead ? "Okundu ✓" : "Aldı"}.`);
+                });
+                let msg = `*[${currentGroup.replace(/_/g, ' ').toUpperCase()}] ${book.name} (${appData.bookHatims[book.id].hatimNo}. Hatim)*\n\n`;
+                msg += active.length === 0 ? "Henüz pay alan kimse yok." : active.join("\n");
+                window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+            }
+
+            await loadGroupData();
         });
     </script>
 </body>
