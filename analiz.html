@@ -134,23 +134,47 @@
         }
 
         function verileriDinamikYukle() {
-            let hamVeri = null;
-            let bulunanAnahtar = "";
+            let gruplar = [];
+            let uyelerListesi = [];
+            let gunlukler = [];
 
-            // localStorage içerisindeki tüm anahtarları tarayarak anlamlı hatim verisini bulalım
+            // localStorage içerisindeki tüm anahtarları akıllıca tarayarak en kapsamlı verileri toplayalım
             for (let i = 0; i < localStorage.length; i++) {
                 let anahtar = localStorage.key(i);
                 try {
-                    let parseEdilmis = JSON.parse(localStorage.getItem(anahtar));
-                    if (parseEdilmis) {
-                        // Eğer veri bir dizi veya içinde grup/üyeler barındıran bir nesne ise yakala
-                        if (Array.isArray(parseEdilmis) || parseEdilmis.gruplar || parseEdilmis.groups || typeof parseEdilmis === 'object') {
-                            hamVeri = parseEdilmis;
-                            bulunanAnahtar = anahtar;
-                            break;
+                    let hamVeri = JSON.parse(localStorage.getItem(anahtar));
+                    if (!hamVeri) continue;
+
+                    if (Array.isArray(hamVeri)) {
+                        if (anahtar.toLowerCase().includes('uye') || anahtar.toLowerCase().includes('member')) {
+                            uyelerListesi = hamVeri;
+                        } else if (anahtar.toLowerCase().includes('log') || anahtar.toLowerCase().includes('gunluk')) {
+                            gunlukler = hamVeri;
+                        } else {
+                            if (hamVeri.length >= gruplar.length) gruplar = hamVeri;
                         }
+                    } else if (typeof hamVeri === 'object') {
+                        if (hamVeri.gruplar && Array.isArray(hamVeri.gruplar)) gruplar = hamVeri.gruplar;
+                        if (hamVeri.groups && Array.isArray(hamVeri.groups)) gruplar = hamVeri.groups;
+                        if (hamVeri.uyeler && Array.isArray(hamVeri.uyeler)) uyelerListesi = hamVeri.uyeler;
+                        if (hamVeri.members && Array.isArray(hamVeri.members)) uyelerListesi = hamVeri.members;
+                        if (hamVeri.logs && Array.isArray(hamVeri.logs)) gunlukler = hamVeri.logs;
+                        if (hamVeri.gunluk && Array.isArray(hamVeri.gunluk)) gunlukler = hamVeri.gunluk;
                     }
                 } catch (e) {}
+            }
+
+            // Eğer dizi bulunamadıysa nesne anahtarlarını grup olarak ele alalım
+            if (gruplar.length === 0) {
+                for (let i = 0; i < localStorage.length; i++) {
+                    let hamVeri = JSON.parse(localStorage.getItem(localStorage.key(i)));
+                    if (hamVeri && typeof hamVeri === 'object' && !Array.isArray(hamVeri)) {
+                        let olasiGruplar = Object.keys(hamVeri).map(k => ({ ad: k, ...hamVeri[k] }));
+                        if (olasiGruplar.length > gruplar.length) {
+                            gruplar = olasiGruplar;
+                        }
+                    }
+                }
             }
 
             const genelOzetAlan = document.getElementById('genel-ozet-alan');
@@ -159,28 +183,16 @@
             const gruplarArasiGovde = document.getElementById('gruplar-arasi-govde');
             const gunlukGovde = document.getElementById('gunluk-tablo-govde');
 
-            if (!hamVeri) {
+            if (gruplar.length === 0 && uyelerListesi.length === 0) {
                 genelOzetAlan.innerHTML = "⚠️ Ana sayfaya ait kayıtlı veri bulunamadı. Lütfen önce ana sayfada grup ve üye işlemleri yapın.";
                 bireyselGovde.innerHTML = `<tr><td colspan="4" class="text-center text-gray-500">Veri bulunamadı.</td></tr>`;
                 grupDetayAlan.innerHTML = `<div class="p-2 text-gray-500">Görüntülenecek grup verisi yok.</div>`;
                 gruplarArasiGovde.innerHTML = `<tr><td colspan="3" class="text-center text-gray-500">Veri bulunamadı.</td></tr>`;
+                gunlukGovde.innerHTML = `<tr><td colspan="3" class="text-center text-gray-500">Kayıt bulunamadı.</td></tr>`;
                 return;
             }
 
-            // Verileri standart bir dizi formatına dönüştürelim
-            let gruplarDizisi = [];
-            if (Array.isArray(hamVeri)) {
-                gruplarDizisi = hamVeri;
-            } else if (hamVeri.gruplar && Array.isArray(hamVeri.gruplar)) {
-                gruplarDizisi = hamVeri.gruplar;
-            } else if (hamVeri.groups && Array.isArray(hamVeri.groups)) {
-                gruplarDizisi = hamVeri.groups;
-            } else {
-                // Eğer nesne tabanlıysa anahtarları grup gibi ele alalım
-                gruplarDizisi = Object.keys(hamVeri).map(key => ({ ad: key, ...hamVeri[key] }));
-            }
-
-            let toplamGrupSayisi = gruplarDizisi.length;
+            let toplamGrupSayisi = gruplar.length;
             let toplamUyeSayisi = 0;
             let toplamAlinanHisse = 0;
             let toplamOkunanHisse = 0;
@@ -189,22 +201,26 @@
             let grupDetayHTML = '';
             let arasiHTML = '';
 
-            gruplarDizisi.forEach((grup, gIndex) => {
-                let grupAdi = grup.ad || grup.grup Adi || grup.name || `Grup ${gIndex + 1}`;
+            gruplar.forEach((grup, gIndex) => {
+                let grupAdi = grup.ad || grup.grupAdi || grup.name || grup.title || `Grup ${gIndex + 1}`;
                 let uyeler = grup.uyeler || grup.members || grup.kisiler || [];
-                
+
+                if (uyeler.length === 0 && uyelerListesi.length > 0) {
+                    uyeler = uyelerListesi.filter(u => (u.grup || u.groupName || u.grupAdi) === grupAdi);
+                }
+
                 toplamUyeSayisi += uyeler.length;
                 let grupAlinan = 0;
                 let grupOkunan = 0;
 
                 if (uyeler.length > 0) {
                     uyeler.forEach(uye => {
-                        let uyeAdi = uye.ad || uye.name || "İsimsiz Üye";
-                        let alinan = uye.alinanHisse || uye.hisse || uye.shares || 0;
-                        let okunan = uye.okunanHisse || uye.okunan || 0;
+                        let uyeAdi = uye.ad || uye.name || uye.kisi || "İsimsiz Üye";
+                        let alinan = Number(uye.alinanHisse || uye.hisse || uye.shares || uye.alinan || 0);
+                        let okunan = Number(uye.okunanHisse || uye.okunan || uye.read || 0);
 
-                        grupAlinan += Number(alinan);
-                        grupOkunan += Number(okunan);
+                        grupAlinan += alinan;
+                        grupOkunan += okunan;
 
                         bireyselHTML += `
                             <tr>
@@ -216,20 +232,31 @@
                         `;
                     });
                 } else {
-                    bireyselHTML += `<tr><td colspan="4" class="text-center text-gray-400">${grupAdi} grubunda kayıtlı üye bulunmuyor.</td></tr>`;
+                    let alinan = Number(grup.alinanHisse || grup.hisse || 0);
+                    let okunan = Number(grup.okunanHisse || grup.okunan || 0);
+                    if (alinan > 0 || okunan > 0) {
+                        grupAlinan += alinan;
+                        grupOkunan += okunan;
+                        bireyselHTML += `
+                            <tr>
+                                <td>${grupAdi}</td>
+                                <td><strong>Genel / Grup Toplamı</strong></td>
+                                <td>${alinan}</td>
+                                <td class="text-green-700 font-semibold">${okunan}</td>
+                            </tr>
+                        `;
+                    }
                 }
 
                 toplamAlinanHisse += grupAlinan;
                 toplamOkunanHisse += grupOkunan;
 
-                // Grup Detayları
                 grupDetayHTML += `
                     <div class="p-3 bg-amber-50/30 border border-amber-200 rounded">
                         <strong>${grupAdi}</strong> - Üye Sayısı: ${uyeler.length} | Alınan: ${grupAlinan} | Okunan: ${grupOkunan}
                     </div>
                 `;
 
-                // Gruplar Arası
                 arasiHTML += `
                     <tr>
                         <td><strong>${grupAdi}</strong></td>
@@ -239,15 +266,34 @@
                 `;
             });
 
+            // Okuma günlüğü doldurma
+            let gunlukHTML = '';
+            if (gunlukler.length > 0) {
+                gunlukler.forEach(log => {
+                    let tarih = log.tarih || log.date || log.zaman || "-";
+                    let kim = log.uye || log.kisi || log.name || log.grupUye || "-";
+                    let eser = log.eser || log.detay || log.bookName || log.aciklama || "-";
+                    gunlukHTML += `
+                        <tr>
+                            <td>${tarih}</td>
+                            <td>${kim}</td>
+                            <td>${eser}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                gunlukHTML = `<tr><td colspan="3" class="text-center text-gray-500">Henüz okuma günlüğü kaydı bulunmuyor.</td></tr>`;
+            }
+
             if (!bireyselHTML) bireyselHTML = `<tr><td colspan="4" class="text-center text-gray-500">Üye kaydı bulunamadı.</td></tr>`;
             if (!grupDetayHTML) grupDetayHTML = `<div class="p-2 text-gray-500">Grup detayı bulunamadı.</div>`;
             if (!arasiHTML) arasiHTML = `<tr><td colspan="3" class="text-center text-gray-500">Grup bulunamadı.</td></tr>`;
 
-            // HTML Alanlarını Güncelle
             genelOzetAlan.innerHTML = `Sistemde aktif olarak toplam <strong>${toplamGrupSayisi}</strong> grup, <strong>${toplamUyeSayisi}</strong> üye bulunmaktadır. Toplam Alınan Hisse: <strong>${toplamAlinanHisse}</strong>, Okunan Toplam Hisse: <strong class="text-green-700">${toplamOkunanHisse}</strong>.`;
             bireyselGovde.innerHTML = bireyselHTML;
             grupDetayAlan.innerHTML = grupDetayHTML;
             gruplarArasiGovde.innerHTML = arasiHTML;
+            gunlukGovde.innerHTML = gunlukHTML;
         }
 
         window.onload = verileriDinamikYukle;
