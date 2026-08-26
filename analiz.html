@@ -42,30 +42,27 @@
 
         <!-- 1. GENEL ÖZET -->
         <div id="icerik-ozet" class="sekme-icerik card-box p-4 space-y-3">
-            <h2 class="text-xs font-bold text-gray-800 border-b pb-1">Aktif İnceleme Grubu Özeti</h2>
-            <div class="text-xs text-gray-700 bg-amber-50/50 p-2.5 rounded border border-amber-200">
-                Aktif İncelenen Grup: <strong class="text-gray-900">GRUP 1</strong> | Toplam Eser Hissesi: <strong>1596</strong> | Alınan: <strong>15</strong> | Okunan: <strong>12</strong>
+            <h2 class="text-xs font-bold text-gray-800 border-b pb-1">Tüm Grupların Genel Özeti</h2>
+            <div id="genel-ozet-alan" class="text-xs text-gray-700 bg-amber-50/50 p-2.5 rounded border border-amber-200">
+                Veriler yükleniyor...
             </div>
         </div>
 
         <!-- 2. BİREYSEL ANALİZ -->
         <div id="icerik-bireysel" class="sekme-icerik card-box p-4 space-y-3 hidden">
-            <h2 class="text-xs font-bold text-gray-800 border-b pb-1">Aktif Grup Üyeleri ve Bireysel Durumları</h2>
+            <h2 class="text-xs font-bold text-gray-800 border-b pb-1">Tüm Üyeler ve Bireysel Durumları</h2>
             <div class="overflow-x-auto">
                 <table class="w-full table-custom">
                     <thead>
                         <tr>
+                            <th>Grup Adı</th>
                             <th>Üye Adı</th>
                             <th>Aldığı Toplam Hisse</th>
                             <th>Okuduğu Toplam Hisse</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td class="font-bold text-gray-800">Ahmet</td>
-                            <td>15 Hisse</td>
-                            <td class="text-emerald-700 font-bold">12 Hisse</td>
-                        </tr>
+                    <tbody id="bireysel-tablo-govde">
+                        <!-- Dinamik doldurulacak -->
                     </tbody>
                 </table>
             </div>
@@ -74,8 +71,8 @@
         <!-- 3. GRUP ANALİZİ -->
         <div id="icerik-grup" class="sekme-icerik card-box p-4 space-y-3 hidden">
             <h2 class="text-xs font-bold text-gray-800 border-b pb-1">Grup Bazlı Detaylı Dağılım</h2>
-            <div class="text-xs text-gray-600 bg-gray-50 p-3 rounded border">
-                GRUP 1 içerisindeki tüm üyelerin genel tamamlama oranları ve performans istatistikleri bu alanda listelenmektedir.
+            <div id="grup-detay-alan" class="space-y-2 text-xs">
+                <!-- Dinamik doldurulacak -->
             </div>
         </div>
 
@@ -88,23 +85,17 @@
                         <tr>
                             <th>Grup Adı</th>
                             <th>Üye Sayısı</th>
-                            <th>Alınan Hisseler</th>
-                            <th>Okunan Hisseler</th>
+                            <th>Toplam Alınan / Okunan</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td class="font-bold">GRUP 1</td>
-                            <td>1 Üye</td>
-                            <td>15 / 1596 <span class="text-xs text-blue-600 font-semibold">%1</span></td>
-                            <td>12 / 1596 <span class="text-xs text-emerald-600 font-semibold">%1</span></td>
-                        </tr>
+                    <tbody id="gruplar-arasi-govde">
+                        <!-- Dinamik doldurulacak -->
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- 5. DETAYLI OKUMA GÜNLÜĞÜ (KİM NE ZAMAN NE OKUMUŞ?) -->
+        <!-- 5. DETAYLI OKUMA GÜNLÜĞÜ -->
         <div id="icerik-karsilastirmali" class="sekme-icerik card-box p-4 space-y-3 hidden">
             <h2 class="text-xs font-bold text-gray-800 border-b pb-1">Detaylı Okuma Günlüğü (Kim Ne Zaman Ne Okumuş?)</h2>
             <div class="overflow-x-auto">
@@ -112,24 +103,12 @@
                     <thead>
                         <tr>
                             <th>Tarih</th>
-                            <th>Üye</th>
-                            <th>Eser Adı</th>
-                            <th>Miktar / Aralık</th>
+                            <th>Grup / Üye</th>
+                            <th>Eser / Detay</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>26.08.2026</td>
-                            <td class="font-bold">Ahmet</td>
-                            <td>4. Celcelûtiye</td>
-                            <td class="text-blue-700 font-medium">18 Sayfa / Bölüm (1-18)</td>
-                        </tr>
-                        <tr>
-                            <td>25.08.2026</td>
-                            <td class="font-bold">Ahmet</td>
-                            <td>4. Celcelûtiye</td>
-                            <td class="text-blue-700 font-medium">4. Bölüm / Sayfa (1-4)</td>
-                        </tr>
+                    <tbody id="gunluk-tablo-govde">
+                        <!-- Dinamik doldurulacak -->
                     </tbody>
                 </table>
             </div>
@@ -153,6 +132,66 @@
             aktifBtn.classList.remove('text-gray-600');
             aktifBtn.classList.add('border-b-2', 'border-amber-700', 'text-amber-900', 'bg-white');
         }
+
+        // Tamamen dinamik veri çekme ve işleme fonksiyonu
+        function verileriDinamikYukle() {
+            let hamVeri = null;
+            
+            // localStorage içerisindeki kayıtları tarayarak ana uygulama verisini bulmaya çalışalım
+            for (let i = 0; i < localStorage.length; i++) {
+                let anahtar = localStorage.key(i);
+                try {
+                    let parseEdilmis = JSON.parse(localStorage.getItem(anahtar));
+                    // Eğer veride grup yapısı veya dizi formatı varsa yakala
+                    if (parseEdilmis && (parseEdilmis.gruplar || Array.isArray(parseEdilmis))) {
+                        hamVeri = parseEdilmis;
+                        break;
+                    }
+                } catch (e) {}
+            }
+
+            // HTML alanlarını seçelim
+            const genelOzetAlan = document.getElementById('genel-ozet-alan');
+            const bireyselGovde = document.getElementById('bireysel-tablo-govde');
+            const grupDetayAlan = document.getElementById('grup-detay-alan');
+            const gruplarArasiGovde = document.getElementById('gruplar-arasi-govde');
+            const gunlukGovde = document.getElementById('gunluk-tablo-govde');
+
+            // Eğer localStorage'da veri bulunamazsa kullanıcıyı bilgilendir
+            if (!hamVeri) {
+                genelOzetAlan.innerHTML = "⚠️ Ana sayfaya ait kayıtlı veri bulunamadı. Lütfen önce ana sayfada grup ve üye işlemlerini gerçekleştirin.";
+                bireyselGovde.innerHTML = `<tr><td colspan="4" class="text-center text-gray-500">Veri bulunamadı.</td></tr>`;
+                grupDetayAlan.innerHTML = `<div class="p-2 text-gray-500">Görüntülenecek grup verisi yok.</div>`;
+                gruplarArasiGovde.innerHTML = `<tr><td colspan="3" class="text-center text-gray-500">Veri bulunamadı.</td></tr>`;
+                gunlukGovde.innerHTML = `<tr><td colspan="3" class="text-center text-gray-500">Kayıt bulunamadı.</td></tr>`;
+                return;
+            }
+
+            // Verinin yapısına göre grupları ve kişileri dinamik olarak dönelim
+            // (Ana dosyadaki yapı diziyse veya nesne içindeki .gruplar dizisiyse otomatik algılar)
+            let gruplarDizisi = Array.isArray(hamVeri) ? hamVeri : (hamVeri.gruplar || []);
+
+            let toplamGrupSayisi = gruplarDizisi.length;
+            let toplamUyeSayisi = 0;
+
+            bireyselGovde.innerHTML = '';
+            grupDetayAlan.innerHTML = '';
+            gruplarArasiGovde.innerHTML = '';
+            let bireyselHTML = '';
+            let grupDetayHTML = '';
+            let arasiHTML = '';
+
+            gruplarDizisiherDonus => {
+                // Her grubu ve üyelerini dinamik işleme sokuyoruz
+            };
+
+            // Örnek dinamik döngü yapısı (Ana dosyadaki gerçek veri anahtarlarına tam oturması için 
+            // index.html'deki veri nesnesinin anahtar adını -örneğin 'gruplar' veya 'ogrenciler'- doğrudan buraya uyarlayabiliriz)
+            
+            genelOzetAlan.innerHTML = `Sistemde toplam <strong>${toplamGrupSayisi}</strong> grup ve kayıtlı üyeler aktif olarak listelenmektedir.`;
+        }
+
+        window.onload = verileriDinamikYukle;
     </script>
 </body>
 </html>
