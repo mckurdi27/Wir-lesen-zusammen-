@@ -1,4 +1,4 @@
-{
+window.sevval_veri = {
     "ay_kodu": "10",
     "ay_adi": "Şevval",
     "aciklama": "Hicri takvimin onuncu ayıdır. Şevval ayı ve altı günlük orucu ile faziletlidir.",
@@ -154,4 +154,4 @@
             "hadis": { "meal": "Müminin silahı dua, dinin direği namazdır.", "kaynak": "Hakim, Müstedrek, 1/492" }
         }
     }
-}
+};
