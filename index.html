@@ -310,7 +310,7 @@
 
             function getAllGroupKeys() {
                 let keys = [];
-                let unlockedProtected = JSON.parse(sessionStorage.getItem("unlocked_protected_groups") || "[]");
+                let unlockedProtected = JSON.parse(localStorage.getItem("unlocked_protected_groups") || "[]");
                 for (let i = 0; i < localStorage.length; i++) {
                     let key = localStorage.key(i);
                     if (key && key.startsWith("hatim_group_")) {
@@ -339,12 +339,12 @@
                 appData = savedData ? JSON.parse(savedData) : { members: currentGroup === "grup_1" ? ["Ahmet", "Mehmet", "Ayşe"] : [], password: "" };
 
                 if (appData.password && !isAdmin) {
-                    let unlockedProtected = JSON.parse(sessionStorage.getItem("unlocked_protected_groups") || "[]");
+                    let unlockedProtected = JSON.parse(localStorage.getItem("unlocked_protected_groups") || "[]");
                     if (!unlockedProtected.includes(currentGroup)) {
                         let enteredPwd = prompt(`"${currentGroup.replace(/_/g, ' ').toUpperCase()}" grubu şifrelidir. Lütfen şifreyi girin:`);
                         if (enteredPwd === appData.password) {
                             unlockedProtected.push(currentGroup);
-                            sessionStorage.setItem("unlocked_protected_groups", JSON.stringify(unlockedProtected));
+                            localStorage.setItem("unlocked_protected_groups", JSON.stringify(unlockedProtected));
                         } else {
                             alert("Hatalı veya boş şifre! Şifreyi bilmediğiniz için bu gruba erişilemiyor.");
                             let allGroups = getAllGroupKeys();
@@ -483,10 +483,10 @@
                         try {
                             let parsed = JSON.parse(targetDataRaw);
                             if (parsed.password && parsed.password === pInput) {
-                                let unlocked = JSON.parse(sessionStorage.getItem("unlocked_protected_groups") || "[]");
+                                let unlocked = JSON.parse(localStorage.getItem("unlocked_protected_groups") || "[]");
                                 if (!unlocked.includes(gInput)) {
                                     unlocked.push(gInput);
-                                    sessionStorage.setItem("unlocked_protected_groups", JSON.stringify(unlocked));
+                                    localStorage.setItem("unlocked_protected_groups", JSON.stringify(unlocked));
                                 }
                                 currentGroup = gInput;
                                 alert("Şifre doğru! Gruba başarıyla giriş yapıldı.");
@@ -645,7 +645,6 @@
 
                 let allGroupKeys = getAllGroupKeys();
 
-                // Toplam sistem verileri (Tab 1 için)
                 let totalSystemBooks = 0, totalSystemTaken = 0, totalSystemRead = 0;
                 allGroupKeys.forEach(gKey => {
                     let gDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
@@ -701,7 +700,6 @@
                         </div>
 
                         <div style="padding: 20px; overflow-y: auto; flex: 1; font-size: 13px;">
-                            <!-- TAB 1 -->
                             <div id="mtab-1" class="m-tab-content">
                                 <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📈 Sistem Genel Özeti</h3>
                                 <p>Bu panel üzerinden tüm grupların ve üyelerin ilerleme durumunu detaylıca takip edebilirsiniz.</p>
@@ -721,7 +719,6 @@
                                 </div>
                             </div>
 
-                            <!-- TAB 2 -->
                             <div id="mtab-2" class="m-tab-content" style="display: none;">
                                 <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">⚔️ Tüm Grupları Karşılaştırma</h3>
                                 <div style="background: rgba(0,0,0,0.02); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 12px;">
@@ -749,7 +746,6 @@
                                 </div>
                             </div>
 
-                            <!-- TAB 3 -->
                             <div id="mtab-3" class="m-tab-content" style="display: none;">
                                 <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">👥 Üye Performansları</h3>
                                 <div style="background: rgba(0,0,0,0.02); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -789,7 +785,6 @@
                                 </div>
                             </div>
 
-                            <!-- TAB 4 -->
                             <div id="mtab-4" class="m-tab-content" style="display: none;">
                                 <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📜 Detaylı Okuma Günlüğü</h3>
                                 <div style="background: rgba(0,0,0,0.02); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -830,7 +825,6 @@
                                 </div>
                             </div>
 
-                            <!-- TAB 5 -->
                             <div id="mtab-5" class="m-tab-content" style="display: none;">
                                 <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📚 Eserler ve Hatim Döngü Durumu (${currentGroup.replace(/_/g, ' ').toUpperCase()})</h3>
                                 <div style="overflow-x: auto;">
@@ -865,7 +859,6 @@
 
                 document.body.appendChild(modalOverlay);
 
-                // --- TAB 2 LOGIC (Grup Karşılaştırma Filtreleme) ---
                 function renderTab2() {
                     let containerEl = modalOverlay.querySelector("#t2-group-checkboxes");
                     let tbodyEl = modalOverlay.querySelector("#t2-table-body");
@@ -924,7 +917,6 @@
                     updateTable();
                 }
 
-                // --- TAB 3 LOGIC (Üye Performansları Filtreleme) ---
                 function renderTab3() {
                     let gContainer = modalOverlay.querySelector("#t3-group-checkboxes");
                     let mContainer = modalOverlay.querySelector("#t3-member-checkboxes");
@@ -1018,7 +1010,6 @@
                     updateMembersList();
                 }
 
-                // --- TAB 4 LOGIC (Okuma Günlüğü Filtreleme) ---
                 function renderTab4() {
                     let gContainer = modalOverlay.querySelector("#t4-group-checkboxes");
                     let mContainer = modalOverlay.querySelector("#t4-member-checkboxes");
