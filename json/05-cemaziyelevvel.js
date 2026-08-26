@@ -1,4 +1,4 @@
-window.cemaziyelahir_veri = {
+window.cemaziyelevvel_veri = {
     "ay_kodu": "05",
     "ay_adi": "Cemaziyelevvel",
     "aciklama": "Hicri takvimin beşinci ayıdır.",
