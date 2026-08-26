@@ -393,7 +393,6 @@
                 const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
                 appData = savedData ? JSON.parse(savedData) : { members: currentGroup === "grup_1" ? ["Ahmet", "Mehmet", "Ayşe"] : [], password: "" };
                 
-                // Şifre Kontrolü: Her grup seçiminde şifre zorunlu kılınır. Doğru girilmezse güvenli gruba düşer.
                 if (appData.password) {
                     let enteredPwd = prompt(`"${currentGroup.replace(/_/g, ' ').toUpperCase()}" grubu şifrelidir. Lütfen şifreyi girin:`);
                     if (enteredPwd !== appData.password) {
@@ -413,6 +412,7 @@
 
                 if (!appData.members) appData.members = [];
                 if (appData.password === undefined) appData.password = "";
+                if (!appData.readingLogs) appData.readingLogs = [];
 
                 const savedSession = localStorage.getItem(`hatim_session_${currentGroup}`);
                 loggedInMember = (savedSession && appData.members.includes(savedSession)) ? savedSession : "";
@@ -536,7 +536,8 @@
                             books: freshBooks,
                             bookPages: freshPages,
                             bookHatims: freshHatims,
-                            bookHistory: freshHistory
+                            bookHistory: freshHistory,
+                            readingLogs: []
                         };
                         saveGroupData();
                         await loadGroupData();
@@ -648,6 +649,161 @@
                 `;
             }
 
+            function openDetailedAnalysisWindow() {
+                let win = window.open('', '_blank');
+                if (!win) {
+                    alert("Tarayıcınız yeni sekme açılmasına izin vermedi. Lütfen pop-up engelleyicinizi kontrol edin.");
+                    return;
+                }
+
+                // Tüm grupların verilerini topla
+                let allGroupKeys = getAllGroupKeys();
+                let groupsComparisonHtml = '';
+                
+                allGroupKeys.forEach(gKey => {
+                    let gDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
+                    if (!gDataRaw) return;
+                    let gData = JSON.parse(gDataRaw);
+                    let mCount = gData.members ? gData.members.length : 0;
+                    let totalU = 0, takenU = 0, readU = 0;
+                    
+                    if (gData.books && gData.bookPages) {
+                        gData.books.forEach(b => {
+                            totalU += b.totalUnits;
+                            if (gData.bookPages[b.id]) {
+                                gData.bookPages[b.id].forEach(p => {
+                                    if (p.owner) takenU++;
+                                    if (p.isRead) readU++;
+                                });
+                            }
+                        });
+                    }
+                    let tPct = totalU > 0 ? Math.round((takenU / totalU) * 100) : 0;
+                    let rPct = totalU > 0 ? Math.round((readU / totalU) * 100) : 0;
+
+                    groupsComparisonHtml += `
+                        <tr>
+                            <td style="padding: 10px; border-bottom: 1px solid #ddd; font-weight: bold;">${gKey.replace(/_/g, ' ').toUpperCase()}</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: center;">${mCount} Üye</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: center;">${takenU} / ${totalU} (%${tPct})</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: center;">${readU} / ${totalU} (%${rPct})</td>
+                        </tr>
+                    `;
+                });
+
+                // Mevcut grup üyeleri ve okuma logları
+                let membersListHtml = '';
+                if (appData.members && appData.members.length > 0) {
+                    appData.members.forEach(m => {
+                        let mTaken = 0, mRead = 0;
+                        Object.keys(appData.bookPages).forEach(bId => {
+                            appData.bookPages[bId].forEach(p => {
+                                if (p.owner === m) mTaken++;
+                                if (p.owner === m && p.isRead) mRead++;
+                            });
+                        });
+                        membersListHtml += `
+                            <tr>
+                                <td style="padding: 8px; border-bottom: 1px solid #eee;">${m}</td>
+                                <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${mTaken}</td>
+                                <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${mRead}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    membersListHtml = `<tr><td colspan="3" style="padding: 10px; text-align: center; color: #777;">Bu grupta kayıtlı üye bulunmuyor.</td></tr>`;
+                }
+
+                // Okuma logları (Kim ne zaman ne okumuş?)
+                let logsHtml = '';
+                if (appData.readingLogs && appData.readingLogs.length > 0) {
+                    // Tersten sırala (en yeni en üstte)
+                    let sortedLogs = [...appData.readingLogs].reverse();
+                    sortedLogs.forEach(log => {
+                        logsHtml += `
+                            <tr>
+                                <td style="padding: 8px; border-bottom: 1px solid #eee;">${log.date}</td>
+                                <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">${log.member}</td>
+                                <td style="padding: 8px; border-bottom: 1px solid #eee;">${log.bookName}</td>
+                                <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${log.count} Sayfa / Bölüm (${log.range})</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    logsHtml = `<tr><td colspan="4" style="padding: 10px; text-align: center; color: #777;">Henüz okundu olarak işaretlenen bir kayıt bulunmuyor.</td></tr>`;
+                }
+
+                win.document.write(`
+                    <!DOCTYPE html>
+                    <html lang="tr">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Yönetici Detaylı Analiz ve Rapor Paneli</title>
+                        <style>
+                            body { font-family: 'Georgia', serif; background: #fdfbf7; color: #3e2723; padding: 20px; max-width: 1000px; margin: 0 auto; }
+                            h1 { color: #8a6d3b; border-bottom: 2px solid #d4af37; padding-bottom: 10px; font-size: 22px; }
+                            h2 { font-size: 16px; margin-top: 30px; color: #2c3e50; border-left: 4px solid #d4af37; padding-left: 8px; }
+                            table { width: 100%; border-collapse: collapse; background: #fff; margin-top: 10px; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+                            th { background: #f4ebd0; color: #3e2723; padding: 10px; text-align: left; font-size: 13px; }
+                            td { font-size: 13px; }
+                            .badge { background: #27ae60; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px; }
+                            .print-btn { background: #2980b9; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; float: right; }
+                        </style>
+                    </head>
+                    <body>
+                        <button class="print-btn" onclick="window.print()">🖨️ Sayfayı Yazdır / PDF Kaydet</button>
+                        <h1>📊 Yönetici Detaylı Analiz ve Rapor Paneli</h1>
+                        <p style="font-size: 13px; opacity: 0.8;">Aktif İncelenen Grup: <strong>${currentGroup.replace(/_/g, ' ').toUpperCase()}</strong></p>
+
+                        <h2>⚔️ Tüm Grupları Karşılaştırma Paneli</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Grup Adı</th>
+                                    <th style="text-align: center;">Üye Sayısı</th>
+                                    <th style="text-align: center;">Alınan Hisseler</th>
+                                    <th style="text-align: center;">Okunan Hisseler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${groupsComparisonHtml}
+                            </tbody>
+                        </table>
+
+                        <h2>👥 Aktif Grup Üyeleri ve Bireysel Durumları (${currentGroup.replace(/_/g, ' ').toUpperCase()})</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Üye Adı</th>
+                                    <th style="text-align: center;">Aldığı Toplam Hisse</th>
+                                    <th style="text-align: center;">Okuduğu Toplam Hisse</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${membersListHtml}
+                            </tbody>
+                        </table>
+
+                        <h2>📜 Detaylı Okuma Günlüğü (Kim Ne Zaman Ne Okumuş?)</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tarih</th>
+                                    <th>Üye</th>
+                                    <th>Eser Adı</th>
+                                    <th style="text-align: center;">Miktar / Aralık</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${logsHtml}
+                            </tbody>
+                        </table>
+                    </body>
+                    </html>
+                `);
+                win.document.close();
+            }
+
             function renderAdminSectionAtBottom() {
                 let bottomContainer = document.getElementById("admin-bottom-section");
                 if (!bottomContainer) {
@@ -679,6 +835,9 @@
                     adminPanelHtml = `
                         <div id="admin-panel-section" style="background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold-primary); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
                             <h3 style="color: var(--gold-dark); font-size: 15px; margin-bottom: 10px;">🛠️ Yönetici Kontrol Paneli</h3>
+                            <div style="margin-bottom: 12px;">
+                                <button id="admin-open-analysis-page" style="width: 100%; padding: 10px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">📊 Detaylı Analiz ve Grup Karşılaştırma Sayfası</button>
+                            </div>
                             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
                                 <label style="font-weight: bold; font-size: 13px;">Grup:</label>
                                 <select id="admin-group-select" style="padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); flex: 1;">${groupsHtml}</select>
@@ -716,6 +875,13 @@
                 document.getElementById("admin-toggle-btn-custom").addEventListener("click", () => triggerAdminToggle());
 
                 if (isAdmin) {
+                    const analysisBtn = document.getElementById("admin-open-analysis-page");
+                    if (analysisBtn) {
+                        analysisBtn.addEventListener("click", () => {
+                            openDetailedAnalysisWindow();
+                        });
+                    }
+
                     document.getElementById("admin-group-select").addEventListener("change", async (e) => {
                         currentGroup = e.target.value;
                         await loadGroupData();
@@ -744,7 +910,8 @@
                                 books: freshBooks,
                                 bookPages: freshPages,
                                 bookHatims: freshHatims,
-                                bookHistory: freshHistory
+                                bookHistory: freshHistory,
+                                readingLogs: []
                             };
                             saveGroupData();
                             await loadGroupData();
@@ -826,6 +993,9 @@
                                     Object.keys(appData.bookPages).forEach(bId => {
                                         appData.bookPages[bId].forEach(p => { if (p.owner === oldName) p.owner = cleanNew; });
                                     });
+                                    if (appData.readingLogs) {
+                                        appData.readingLogs.forEach(l => { if (l.member === oldName) l.member = cleanNew; });
+                                    }
                                     saveGroupData();
                                     await loadGroupData();
                                 }
@@ -1060,8 +1230,24 @@
                         if (markReadBtn) markReadBtn.addEventListener("click", (e) => {
                             e.stopPropagation();
                             let start = parseInt(e.target.getAttribute("data-start")), end = parseInt(e.target.getAttribute("data-end"));
-                            let bArr = appData.bookPages[e.target.getAttribute("data-bookid")];
+                            let bId = e.target.getAttribute("data-bookid");
+                            let bArr = appData.bookPages[bId];
+                            let bObj = appData.books.find(b => b.id === bId);
+                            let unitCount = end - start;
+                            let todayStr = new Date().toLocaleDateString("tr-TR");
+
                             for (let i = start; i < end; i++) bArr[i].isRead = true;
+
+                            if (!appData.readingLogs) appData.readingLogs = [];
+                            appData.readingLogs.push({
+                                member: loggedInMember,
+                                bookName: bObj ? bObj.name : bId,
+                                count: unitCount,
+                                range: `${start + 1}-${end}`,
+                                date: todayStr,
+                                timestamp: Date.now()
+                            });
+
                             saveGroupData();
                             renderAnalysisSection();
                             renderBooks();
