@@ -43,28 +43,46 @@
         <!-- 1. GENEL ÖZET -->
         <div id="icerik-ozet" class="sekme-icerik card-box p-4 space-y-3">
             <h2 class="text-xs font-bold text-gray-800 border-b pb-1">Tüm Grupların Genel Özeti</h2>
-            <div id="genel-ozet-alan" class="text-xs text-gray-700 bg-amber-50/50 p-2.5 rounded border border-amber-200">
+            <div id="genel-ust-bilgi" class="text-xs text-gray-700 bg-amber-50/50 p-2.5 rounded border border-amber-200">
                 Veriler yükleniyor...
             </div>
-        </div>
-
-        <!-- 2. BİREYSEL ANALİZ -->
-        <div id="icerik-bireysel" class="sekme-icerik card-box p-4 space-y-3 hidden">
-            <h2 class="text-xs font-bold text-gray-800 border-b pb-1">Tüm Üyeler ve Bireysel Durumları</h2>
             <div class="overflow-x-auto">
                 <table class="w-full table-custom">
                     <thead>
                         <tr>
                             <th>Grup Adı</th>
-                            <th>Üye Adı</th>
-                            <th>Aldığı Toplam Hisse</th>
-                            <th>Okuduğu Toplam Hisse</th>
+                            <th>Üye Sayısı</th>
+                            <th>Toplam Eser Birimi</th>
+                            <th>Alınan Toplam Hisse</th>
+                            <th>Okunan Toplam Hisse</th>
                         </tr>
                     </thead>
-                    <tbody id="bireysel-tablo-govde">
-                        <tr><td colspan="4" class="text-center text-gray-500">Veriler yükleniyor...</td></tr>
+                    <tbody id="genel-ozet-tablo-govde">
+                        <tr><td colspan="5" class="text-center text-gray-500">Veriler yükleniyor...</td></tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- 2. BİREYSEL ANALİZ (SEÇMELİ) -->
+        <div id="icerik-bireysel" class="sekme-icerik card-box p-4 space-y-3 hidden">
+            <h2 class="text-xs font-bold text-gray-800 border-b pb-1">Üye Bazlı Detaylı Performans ve Okumalar</h2>
+            <div class="flex gap-2 items-center bg-amber-50/40 p-2 rounded border border-amber-200 text-xs">
+                <div class="flex-1">
+                    <label class="block font-bold text-amber-900 mb-1">Grup Seçin:</label>
+                    <select id="select-bireysel-grup" onchange="bireyselUyeListesiniDoldur()" class="w-full p-1.5 border border-gray-300 rounded bg-white font-medium">
+                        <option value="">-- Önce Grup Seçin --</option>
+                    </select>
+                </div>
+                <div class="flex-1">
+                    <label class="block font-bold text-amber-900 mb-1">Üye Seçin:</label>
+                    <select id="select-bireysel-uye" onchange="bireyselVerileriGoster()" class="w-full p-1.5 border border-gray-300 rounded bg-white font-medium">
+                        <option value="">-- Önce Üye Seçin --</option>
+                    </select>
+                </div>
+            </div>
+            <div id="bireysel-detay-sonuc" class="text-xs text-gray-600 p-2 border border-dashed rounded bg-gray-50">
+                Lütfen yukarıdan bir grup ve üye seçiniz.
             </div>
         </div>
 
@@ -95,9 +113,23 @@
             </div>
         </div>
 
-        <!-- 5. DETAYLI OKUMA GÜNLÜĞÜ -->
+        <!-- 5. DETAYLI OKUMA GÜNLÜĞÜ (FİLTRELİ) -->
         <div id="icerik-karsilastirmali" class="sekme-icerik card-box p-4 space-y-3 hidden">
-            <h2 class="text-xs font-bold text-gray-800 border-b pb-1">Detaylı Okuma Günlüğü (Kim Ne Zaman Ne Okumuş?)</h2>
+            <h2 class="text-xs font-bold text-gray-800 border-b pb-1">Detaylı Okuma Günlüğü (Filtreli)</h2>
+            <div class="flex gap-2 items-center bg-amber-50/40 p-2 rounded border border-amber-200 text-xs">
+                <div class="flex-1">
+                    <label class="block font-bold text-amber-900 mb-1">Grup Filtrele:</label>
+                    <select id="select-gunluk-grup" onchange="gunlukFiltrele()" class="w-full p-1.5 border border-gray-300 rounded bg-white font-medium">
+                        <option value="TUMU">Tüm Gruplar</option>
+                    </select>
+                </div>
+                <div class="flex-1">
+                    <label class="block font-bold text-amber-900 mb-1">Üye Filtrele:</label>
+                    <select id="select-gunluk-uye" onchange="gunlukFiltrele()" class="w-full p-1.5 border border-gray-300 rounded bg-white font-medium">
+                        <option value="TUMU">Tüm Üyeler</option>
+                    </select>
+                </div>
+            </div>
             <div class="overflow-x-auto">
                 <table class="w-full table-custom">
                     <thead>
@@ -118,6 +150,8 @@
 
     <!-- SCRIPT -->
     <script>
+        let globalAppDataStore = {}; // Tüm grup verilerini bellekte tutmak için
+
         function aktifSekmeGoster(sekmeAdi) {
             const sekmeler = ['ozet', 'bireysel', 'grup', 'arasi', 'karsilastirmali'];
             sekmeler.forEach(s => {
@@ -133,8 +167,12 @@
             aktifBtn.classList.add('border-b-2', 'border-amber-700', 'text-amber-900', 'bg-white');
         }
 
+        let tumLoglarGlobal = [];
+
         function verileriDinamikYukle() {
             let allGroupKeys = [];
+            globalAppDataStore = {};
+
             for (let i = 0; i < localStorage.length; i++) {
                 let key = localStorage.key(i);
                 if (key && key.startsWith("hatim_group_")) {
@@ -148,10 +186,16 @@
             let toplamAlinanHisse = 0;
             let toplamOkunanHisse = 0;
 
-            let bireyselHTML = '';
+            let genelOzetTabloHTML = '';
             let grupDetayHTML = '';
             let arasiHTML = '';
-            let tumLoglar = [];
+            tumLoglarGlobal = [];
+
+            // Açılır listeleri sıfırla
+            let selectBireyselGrup = document.getElementById('select-bireysel-grup');
+            let selectGunlukGrup = document.getElementById('select-gunluk-grup');
+            selectBireyselGrup.innerHTML = '<option value="">-- Önce Grup Seçin --</option>';
+            selectGunlukGrup.innerHTML = '<option value="TUMU">Tüm Gruplar</option>';
 
             allGroupKeys.forEach(key => {
                 let rawData = localStorage.getItem(key);
@@ -160,7 +204,15 @@
                     let appData = JSON.parse(rawData);
                     if (appData && (appData.members || appData.books || appData.bookPages)) {
                         toplamGrupSayisi++;
-                        let groupName = key.replace("hatim_group_", "").replace(/_/g, ' ').toUpperCase();
+                        let groupKeyClean = key.replace("hatim_group_", "");
+                        let groupName = groupKeyClean.replace(/_/g, ' ').toUpperCase();
+                        
+                        globalAppDataStore[groupKeyClean] = appData;
+
+                        // Dropdownlara grupları ekle
+                        selectBireyselGrup.innerHTML += `<option value="${groupKeyClean}">${groupName}</option>`;
+                        selectGunlukGrup.innerHTML += `<option value="${groupKeyClean}">${groupName}</option>`;
+
                         let members = appData.members || [];
                         toplamUyeSayisi += members.length;
 
@@ -187,38 +239,16 @@
                             });
                         }
 
-                        // Üye istatistikleri
-                        if (members.length > 0) {
-                            members.forEach(m => {
-                                let mTaken = 0;
-                                let mRead = 0;
-                                if (appData.bookPages) {
-                                    Object.keys(appData.bookPages).forEach(bId => {
-                                        appData.bookPages[bId].forEach(p => {
-                                            if (p.owner === m) mTaken++;
-                                            if (p.owner === m && p.isRead) mRead++;
-                                        });
-                                    });
-                                }
-                                bireyselHTML += `
-                                    <tr>
-                                        <td>${groupName}</td>
-                                        <td><strong>${m}</strong></td>
-                                        <td>${mTaken}</td>
-                                        <td class="text-green-700 font-semibold">${mRead}</td>
-                                    </tr>
-                                `;
-                            });
-                        } else {
-                            bireyselHTML += `
-                                <tr>
-                                    <td>${groupName}</td>
-                                    <td><strong>Üye Yok</strong></td>
-                                    <td>0</td>
-                                    <td class="text-green-700 font-semibold">0</td>
-                                </tr>
-                            `;
-                        }
+                        // Genel özet tablosu satırı
+                        genelOzetTabloHTML += `
+                            <tr>
+                                <td><strong>${groupName}</strong></td>
+                                <td>${members.length}</td>
+                                <td>${gTotalBooks}</td>
+                                <td>${gTaken}</td>
+                                <td class="text-green-700 font-semibold">${gRead}</td>
+                            </tr>
+                        `;
 
                         // Grup detay HTML
                         grupDetayHTML += `
@@ -242,9 +272,11 @@
                         // Okuma günlükleri
                         if (appData.readingLogs && appData.readingLogs.length > 0) {
                             appData.readingLogs.forEach(log => {
-                                tumLoglar.push({
+                                tumLoglarGlobal.push({
                                     tarih: log.date || '-',
-                                    grupUye: `${groupName} / ${log.member || '-'}`,
+                                    grupKey: groupKeyClean,
+                                    grupAdi: groupName,
+                                    uyeAdi: log.member || '-',
                                     eserDetay: `${log.bookName || '-'} (${log.count || 0} Birim - ${log.range || ''})`
                                 });
                             });
@@ -255,34 +287,144 @@
                 }
             });
 
-            // Okuma günlüğü tablosunu doldur
+            if (!genelOzetTabloHTML) genelOzetTabloHTML = `<tr><td colspan="5" class="text-center text-gray-500">Grup kaydı bulunamadı.</td></tr>`;
+            if (!grupDetayHTML) grupDetayHTML = `<div class="p-2 text-gray-500">Grup detayı bulunamadı.</div>`;
+            if (!arasiHTML) arasiHTML = `<tr><td colspan="3" class="text-center text-gray-500">Grup bulunamadı.</td></tr>`;
+
+            document.getElementById('genel-ust-bilgi').innerHTML = `Sistemde aktif olarak toplam <strong>${toplamGrupSayisi}</strong> grup, <strong>${toplamUyeSayisi}</strong> üye bulunmaktadır. Toplam Eser Birimi: <strong>${toplamSistemBirim}</strong> | Alınan Hisse: <strong>${toplamAlinanHisse}</strong>, Okunan Toplam Hisse: <strong class="text-green-700">${toplamOkunanHisse}</strong>.`;
+            document.getElementById('genel-ozet-tablo-govde').innerHTML = genelOzetTabloHTML;
+            document.getElementById('grup-detay-alan').innerHTML = grupDetayHTML;
+            document.getElementById('gruplar-arasi-govde').innerHTML = arasiHTML;
+
+            gunlukFiltrele();
+            guncelleGunlukUyelerDropdown();
+        }
+
+        // Bireysel Analiz: Grup seçildiğinde üyeleri listele
+        function bireyselUyeListesiniDoldur() {
+            let gKey = document.getElementById('select-bireysel-grup').value;
+            let selectUye = document.getElementById('select-bireysel-uye');
+            selectUye.innerHTML = '<option value="">-- Üye Seçin --</option>';
+            document.getElementById('bireysel-detay-sonuc').innerHTML = 'Lütfen bir üye seçiniz.';
+
+            if (!gKey || !globalAppDataStore[gKey]) return;
+
+            let appData = globalAppDataStore[gKey];
+            let members = appData.members || [];
+
+            members.forEach(m => {
+                selectUye.innerHTML += `<option value="${m}">${m}</option>`;
+            });
+        }
+
+        // Bireysel Analiz: Üye seçildiğinde detayları göster (Aldığı ve okuduğu hisseler)
+        function bireyselVerileriGoster() {
+            let gKey = document.getElementById('select-bireysel-grup').value;
+            let uyeAdi = document.getElementById('select-bireysel-uye').value;
+            let sonucDiv = document.getElementById('bireysel-detay-sonuc');
+
+            if (!gKey || !uyeAdi || !globalAppDataStore[gKey]) {
+                sonucDiv.innerHTML = 'Lütfen geçerli bir grup ve üye seçiniz.';
+                return;
+            }
+
+            let appData = globalAppDataStore[gKey];
+            let alinanHisseler = [];
+            let okunanHisseler = [];
+
+            if (appData.books && appData.bookPages) {
+                appData.books.forEach(b => {
+                    let bPages = appData.bookPages[b.id] || [];
+                    bPages.forEach(p => {
+                        if (p.owner === uyeAdi) {
+                            let bilgi = `${b.name} - Birim ${p.number}`;
+                            alinanHisseler.push(bilgi);
+                            if (p.isRead) {
+                                okunanHisseler.push(bilgi);
+                            }
+                        }
+                    });
+                });
+            }
+
+            let html = `
+                <div class="space-y-2">
+                    <div class="font-bold text-amber-900 border-b pb-1">Seçilen Üye: ${uyeAdi}</div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="bg-white p-2 rounded border">
+                            <span class="font-semibold text-gray-700">Aldığı Toplam Hisse (${alinanHisseler.length}):</span>
+                            <ul class="list-disc pl-4 mt-1 max-h-32 overflow-y-auto text-gray-600">
+                                ${alinanHisseler.length > 0 ? alinanHisseler.map(h => `<li>${h}</li>`).join('') : '<li class="text-gray-400">Hisse almamış.</li>'}
+                            </ul>
+                        </div>
+                        <div class="bg-white p-2 rounded border">
+                            <span class="font-semibold text-green-700">Okuduğu Toplam Hisse (${okunanHisseler.length}):</span>
+                            <ul class="list-disc pl-4 mt-1 max-h-32 overflow-y-auto text-gray-600">
+                                ${okunanHisseler.length > 0 ? okunanHisseler.map(h => `<li>${h}</li>`).join('') : '<li class="text-gray-400">Okunan hisse yok.</li>'}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+            sonucDiv.innerHTML = html;
+        }
+
+        // Okuma Günlüğü: Grup değiştiğinde güncükteki üye filtre listesini güncelle
+        function guncelleGunlukUyelerDropdown() {
+            let gKey = document.getElementById('select-gunluk-grup').value;
+            let selectUye = document.getElementById('select-gunluk-uye');
+            let mevcutSecim = selectUye.value;
+
+            selectUye.innerHTML = '<option value="TUMU">Tüm Üyeler</option>';
+
+            let uygun Uyeler = new Set();
+            tumLoglarGlobal.forEach(log => {
+                if (gKey === 'TUMU' || log.grupKey === gKey) {
+                    uygunUyeler.add(log.uyeAdi);
+                }
+            });
+
+            uygunUyeler.forEach(uye => {
+                selectUye.innerHTML += `<option value="${uye}">${uye}</option>`;
+            });
+
+            selectUye.value = uygunUyeler.has(mevcutSecim) ? mevcutSecim : 'TUMU';
+        }
+
+        // Okuma Günlüğü Filtreleme Fonksiyonu
+        function gunlukFiltrele() {
+            guncelleGunlukUyelerDropdown();
+            let gKey = document.getElementById('select-gunluk-grup').value;
+            let uAdi = document.getElementById('select-gunluk-uye').value;
+
+            let filtrelenmis = tumLoglarGlobal.filter(log => {
+                let grupUyusuyor = (gKey === 'TUMU' || log.grupKey === gKey);
+                let uyeUyusuyor = (uAdi === 'TUMU' || log.uyeAdi === uAdi);
+                return grupUyusuyor && uyeUyusuyor;
+            });
+
             let gunlukHTML = '';
-            if (tumLoglar.length > 0) {
-                tumLoglar.reverse().forEach(log => {
+            if (filtrelenmis.length > 0) {
+                [...filtrelenmis].reverse().forEach(log => {
                     gunlukHTML += `
                         <tr>
                             <td>${log.tarih}</td>
-                            <td>${log.grupUye}</td>
+                            <td>${log.grupAdi} / <strong>${log.uyeAdi}</strong></td>
                             <td>${log.eserDetay}</td>
                         </tr>
                     `;
                 });
             } else {
-                gunlukHTML = `<tr><td colspan="3" class="text-center text-gray-500">Henüz okuma günlüğü kaydı bulunmuyor.</td></tr>`;
+                gunlukHTML = `<tr><td colspan="3" class="text-center text-gray-500">Seçilen kriterlere uygun okuma günlüğü kaydı bulunamadı.</td></tr>`;
             }
 
-            if (!bireyselHTML) bireyselHTML = `<tr><td colspan="4" class="text-center text-gray-500">Üye kaydı bulunamadı.</td></tr>`;
-            if (!grupDetayHTML) grupDetayHTML = `<div class="p-2 text-gray-500">Grup detayı bulunamadı.</div>`;
-            if (!arasiHTML) arasiHTML = `<tr><td colspan="3" class="text-center text-gray-500">Grup bulunamadı.</td></tr>`;
-
-            const genelOzetAlan = document.getElementById('genel-ozet-alan');
-            genelOzetAlan.innerHTML = `Sistemde aktif olarak toplam <strong>${toplamGrupSayisi}</strong> grup, <strong>${toplamUyeSayisi}</strong> üye bulunmaktadır. Toplam Eser Birimi: <strong>${toplamSistemBirim}</strong> | Alınan Hisse: <strong>${toplamAlinanHisse}</strong>, Okunan Toplam Hisse: <strong class="text-green-700">${toplamOkunanHisse}</strong>.`;
-
-            document.getElementById('bireysel-tablo-govde').innerHTML = bireyselHTML;
-            document.getElementById('grup-detay-alan').innerHTML = grupDetayHTML;
-            document.getElementById('gruplar-arasi-govde').innerHTML = arasiHTML;
             document.getElementById('gunluk-tablo-govde').innerHTML = gunlukHTML;
         }
+
+        // Grup filtresi değiştiğinde günlük listesini güncelle
+        document.getElementById('select-gunluk-grup').addEventListener('change', () => {
+            gunlukFiltrele();
+        });
 
         window.onload = verileriDinamikYukle;
     </script>
