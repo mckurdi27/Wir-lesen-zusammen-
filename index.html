@@ -79,6 +79,16 @@
                         max-width: 800px;
                         margin: 0 auto;
                     }
+                    @media (max-width: 768px) {
+                        #visual-prayer-widget {
+                            grid-template-columns: 1fr !important;
+                        }
+                    }
+                    @media (min-width: 769px) {
+                        #visual-prayer-widget {
+                            grid-template-columns: 1fr 1fr 1fr !important;
+                        }
+                    }
                     @media (prefers-color-scheme: dark) {
                         :root {
                             --bg-primary: #0b1329;
@@ -136,9 +146,9 @@
             };
 
             /* ========================================================= */
-            /* GÖMÜLÜ PDF OKUYUCU MODÜLÜ                                  */
+            /* PRATİK SAYFA GİRİŞLİ GÖMÜLÜ PDF OKUYUCU MODÜLÜ              */
             /* ========================================================= */
-            function openEmbeddedPdfReader(pdfUrl, bookTitle) {
+            function openEmbeddedPdfReader(pdfUrl, bookTitle, totalUnits) {
                 let existingModal = document.getElementById("embedded-pdf-modal");
                 if (existingModal) existingModal.remove();
 
@@ -150,15 +160,36 @@
                     display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px;
                 `;
                 modal.innerHTML = `
-                    <div style="width: 100%; max-width: 900px; display: flex; justify-content: space-between; align-items: center; background: #222; padding: 10px 15px; border-radius: 8px 8px 0 0; color: #fff;">
-                        <span style="font-weight: bold; font-size: 14px;">📄 ${bookTitle} (Gömülü Okuyucu)</span>
-                        <button id="close-pdf-modal" style="background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;">✕ Kapat</button>
+                    <div style="width: 100%; max-width: 900px; display: flex; justify-content: space-between; align-items: center; background: #222; padding: 8px 12px; border-radius: 8px 8px 0 0; color: #fff; flex-wrap: wrap; gap: 8px;">
+                        <span style="font-weight: bold; font-size: 13px;">📄 ${bookTitle}</span>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="font-size: 12px;">Sayfa:</span>
+                            <input type="number" id="pdf-page-input" value="1" min="1" max="${totalUnits || 604}" style="width: 60px; padding: 4px; border-radius: 4px; border: none; text-align: center; font-weight: bold;">
+                            <button id="pdf-go-page-btn" style="background: #27ae60; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">Git</button>
+                            <button id="close-pdf-modal" style="background: #e74c3c; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">✕ Kapat</button>
+                        </div>
                     </div>
                     <div style="width: 100%; max-width: 900px; height: 80vh; background: #fff; border-radius: 0 0 8px 8px; overflow: hidden;">
-                        <iframe src="${pdfUrl}" style="width: 100%; height: 100%; border: none;"></iframe>
+                        <iframe id="pdf-iframe" src="${pdfUrl}#page=1" style="width: 100%; height: 100%; border: none;"></iframe>
                     </div>
                 `;
                 document.body.appendChild(modal);
+
+                const iframe = modal.querySelector("#pdf-iframe");
+                const pageInput = modal.querySelector("#pdf-page-input");
+
+                const goToPage = () => {
+                    let p = parseInt(pageInput.value, 10);
+                    if (isNaN(p) || p < 1) p = 1;
+                    if (totalUnits && p > totalUnits) p = totalUnits;
+                    pageInput.value = p;
+                    iframe.src = `${pdfUrl}#page=${p}`;
+                };
+
+                modal.querySelector("#pdf-go-page-btn").addEventListener("click", goToPage);
+                pageInput.addEventListener("keypress", (e) => {
+                    if (e.key === 'Enter') goToPage();
+                });
 
                 modal.querySelector("#close-pdf-modal").addEventListener("click", () => modal.remove());
                 modal.addEventListener("click", (e) => {
@@ -167,7 +198,7 @@
             }
 
             /* ========================================================= */
-            /* GÖRSEL VE NAMAZ VAKTİ ONARIM MODÜLÜ                       */
+            /* GÖRSEL VE NAMAZ VAKTİ (SOL: MESCİD-İ NEBEVİ, ORTA: VAKİT, SAĞ: KÂBE) */
             /* ========================================================= */
             function renderVisualAndPrayerWidget() {
                 let widgetContainer = document.getElementById("visual-prayer-widget");
@@ -182,33 +213,33 @@
                     }
                 }
 
-                let savedCity = localStorage.getItem("prayer_city") || "İstanbul";
+                let savedCity = localStorage.getItem("prayer_city") || "Berlin";
 
                 widgetContainer.style.cssText = `
-                    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;
+                    display: grid; gap: 10px;
                     margin-bottom: 20px;
                 `;
 
                 widgetContainer.innerHTML = `
-                    <!-- Kâbe / Mescid Görsel Alanı (Kırık Görsel Önleyici SVG/Yapı) -->
-                    <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; position: relative; overflow: hidden;">
-                        <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px; color: var(--gold-dark);">🕋 Haremeyn-i Şerifeyn İklimi</div>
-                        <div style="width: 100%; height: 110px; background: linear-gradient(135deg, #111, #2c3e50); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #f1c40f; font-size: 12px; font-style: italic; border: 1px solid var(--gold-primary);">
-                            <div style="text-align: center; padding: 10px;">
-                                <span style="font-size: 28px; display: block; margin-bottom: 4px;">🕌</span>
-                                <span>"Kalpler ancak Zikrullah ile mutmain olur."</span>
+                    <!-- 1. SOL: Mescid-i Nebevi -->
+                    <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; text-align: center; overflow: hidden;">
+                        <div style="font-size: 12px; font-weight: bold; margin-bottom: 6px; color: var(--gold-dark);">🕌 Mescid-i Nebevi</div>
+                        <div style="width: 100%; height: 95px; background: linear-gradient(135deg, #111, #2c3e50); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #f1c40f; font-size: 11px; font-style: italic; border: 1px solid var(--gold-primary);">
+                            <div style="text-align: center; padding: 5px;">
+                                <span style="font-size: 22px; display: block; margin-bottom: 2px;">🟢</span>
+                                <span>"Ravza-i Mutahhara İklimi"</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Namaz Vakitleri ve Şehir Ayar Paneli -->
-                    <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <!-- 2. ORTA: Namaz Vakitleri -->
+                    <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between;">
                         <div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                <span style="font-size: 13px; font-weight: bold; color: var(--gold-dark);">⏰ Namaz Vakitleri (${savedCity})</span>
-                                <button id="change-city-btn" style="background: #2980b9; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold;">Şehir Seç</button>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <span style="font-size: 12px; font-weight: bold; color: var(--gold-dark);">⏰ Vakitler (${savedCity})</span>
+                                <button id="change-city-btn" style="background: #2980b9; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px; cursor: pointer; font-weight: bold;">Şehir</button>
                             </div>
-                            <div id="prayer-times-list" style="font-size: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; opacity: 0.9;">
+                            <div id="prayer-times-list" style="font-size: 11px; display: grid; grid-template-columns: 1fr 1fr; gap: 2px; opacity: 0.9;">
                                 <div>İmsak: Yükleniyor...</div>
                                 <div>Güneş: Yükleniyor...</div>
                                 <div>Öğle: Yükleniyor...</div>
@@ -218,17 +249,27 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- 3. SAĞ: Kâbe-i Muazzama -->
+                    <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; text-align: center; overflow: hidden;">
+                        <div style="font-size: 12px; font-weight: bold; margin-bottom: 6px; color: var(--gold-dark);">🕋 Kâbe-i Muazzama</div>
+                        <div style="width: 100%; height: 95px; background: linear-gradient(135deg, #111, #2c3e50); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #f1c40f; font-size: 11px; font-style: italic; border: 1px solid var(--gold-primary);">
+                            <div style="text-align: center; padding: 5px;">
+                                <span style="font-size: 22px; display: block; margin-bottom: 2px;">🕋</span>
+                                <span>"Beytullah İklimi"</span>
+                            </div>
+                        </div>
+                    </div>
                 `;
 
                 widgetContainer.querySelector("#change-city-btn").addEventListener("click", () => {
-                    let newCity = prompt("Namaz vakitleri için şehir adı girin (Örn: Ankara, Bursa, Berlin):", savedCity);
+                    let newCity = prompt("Namaz vakitleri için şehir adı girin (Örn: Berlin, İstanbul, Ankara):", savedCity);
                     if (newCity && newCity.trim()) {
                         localStorage.setItem("prayer_city", newCity.trim());
                         renderVisualAndPrayerWidget();
                     }
                 });
 
-                // Örnek vakit simülasyonu / API simülasyonu
                 setTimeout(() => {
                     const timesEl = widgetContainer.querySelector("#prayer-times-list");
                     if (timesEl) {
@@ -1227,7 +1268,7 @@
                                 <span class="book-stats" style="font-size: 12px; opacity: 0.8; display: block; margin-top: 2px;">Alınan: ${takenCount} / ${totalCount}</span>
                             </div>
                             <div class="book-actions" style="display: flex; align-items: center; gap: 14px;">
-                                <button class="book-pdf-btn" data-bookid="${book.id}" data-bookname="${book.name}" title="PDF Görüntüle" style="padding: 6px 10px; font-size: 12px; cursor: pointer; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-weight: bold;">📄 PDF</button>
+                                <button class="book-pdf-btn" data-bookid="${book.id}" data-bookname="${book.name}" data-totalunits="${book.totalUnits}" title="PDF Görüntüle" style="padding: 6px 10px; font-size: 12px; cursor: pointer; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-weight: bold;">📄 PDF</button>
                                 <button class="book-whatsapp-btn" data-whatsapp="${bookIndex}" style="padding: 6px 10px; font-size: 12px; cursor: pointer; background: #25D366; color: #fff; border: none; border-radius: 6px; font-weight: bold;">💬 Paylaş</button>
                                 <span class="toggle-icon" style="font-size: 14px; padding: 4px 6px; font-weight: bold; opacity: 0.8;">▼</span>
                             </div>
@@ -1257,8 +1298,9 @@
                         e.stopPropagation();
                         const bId = e.target.getAttribute("data-bookid");
                         const bName = e.target.getAttribute("data-bookname");
+                        const bTotal = parseInt(e.target.getAttribute("data-totalunits"), 10) || 604;
                         const pdfPath = bookPdfMap[bId] || (book.pdf ? book.pdf : "pdf/Kuran-ı Kerim.pdf");
-                        openEmbeddedPdfReader(pdfPath, bName);
+                        openEmbeddedPdfReader(pdfPath, bName, bTotal);
                     });
 
                     cardEl.querySelectorAll(".finish-hatim-btn").forEach(btn => {
