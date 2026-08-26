@@ -85,7 +85,7 @@
                         <tr>
                             <th>Grup Adı</th>
                             <th>Üye Sayısı</th>
-                            <th>Toplam Alınan / Okunan</th>
+                            <th>Toplam Alınan / Okunan (% Oranlar)</th>
                         </tr>
                     </thead>
                     <tbody id="gruplar-arasi-govde">
@@ -134,150 +134,136 @@
         }
 
         function verileriDinamikYukle() {
-            let gruplar = [];
-            let uyelerListesi = [];
-            let gunlukler = [];
-
-            // localStorage içerisindeki tüm anahtarları akıllıca tarayarak en kapsamlı verileri toplayalım
+            let allGroupKeys = [];
             for (let i = 0; i < localStorage.length; i++) {
-                let anahtar = localStorage.key(i);
-                try {
-                    let hamVeri = JSON.parse(localStorage.getItem(anahtar));
-                    if (!hamVeri) continue;
-
-                    if (Array.isArray(hamVeri)) {
-                        if (anahtar.toLowerCase().includes('uye') || anahtar.toLowerCase().includes('member')) {
-                            uyelerListesi = hamVeri;
-                        } else if (anahtar.toLowerCase().includes('log') || anahtar.toLowerCase().includes('gunluk')) {
-                            gunlukler = hamVeri;
-                        } else {
-                            if (hamVeri.length >= gruplar.length) gruplar = hamVeri;
-                        }
-                    } else if (typeof hamVeri === 'object') {
-                        if (hamVeri.gruplar && Array.isArray(hamVeri.gruplar)) gruplar = hamVeri.gruplar;
-                        if (hamVeri.groups && Array.isArray(hamVeri.groups)) gruplar = hamVeri.groups;
-                        if (hamVeri.uyeler && Array.isArray(hamVeri.uyeler)) uyelerListesi = hamVeri.uyeler;
-                        if (hamVeri.members && Array.isArray(hamVeri.members)) uyelerListesi = hamVeri.members;
-                        if (hamVeri.logs && Array.isArray(hamVeri.logs)) gunlukler = hamVeri.logs;
-                        if (hamVeri.gunluk && Array.isArray(hamVeri.gunluk)) gunlukler = hamVeri.gunluk;
-                    }
-                } catch (e) {}
-            }
-
-            // Eğer dizi bulunamadıysa nesne anahtarlarını grup olarak ele alalım
-            if (gruplar.length === 0) {
-                for (let i = 0; i < localStorage.length; i++) {
-                    let hamVeri = JSON.parse(localStorage.getItem(localStorage.key(i)));
-                    if (hamVeri && typeof hamVeri === 'object' && !Array.isArray(hamVeri)) {
-                        let olasiGruplar = Object.keys(hamVeri).map(k => ({ ad: k, ...hamVeri[k] }));
-                        if (olasiGruplar.length > gruplar.length) {
-                            gruplar = olasiGruplar;
-                        }
-                    }
+                let key = localStorage.key(i);
+                if (key && key.startsWith("hatim_group_")) {
+                    allGroupKeys.push(key);
                 }
             }
 
-            const genelOzetAlan = document.getElementById('genel-ozet-alan');
-            const bireyselGovde = document.getElementById('bireysel-tablo-govde');
-            const grupDetayAlan = document.getElementById('grup-detay-alan');
-            const gruplarArasiGovde = document.getElementById('gruplar-arasi-govde');
-            const gunlukGovde = document.getElementById('gunluk-tablo-govde');
-
-            if (gruplar.length === 0 && uyelerListesi.length === 0) {
-                genelOzetAlan.innerHTML = "⚠️ Ana sayfaya ait kayıtlı veri bulunamadı. Lütfen önce ana sayfada grup ve üye işlemleri yapın.";
-                bireyselGovde.innerHTML = `<tr><td colspan="4" class="text-center text-gray-500">Veri bulunamadı.</td></tr>`;
-                grupDetayAlan.innerHTML = `<div class="p-2 text-gray-500">Görüntülenecek grup verisi yok.</div>`;
-                gruplarArasiGovde.innerHTML = `<tr><td colspan="3" class="text-center text-gray-500">Veri bulunamadı.</td></tr>`;
-                gunlukGovde.innerHTML = `<tr><td colspan="3" class="text-center text-gray-500">Kayıt bulunamadı.</td></tr>`;
-                return;
-            }
-
-            let toplamGrupSayisi = gruplar.length;
+            let toplamGrupSayisi = 0;
             let toplamUyeSayisi = 0;
+            let toplamSistemBirim = 0;
             let toplamAlinanHisse = 0;
             let toplamOkunanHisse = 0;
 
             let bireyselHTML = '';
             let grupDetayHTML = '';
             let arasiHTML = '';
+            let tumLoglar = [];
 
-            gruplar.forEach((grup, gIndex) => {
-                let grupAdi = grup.ad || grup.grupAdi || grup.name || grup.title || `Grup ${gIndex + 1}`;
-                let uyeler = grup.uyeler || grup.members || grup.kisiler || [];
+            allGroupKeys.forEach(key => {
+                let rawData = localStorage.getItem(key);
+                if (!rawData) return;
+                try {
+                    let appData = JSON.parse(rawData);
+                    if (appData && (appData.members || appData.books || appData.bookPages)) {
+                        toplamGrupSayisi++;
+                        let groupName = key.replace("hatim_group_", "").replace(/_/g, ' ').toUpperCase();
+                        let members = appData.members || [];
+                        toplamUyeSayisi += members.length;
 
-                if (uyeler.length === 0 && uyelerListesi.length > 0) {
-                    uyeler = uyelerListesi.filter(u => (u.grup || u.groupName || u.grupAdi) === grupAdi);
-                }
+                        let gTotalBooks = 0;
+                        let gTaken = 0;
+                        let gRead = 0;
 
-                toplamUyeSayisi += uyeler.length;
-                let grupAlinan = 0;
-                let grupOkunan = 0;
+                        if (appData.books && appData.bookPages) {
+                            appData.books.forEach(b => {
+                                gTotalBooks += b.totalUnits;
+                                toplamSistemBirim += b.totalUnits;
+                                if (appData.bookPages[b.id]) {
+                                    appData.bookPages[b.id].forEach(p => {
+                                        if (p.owner) {
+                                            gTaken++;
+                                            toplamAlinanHisse++;
+                                        }
+                                        if (p.isRead) {
+                                            gRead++;
+                                            toplamOkunanHisse++;
+                                        }
+                                    });
+                                }
+                            });
+                        }
 
-                if (uyeler.length > 0) {
-                    uyeler.forEach(uye => {
-                        let uyeAdi = uye.ad || uye.name || uye.kisi || "İsimsiz Üye";
-                        let alinan = Number(uye.alinanHisse || uye.hisse || uye.shares || uye.alinan || 0);
-                        let okunan = Number(uye.okunanHisse || uye.okunan || uye.read || 0);
+                        // Üye istatistikleri
+                        if (members.length > 0) {
+                            members.forEach(m => {
+                                let mTaken = 0;
+                                let mRead = 0;
+                                if (appData.bookPages) {
+                                    Object.keys(appData.bookPages).forEach(bId => {
+                                        appData.bookPages[bId].forEach(p => {
+                                            if (p.owner === m) mTaken++;
+                                            if (p.owner === m && p.isRead) mRead++;
+                                        });
+                                    });
+                                }
+                                bireyselHTML += `
+                                    <tr>
+                                        <td>${groupName}</td>
+                                        <td><strong>${m}</strong></td>
+                                        <td>${mTaken}</td>
+                                        <td class="text-green-700 font-semibold">${mRead}</td>
+                                    </tr>
+                                `;
+                            });
+                        } else {
+                            bireyselHTML += `
+                                <tr>
+                                    <td>${groupName}</td>
+                                    <td><strong>Üye Yok</strong></td>
+                                    <td>0</td>
+                                    <td class="text-green-700 font-semibold">0</td>
+                                </tr>
+                            `;
+                        }
 
-                        grupAlinan += alinan;
-                        grupOkunan += okunan;
+                        // Grup detay HTML
+                        grupDetayHTML += `
+                            <div class="p-3 bg-amber-50/30 border border-amber-200 rounded space-y-1">
+                                <div class="font-bold text-amber-900">${groupName}</div>
+                                <div class="text-gray-600">Üye Sayısı: ${members.length} | Toplam Eser Birimi: ${gTotalBooks} | Alınan: ${gTaken} | Okunan: ${gRead}</div>
+                            </div>
+                        `;
 
-                        bireyselHTML += `
+                        // Gruplar arası karşılaştırma
+                        let takePct = gTotalBooks > 0 ? Math.round((gTaken / gTotalBooks) * 100) : 0;
+                        let readPct = gTotalBooks > 0 ? Math.round((gRead / gTotalBooks) * 100) : 0;
+                        arasiHTML += `
                             <tr>
-                                <td>${grupAdi}</td>
-                                <td><strong>${uyeAdi}</strong></td>
-                                <td>${alinan}</td>
-                                <td class="text-green-700 font-semibold">${okunan}</td>
+                                <td><strong>${groupName}</strong></td>
+                                <td>${members.length}</td>
+                                <td>${gTaken} / <span class="text-green-700 font-semibold">${gRead}</span> <span class="text-gray-500 text-[10px]">(%${takePct} Alınan / %${readPct} Okunan)</span></td>
                             </tr>
                         `;
-                    });
-                } else {
-                    let alinan = Number(grup.alinanHisse || grup.hisse || 0);
-                    let okunan = Number(grup.okunanHisse || grup.okunan || 0);
-                    if (alinan > 0 || okunan > 0) {
-                        grupAlinan += alinan;
-                        grupOkunan += okunan;
-                        bireyselHTML += `
-                            <tr>
-                                <td>${grupAdi}</td>
-                                <td><strong>Genel / Grup Toplamı</strong></td>
-                                <td>${alinan}</td>
-                                <td class="text-green-700 font-semibold">${okunan}</td>
-                            </tr>
-                        `;
+
+                        // Okuma günlükleri
+                        if (appData.readingLogs && appData.readingLogs.length > 0) {
+                            appData.readingLogs.forEach(log => {
+                                tumLoglar.push({
+                                    tarih: log.date || '-',
+                                    grupUye: `${groupName} / ${log.member || '-'}`,
+                                    eserDetay: `${log.bookName || '-'} (${log.count || 0} Birim - ${log.range || ''})`
+                                });
+                            });
+                        }
                     }
+                } catch (e) {
+                    console.error("Veri okuma hatası:", e);
                 }
-
-                toplamAlinanHisse += grupAlinan;
-                toplamOkunanHisse += grupOkunan;
-
-                grupDetayHTML += `
-                    <div class="p-3 bg-amber-50/30 border border-amber-200 rounded">
-                        <strong>${grupAdi}</strong> - Üye Sayısı: ${uyeler.length} | Alınan: ${grupAlinan} | Okunan: ${grupOkunan}
-                    </div>
-                `;
-
-                arasiHTML += `
-                    <tr>
-                        <td><strong>${grupAdi}</strong></td>
-                        <td>${uyeler.length}</td>
-                        <td>${grupAlinan} / <span class="text-green-700 font-semibold">${grupOkunan}</span></td>
-                    </tr>
-                `;
             });
 
-            // Okuma günlüğü doldurma
+            // Okuma günlüğü tablosunu doldur
             let gunlukHTML = '';
-            if (gunlukler.length > 0) {
-                gunlukler.forEach(log => {
-                    let tarih = log.tarih || log.date || log.zaman || "-";
-                    let kim = log.uye || log.kisi || log.name || log.grupUye || "-";
-                    let eser = log.eser || log.detay || log.bookName || log.aciklama || "-";
+            if (tumLoglar.length > 0) {
+                tumLoglar.reverse().forEach(log => {
                     gunlukHTML += `
                         <tr>
-                            <td>${tarih}</td>
-                            <td>${kim}</td>
-                            <td>${eser}</td>
+                            <td>${log.tarih}</td>
+                            <td>${log.grupUye}</td>
+                            <td>${log.eserDetay}</td>
                         </tr>
                     `;
                 });
@@ -289,11 +275,13 @@
             if (!grupDetayHTML) grupDetayHTML = `<div class="p-2 text-gray-500">Grup detayı bulunamadı.</div>`;
             if (!arasiHTML) arasiHTML = `<tr><td colspan="3" class="text-center text-gray-500">Grup bulunamadı.</td></tr>`;
 
-            genelOzetAlan.innerHTML = `Sistemde aktif olarak toplam <strong>${toplamGrupSayisi}</strong> grup, <strong>${toplamUyeSayisi}</strong> üye bulunmaktadır. Toplam Alınan Hisse: <strong>${toplamAlinanHisse}</strong>, Okunan Toplam Hisse: <strong class="text-green-700">${toplamOkunanHisse}</strong>.`;
-            bireyselGovde.innerHTML = bireyselHTML;
-            grupDetayAlan.innerHTML = grupDetayHTML;
-            gruplarArasiGovde.innerHTML = arasiHTML;
-            gunlukGovde.innerHTML = gunlukHTML;
+            const genelOzetAlan = document.getElementById('genel-ozet-alan');
+            genelOzetAlan.innerHTML = `Sistemde aktif olarak toplam <strong>${toplamGrupSayisi}</strong> grup, <strong>${toplamUyeSayisi}</strong> üye bulunmaktadır. Toplam Eser Birimi: <strong>${toplamSistemBirim}</strong> | Alınan Hisse: <strong>${toplamAlinanHisse}</strong>, Okunan Toplam Hisse: <strong class="text-green-700">${toplamOkunanHisse}</strong>.`;
+
+            document.getElementById('bireysel-tablo-govde').innerHTML = bireyselHTML;
+            document.getElementById('grup-detay-alan').innerHTML = grupDetayHTML;
+            document.getElementById('gruplar-arasi-govde').innerHTML = arasiHTML;
+            document.getElementById('gunluk-tablo-govde').innerHTML = gunlukHTML;
         }
 
         window.onload = verileriDinamikYukle;
