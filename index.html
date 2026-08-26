@@ -139,7 +139,6 @@
                 }
             }
 
-            // JavaScript dosyalarını dinamik modül olarak içe aktarma fonksiyonu
             async function fetchHijriMonthData(ayKodu) {
                 if (monthlyInspirationCache[ayKodu]) return monthlyInspirationCache[ayKodu];
                 const fileMap = {
@@ -150,13 +149,12 @@
                 };
                 let filePath = fileMap[ayKodu] || "js/03-rebiulevvel.js";
                 try {
-                    // .js dosyalarını import() ile yüklüyoruz
                     let mod = await import(`./${filePath}`);
                     let data = mod.default || mod.data || mod;
                     monthlyInspirationCache[ayKodu] = data;
                     return data;
                 } catch (e) {
-                    console.error("JavaScript modülü yükleme hatası (Yerel sunucu veya dosya yolu kontrolü):", e);
+                    console.error("JavaScript modülü yükleme hatası:", e);
                     return null;
                 }
             }
@@ -182,8 +180,10 @@
                     }
                 }
 
-                let verseText = "Bu güne ait ayet verisi JavaScript dosyasında bulunamadı.";
-                let hadishText = "Bu güne ait hadis verisi JavaScript dosyasında bulunamadı.";
+                let verseText = "Bu güne ait ayet verisi bulunamadı.";
+                let hadishText = "Bu güne ait hadis verisi bulunamadı.";
+                let proverbText = "Bu güne ait atasözü verisi bulunamadı.";
+                let quoteText = "Bu güne ait özlü söz verisi bulunamadı.";
                 let germanQuote = "Verfügbar nicht.";
                 let germanTrans = "Çeviri bulunamadı.";
 
@@ -199,12 +199,32 @@
                         let kaynak = typeof h === 'object' ? (h.kaynak || h.source || "") : "";
                         hadishText = kaynak ? `${meal} (${kaynak})` : meal;
                     }
+                    let a = item.atasozu || item.atasözü;
+                    if (a) {
+                        let text = typeof a === 'object' ? (a.text || a.meal || "") : String(a);
+                        let kaynak = typeof a === 'object' ? (a.kaynak || a.source || "") : "";
+                        proverbText = kaynak ? `${text} (${kaynak})` : text;
+                    }
+                    let o = item.ozlu_soz || item.ozluSoz || item.soz;
+                    if (o) {
+                        let text = typeof o === 'object' ? (o.text || o.meal || "") : String(o);
+                        let kaynak = typeof o === 'object' ? (o.kaynak || o.source || "") : "";
+                        quoteText = kaynak ? `${text} (${kaynak})` : text;
+                    }
                     if (item.german) {
                         germanQuote = item.german.quote || germanQuote;
                         germanTrans = item.german.translation || germanTrans;
                     }
                 }
-                return { fullDateStr: todayHijriStr, miladiDateStr: todayMiladiStr, verse: verseText, hadish: hadishText, german: { quote: germanQuote, translation: germanTrans } };
+                return { 
+                    fullDateStr: todayHijriStr, 
+                    miladiDateStr: todayMiladiStr, 
+                    verse: verseText, 
+                    hadish: hadishText, 
+                    proverb: proverbText,
+                    quote: quoteText,
+                    german: { quote: germanQuote, translation: germanTrans } 
+                };
             }
 
             function renderMainTitleHeader() {
@@ -269,9 +289,11 @@
                         <span style="font-size: 12px; padding: 4px 10px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(150,150,150,0.2);">📅 Miladi: ${inspirationData.miladiDateStr}</span>
                         <span style="font-size: 12px; padding: 4px 10px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(150,150,150,0.2);">🌙 Hicri: ${inspirationData.fullDateStr}</span>
                     </div>
-                    <div style="font-size: 13px; line-height: 1.5;">
+                    <div style="font-size: 13px; line-height: 1.6;">
                         <p style="margin-bottom: 6px;">📖 <strong>Günün Ayeti:</strong> ${inspirationData.verse}</p>
                         <p style="margin-bottom: 6px;">📜 <strong>Günün Hadisi:</strong> ${inspirationData.hadish}</p>
+                        <p style="margin-bottom: 6px;">💬 <strong>Günün Atasözü:</strong> ${inspirationData.proverb}</p>
+                        <p style="margin-bottom: 6px;">✨ <strong>Günün Özlü Sözü:</strong> ${inspirationData.quote}</p>
                         <p style="margin-bottom: 2px;">🇩🇪 <strong>Tägliche Weisheit:</strong> <em>"${inspirationData.german.quote}"</em> <span style="opacity: 0.8;">(${inspirationData.german.translation})</span></p>
                     </div>
                 `;
@@ -369,8 +391,30 @@
             async function loadGroupData() {
                 removeStuckPanel();
                 const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
-                appData = savedData ? JSON.parse(savedData) : { members: currentGroup === "grup_1" ? ["Ahmet", "Mehmet", "Ayşe"] : [] };
+                appData = savedData ? JSON.parse(savedData) : { members: currentGroup === "grup_1" ? ["Ahmet", "Mehmet", "Ayşe"] : [], password: "" };
+                
+                // Şifre Kontrolü
+                if (appData.password && sessionStorage.getItem(`unlocked_${currentGroup}`) !== "true") {
+                    let enteredPwd = prompt(`"${currentGroup.replace(/_/g, ' ').toUpperCase()}" grubu şifrelidir. Lütfen şifreyi girin:`);
+                    if (enteredPwd === appData.password) {
+                        sessionStorage.setItem(`unlocked_${currentGroup}`, "true");
+                    } else {
+                        alert("Hatalı şifre!");
+                        let allGroups = getAllGroupKeys();
+                        let fallback = allGroups.find(g => {
+                            let d = localStorage.getItem(`hatim_group_${g}`);
+                            if (!d) return true;
+                            let parsed = JSON.parse(d);
+                            return !parsed.password || sessionStorage.getItem(`unlocked_${g}`) === "true";
+                        }) || "grup_1";
+                        currentGroup = fallback;
+                        const savedDataFallback = localStorage.getItem(`hatim_group_${currentGroup}`);
+                        appData = savedDataFallback ? JSON.parse(savedDataFallback) : { members: [], password: "" };
+                    }
+                }
+
                 if (!appData.members) appData.members = [];
+                if (appData.password === undefined) appData.password = "";
 
                 const savedSession = localStorage.getItem(`hatim_session_${currentGroup}`);
                 loggedInMember = (savedSession && appData.members.includes(savedSession)) ? savedSession : "";
@@ -426,7 +470,16 @@
                 }
 
                 let allGroups = getAllGroupKeys();
-                let groupsHtml = allGroups.map(g => `<option value="${g}" ${g === currentGroup ? "selected" : ""}>${g.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
+                let groupsHtml = allGroups.map(g => {
+                    let d = localStorage.getItem(`hatim_group_${g}`);
+                    let isLocked = false;
+                    if (d) {
+                        try { let parsed = JSON.parse(d); if (parsed.password && sessionStorage.getItem(`unlocked_${g}`) !== "true") isLocked = true; } catch(e){}
+                    }
+                    let lockIcon = isLocked ? " 🔒" : "";
+                    return `<option value="${g}" ${g === currentGroup ? "selected" : ""}>${g.replace(/_/g, ' ').toUpperCase()}${lockIcon}</option>`;
+                }).join('');
+
                 let membersOptions = '<option value="">-- İsminizi Seçin --</option>' + appData.members.map(m => `<option value="${m}" ${m === loggedInMember ? "selected" : ""}>${m}</option>`).join('');
 
                 controlsContainer.style.cssText = `
@@ -465,7 +518,11 @@
                 document.getElementById("user-new-group-btn").addEventListener("click", async () => {
                     let newG = prompt("Yeni grup adını girin:");
                     if (newG && newG.trim()) {
-                        currentGroup = newG.trim().toLowerCase().replace(/\s+/g, '_');
+                        let groupKey = newG.trim().toLowerCase().replace(/\s+/g, '_');
+                        let groupPwd = prompt("Bu gruba şifre koymak ister misiniz? (İstemiyorsanız boş bırakın):") || "";
+                        currentGroup = groupKey;
+                        if (groupPwd) sessionStorage.setItem(`unlocked_${currentGroup}`, "true");
+
                         const todayStr = new Date().toLocaleDateString("tr-TR");
                         let freshBooks = JSON.parse(JSON.stringify(defaultBooksTemplate));
                         let freshPages = {};
@@ -478,6 +535,7 @@
                         });
                         appData = {
                             members: [],
+                            password: groupPwd.trim(),
                             books: freshBooks,
                             bookPages: freshPages,
                             bookHatims: freshHatims,
@@ -620,6 +678,7 @@
 
                 let adminPanelHtml = "";
                 if (isAdmin) {
+                    let hasPassword = appData.password ? true : false;
                     adminPanelHtml = `
                         <div id="admin-panel-section" style="background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold-primary); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
                             <h3 style="color: var(--gold-dark); font-size: 15px; margin-bottom: 10px;">🛠️ Yönetici Kontrol Paneli</h3>
@@ -629,6 +688,10 @@
                                 <button id="admin-add-group" style="background: #27ae60; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">+ Ekle</button>
                                 <button id="admin-edit-group" style="background: #f39c12; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Düzenle</button>
                                 <button id="admin-delete-group" style="background: #e74c3c; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Sil</button>
+                            </div>
+                            <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; background: var(--card-bg); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);">
+                                <span style="font-size: 13px; font-weight: bold;">Grup Şifre Durumu: <span style="color: ${hasPassword ? '#27ae60' : '#e67e22'};">${hasPassword ? '🔒 Şifreli' : '🔓 Şifresiz'}</span></span>
+                                <button id="admin-set-password" style="background: #8e44ad; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">🔑 Şifre Belirle / Kaldır</button>
                             </div>
                             <div style="border-top: 1px solid var(--border-color); padding-top: 10px;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -664,7 +727,11 @@
                     document.getElementById("admin-add-group").addEventListener("click", async () => {
                         let newG = prompt("Yeni grup adı:");
                         if (newG && newG.trim()) {
-                            currentGroup = newG.trim().toLowerCase().replace(/\s+/g, '_');
+                            let groupKey = newG.trim().toLowerCase().replace(/\s+/g, '_');
+                            let groupPwd = prompt("Bu gruba şifre koymak ister misiniz? (İstemiyorsanız boş bırakın):") || "";
+                            currentGroup = groupKey;
+                            if (groupPwd) sessionStorage.setItem(`unlocked_${currentGroup}`, "true");
+
                             const todayStr = new Date().toLocaleDateString("tr-TR");
                             let freshBooks = JSON.parse(JSON.stringify(defaultBooksTemplate));
                             let freshPages = {};
@@ -677,6 +744,7 @@
                             });
                             appData = {
                                 members: [],
+                                password: groupPwd.trim(),
                                 books: freshBooks,
                                 bookPages: freshPages,
                                 bookHatims: freshHatims,
@@ -694,6 +762,10 @@
                             if (newKey !== currentGroup) {
                                 localStorage.setItem(`hatim_group_${newKey}`, JSON.stringify(appData));
                                 localStorage.removeItem(`hatim_group_${currentGroup}`);
+                                if (sessionStorage.getItem(`unlocked_${currentGroup}`)) {
+                                    sessionStorage.setItem(`unlocked_${newKey}`, "true");
+                                    sessionStorage.removeItem(`unlocked_${currentGroup}`);
+                                }
                                 currentGroup = newKey;
                                 await loadGroupData();
                             }
@@ -703,11 +775,31 @@
                     document.getElementById("admin-delete-group").addEventListener("click", async () => {
                         if (confirm(`"${currentGroup}" grubunu silmek istiyor musunuz?`)) {
                             localStorage.removeItem(`hatim_group_${currentGroup}`);
+                            sessionStorage.removeItem(`unlocked_${currentGroup}`);
                             let keys = getAllGroupKeys();
                             currentGroup = keys[0];
                             await loadGroupData();
                         }
                     });
+
+                    const setPwdBtn = document.getElementById("admin-set-password");
+                    if (setPwdBtn) {
+                        setPwdBtn.addEventListener("click", () => {
+                            let currentPwd = appData.password || "";
+                            let newPwd = prompt("Gruba yeni şifre belirleyin (Kaldırmak için kutuyu tamamen boş bırakıp Tamam'a basın):", currentPwd);
+                            if (newPwd !== null) {
+                                appData.password = newPwd.trim();
+                                saveGroupData();
+                                if (appData.password) {
+                                    sessionStorage.setItem(`unlocked_${currentGroup}`, "true");
+                                    alert("Grup şifresi başarıyla tanımlandı.");
+                                } else {
+                                    alert("Grup şifresi kaldırıldı.");
+                                }
+                                loadGroupData();
+                            }
+                        });
+                    }
 
                     document.getElementById("admin-add-member").addEventListener("click", async () => {
                         let mName = prompt("Eklenecek üye adı:");
