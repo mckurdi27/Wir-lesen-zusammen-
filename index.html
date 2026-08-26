@@ -17,16 +17,16 @@
         <div id="main-title-ornate-section" style="margin-bottom: 20px; padding: 10px 15px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border: 2px solid #d4af37; border-top: 6px solid #8a6d3b; border-radius: 12px; box-shadow: 0 4px 15px rgba(138, 109, 59, 0.2);">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
                 
-                <!-- Sol Kart: Mescid-i Nebevi Resmi -->
-                <div style="flex: 0 0 190px; text-align: center;">
-                    <img src="img/Nebevi.jpg" alt="Mescid-i Nebevi" style="width: 100%; height: 117px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
+                <!-- Sol Kart: Mescid-i Nebevi Resmi (Genişletilmiş ve Uzatılmış) -->
+                <div style="flex: 0 0 220px; text-align: center;">
+                    <img src="img/Nebevi.jpg" alt="Mescid-i Nebevi" style="width: 100%; height: 155px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
                     <div style="font-size: 11px; font-weight: bold; margin-top: 2px; color: #3e2723;">Mescid-i Nebevi</div>
                 </div>
 
                 <!-- Orta Kısım: Başlık ve Namaz Vakitleri Modülü -->
                 <div style="flex: 1; min-width: 220px; text-align: center;">
-                    <div style="font-size: 18px; font-weight: bold; margin-bottom: 4px; color: #3e2723; display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap;">
-                        <span>Ortak Hatim und Duada Buluşuyoruz</span>
+                    <div style="font-size: 18px; font-weight: bold; margin-bottom: 4px; color: #3e2723; line-height: 1.3;">
+                        Ortak Hatim<br>Duada Buluşuyoruz
                     </div>
                     <div style="font-size: 12px; opacity: 0.85; font-style: italic; margin-bottom: 8px; max-width: 260px; margin-left: auto; margin-right: auto; line-height: 1.4;">
                         Grubunuzu seçin, isminizi belirleyin ve<br>manevi iklimde ortak hatim halkamıza katılın.
@@ -55,9 +55,9 @@
                     </div>
                 </div>
 
-                <!-- Sağ Kart: Kâbe-i Muazzama Resmi -->
-                <div style="flex: 0 0 190px; text-align: center;">
-                    <img src="img/Kabe.jpg" alt="Kâbe-i Muazzama" style="width: 100%; height: 117px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
+                <!-- Sağ Kart: Kâbe-i Muazzama Resmi (Genişletilmiş ve Uzatılmış) -->
+                <div style="flex: 0 0 220px; text-align: center;">
+                    <img src="img/Kabe.jpg" alt="Kâbe-i Muazzama" style="width: 100%; height: 155px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
                     <div style="font-size: 11px; font-weight: bold; margin-top: 2px; color: #3e2723;">Kâbe-i Muazzama</div>
                 </div>
 
@@ -66,7 +66,7 @@
 
         <div id="books-grid"></div>
 
-        <!-- Namaz Vakitleri Çalışma Scripti -->
+        <!-- Namaz Vakitleri Çalışma Scripti (Şehir + GPS Destekli) -->
         <script>
         async function fetchPrayerTimes() {
             const city = document.getElementById('citySelect').value;
@@ -1714,87 +1714,65 @@
                                         </div>
                                     `;
                                 } else if (st.statusType === "read") {
-                                    actionButtons = `<button class="unread-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 8px 12px; background: #e67e22; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: bold;">Okunmadı Yap</button>`;
+                                    actionButtons = `<button class="unread-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 8px 12px; background: #f39c12; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: bold;">Okunmadı Çek</button>`;
                                 }
+                            } else if (isAdmin) {
+                                actionButtons = `<button class="admin-force-free-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 6px 10px; background: #c0392b; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">Yönetici: Boşa Çıkart</button>`;
                             }
                         }
 
                         return `
-                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; ${bgStyle}; border-bottom: ${borderStyle}; border-radius: 6px; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
-                                <div style="display: flex; flex-direction: column;">
-                                    <span style="font-weight: bold; font-size: 13px;">${pi.name}</span>
-                                    <span style="font-size: 11px; opacity: 0.85;">Durum: ${statusText}</span>
-                                </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; margin-bottom: 8px; border-radius: 6px; border: 1px solid var(--border-color); ${bgStyle}; flex-wrap: wrap; gap: 8px;">
+                                <div style="font-weight: bold; font-size: 13px;">${pi.name}</div>
+                                <div style="font-size: 12px;">Durum: <strong>${statusText}</strong></div>
                                 <div>${actionButtons}</div>
                             </div>
                         `;
                     }).join('');
 
                     card.innerHTML = `
-                        <div class="book-header" style="padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; flex-wrap: wrap; gap: 10px;">
+                        <div class="book-header" style="padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: linear-gradient(to right, rgba(212,175,55,0.1), transparent); border-bottom: 2px solid var(--gold-primary);">
                             <div>
-                                <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">${book.name}</h3>
-                                <div style="font-size: 11px; opacity: 0.8; margin-top: 2px;">Alınan: ${takenCount} / ${book.totalUnits} (%${percent}) | Hatim: ${hatimInfo.hatimNo}. Hatim</div>
+                                <h3 style="margin: 0; font-size: 15px; color: var(--gold-dark);">${book.name}</h3>
+                                <div style="font-size: 11px; opacity: 0.8; margin-top: 3px;">Hatim No: ${hatimInfo.hatimNo} | İlerleme: %${percent} (${takenCount}/${book.totalUnits})</div>
                             </div>
-                            <div style="display: flex; gap: 6px; align-items: center;" onclick="event.stopPropagation();">
-                                <button class="open-pdf-btn" data-book-id="${book.id}" data-book-name="${book.name}" style="padding: 5px 10px; background: #8e44ad; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">📄 PDF Oku</button>
-                                <span style="font-size: 12px; font-weight: bold;">${isOpen ? '▼ Kapat' : '▶ Aç'}</span>
+                            <div style="display: flex; gap: 6px; align-items: center;">
+                                <button class="open-pdf-btn" data-book-id="${book.id}" data-book-name="${book.name}" style="background: #e67e22; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">📄 PDF Oku</button>
+                                <span style="font-size: 13px; font-weight: bold; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--gold-primary);">${isOpen ? '▼ Gizle' : '▶ Göster'}</span>
                             </div>
                         </div>
-                        <div class="book-body" style="display: ${isOpen ? 'block' : 'none'}; padding: 16px; border-top: 1px solid var(--border-color);">
-                            <div style="margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;">
+                        <div class="book-body" style="display: ${isOpen ? 'block' : 'none'}; padding: 15px; background: var(--card-bg);">
+                            <div style="margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: wrap;">
+                                <span style="font-size: 12px; font-weight: bold; align-self: center; margin-right: 4px;">Görünüm:</span>
                                 ${modeButtonsHtml}
                             </div>
-                            <div style="max-height: 350px; overflow-y: auto; padding-right: 4px; margin-bottom: 15px;">
+                            <div style="max-height: 350px; overflow-y: auto; padding-right: 4px;">
                                 ${itemsHtml}
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-color); padding-top: 12px; flex-wrap: wrap; gap: 8px;">
-                                <div style="font-size: 12px;">
-                                    <span>Başlangıç: <strong>${hatimInfo.startDate}</strong></span> | 
-                                    <span style="color: ${hatimInfo.prayerDone ? '#27ae60' : '#e67e22'}; font-weight: bold;">Dua: ${hatimInfo.prayerDone ? 'Yapıldı' : 'Yapılacak'}</span>
-                                </div>
-                                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                                    <button class="toggle-prayer-btn" data-book-id="${book.id}" style="padding: 6px 10px; background: ${hatimInfo.prayerDone ? '#e67e22' : '#27ae60'}; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">${hatimInfo.prayerDone ? 'Duayı Geri Al' : 'Duayı Yapıldı İşaretle'}</button>
-                                    <button class="finish-hatim-btn" data-book-id="${book.id}" style="padding: 6px 10px; background: #8e44ad; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">🎉 Hatim Tamamla & Yeni Hatim Başlat</button>
-                                    <button class="whatsapp-book-btn" data-book-id="${book.id}" style="padding: 6px 10px; background: #25D366; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">💬 WhatsApp Paylaş</button>
-                                </div>
                             </div>
                         </div>
                     `;
 
-                    booksGrid.appendChild(card);
-                });
-
-                document.querySelectorAll(".book-header").forEach(header => {
-                    header.addEventListener("click", (e) => {
-                        let card = header.closest(".book-card");
+                    card.querySelector(".book-header").addEventListener("click", (e) => {
+                        if (e.target.classList.contains("open-pdf-btn")) return;
                         card.classList.toggle("open");
-                        let body = card.querySelector(".book-body");
-                        body.style.display = body.style.display === "none" ? "block" : "none";
-                        let span = header.querySelector("span:last-child");
-                        span.textContent = card.classList.contains("open") ? "▼ Kapat" : "▶ Aç";
+                        renderBooks();
                     });
-                });
 
-                document.querySelectorAll(".open-pdf-btn").forEach(btn => {
-                    btn.addEventListener("click", (e) => {
-                        let bId = e.target.getAttribute("data-book-id");
-                        let bName = e.target.getAttribute("data-book-name");
-                        openPdfReaderModal(bId, bName);
+                    card.querySelector(".open-pdf-btn").addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        openPdfReaderModal(book.id, book.name);
                     });
-                });
 
-                document.querySelectorAll(".mode-btn").forEach(btn => {
-                    btn.addEventListener("click", (e) => {
-                        let bId = e.target.getAttribute("data-book-id");
-                        let mode = e.target.getAttribute("data-mode");
-                        let bookObj = appData.books.find(b => b.id === bId);
-                        if (bookObj) {
-                            bookObj.currentMode = mode;
+                    card.querySelectorAll(".mode-btn").forEach(btn => {
+                        btn.addEventListener("click", (e) => {
+                            e.stopPropagation();
+                            book.currentMode = e.target.getAttribute("data-mode");
                             saveGroupData();
                             renderBooks();
-                        }
+                        });
                     });
+
+                    booksGrid.appendChild(card);
                 });
 
                 document.querySelectorAll(".take-range-btn").forEach(btn => {
@@ -1807,10 +1785,23 @@
                         let start = parseInt(e.target.getAttribute("data-start"), 10);
                         let end = parseInt(e.target.getAttribute("data-end"), 10);
                         let baseArray = appData.bookPages[bId];
+
                         for (let i = start; i < end; i++) {
                             baseArray[i].owner = loggedInMember;
                             baseArray[i].isRead = false;
                         }
+
+                        if (!appData.readingLogs) appData.readingLogs = [];
+                        let bObj = appData.books.find(b => b.id === bId);
+                        appData.readingLogs.push({
+                            date: new Date().toLocaleDateString("tr-TR"),
+                            timestamp: Date.now(),
+                            member: loggedInMember,
+                            bookName: bObj ? bObj.name : bId,
+                            count: (end - start),
+                            range: `${start + 1}-${end}`
+                        });
+
                         saveGroupData();
                         renderBooks();
                         renderAnalysisSection();
@@ -1819,37 +1810,14 @@
 
                 document.querySelectorAll(".read-range-btn").forEach(btn => {
                     btn.addEventListener("click", (e) => {
-                        if (!loggedInMember) {
-                            alert("Lütfen önce isminizi seçin.");
-                            return;
-                        }
                         let bId = e.target.getAttribute("data-book-id");
                         let start = parseInt(e.target.getAttribute("data-start"), 10);
                         let end = parseInt(e.target.getAttribute("data-end"), 10);
                         let baseArray = appData.bookPages[bId];
-                        let bookObj = appData.books.find(b => b.id === bId);
-                        let defModes = bookModesDefs[bId];
-                        let primaryKey = bookObj.type === "bab" ? "on_bab" : "yirmi_sayfa";
-                        if (!defModes[primaryKey]) primaryKey = Object.keys(defModes)[0];
-                        let rangeName = "";
-                        defModes[primaryKey].getItems().forEach(pi => {
-                            if (pi.start === start && pi.end === end) rangeName = pi.name;
-                        });
-                        if (!rangeName) rangeName = `${start + 1}-${end}`;
 
                         for (let i = start; i < end; i++) {
                             baseArray[i].isRead = true;
                         }
-
-                        if (!appData.readingLogs) appData.readingLogs = [];
-                        appData.readingLogs.push({
-                            date: new Date().toLocaleDateString("tr-TR") + " " + new Date().toLocaleTimeString("tr-TR", { hour: '2-digit', minute: '2-digit' }),
-                            timestamp: Date.now(),
-                            member: loggedInMember,
-                            bookName: bookObj.name,
-                            range: rangeName,
-                            count: end - start
-                        });
 
                         saveGroupData();
                         renderBooks();
@@ -1863,9 +1831,11 @@
                         let start = parseInt(e.target.getAttribute("data-start"), 10);
                         let end = parseInt(e.target.getAttribute("data-end"), 10);
                         let baseArray = appData.bookPages[bId];
+
                         for (let i = start; i < end; i++) {
                             baseArray[i].isRead = false;
                         }
+
                         saveGroupData();
                         renderBooks();
                         renderAnalysisSection();
@@ -1878,71 +1848,33 @@
                         let start = parseInt(e.target.getAttribute("data-start"), 10);
                         let end = parseInt(e.target.getAttribute("data-end"), 10);
                         let baseArray = appData.bookPages[bId];
+
                         for (let i = start; i < end; i++) {
                             baseArray[i].owner = "";
                             baseArray[i].isRead = false;
                         }
+
                         saveGroupData();
                         renderBooks();
                         renderAnalysisSection();
                     });
                 });
 
-                document.querySelectorAll(".toggle-prayer-btn").forEach(btn => {
+                document.querySelectorAll(".admin-force-free-btn").forEach(btn => {
                     btn.addEventListener("click", (e) => {
                         let bId = e.target.getAttribute("data-book-id");
-                        if (!appData.bookHatims[bId]) appData.bookHatims[bId] = { hatimNo: 1, startDate: new Date().toLocaleDateString("tr-TR"), prayerDone: false };
-                        appData.bookHatims[bId].prayerDone = !appData.bookHatims[bId].prayerDone;
+                        let start = parseInt(e.target.getAttribute("data-start"), 10);
+                        let end = parseInt(e.target.getAttribute("data-end"), 10);
+                        let baseArray = appData.bookPages[bId];
+
+                        for (let i = start; i < end; i++) {
+                            baseArray[i].owner = "";
+                            baseArray[i].isRead = false;
+                        }
+
                         saveGroupData();
                         renderBooks();
-                    });
-                });
-
-                document.querySelectorAll(".finish-hatim-btn").forEach(btn => {
-                    btn.addEventListener("click", (e) => {
-                        let bId = e.target.getAttribute("data-book-id");
-                        let bookObj = appData.books.find(b => b.id === bId);
-                        if (confirm(`"${bookObj.name}" için yeni hatim başlatılsın mı? (Mevcut sayfalar sıfırlanacak ve hatim numarası artırılacaktır)`)) {
-                            let hInfo = appData.bookHatims[bId] || { hatimNo: 1 };
-                            let currentHatimNo = hInfo.hatimNo || 1;
-                            if (!appData.bookHistory[bId]) appData.bookHistory[bId] = [];
-                            appData.bookHistory[bId].push({
-                                hatimNo: currentHatimNo,
-                                endDate: new Date().toLocaleDateString("tr-TR")
-                            });
-
-                            appData.bookPages[bId] = Array(bookObj.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
-                            appData.bookHatims[bId] = {
-                                hatimNo: currentHatimNo + 1,
-                                startDate: new Date().toLocaleDateString("tr-TR"),
-                                prayerDone: false
-                            };
-                            saveGroupData();
-                            renderBooks();
-                            renderAnalysisSection();
-                        }
-                    });
-                });
-
-                document.querySelectorAll(".whatsapp-book-btn").forEach(btn => {
-                    btn.addEventListener("click", (e) => {
-                        let bId = e.target.getAttribute("data-book-id");
-                        let bookObj = appData.books.find(b => b.id === bId);
-                        let baseArray = appData.bookPages[bId];
-                        let defModes = bookModesDefs[bId];
-                        let primaryKey = bookObj.type === "bab" ? "on_bab" : "yirmi_sayfa";
-                        if (!defModes[primaryKey]) primaryKey = Object.keys(defModes)[0];
-
-                        let summary = [];
-                        defModes[primaryKey].getItems().forEach(pi => {
-                            let st = getRangeStatus(baseArray, pi.start, pi.end);
-                            if (st.owner) {
-                                summary.push(`• ${pi.name}: *${st.owner}* ${st.isRead ? '(✓ Okundu)' : ''}`);
-                            }
-                        });
-
-                        let msg = `*[${currentGroup.replace(/_/g, ' ').toUpperCase()}] ${bookObj.name} Takip Durumu*\n\n` + (summary.length > 0 ? summary.join("\n") : "Henüz alınan hisse bulunmuyor.");
-                        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+                        renderAnalysisSection();
                     });
                 });
             }
