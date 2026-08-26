@@ -150,18 +150,13 @@
                 let filePath = fileMap[ayKodu] || "json/03-rebiulevvel.json";
                 try {
                     let response = await fetch(filePath);
-                    if (!response.ok) throw new Error("JSON dosyası bulunamadı");
+                    if (!response.ok) throw new Error("JSON dosyası bulunamadı: " + filePath);
                     let data = await response.json();
                     monthlyInspirationCache[ayKodu] = data;
                     return data;
                 } catch (e) {
-                    return {
-                        "1": {
-                            ayet: { meal: "Şüphesiz güçlükle beraber bir kolaylık vardır.", kaynak: "İnşirah, 5-6" },
-                            hadis: { meal: "İki nimet vardır ki, insanların çoğu bunların kıymetini bilmekte aldanmıştır.", kaynak: "Buhari" },
-                            german: { quote: "Übung macht den Meister.", translation: "Pratik ustayı yapar." }
-                        }
-                    };
+                    console.error(e);
+                    return {}; // Sabit örnekler kaldırıldı, dosya okunamazsa boş döner.
                 }
             }
 
@@ -175,13 +170,13 @@
                 let jsonData = await fetchHijriMonthData(hMonth);
                 let item = null;
                 if (jsonData) {
-                    item = jsonData[String(hDay)] || jsonData[hDay] || jsonData[String(hDay).padStart(2, '0')] || Object.values(jsonData)[0];
+                    item = jsonData[String(hDay)] || jsonData[hDay] || jsonData[String(hDay).padStart(2, '0')];
                 }
 
-                let verseText = "Şüphesiz güçlükle beraber bir kolaylık vardır. (İnşirah, 5-6)";
-                let hadishText = "İki nimet vardır ki, insanların çoğu bunların kıymetini bilmekte aldanmıştır.";
-                let germanQuote = "Übung macht den Meister.";
-                let germanTrans = "Pratik ustayı yapar.";
+                let verseText = "Bu güne ait ayet verisi JSON dosyasında bulunamadı.";
+                let hadishText = "Bu güne ait hadis verisi JSON dosyasında bulunamadı.";
+                let germanQuote = "Verfügbar nicht.";
+                let germanTrans = "Çeviri bulunamadı.";
 
                 if (item) {
                     if (item.ayet) {
