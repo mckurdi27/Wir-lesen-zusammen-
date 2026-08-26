@@ -1,4 +1,4 @@
-{
+window.sefer_veri = {
     "ay_kodu": "02",
     "ay_adi": "Sefer",
     "aciklama": "Hicri takvimin ikinci ayıdır.",
@@ -154,4 +154,4 @@
             "hadis": { "meal": "Müminin silahı dua, dinin direği namaz, göklerin ve yerin nuru oruçtur.", "kaynak": "Hakim, Müstedrek, 1/492" }
         }
     }
-}
+};
