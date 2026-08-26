@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ortak Hatim dan Dua Takip Sistemi</title>
+    <title>Ortak Hatim ve Dua Takip Sistemi</title>
 </head>
 <body>
     <div class="container">
@@ -393,7 +393,6 @@
                 const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
                 appData = savedData ? JSON.parse(savedData) : { members: currentGroup === "grup_1" ? ["Ahmet", "Mehmet", "Ayşe"] : [], password: "" };
                 
-                // Yönetici modu açıkken şifreli grupların tekrar şifre sormasını engelleyen mantık
                 if (appData.password && !isAdmin) {
                     let enteredPwd = prompt(`"${currentGroup.replace(/_/g, ' ').toUpperCase()}" grubu şifrelidir. Lütfen şifreyi girin:`);
                     if (enteredPwd !== appData.password) {
@@ -650,13 +649,10 @@
                 `;
             }
 
-            // 5 SEKMELİ YÖNETİCİ ANALİZ PANELİ
-            function openDetailedAnalysisWindow() {
-                let win = window.open('', '_blank');
-                if (!win) {
-                    alert("Tarayıcınız yeni sekme açılmasına izin vermedi. Lütfen pop-up engelleyicinizi kontrol edin.");
-                    return;
-                }
+            // GÜVENLİ VE MOBİL UYUMLU 5 SEKMELİ ANALİZ MODAL (PENCERE) SİSTEMİ
+            function openDetailedAnalysisModal() {
+                let existingModal = document.getElementById("detailed-analysis-modal");
+                if (existingModal) existingModal.remove();
 
                 let allGroupKeys = getAllGroupKeys();
                 let groupsComparisonHtml = '';
@@ -692,10 +688,10 @@
 
                     groupsComparisonHtml += `
                         <tr>
-                            <td style="padding: 12px 15px; border-bottom: 1px solid #e3dcd2; font-weight: bold; color: #3e2723;">${gKey.replace(/_/g, ' ').toUpperCase()}</td>
-                            <td style="padding: 12px 15px; border-bottom: 1px solid #e3dcd2; text-align: center;">${mCount} Üye</td>
-                            <td style="padding: 12px 15px; border-bottom: 1px solid #e3dcd2; text-align: center;">${takenU} / ${totalU} <span style="font-size: 11px; color: #8a6d3b; font-weight: bold;">(%${tPct})</span></td>
-                            <td style="padding: 12px 15px; border-bottom: 1px solid #e3dcd2; text-align: center;">${readU} / ${totalU} <span style="font-size: 11px; color: #27ae60; font-weight: bold;">(%${rPct})</span></td>
+                            <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${gKey.replace(/_/g, ' ').toUpperCase()}</td>
+                            <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${mCount} Üye</td>
+                            <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${takenU} / ${totalU} (%${tPct})</td>
+                            <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${readU} / ${totalU} (%${rPct})</td>
                         </tr>
                     `;
                 });
@@ -712,9 +708,9 @@
                         });
                         membersListHtml += `
                             <tr>
-                                <td style="padding: 12px 15px; border-bottom: 1px solid #e3dcd2; font-weight: bold;">${m}</td>
-                                <td style="padding: 12px 15px; border-bottom: 1px solid #e3dcd2; text-align: center;">${mTaken} Hisse</td>
-                                <td style="padding: 12px 15px; border-bottom: 1px solid #e3dcd2; text-align: center; color: #27ae60; font-weight: bold;">${mRead} Hisse</td>
+                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${m}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${mTaken} Hisse</td>
+                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${mRead} Hisse</td>
                             </tr>
                         `;
                     });
@@ -728,15 +724,15 @@
                     sortedLogs.forEach(log => {
                         logsHtml += `
                             <tr>
-                                <td style="padding: 10px 15px; border-bottom: 1px solid #e3dcd2; color: #666; font-size: 12px;">${log.date}</td>
-                                <td style="padding: 10px 15px; border-bottom: 1px solid #e3dcd2; font-weight: bold; color: #2c3e50;">${log.member}</td>
-                                <td style="padding: 10px 15px; border-bottom: 1px solid #e3dcd2;">${log.bookName}</td>
-                                <td style="padding: 10px 15px; border-bottom: 1px solid #e3dcd2; text-align: center; font-weight: bold; color: #27ae60;">${log.count} Sayfa / Bölüm <span style="font-size: 11px; color: #666; font-weight: normal;">(${log.range})</span></td>
+                                <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-size: 11px; opacity: 0.8;">${log.date}</td>
+                                <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${log.member}</td>
+                                <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color);">${log.bookName}</td>
+                                <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${log.count} Birim (${log.range})</td>
                             </tr>
                         `;
                     });
                 } else {
-                    logsHtml = `<tr><td colspan="4" style="padding: 15px; text-align: center; color: #777;">Henüz okundu olarak işaretlenen bir kayıt bulunmuyor.</td></tr>`;
+                    logsHtml = `<tr><td colspan="4" style="padding: 15px; text-align: center; color: #777;">Henüz okundu olarak işaretlenen kayıt bulunmuyor.</td></tr>`;
                 }
 
                 let bookStatusHtml = '';
@@ -745,266 +741,157 @@
                         let hInfo = appData.bookHatims[b.id] || { hatimNo: 1, prayerDone: false };
                         bookStatusHtml += `
                             <tr>
-                                <td style="padding: 12px 15px; border-bottom: 1px solid #e3dcd2; font-weight: bold;">${b.name}</td>
-                                <td style="padding: 12px 15px; border-bottom: 1px solid #e3dcd2; text-align: center;">${hInfo.hatimNo}. Hatim</td>
-                                <td style="padding: 12px 15px; border-bottom: 1px solid #e3dcd2; text-align: center; color: ${hInfo.prayerDone ? '#27ae60' : '#e67e22'}; font-weight: bold;">${hInfo.prayerDone ? '✓ Yapıldı' : 'Yapılacak'}</td>
-                                <td style="padding: 12px 15px; border-bottom: 1px solid #e3dcd2; text-align: center;">${b.totalUnits} Birim</td>
+                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${b.name}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${hInfo.hatimNo}. Hatim</td>
+                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: ${hInfo.prayerDone ? '#27ae60' : '#e67e22'}; font-weight: bold;">${hInfo.prayerDone ? '✓ Yapıldı' : 'Yapılacak'}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${b.totalUnits} Birim</td>
                             </tr>
                         `;
                     });
                 }
 
-                win.document.write(`
-                    <!DOCTYPE html>
-                    <html lang="tr">
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>Yönetici 5 Sekmeli Analiz ve Rapor Paneli</title>
-                        <style>
-                            body {
-                                font-family: 'Georgia', serif;
-                                background-color: #fdfbf7;
-                                color: #3e2723;
-                                margin: 0;
-                                padding: 30px;
-                            }
-                            .report-container {
-                                max-width: 1100px;
-                                margin: 0 auto;
-                                background: #ffffff;
-                                padding: 30px;
-                                border-radius: 12px;
-                                border: 2px solid #d4af37;
-                                box-shadow: 0 4px 20px rgba(138, 109, 59, 0.15);
-                            }
-                            .header-flex {
-                                display: flex;
-                                justify-content: space-between;
-                                align-items: center;
-                                border-bottom: 3px solid #d4af37;
-                                padding-bottom: 15px;
-                                margin-bottom: 20px;
-                                flex-wrap: wrap;
-                                gap: 15px;
-                            }
-                            h1 {
-                                font-size: 22px;
-                                color: #8a6d3b;
-                                margin: 0;
-                            }
-                            .print-btn {
-                                background: #2980b9;
-                                color: white;
-                                border: none;
-                                padding: 10px 18px;
-                                border-radius: 6px;
-                                cursor: pointer;
-                                font-weight: bold;
-                                font-size: 13px;
-                                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                            }
-                            .print-btn:hover {
-                                background: #2471a3;
-                            }
-                            .tabs-nav {
-                                display: flex;
-                                gap: 5px;
-                                border-bottom: 2px solid #d4af37;
-                                margin-bottom: 20px;
-                                flex-wrap: wrap;
-                            }
-                            .tab-btn {
-                                padding: 10px 16px;
-                                background: #f4ebd0;
-                                border: 1px solid #d4af37;
-                                border-bottom: none;
-                                border-radius: 6px 6px 0 0;
-                                cursor: pointer;
-                                font-weight: bold;
-                                font-size: 13px;
-                                color: #3e2723;
-                                transition: all 0.2s;
-                            }
-                            .tab-btn.active {
-                                background: #d4af37;
-                                color: #fff;
-                                border-bottom: 2px solid #d4af37;
-                            }
-                            .tab-content {
-                                display: none;
-                            }
-                            .tab-content.active {
-                                display: block;
-                            }
-                            h2 {
-                                font-size: 16px;
-                                margin-top: 15px;
-                                margin-bottom: 12px;
-                                color: #3e2723;
-                                border-left: 5px solid #d4af37;
-                                padding-left: 10px;
-                                background: linear-gradient(to right, rgba(212,175,55,0.1), transparent);
-                                padding-top: 6px;
-                                padding-bottom: 6px;
-                            }
-                            table {
-                                width: 100%;
-                                border-collapse: collapse;
-                                background: #fff;
-                                border-radius: 8px;
-                                overflow: hidden;
-                                border: 1px solid #e3dcd2;
-                                margin-bottom: 10px;
-                            }
-                            th {
-                                background: #f4ebd0;
-                                color: #3e2723;
-                                padding: 12px 15px;
-                                text-align: left;
-                                font-size: 13px;
-                                border-bottom: 2px solid #d4af37;
-                            }
-                            td {
-                                font-size: 13px;
-                            }
-                            .meta-info {
-                                font-size: 13px;
-                                opacity: 0.85;
-                                margin-bottom: 20px;
-                                background: #f9f6ef;
-                                padding: 12px 15px;
-                                border-radius: 6px;
-                                border: 1px solid #e3dcd2;
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="report-container">
-                            <div class="header-flex">
-                                <div>
-                                    <h1>📊 Yönetici 5 Sekmeli Analiz ve Rapor Paneli</h1>
-                                    <div style="font-size: 12px; color: #666; margin-top: 4px;">Kapsamlı Sistem Raporu ve İstatistik Merkezi</div>
-                                </div>
-                                <button class="print-btn" onclick="window.print()">🖨️ Raporu Yazdır / PDF Kaydet</button>
-                            </div>
+                let modalOverlay = document.createElement("div");
+                modalOverlay.id = "detailed-analysis-modal";
+                modalOverlay.style.cssText = `
+                    position: fixed;
+                    top: 0; left: 0; width: 100%; height: 100%;
+                    background: rgba(0, 0, 0, 0.6);
+                    z-index: 99999;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    padding: 15px;
+                    box-sizing: border-box;
+                `;
 
-                            <div class="meta-info">
-                                Aktif İncelenen Grup: <strong>${currentGroup.replace(/_/g, ' ').toUpperCase()}</strong> | 
-                                Toplam Eser Hissesi: <strong>${totalSystemBooks}</strong> | 
-                                Alınan: <strong>${totalSystemTaken}</strong> | 
-                                Okunan: <strong>${totalSystemRead}</strong>
+                modalOverlay.innerHTML = `
+                    <div style="background: var(--card-bg); color: var(--text-main); width: 100%; max-width: 900px; max-height: 90vh; border-radius: 12px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.3);">
+                        <div style="padding: 15px 20px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border-bottom: 2px solid var(--gold-primary); display: flex; justify-content: space-between; align-items: center; color: #3e2723;">
+                            <div>
+                                <h2 style="margin: 0; font-size: 18px; color: #8a6d3b;">📊 Yönetici 5 Sekmeli Analiz ve Rapor Paneli</h2>
+                                <div style="font-size: 11px; opacity: 0.8; margin-top: 3px;">Aktif Grup: ${currentGroup.replace(/_/g, ' ').toUpperCase()}</div>
                             </div>
-
-                            <div class="tabs-nav">
-                                <button class="tab-btn active" onclick="switchTab(event, 'tab-1')">1. Genel Özet</button>
-                                <button class="tab-btn" onclick="switchTab(event, 'tab-2')">2. Grup Karşılaştırma</button>
-                                <button class="tab-btn" onclick="switchTab(event, 'tab-3')">3. Üye Performansı</button>
-                                <button class="tab-btn" onclick="switchTab(event, 'tab-4')">4. Okuma Günlüğü</button>
-                                <button class="tab-btn" onclick="switchTab(event, 'tab-5')">5. Eser & Hatim Durumu</button>
-                            </div>
-
-                            <div id="tab-1" class="tab-content active">
-                                <h2>📈 Sistem Genel Özeti</h2>
-                                <p style="font-size: 13px; line-height: 1.6;">Bu panel üzerinden Ortak Hatim ve Dua Takip Sistemi'nin tüm gruplar ve bireyler bazındaki performansını 5 farklı sekmede inceleyebilir, raporları yazdırabilirsiniz.</p>
-                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
-                                    <div style="padding: 15px; border-radius: 8px; border-left: 4px solid #3498db; border: 1px solid #e3dcd2; background: #fff;">
-                                        <div style="font-size: 12px; color: #666;">Aktif Grup</div>
-                                        <div style="font-size: 18px; font-weight: bold; margin-top: 5px;">${currentGroup.replace(/_/g, ' ').toUpperCase()}</div>
-                                    </div>
-                                    <div style="padding: 15px; border-radius: 8px; border-left: 4px solid #f39c12; border: 1px solid #e3dcd2; background: #fff;">
-                                        <div style="font-size: 12px; color: #666;">Toplam Alınan Hisse</div>
-                                        <div style="font-size: 18px; font-weight: bold; margin-top: 5px;">${totalSystemTaken} / ${totalSystemBooks}</div>
-                                    </div>
-                                    <div style="padding: 15px; border-radius: 8px; border-left: 4px solid #27ae60; border: 1px solid #e3dcd2; background: #fff;">
-                                        <div style="font-size: 12px; color: #666;">Toplam Okunan Hisse</div>
-                                        <div style="font-size: 18px; font-weight: bold; margin-top: 5px;">${totalSystemRead} / ${totalSystemBooks}</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div id="tab-2" class="tab-content">
-                                <h2>⚔️ Tüm Grupları Karşılaştırma Paneli</h2>
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Grup Adı</th>
-                                            <th style="text-align: center;">Üye Sayısı</th>
-                                            <th style="text-align: center;">Alınan Hisseler</th>
-                                            <th style="text-align: center;">Okunan Hisseler</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${groupsComparisonHtml}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div id="tab-3" class="tab-content">
-                                <h2>👥 Aktif Grup Üyeleri ve Bireysel Durumları (${currentGroup.replace(/_/g, ' ').toUpperCase()})</h2>
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Üye Adı</th>
-                                            <th style="text-align: center;">Aldığı Toplam Hisse</th>
-                                            <th style="text-align: center;">Okuduğu Toplam Hisse</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${membersListHtml}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div id="tab-4" class="tab-content">
-                                <h2>📜 Detaylı Okuma Günlüğü (Kim Ne Zaman Ne Okumuş?)</h2>
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Tarih</th>
-                                            <th>Üye</th>
-                                            <th>Eser Adı</th>
-                                            <th style="text-align: center;">Miktar / Aralık</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${logsHtml}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div id="tab-5" class="tab-content">
-                                <h2>📚 Eserler ve Hatim Döngüsü Durumu</h2>
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Eser Adı</th>
-                                            <th style="text-align: center;">Mevcut Hatim</th>
-                                            <th style="text-align: center;">Dua Durumu</th>
-                                            <th style="text-align: center;">Toplam Birim</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${bookStatusHtml}
-                                    </tbody>
-                                </table>
+                            <div style="display: flex; gap: 8px;">
+                                <button id="modal-print-btn" style="background: #2980b9; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;">🖨️ Yazdır</button>
+                                <button id="modal-close-btn" style="background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;">✕ Kapat</button>
                             </div>
                         </div>
 
-                        <script>
-                            function switchTab(evt, tabId) {
-                                const contents = document.querySelectorAll('.tab-content');
-                                contents.forEach(c => c.classList.remove('active'));
-                                const buttons = document.querySelectorAll('.tab-btn');
-                                buttons.forEach(b => b.classList.remove('active'));
-                                document.getElementById(tabId).classList.add('active');
-                                evt.currentTarget.classList.add('active');
-                            }
-                        </script>
-                    </body>
-                    </html>
-                `);
-                win.document.close();
+                        <div style="display: flex; gap: 4px; padding: 10px 15px 0 15px; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border-color); overflow-x: auto;">
+                            <button class="m-tab-btn active" data-target="mtab-1" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">1. Genel Özet</button>
+                            <button class="m-tab-btn" data-target="mtab-2" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">2. Grup Karşılaştırma</button>
+                            <button class="m-tab-btn" data-target="mtab-3" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">3. Üye Performansı</button>
+                            <button class="m-tab-btn" data-target="mtab-4" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">4. Okuma Günlüğü</button>
+                            <button class="m-tab-btn" data-target="mtab-5" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">5. Eser Durumu</button>
+                        </div>
+
+                        <div style="padding: 20px; overflow-y: auto; flex: 1; font-size: 13px;">
+                            <div id="mtab-1" class="m-tab-content">
+                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📈 Sistem Genel Özeti</h3>
+                                <p>Bu panel üzerinden tüm grupların ve üyelerin ilerleme durumunu detaylıca takip edebilirsiniz.</p>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 15px;">
+                                    <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; border-left: 4px solid #3498db;">
+                                        <div style="font-size: 11px; opacity: 0.8;">Aktif Grup</div>
+                                        <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${currentGroup.replace(/_/g, ' ').toUpperCase()}</div>
+                                    </div>
+                                    <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; border-left: 4px solid #f39c12;">
+                                        <div style="font-size: 11px; opacity: 0.8;">Alınan Hisseler</div>
+                                        <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${totalSystemTaken} / ${totalSystemBooks}</div>
+                                    </div>
+                                    <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; border-left: 4px solid #27ae60;">
+                                        <div style="font-size: 11px; opacity: 0.8;">Okunan Hisseler</div>
+                                        <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${totalSystemRead} / ${totalSystemBooks}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="mtab-2" class="m-tab-content" style="display: none;">
+                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">⚔️ Tüm Grupları Karşılaştırma</h3>
+                                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                                    <thead>
+                                        <tr style="background: rgba(212,175,55,0.1);">
+                                            <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Grup Adı</th>
+                                            <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Üye Sayısı</th>
+                                            <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Alınan</th>
+                                            <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okunan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${groupsComparisonHtml}</tbody>
+                                </table>
+                            </div>
+
+                            <div id="mtab-3" class="m-tab-content" style="display: none;">
+                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">👥 Üye Performansları (${currentGroup.replace(/_/g, ' ').toUpperCase()})</h3>
+                                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                                    <thead>
+                                        <tr style="background: rgba(212,175,55,0.1);">
+                                            <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye Adı</th>
+                                            <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Aldığı Toplam</th>
+                                            <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okuduğu Toplam</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${membersListHtml}</tbody>
+                                </table>
+                            </div>
+
+                            <div id="mtab-4" class="m-tab-content" style="display: none;">
+                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📜 Detaylı Okuma Günlüğü</h3>
+                                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                                    <thead>
+                                        <tr style="background: rgba(212,175,55,0.1);">
+                                            <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Tarih</th>
+                                            <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye</th>
+                                            <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser</th>
+                                            <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Miktar / Aralık</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${logsHtml}</tbody>
+                                </table>
+                            </div>
+
+                            <div id="mtab-5" class="m-tab-content" style="display: none;">
+                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📚 Eserler ve Hatim Döngü Durumu</h3>
+                                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                                    <thead>
+                                        <tr style="background: rgba(212,175,55,0.1);">
+                                            <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser Adı</th>
+                                            <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Mevcut Hatim</th>
+                                            <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Dua Durumu</th>
+                                            <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Toplam Birim</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${bookStatusHtml}</tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(modalOverlay);
+
+                // Modal İçi Sekme Geçiş Mantığı
+                const tabBtns = modalOverlay.querySelectorAll(".m-tab-btn");
+                const tabContents = modalOverlay.querySelectorAll(".m-tab-content");
+
+                tabBtns.forEach(btn => {
+                    btn.addEventListener("click", (e) => {
+                        tabBtns.forEach(b => { b.style.background = "var(--card-bg)"; b.style.color = "var(--text-main)"; });
+                        tabContents.forEach(c => c.style.display = "none");
+
+                        e.currentTarget.style.background = "var(--gold-primary)";
+                        e.currentTarget.style.color = "#fff";
+                        document.getElementById(e.currentTarget.getAttribute("data-target")).style.display = "block";
+                    });
+                });
+                // İlk sekmeyi aktif yap
+                tabBtns[0].style.background = "var(--gold-primary)";
+                tabBtns[0].style.color = "#fff";
+
+                modalOverlay.querySelector("#modal-close-btn").addEventListener("click", () => modalOverlay.remove());
+                modalOverlay.querySelector("#modal-print-btn").addEventListener("click", () => window.print());
+                modalOverlay.addEventListener("click", (e) => {
+                    if (e.target === modalOverlay) modalOverlay.remove();
+                });
             }
 
             function renderAdminSectionAtBottom() {
@@ -1081,7 +968,7 @@
                     const analysisBtn = document.getElementById("admin-open-analysis-page");
                     if (analysisBtn) {
                         analysisBtn.addEventListener("click", () => {
-                            openDetailedAnalysisWindow();
+                            openDetailedAnalysisModal();
                         });
                     }
 
