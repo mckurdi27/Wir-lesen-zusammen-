@@ -1,4 +1,4 @@
-{
+window.rebiulevvel_veri = {
     "ay_kodu": "03",
     "ay_adi": "Rebiülevvel",
     "aciklama": "Hicri takvimin üçüncü ayıdır. Sevgili Peygamberimiz Hz. Muhammed'in (s.a.s.) doğum ayıdır.",
@@ -61,7 +61,7 @@
         "12": {
             "hicri_tarih": "12 Rebiülevvel (Mevlid Kandili)",
             "ayet": { "meal": "O, kendisinden önceki kitapları tasdik edici olarak inen bu Kitap'ı hak ile sana indirdi.", "kaynak": "Âl-i İmrân Suresi, 3" },
-            "hadis": { "meal": "Ey insanlar! Aranızda selamı yayınız, yemek yediriniz ve insanlar uyırken gece namaz kılınız ki selametle cennete giresiniz.", "kaynak": "Tirmizî, Kıyamet 42"  SEVİYORUMMM }
+            "hadis": { "meal": "Ey insanlar! Aranızda selamı yayınız, yemek yediriniz ve insanlar uyırken gece namaz kılınız ki selametle cennete giresiniz.", "kaynak": "Tirmizî, Kıyamet 42" }
         },
         "13": {
             "hicri_tarih": "13 Rebiülevvel",
@@ -154,4 +154,4 @@
             "hadis": { "meal": "Kalbinde iman ile Kur'an'ın birleştiği kişi ne güzel bir kuldur.", "kaynak": "Tirmizî, Edeb 70" }
         }
     }
-}
+};
