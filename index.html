@@ -100,16 +100,16 @@
             const ADMIN_PASSWORD = "1234";
 
             const bookPdfMap = {
-                "kuran": "pdfs/Kuran-ı Kerim.pdf",
-                "cevsen": "pdfs/Cevşen.pdf",
-                "tevhidname": "pdfs/Tevhidname Mealli.pdf",
-                "celcelutiye": "pdfs/Celcelûtiye.pdf",
-                "buyuk_cevsen": "pdfs/Büyük Cevşen.pdf",
-                "ashabi_bedr": "pdfs/Ashabı Bedr ve Şühedayı Uhud.pdf",
-                "dalail": "pdfs/Dalail ul khairat_text.pdf",
-                "dua_mecmuasi": "pdfs/Dua Mecmuasi Mealli.pdf",
-                "dilekce_tr": "pdfs/Bir Kırık Dilekçe Tr.pdf",
-                "dilekce_ar": "pdfs/Bir Kırık Dilekçe Ar.pdf"
+                "kuran": "pdf/Kuran-ı Kerim.pdf",
+                "cevsen": "pdf/Cevşen.pdf",
+                "tevhidname": "pdf/Tevhidname Mealli.pdf",
+                "celcelutiye": "pdf/Celcelûtiye.pdf",
+                "buyuk_cevsen": "pdf/Büyük Cevşen.pdf",
+                "ashabi_bedr": "pdf/Ashabı Bedr ve Şühedayı Uhud.pdf",
+                "dalail": "pdf/Dalail ul khairat_text.pdf",
+                "dua_mecmuasi": "pdf/Dua Mecmuasi Mealli.pdf",
+                "dilekce_tr": "pdf/Bir Kırık Dilekçe Tr.pdf",
+                "dilekce_ar": "pdf/Bir Kırık Dilekçe Ar.pdf"
             };
 
             function bugunkuHicriTarihiAl() {
@@ -142,8 +142,8 @@
             async function fetchHijriMonthData(ayKodu) {
                 if (monthlyInspirationCache[ayKodu]) return monthlyInspirationCache[ayKodu];
                 const fileMap = {
-                    "01": "js/01-muharrem.js", "02": "js/02-sefer.js", "03": "js/03-rebiulevvel.js",
-                    "04": "js/04-rebiulahir.js", "05": "js/05-cemaziyelevvel.js", "06": "js/06-cemaziyelahir.js",
+                    "01": "js/01-muharrem.js", "02": "js/02-sefer.js", "03": "js/03-rebiülevvel.js",
+                    "04": "js/04-rebiülahir.js", "05": "js/05-cemaziyelevvel.js", "06": "js/06-cemaziyelahir.js",
                     "07": "js/07-recep.js", "08": "js/08-saban.js", "09": "js/09-ramazan.js",
                     "10": "js/10-sevval.js", "11": "js/11-zilkade.js", "12": "js/12-zilhicce.js"
                 };
@@ -290,10 +290,10 @@
                         <span style="font-size: 12px; padding: 4px 10px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(150,150,150,0.2);">🌙 Hicri: ${inspirationData.fullDateStr}</span>
                     </div>
                     <div style="font-size: 13px; line-height: 1.6;">
-                        <p style="margin-bottom: 6px;">📖 <strong>Günün Ayeti:</strong> ${inspirationData.verse}</p>
-                        <p style="margin-bottom: 6px;">📜 <strong>Günün Hadisi:</strong> ${inspirationData.hadish}</p>
-                        <p style="margin-bottom: 6px;">💬 <strong>Günün Atasözü:</strong> ${inspirationData.proverb}</p>
-                        <p style="margin-bottom: 6px;">✨ <strong>Günün Özlü Sözü:</strong> ${inspirationData.quote}</p>
+                        <p style="margin-bottom: 6px;">📖 <strong>Ayet:</strong> ${inspirationData.verse}</p>
+                        <p style="margin-bottom: 6px;">📜 <strong>Hadis:</strong> ${inspirationData.hadish}</p>
+                        <p style="margin-bottom: 6px;">💬 <strong>Atasözü:</strong> ${inspirationData.proverb}</p>
+                        <p style="margin-bottom: 6px;">✨ <strong>Özlü Sözü:</strong> ${inspirationData.quote}</p>
                         <p style="margin-bottom: 2px;">🇩🇪 <strong>Tägliche Weisheit:</strong> <em>"${inspirationData.german.quote}"</em> <span style="opacity: 0.8;">(${inspirationData.german.translation})</span></p>
                     </div>
                 `;
