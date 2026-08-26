@@ -249,7 +249,7 @@
                 titleSection.innerHTML = `
                     <div style="font-size: 21px; font-weight: bold; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
                         <span>⚜️ 📖</span>
-                        <span>Ortak Hatim and Duada Buluşuyoruz</span>
+                        <span>Ortak Hatim ve Duada Buluşuyoruz</span>
                         <span>📖 ⚜️</span>
                     </div>
                     <div style="font-size: 13px; opacity: 0.85; font-style: italic;">
@@ -391,6 +391,7 @@
             async function loadGroupData() {
                 removeStuckPanel();
                 const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
+                // Yeni gruplarda üyeler varsayılan olarak boş gelir (members: [])
                 appData = savedData ? JSON.parse(savedData) : { members: currentGroup === "grup_1" ? ["Ahmet", "Mehmet", "Ayşe"] : [], password: "" };
                 
                 // Şifre Kontrolü
