@@ -1,4 +1,4 @@
-{
+window.cemaziyelahir_veri = {
     "ay_kodu": "06",
     "ay_adi": "Cemaziyelahir",
     "aciklama": "Hicri takvimin altıncı ayıdır.",
@@ -154,4 +154,4 @@
             "hadis": { "meal": "Müminin silahı dua, dinin direği namaz, göklerin ve yerin nuru oruçtur.", "kaynak": "Hakim, Müstedrek, 1/492" }
         }
     }
-}
+};
