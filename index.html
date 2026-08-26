@@ -577,6 +577,7 @@
                 localStorage.setItem(`hatim_group_${currentGroup}`, JSON.stringify(appData));
             }
 
+            // GÜNCELLENEN KULLANICI KONTROL PANELİ (İsim, Şifre, Grup Seçimi, Katıl)
             function renderUserControls() {
                 let controlsContainer = document.getElementById("user-controls-section");
                 if (!controlsContainer) {
@@ -595,6 +596,8 @@
                     return `<option value="${g}" ${g === currentGroup ? "selected" : ""}>${g.replace(/_/g, ' ').toUpperCase()}</option>`;
                 }).join('');
 
+                let membersOptions = '<option value="">-- İsminizi Seçin --</option>' + appData.members.map(m => `<option value="${m}" ${m === loggedInMember ? "selected" : ""}>${m}</option>`).join('');
+
                 controlsContainer.style.cssText = `
                     padding: 16px;
                     border-radius: 8px;
@@ -604,22 +607,33 @@
                 `;
 
                 controlsContainer.innerHTML = `
-                    <!-- 1. Satır: İsim, Şifre, Bireysel/Grup Seçimi -->
-                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px;">
-                        <input type="text" id="user-name-input" placeholder="İsminiz" value="${loggedInMember || ''}" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 100px;">
-                        <input type="password" id="user-pwd-input" placeholder="Şifreniz" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 90px;">
-                        <select id="participation-type-select" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 100px;">
-                            <option value="bireysel">Bireysel</option>
-                            <option value="grup" selected>Grup</option>
+                    <!-- 1. Grup Seçimi -->
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px;">
+                        <label style="font-weight: bold; font-size: 13px; min-width: 65px;">Grup Seç:</label>
+                        <select id="user-group-select" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 140px;">
+                            ${groupsHtml}
                         </select>
                     </div>
-
-                    <!-- 2. Satır: Dinamik Alt Alan (Grup Seçimi ve Şifre / Sadece Katıl) -->
-                    <div id="dynamic-sub-row" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; border-top: 1px dashed var(--border-color); padding-top: 10px;">
+                    
+                    <!-- 2. Grup Adı, Şifre ve Katıl Bölümü -->
+                    <div style="display: flex; gap: 6px; align-items: center; margin-top: 10px; margin-bottom: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px; flex-wrap: wrap;">
+                        <span style="font-weight: bold; font-size: 12px; white-space: nowrap;">Grup ve Şifre:</span>
+                        <input type="text" id="locked-group-name" placeholder="Grup Adı" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 80px;">
+                        <input type="password" id="locked-group-pwd" placeholder="Şifre" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 70px;">
+                        <button id="join-locked-group-btn" style="padding: 6px 10px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; white-space: nowrap;">Katıl</button>
                     </div>
 
-                    <div style="font-size: 11px; color: #e67e22; font-style: italic; margin-top: 8px;">
-                        * Not: İsminiz ve şifrenizle katılarak sayfada hisse alabilir ve değişiklik yapabilirsiniz[span_0](start_span)[span_0](end_span).
+                    <!-- 3. İsim Seçimi ve Üye Ekle -->
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
+                        <label style="font-weight: bold; font-size: 13px; min-width: 65px;">İsim:</label>
+                        <select id="user-member-select" style="padding: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 14px; flex: 1; min-width: 180px;">
+                            ${membersOptions}
+                        </select>
+                        <button id="user-add-member-btn" style="padding: 6px 10px; background: #2980b9; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">+ Üye Ekle</button>
+                    </div>
+                    
+                    <div style="font-size: 11px; color: #e67e22; font-style: italic; margin-top: 5px;">
+                        * Not: İşlem yapabilmek için lütfen isminizi seçin veya şifreli gruba katılın.
                     </div>
 
                     <div id="bulk-share-area" style="display: ${loggedInMember ? 'block' : 'none'}; margin-top: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
@@ -627,101 +641,83 @@
                     </div>
                 `;
 
-                const typeSelect = document.getElementById("participation-type-select");
-                const subRow = document.getElementById("dynamic-sub-row");
+                document.getElementById("user-group-select").addEventListener("change", async (e) => {
+                    currentGroup = e.target.value;
+                    await loadGroupData();
+                });
 
-                function updateSubRow() {
-                    const type = typeSelect.value;
-                    if (type === "grup") {
-                        subRow.innerHTML = `
-                            <select id="sub-group-select" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 2; min-width: 120px;">
-                                ${groupsHtml}
-                            </select>
-                            <input type="password" id="sub-group-pwd" placeholder="Grup Şifresi (Varsa)" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 100px;">
-                            <button id="join-participation-btn" style="padding: 6px 14px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; white-space: nowrap;">Katıl</button>
-                        `;
-                        const gSelect = document.getElementById("sub-group-select");
-                        if (gSelect) gSelect.value = currentGroup;
-
-                        document.getElementById("join-participation-btn").addEventListener("click", async () => {
-                            const nameVal = document.getElementById("user-name-input").value.trim();
-                            const pwdVal = document.getElementById("user-pwd-input").value;
-                            const selGroup = document.getElementById("sub-group-select").value;
-                            const groupPwdVal = document.getElementById("sub-group-pwd").value;
-
-                            if (!nameVal) {
-                                alert("Lütfen isminizi girin.");
-                                return;
+                const joinBtn = document.getElementById("join-locked-group-btn");
+                if (joinBtn) {
+                    joinBtn.addEventListener("click", async () => {
+                        let gInput = document.getElementById("locked-group-name").value.trim().toLowerCase().replace(/\s+/g, '_');
+                        let pInput = document.getElementById("locked-group-pwd").value;
+                        if (!gInput) {
+                            alert("Lütfen grup adını yazın.");
+                            return;
+                        }
+                        let targetKey = `hatim_group_${gInput}`;
+                        let targetDataRaw = localStorage.getItem(targetKey);
+                        if (!targetDataRaw) {
+                            alert("Bu isimde kayıtlı bir grup bulunamadı!");
+                            return;
+                        }
+                        try {
+                            let parsed = JSON.parse(targetDataRaw);
+                            if (parsed.password && parsed.password === pInput) {
+                                let unlocked = JSON.parse(localStorage.getItem("unlocked_protected_groups") || "[]");
+                                if (!unlocked.includes(gInput)) {
+                                    unlocked.push(gInput);
+                                    localStorage.setItem("unlocked_protected_groups", JSON.stringify(unlocked));
+                                }
+                                currentGroup = gInput;
+                                alert("Şifre doğru! Gruba başarıyla giriş yapıldı.");
+                                await loadGroupData();
+                            } else {
+                                alert("Hatalı şifre veya grup adı!");
                             }
-
-                            let targetKey = `hatim_group_${selGroup}`;
-                            let targetDataRaw = localStorage.getItem(targetKey);
-                            if (targetDataRaw) {
-                                try {
-                                    let parsed = JSON.parse(targetDataRaw);
-                                    if (parsed.password && parsed.password.trim() !== "") {
-                                        if (parsed.password !== groupPwdVal) {
-                                            alert("Hatalı grup şifresi!");
-                                            return;
-                                        } else {
-                                            let unlocked = JSON.parse(localStorage.getItem("unlocked_protected_groups") || "[]");
-                                            if (!unlocked.includes(selGroup)) {
-                                                unlocked.push(selGroup);
-                                                localStorage.setItem("unlocked_protected_groups", JSON.stringify(unlocked));
-                                            }
-                                        }
-                                    }
-                                } catch(e){}
-                            }
-
-                            currentGroup = selGroup;
-                            await loadGroupData();
-
-                            if (!appData.members.includes(nameVal)) {
-                                appData.members.push(nameVal);
-                            }
-                            loggedInMember = nameVal;
-                            saveGroupData();
-                            localStorage.setItem(`hatim_session_${currentGroup}`, loggedInMember);
-
-                            alert(`"${currentGroup.replace(/_/g, ' ').toUpperCase()}" grubuna "${loggedInMember}" olarak başarıyla katıldınız.`);
-                            renderUserControls();
-                            renderBooks();
-                        });
-
-                    } else {
-                        subRow.innerHTML = `
-                            <button id="join-participation-btn" style="width: 100%; padding: 8px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold;">Katıl</button>
-                        `;
-
-                        document.getElementById("join-participation-btn").addEventListener("click", async () => {
-                            const nameVal = document.getElementById("user-name-input").value.trim();
-                            if (!nameVal) {
-                                alert("Lütfen isminizi girin.");
-                                return;
-                            }
-                            if (!appData.members.includes(nameVal)) {
-                                appData.members.push(nameVal);
-                            }
-                            loggedInMember = nameVal;
-                            saveGroupData();
-                            localStorage.setItem(`hatim_session_${currentGroup}`, loggedInMember);
-
-                            alert(`"${loggedInMember}" olarak bireysel katılım kaydedildi.`);
-                            renderUserControls();
-                            renderBooks();
-                        });
-                    }
+                        } catch(e) {
+                            alert("Grup verisi okunamadı.");
+                        }
+                    });
                 }
 
-                typeSelect.addEventListener("change", updateSubRow);
-                updateSubRow();
+                document.getElementById("user-member-select").addEventListener("change", (e) => {
+                    loggedInMember = e.target.value;
+                    if (loggedInMember) {
+                        localStorage.setItem(`hatim_session_${currentGroup}`, loggedInMember);
+                    } else {
+                        localStorage.removeItem(`hatim_session_${currentGroup}`);
+                    }
+                    renderUserControls();
+                    renderBooks();
+                });
+
+                document.getElementById("user-add-member-btn").addEventListener("click", async () => {
+                    let mName = prompt("Eklenecek üye adı:");
+                    if (mName && mName.trim()) {
+                        let clean = mName.trim();
+                        if (!appData.members.includes(clean)) {
+                            appData.members.push(clean);
+                            loggedInMember = clean;
+                            saveGroupData();
+                            localStorage.setItem(`hatim_session_${currentGroup}`, loggedInMember);
+                            renderUserControls();
+                            renderBooks();
+                            renderAdminSectionAtBottom();
+                        } else {
+                            loggedInMember = clean;
+                            document.getElementById("user-member-select").value = clean;
+                            localStorage.setItem(`hatim_session_${currentGroup}`, loggedInMember);
+                            renderBooks();
+                        }
+                    }
+                });
 
                 const bulkBtn = document.getElementById("bulk-whatsapp-btn");
                 if (bulkBtn) {
                     bulkBtn.addEventListener("click", () => {
                         if (!loggedInMember) {
-                            alert("Lütfen önce isminizi girin.");
+                            alert("Lütfen önce isminizi seçin.");
                             return;
                         }
                         let summary = [];
@@ -1324,7 +1320,6 @@
                                 <button id="admin-open-analysis-page" style="width: 100%; padding: 10px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">📊 Detaylı 5 Sekmeli Analiz ve Rapor Paneli</button>
                             </div>
                             
-                            <!-- TOPLU ATAMA VE SİLME BÖLÜMÜ -->
                             <div style="border-top: 1px solid var(--border-color); padding-top: 10px; margin-bottom: 12px;">
                                 <div style="font-weight: bold; font-size: 13px; margin-bottom: 8px;">📚 Kitaplarda Toplu Atama ve Silme Bölümü:</div>
                                 <div style="display: flex; flex-direction: column; gap: 8px; background: var(--card-bg); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);">
@@ -1336,8 +1331,7 @@
                                     </div>
                                     <div>
                                         <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Grup / Kişi Seçimi (Hiyerarşik):</label>
-                                        <select id="admin-bulk-target-select" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 12px;">
-                                        </select>
+                                        <select id="admin-bulk-target-select" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 12px;"></select>
                                     </div>
                                     <div style="display: flex; gap: 8px; margin-top: 4px;">
                                         <button id="admin-bulk-assign-btn" style="flex: 1; padding: 8px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">📥 Toplu Atama Yap</button>
@@ -1715,15 +1709,7 @@
                                             if (p.owner === oldName) p.owner = cleanNew;
                                         });
                                     });
-                                    if (appData.readingLogs) {
-                                        appData.readingLogs.forEach(l => {
-                                            if (l.member === oldName) l.member = cleanNew;
-                                        });
-                                    }
-                                    if (loggedInMember === oldName) {
-                                        loggedInMember = cleanNew;
-                                        localStorage.setItem(`hatim_session_${currentGroup}`, loggedInMember);
-                                    }
+                                    if (loggedInMember === oldName) loggedInMember = cleanNew;
                                     saveGroupData();
                                     await loadGroupData();
                                 }
@@ -1731,40 +1717,293 @@
                         });
                     });
                 }
+            }
 
-                const adminToggleBtn = document.getElementById("admin-toggle-btn-custom");
-                if (adminToggleBtn) {
-                    adminToggleBtn.addEventListener("click", () => triggerAdminToggle());
+            function getRangeStatus(baseArray, start, end) {
+                let owners = new Set();
+                let allRead = true;
+                let anyTaken = false;
+                for (let i = start; i < end; i++) {
+                    let item = baseArray[i];
+                    if (item && item.owner) {
+                        owners.add(item.owner);
+                        anyTaken = true;
+                        if (!item.isRead) allRead = false;
+                    } else {
+                        allRead = false;
+                    }
                 }
+                let ownerStr = "";
+                if (owners.size === 1) ownerStr = Array.from(owners)[0];
+                else if (owners.size > 1) ownerStr = "Çoklu";
+                return { owner: ownerStr, allRead, anyTaken };
+            }
 
-                const sendMsgBtn = document.getElementById("send-admin-msg-btn");
-                if (sendMsgBtn) {
-                    sendMsgBtn.addEventListener("click", () => {
-                        let msgInput = document.getElementById("admin-msg-input").value.trim();
-                        if (!msgInput) {
-                            alert("Lütfen bir mesaj yazın.");
+            function renderBooks() {
+                let booksGrid = document.getElementById("books-grid");
+                if (!booksGrid) return;
+                booksGrid.innerHTML = "";
+
+                appData.books.forEach(book => {
+                    let baseArray = appData.bookPages[book.id];
+                    let defModes = bookModesDefs[book.id] || createPageModes(book.totalUnits);
+                    let currentModeKey = book.currentMode || book.defaultMode || Object.keys(defModes)[0];
+                    if (!defModes[currentModeKey]) currentModeKey = Object.keys(defModes)[0];
+                    let modeObj = defModes[currentModeKey];
+                    let items = modeObj.getItems();
+
+                    let hatimInfo = appData.bookHatims[book.id] || { hatimNo: 1, startDate: new Date().toLocaleDateString("tr-TR"), prayerDone: false };
+
+                    let card = document.createElement("div");
+                    card.className = "book-card";
+
+                    let modesButtonsHtml = Object.keys(defModes).map(mKey => {
+                        let m = defModes[mKey];
+                        let active = mKey === currentModeKey;
+                        return `<button class="mode-btn" data-book="${book.id}" data-mode="${mKey}" style="padding: 4px 8px; font-size: 11px; border-radius: 4px; cursor: pointer; border: 1px solid var(--gold-primary); background: ${active ? 'var(--gold-primary)' : 'transparent'}; color: ${active ? '#fff' : 'var(--text-main)'}; font-weight: bold;">${m.name}</button>`;
+                    }).join('');
+
+                    let itemsHtml = items.map(pi => {
+                        let st = getRangeStatus(baseArray, pi.start, pi.end);
+                        let statusBg = "transparent";
+                        let statusBorder = "var(--border-color)";
+                        let statusText = "Boş";
+                        let textColor = "var(--text-main)";
+
+                        if (st.owner) {
+                            if (st.allRead) {
+                                statusBg = "rgba(39, 174, 96, 0.15)";
+                                statusBorder = "#27ae60";
+                                statusText = `✓ Okundu (${st.owner})`;
+                                textColor = "#27ae60";
+                            } else {
+                                statusBg = "rgba(52, 152, 219, 0.15)";
+                                statusBorder = "#3498db";
+                                statusText = `Alındı (${st.owner})`;
+                                textColor = "#3498db";
+                            }
+                        }
+
+                        let isOwner = loggedInMember && st.owner === loggedInMember;
+                        let actionButtons = "";
+
+                        if (!st.owner) {
+                            actionButtons = `<button class="take-range-btn" data-book="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="background: #27ae60; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">Hisse Al</button>`;
+                        } else if (isOwner || isAdmin) {
+                            if (!st.allRead) {
+                                actionButtons = `
+                                    <button class="read-range-btn" data-book="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="background: #2980b9; color: white; border: none; padding: 4px 6px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold;">Okundu İşaretle</button>
+                                    <button class="release-range-btn" data-book="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="background: #e74c3c; color: white; border: none; padding: 4px 6px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold;">Bırak</button>
+                                `;
+                            } else {
+                                actionButtons = `
+                                    <button class="unread-range-btn" data-book="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="background: #e67e22; color: white; border: none; padding: 4px 6px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold;">Okunmadı Yap</button>
+                                    <button class="release-range-btn" data-book="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="background: #e74c3c; color: white; border: none; padding: 4px 6px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold;">Bırak</button>
+                                `;
+                            }
+                        } else {
+                            actionButtons = `<span style="font-size: 11px; opacity: 0.7; font-style: italic;">(${st.owner})</span>`;
+                        }
+
+                        return `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; margin-bottom: 6px; border-radius: 6px; border: 1px solid ${statusBorder}; background: ${statusBg};">
+                                <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
+                                    <span style="font-weight: bold; font-size: 13px; min-width: 110px;">${pi.name}</span>
+                                    <span style="font-size: 12px; color: ${textColor}; font-weight: bold;">${statusText}</span>
+                                </div>
+                                <div style="display: flex; gap: 4px; align-items: center;">
+                                    ${actionButtons}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    card.innerHTML = `
+                        <div class="book-header" style="padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <h3 style="margin: 0; font-size: 16px; color: var(--gold-dark);">${book.name}</h3>
+                                <div style="font-size: 11px; opacity: 0.8; margin-top: 2px;">Döngü: ${hatimInfo.hatimNo}. Hatim | Başlangıç: ${hatimInfo.startDate}</div>
+                            </div>
+                            <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                                <button class="open-pdf-btn" data-id="${book.id}" data-name="${book.name}" style="background: #8e44ad; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px;">📄 PDF Oku</button>
+                                ${modesButtonsHtml}
+                            </div>
+                        </div>
+                        <div style="padding: 12px; max-height: 320px; overflow-y: auto;">
+                            ${itemsHtml}
+                        </div>
+                        <div style="padding: 10px 15px; background: rgba(0,0,0,0.02); border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                            <div style="font-size: 12px; font-weight: bold;">
+                                Dua Durumu: <span style="color: ${hatimInfo.prayerDone ? '#27ae60' : '#e67e22'};">${hatimInfo.prayerDone ? '✓ Hatim Duası Yapıldı' : 'Dua Bekleniyor'}</span>
+                            </div>
+                            <div style="display: flex; gap: 6px;">
+                                <button class="toggle-prayer-btn" data-id="${book.id}" style="background: ${hatimInfo.prayerDone ? '#e67e22' : '#27ae60'}; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">${hatimInfo.prayerDone ? 'Duayı Sıfırla' : 'Hatim Duası Yap'}</button>
+                                <button class="reset-hatim-btn" data-id="${book.id}" style="background: #c0392b; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">🔄 Yeni Hatime Başla</button>
+                            </div>
+                        </div>
+                    `;
+
+                    booksGrid.appendChild(card);
+                });
+
+                attachBookEventListeners();
+            }
+
+            function attachBookEventListeners() {
+                document.querySelectorAll(".open-pdf-btn").forEach(btn => {
+                    btn.addEventListener("click", (e) => {
+                        let bId = e.target.getAttribute("data-id");
+                        let bName = e.target.getAttribute("data-name");
+                        openPdfReaderModal(bId, bName);
+                    });
+                });
+
+                document.querySelectorAll(".mode-btn").forEach(btn => {
+                    btn.addEventListener("click", (e) => {
+                        let bId = e.target.getAttribute("data-book");
+                        let mKey = e.target.getAttribute("data-mode");
+                        let bookObj = appData.books.find(b => b.id === bId);
+                        if (bookObj) {
+                            bookObj.currentMode = mKey;
+                            saveGroupData();
+                            renderBooks();
+                        }
+                    });
+                });
+
+                document.querySelectorAll(".take-range-btn").forEach(btn => {
+                    btn.addEventListener("click", (e) => {
+                        if (!loggedInMember) {
+                            alert("Lütfen önce isminizi seçin.");
                             return;
                         }
-                        let text = `*[${currentGroup.replace(/_/g, ' ').toUpperCase()} - Yönetici Mesajı]*\n\n${msgInput}`;
-                        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+                        let bId = e.target.getAttribute("data-book");
+                        let start = parseInt(e.target.getAttribute("data-start"), 10);
+                        let end = parseInt(e.target.getAttribute("data-end"), 10);
+                        let baseArray = appData.bookPages[bId];
+                        for (let i = start; i < end; i++) {
+                            if (!baseArray[i].owner) {
+                                baseArray[i].owner = loggedInMember;
+                            }
+                        }
+                        saveGroupData();
+                        renderBooks();
+                        renderAnalysisSection();
                     });
-                }
+                });
+
+                document.querySelectorAll(".read-range-btn").forEach(btn => {
+                    btn.addEventListener("click", (e) => {
+                        let bId = e.target.getAttribute("data-book");
+                        let start = parseInt(e.target.getAttribute("data-start"), 10);
+                        let end = parseInt(e.target.getAttribute("data-end"), 10);
+                        let baseArray = appData.bookPages[bId];
+                        for (let i = start; i < end; i++) {
+                            if (baseArray[i].owner) {
+                                baseArray[i].isRead = true;
+                            }
+                        }
+                        if (!appData.readingLogs) appData.readingLogs = [];
+                        let bookObj = appData.books.find(b => b.id === bId);
+                        let defModes = bookModesDefs[bId];
+                        let modeKey = bookObj.currentMode || bookObj.defaultMode || Object.keys(defModes)[0];
+                        let modeItem = defModes[modeKey].getItems().find(pi => pi.start === start && pi.end === end);
+                        let rangeName = modeItem ? modeItem.name : `${start+1}-${end}`;
+
+                        appData.readingLogs.push({
+                            date: new Date().toLocaleDateString("tr-TR"),
+                            timestamp: Date.now(),
+                            member: loggedInMember || "Bilinmiyor",
+                            bookName: bookObj ? bookObj.name : bId,
+                            count: end - start,
+                            range: rangeName
+                        });
+
+                        saveGroupData();
+                        renderBooks();
+                        renderAnalysisSection();
+                    });
+                });
+
+                document.querySelectorAll(".unread-range-btn").forEach(btn => {
+                    btn.addEventListener("click", (e) => {
+                        let bId = e.target.getAttribute("data-book");
+                        let start = parseInt(e.target.getAttribute("data-start"), 10);
+                        let end = parseInt(e.target.getAttribute("data-end"), 10);
+                        let baseArray = appData.bookPages[bId];
+                        for (let i = start; i < end; i++) {
+                            baseArray[i].isRead = false;
+                        }
+                        saveGroupData();
+                        renderBooks();
+                        renderAnalysisSection();
+                    });
+                });
+
+                document.querySelectorAll(".release-range-btn").forEach(btn => {
+                    btn.addEventListener("click", (e) => {
+                        let bId = e.target.getAttribute("data-book");
+                        let start = parseInt(e.target.getAttribute("data-start"), 10);
+                        let end = parseInt(e.target.getAttribute("data-end"), 10);
+                        let baseArray = appData.bookPages[bId];
+                        for (let i = start; i < end; i++) {
+                            baseArray[i].owner = "";
+                            baseArray[i].isRead = false;
+                        }
+                        saveGroupData();
+                        renderBooks();
+                        renderAnalysisSection();
+                    });
+                });
+
+                document.querySelectorAll(".toggle-prayer-btn").forEach(btn => {
+                    btn.addEventListener("click", (e) => {
+                        let bId = e.target.getAttribute("data-id");
+                        if (!appData.bookHatims[bId]) appData.bookHatims[bId] = { hatimNo: 1, startDate: new Date().toLocaleDateString("tr-TR"), prayerDone: false };
+                        appData.bookHatims[bId].prayerDone = !appData.bookHatims[bId].prayerDone;
+                        saveGroupData();
+                        renderBooks();
+                    });
+                });
+
+                document.querySelectorAll(".reset-hatim-btn").forEach(btn => {
+                    btn.addEventListener("click", (e) => {
+                        let bId = e.target.getAttribute("data-id");
+                        let bookObj = appData.books.find(b => b.id === bId);
+                        if (confirm(`"${bookObj ? bookObj.name : bId}" eseri için yeni hatime başlansın mı? Tüm sayfalar sıfırlanacak.`)) {
+                            appData.bookPages[bId] = Array(bookObj.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
+                            if (!appData.bookHatims[bId]) appData.bookHatims[bId] = { hatimNo: 1, startDate: new Date().toLocaleDateString("tr-TR"), prayerDone: false };
+                            appData.bookHatims[bId].hatimNo += 1;
+                            appData.bookHatims[bId].startDate = new Date().toLocaleDateString("tr-TR");
+                            appData.bookHatims[bId].prayerDone = false;
+                            saveGroupData();
+                            renderBooks();
+                            renderAnalysisSection();
+                        }
+                    });
+                });
             }
 
             function triggerAdminToggle() {
-                if (!isAdmin) {
-                    let pwd = prompt("Yönetici şifresini girin:");
+                if (isAdmin) {
+                    isAdmin = false;
+                    alert("Yönetici modu kapatıldı.");
+                    renderUserControls();
+                    renderBooks();
+                    renderAnalysisSection();
+                    renderAdminSectionAtBottom();
+                } else {
+                    let pwd = prompt("Yönetici şifresini girin (Varsayılan: 1234):");
                     if (pwd === ADMIN_PASSWORD) {
                         isAdmin = true;
                         alert("Yönetici modu açıldı.");
+                        renderUserControls();
+                        renderBooks();
+                        renderAnalysisSection();
                         renderAdminSectionAtBottom();
-                    } else {
+                    } else if (pwd !== null) {
                         alert("Hatalı yönetici şifresi!");
                     }
-                } else {
-                    isAdmin = false;
-                    alert("Yönetici modu kapatıldı.");
-                    renderAdminSectionAtBottom();
                 }
             }
 
