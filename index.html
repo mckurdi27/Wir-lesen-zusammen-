@@ -391,26 +391,23 @@
             async function loadGroupData() {
                 removeStuckPanel();
                 const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
-                // Yeni gruplarda üyeler varsayılan olarak boş gelir (members: [])
                 appData = savedData ? JSON.parse(savedData) : { members: currentGroup === "grup_1" ? ["Ahmet", "Mehmet", "Ayşe"] : [], password: "" };
                 
-                // Şifre Kontrolü
-                if (appData.password && sessionStorage.getItem(`unlocked_${currentGroup}`) !== "true") {
+                // Şifre Kontrolü: Her grup seçiminde şifre zorunlu kılınır. Doğru girilmezse güvenli gruba düşer.
+                if (appData.password) {
                     let enteredPwd = prompt(`"${currentGroup.replace(/_/g, ' ').toUpperCase()}" grubu şifrelidir. Lütfen şifreyi girin:`);
-                    if (enteredPwd === appData.password) {
-                        sessionStorage.setItem(`unlocked_${currentGroup}`, "true");
-                    } else {
-                        alert("Hatalı şifre!");
+                    if (enteredPwd !== appData.password) {
+                        alert("Hatalı veya boş şifre! Şifreyi bilmediğiniz için bu gruba erişilemiyor.");
                         let allGroups = getAllGroupKeys();
                         let fallback = allGroups.find(g => {
                             let d = localStorage.getItem(`hatim_group_${g}`);
                             if (!d) return true;
                             let parsed = JSON.parse(d);
-                            return !parsed.password || sessionStorage.getItem(`unlocked_${g}`) === "true";
+                            return !parsed.password;
                         }) || "grup_1";
                         currentGroup = fallback;
                         const savedDataFallback = localStorage.getItem(`hatim_group_${currentGroup}`);
-                        appData = savedDataFallback ? JSON.parse(savedDataFallback) : { members: [], password: "" };
+                        appData = savedDataFallback ? JSON.parse(savedDataFallback) : { members: currentGroup === "grup_1" ? ["Ahmet", "Mehmet", "Ayşe"] : [], password: "" };
                     }
                 }
 
@@ -475,7 +472,7 @@
                     let d = localStorage.getItem(`hatim_group_${g}`);
                     let isLocked = false;
                     if (d) {
-                        try { let parsed = JSON.parse(d); if (parsed.password && sessionStorage.getItem(`unlocked_${g}`) !== "true") isLocked = true; } catch(e){}
+                        try { let parsed = JSON.parse(d); if (parsed.password) isLocked = true; } catch(e){}
                     }
                     let lockIcon = isLocked ? " 🔒" : "";
                     return `<option value="${g}" ${g === currentGroup ? "selected" : ""}>${g.replace(/_/g, ' ').toUpperCase()}${lockIcon}</option>`;
@@ -522,7 +519,6 @@
                         let groupKey = newG.trim().toLowerCase().replace(/\s+/g, '_');
                         let groupPwd = prompt("Bu gruba şifre koymak ister misiniz? (İstemiyorsanız boş bırakın):") || "";
                         currentGroup = groupKey;
-                        if (groupPwd) sessionStorage.setItem(`unlocked_${currentGroup}`, "true");
 
                         const todayStr = new Date().toLocaleDateString("tr-TR");
                         let freshBooks = JSON.parse(JSON.stringify(defaultBooksTemplate));
@@ -731,7 +727,6 @@
                             let groupKey = newG.trim().toLowerCase().replace(/\s+/g, '_');
                             let groupPwd = prompt("Bu gruba şifre koymak ister misiniz? (İstemiyorsanız boş bırakın):") || "";
                             currentGroup = groupKey;
-                            if (groupPwd) sessionStorage.setItem(`unlocked_${currentGroup}`, "true");
 
                             const todayStr = new Date().toLocaleDateString("tr-TR");
                             let freshBooks = JSON.parse(JSON.stringify(defaultBooksTemplate));
@@ -763,10 +758,6 @@
                             if (newKey !== currentGroup) {
                                 localStorage.setItem(`hatim_group_${newKey}`, JSON.stringify(appData));
                                 localStorage.removeItem(`hatim_group_${currentGroup}`);
-                                if (sessionStorage.getItem(`unlocked_${currentGroup}`)) {
-                                    sessionStorage.setItem(`unlocked_${newKey}`, "true");
-                                    sessionStorage.removeItem(`unlocked_${currentGroup}`);
-                                }
                                 currentGroup = newKey;
                                 await loadGroupData();
                             }
@@ -776,7 +767,6 @@
                     document.getElementById("admin-delete-group").addEventListener("click", async () => {
                         if (confirm(`"${currentGroup}" grubunu silmek istiyor musunuz?`)) {
                             localStorage.removeItem(`hatim_group_${currentGroup}`);
-                            sessionStorage.removeItem(`unlocked_${currentGroup}`);
                             let keys = getAllGroupKeys();
                             currentGroup = keys[0];
                             await loadGroupData();
@@ -792,7 +782,6 @@
                                 appData.password = newPwd.trim();
                                 saveGroupData();
                                 if (appData.password) {
-                                    sessionStorage.setItem(`unlocked_${currentGroup}`, "true");
                                     alert("Grup şifresi başarıyla tanımlandı.");
                                 } else {
                                     alert("Grup şifresi kaldırıldı.");
