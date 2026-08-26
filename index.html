@@ -1,9 +1,3 @@
-Şifreli grupların ana grup seçim listesinde görünmemesi ve yan yana grup adı ile şifre girilerek açılabilmesi için gerekli düzenlemeleri tamamladım.
-Yapılacaklar ve Yapılan Düzenlemeler:
- * Şifreli Grupların Gizlenmesi: Şifre koruması bulunan gruplar, ana grup seçim listesinden (dropdown) tamamen gizlendi. Bu sayede şifresi bilinmeyen gruplar listede görünmeyecek.
- * Şifreli Gruba Katıl Paneli: Kullanıcı kontrol paneline yan yana iki yeni alan (Grup İsmi ve Şifre) ile bir "Katıl" butonu eklendi.
- * Oturum Bazlı Kilit Açma: Kullanıcı, şifreli grubun adını ve şifresini yazıp "Katıl" butonuna bastığında şifre doğrulanır; doğruysa grup aktif hale gelir ve oturum süresince listede görünür olur.
-Güncellenmiş Tam Kod Bloğu
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -15,7 +9,6 @@ Güncellenmiş Tam Kod Bloğu
     <div class="container">
         <div id="books-grid"></div>
     </div>
-
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
             let container = document.querySelector(".container");
@@ -94,7 +87,6 @@ Güncellenmiş Tam Kod Bloğu
                 `;
                 document.head.appendChild(styleEl);
             }
-
             injectOrientalStyles();
 
             let currentGroup = "grup_1";
@@ -102,7 +94,6 @@ Güncellenmiş Tam Kod Bloğu
             let appData = null;
             let loggedInMember = "";
             let monthlyInspirationCache = {};
-
             const ADMIN_PASSWORD = "1234";
 
             const bookPdfMap = {
@@ -135,11 +126,7 @@ Güncellenmiş Tam Kod Bloğu
                     }
                     let ayKoduStr = String(ay).padStart(2, '0');
                     let ayAdi = ayAdlari[ayKoduStr] || "Rebiülevvel";
-                    return {
-                        ayKodu: ayKoduStr,
-                        gunNumarasi: parseInt(gun, 10),
-                        fullStr: `${gun} ${ayAdi} ${yil}`
-                    };
+                    return { ayKodu: ayKoduStr, gunNumarasi: parseInt(gun, 10), fullStr: `${gun} ${ayAdi} ${yil}` };
                 } catch (hata) {
                     return { ayKodu: "03", gunNumarasi: 1, fullStr: "1 Rebiülevvel 1448" };
                 }
@@ -171,28 +158,21 @@ Güncellenmiş Tam Kod Bloğu
                 let hDay = hicriInfo.gunNumarasi;
                 let hMonth = hicriInfo.ayKodu;
                 let todayHijriStr = hicriInfo.fullStr;
-
                 let jsonData = await fetchHijriMonthData(hMonth);
                 let item = null;
-                
                 if (jsonData) {
                     if (Array.isArray(jsonData)) {
                         item = jsonData[hDay - 1] || jsonData[hDay];
                     } else if (typeof jsonData === 'object') {
-                        item = jsonData[hDay] || 
-                               jsonData[String(hDay)] || 
-                               jsonData[String(hDay).padStart(2, '0')] || 
-                               jsonData[String(parseInt(hDay, 10))];
+                        item = jsonData[hDay] || jsonData[String(hDay)] || jsonData[String(hDay).padStart(2, '0')] || jsonData[String(parseInt(hDay, 10))];
                     }
                 }
-
                 let verseText = "Bu güne ait ayet verisi bulunamadı.";
                 let hadishText = "Bu güne ait hadis verisi bulunamadı.";
                 let proverbText = "Bu güne ait atasözü verisi bulunamadı.";
                 let quoteText = "Bu güne ait özlü söz verisi bulunamadı.";
                 let germanQuote = "Verfügbar nicht.";
                 let germanTrans = "Çeviri bulunamadı.";
-
                 if (item) {
                     if (item.ayet) {
                         let meal = typeof item.ayet === 'object' ? (item.ayet.meal || item.ayet.text || "") : String(item.ayet);
@@ -222,15 +202,7 @@ Güncellenmiş Tam Kod Bloğu
                         germanTrans = item.german.translation || germanTrans;
                     }
                 }
-                return { 
-                    fullDateStr: todayHijriStr, 
-                    miladiDateStr: todayMiladiStr, 
-                    verse: verseText, 
-                    hadish: hadishText, 
-                    proverb: proverbText,
-                    quote: quoteText,
-                    german: { quote: germanQuote, translation: germanTrans } 
-                };
+                return { fullDateStr: todayHijriStr, miladiDateStr: todayMiladiStr, verse: verseText, hadish: hadishText, proverb: proverbText, quote: quoteText, german: { quote: germanQuote, translation: germanTrans } };
             }
 
             function renderMainTitleHeader() {
@@ -240,7 +212,6 @@ Güncellenmiş Tam Kod Bloğu
                     titleSection.id = "main-title-ornate-section";
                     container.insertBefore(titleSection, container.firstChild);
                 }
-
                 titleSection.style.cssText = `
                     margin-bottom: 20px;
                     padding: 22px;
@@ -251,7 +222,6 @@ Güncellenmiş Tam Kod Bloğu
                     box-shadow: 0 4px 15px rgba(138, 109, 59, 0.2);
                     text-align: center;
                 `;
-
                 titleSection.innerHTML = `
                     <div style="font-size: 21px; font-weight: bold; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
                         <span>⚜️ 📖</span>
@@ -277,7 +247,6 @@ Güncellenmiş Tam Kod Bloğu
                         container.appendChild(inspirationContainer);
                     }
                 }
-
                 inspirationContainer.style.cssText = `
                     margin-bottom: 20px;
                     padding: 16px;
@@ -286,7 +255,6 @@ Güncellenmiş Tam Kod Bloğu
                     border-radius: 8px;
                     background: var(--card-bg);
                 `;
-
                 inspirationContainer.innerHTML = `
                     <div style="text-align: center; font-weight: bold; font-size: 14px; border-bottom: 1px dashed rgba(150,150,150,0.3); padding-bottom: 8px; margin-bottom: 10px;">
                         🌙 Manevi ve Dil İlhamı Köşesi
@@ -307,61 +275,18 @@ Güncellenmiş Tam Kod Bloğu
 
             function createPageModes(totalPages) {
                 return {
-                    yirmi_sayfa: { name: "20 Sayfa", getItems: () => {
-                        let items = [], count = Math.ceil(totalPages / 20);
-                        for (let i = 0; i < count; i++) {
-                            let start = i * 20, end = Math.min((i + 1) * 20, totalPages);
-                            items.push({ id: i + 1, name: `${i + 1}. Cüz / Sayfa ${start + 1}-${end}`, start, end });
-                        }
-                        return items;
-                    }},
-                    on_sayfa: { name: "10 Sayfa", getItems: () => {
-                        let items = [], count = Math.ceil(totalPages / 10);
-                        for (let i = 0; i < count; i++) {
-                            let start = i * 10, end = Math.min((i + 1) * 10, totalPages);
-                            items.push({ id: i + 1, name: `Sayfa ${start + 1}-${end}`, start, end });
-                        }
-                        return items;
-                    }},
-                    bes_sayfa: { name: "5 Sayfa", getItems: () => {
-                        let items = [], count = Math.ceil(totalPages / 5);
-                        for (let i = 0; i < count; i++) {
-                            let start = i * 5, end = Math.min((i + 1) * 5, totalPages);
-                            items.push({ id: i + 1, name: `Sayfa ${start + 1}-${end}`, start, end });
-                        }
-                        return items;
-                    }},
-                    bir_sayfa: { name: "1 Sayfa", getItems: () => {
-                        let items = [];
-                        for (let i = 0; i < totalPages; i++) items.push({ id: i + 1, name: `${i + 1}. Sayfa`, start: i, end: i + 1 });
-                        return items;
-                    }}
+                    yirmi_sayfa: { name: "20 Sayfa", getItems: () => { let items = [], count = Math.ceil(totalPages / 20); for (let i = 0; i < count; i++) { let start = i * 20, end = Math.min((i + 1) * 20, totalPages); items.push({ id: i + 1, name: `${i + 1}. Cüz / Sayfa ${start + 1}-${end}`, start, end }); } return items; }},
+                    on_sayfa: { name: "10 Sayfa", getItems: () => { let items = [], count = Math.ceil(totalPages / 10); for (let i = 0; i < count; i++) { let start = i * 10, end = Math.min((i + 1) * 10, totalPages); items.push({ id: i + 1, name: `Sayfa ${start + 1}-${end}`, start, end }); } return items; }},
+                    bes_sayfa: { name: "5 Sayfa", getItems: () => { let items = [], count = Math.ceil(totalPages / 5); for (let i = 0; i < count; i++) { let start = i * 5, end = Math.min((i + 1) * 5, totalPages); items.push({ id: i + 1, name: `Sayfa ${start + 1}-${end}`, start, end }); } return items; }},
+                    bir_sayfa: { name: "1 Sayfa", getItems: () => { let items = []; for (let i = 0; i < totalPages; i++) items.push({ id: i + 1, name: `${i + 1}. Sayfa`, start: i, end: i + 1 }); return items; }}
                 };
             }
 
             function createBabModes(totalBabs) {
                 return {
-                    on_bab: { name: "10 Bab", getItems: () => {
-                        let items = [], count = Math.ceil(totalBabs / 10);
-                        for (let i = 0; i < count; i++) {
-                            let start = i * 10, end = Math.min((i + 1) * 10, totalBabs);
-                            items.push({ id: i + 1, name: `${start + 1}-${end}. Bablar`, start, end });
-                        }
-                        return items;
-                    }},
-                    bes_bab: { name: "5 Bab", getItems: () => {
-                        let items = [], count = Math.ceil(totalBabs / 5);
-                        for (let i = 0; i < count; i++) {
-                            let start = i * 5, end = Math.min((i + 1) * 5, totalBabs);
-                            items.push({ id: i + 1, name: `${start + 1}-${end}. Bablar`, start, end });
-                        }
-                        return items;
-                    }},
-                    bab: { name: "1 Bab", getItems: () => {
-                        let items = [];
-                        for (let i = 0; i < totalBabs; i++) items.push({ id: i + 1, name: `${i + 1}. Bab`, start: i, end: i + 1 });
-                        return items;
-                    }}
+                    on_bab: { name: "10 Bab", getItems: () => { let items = [], count = Math.ceil(totalBabs / 10); for (let i = 0; i < count; i++) { let start = i * 10, end = Math.min((i + 1) * 10, totalBabs); items.push({ id: i + 1, name: `${start + 1}-${end}. Bablar`, start, end }); } return items; }},
+                    bes_bab: { name: "5 Bab", getItems: () => { let items = [], count = Math.ceil(totalBabs / 5); for (let i = 0; i < count; i++) { let start = i * 5, end = Math.min((i + 1) * 5, totalBabs); items.push({ id: i + 1, name: `${start + 1}-${end}. Bablar`, start, end }); } return items; }},
+                    bab: { name: "1 Bab", getItems: () => { let items = []; for (let i = 0; i < totalBabs; i++) items.push({ id: i + 1, name: `${i + 1}. Bab`, start: i, end: i + 1 }); return items; }}
                 };
             }
 
@@ -412,7 +337,7 @@ Güncellenmiş Tam Kod Bloğu
                 removeStuckPanel();
                 const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
                 appData = savedData ? JSON.parse(savedData) : { members: currentGroup === "grup_1" ? ["Ahmet", "Mehmet", "Ayşe"] : [], password: "" };
-                
+
                 if (appData.password && !isAdmin) {
                     let unlockedProtected = JSON.parse(sessionStorage.getItem("unlocked_protected_groups") || "[]");
                     if (!unlockedProtected.includes(currentGroup)) {
@@ -453,7 +378,7 @@ Güncellenmiş Tam Kod Bloğu
                     if (!appData.bookHatims[defBook.id]) appData.bookHatims[defBook.id] = { hatimNo: 1, startDate: todayStr, prayerDone: false };
                     if (!appData.bookHistory[defBook.id]) appData.bookHistory[defBook.id] = [];
                 });
-                
+
                 if (!appData.books) {
                     appData.books = JSON.parse(JSON.stringify(defaultBooksTemplate));
                 } else {
@@ -467,7 +392,6 @@ Güncellenmiş Tam Kod Bloğu
                     });
                 }
                 saveGroupData();
-                
                 renderMainTitleHeader();
                 await renderDailyInspiration();
                 renderUserControls();
@@ -517,13 +441,11 @@ Güncellenmiş Tam Kod Bloğu
                         <button id="user-new-group-btn" style="padding: 6px 10px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">+ Yeni Grup</button>
                     </div>
                     
-                    <div style="margin-top: 10px; margin-bottom: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
-                        <div style="font-size: 12px; font-weight: bold; margin-bottom: 6px;">🔐 Şifreli Gruba Katıl</div>
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                            <input type="text" id="locked-group-name" placeholder="Grup Adı" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 110px;">
-                            <input type="password" id="locked-group-pwd" placeholder="Grup Şifresi" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 110px;">
-                            <button id="join-locked-group-btn" style="padding: 6px 12px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">Katıl</button>
-                        </div>
+                    <div style="display: flex; gap: 6px; align-items: center; margin-top: 10px; margin-bottom: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
+                        <span style="font-weight: bold; font-size: 12px; white-space: nowrap;">🔐 Şifreli</span>
+                        <input type="text" id="locked-group-name" placeholder="Grup Adı" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 80px;">
+                        <input type="password" id="locked-group-pwd" placeholder="Şifre" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 70px;">
+                        <button id="join-locked-group-btn" style="padding: 6px 10px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; white-space: nowrap;">Katıl</button>
                     </div>
 
                     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
@@ -548,7 +470,10 @@ Güncellenmiş Tam Kod Bloğu
                     joinBtn.addEventListener("click", async () => {
                         let gInput = document.getElementById("locked-group-name").value.trim().toLowerCase().replace(/\s+/g, '_');
                         let pInput = document.getElementById("locked-group-pwd").value;
-                        if (!gInput) { alert("Lütfen grup adını yazın."); return; }
+                        if (!gInput) {
+                            alert("Lütfen grup adını yazın.");
+                            return;
+                        }
                         let targetKey = `hatim_group_${gInput}`;
                         let targetDataRaw = localStorage.getItem(targetKey);
                         if (!targetDataRaw) {
@@ -581,7 +506,6 @@ Güncellenmiş Tam Kod Bloğu
                         let groupKey = newG.trim().toLowerCase().replace(/\s+/g, '_');
                         let groupPwd = prompt("Bu gruba şifre koymak ister misiniz? (İstemiyorsanız boş bırakın):") || "";
                         currentGroup = groupKey;
-
                         const todayStr = new Date().toLocaleDateString("tr-TR");
                         let freshBooks = JSON.parse(JSON.stringify(defaultBooksTemplate));
                         let freshPages = {};
@@ -641,7 +565,10 @@ Güncellenmiş Tam Kod Bloğu
                 const bulkBtn = document.getElementById("bulk-whatsapp-btn");
                 if (bulkBtn) {
                     bulkBtn.addEventListener("click", () => {
-                        if (!loggedInMember) { alert("Lütfen önce isminizi seçin."); return; }
+                        if (!loggedInMember) {
+                            alert("Lütfen önce isminizi seçin.");
+                            return;
+                        }
                         let summary = [];
                         appData.books.forEach(book => {
                             let baseArray = appData.bookPages[book.id];
@@ -655,7 +582,10 @@ Güncellenmiş Tam Kod Bloğu
                             });
                             if (taken.length > 0) summary.push(`• ${book.name}: *${taken.join(", ")}*`);
                         });
-                        if (summary.length === 0) { alert("Üzerinizde hisse bulunmuyor."); return; }
+                        if (summary.length === 0) {
+                            alert("Üzerinizde hisse bulunmuyor.");
+                            return;
+                        }
                         let msg = `*[${currentGroup.replace(/_/g, ' ').toUpperCase()}] ${loggedInMember} Hisseleri*\n\n` + summary.join("\n");
                         window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
                     });
@@ -671,12 +601,10 @@ Güncellenmiş Tam Kod Bloğu
                 } else {
                     container.appendChild(analysisContainer);
                 }
-
                 analysisContainer.style.cssText = "margin: 20px 0; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg);";
 
                 let totalBooks = appData.books.length;
                 let totalTakenUnits = 0, totalReadUnits = 0, totalUnitsAll = 0;
-
                 appData.books.forEach(book => {
                     let baseArray = appData.bookPages[book.id];
                     totalUnitsAll += book.totalUnits;
@@ -720,14 +648,13 @@ Güncellenmiş Tam Kod Bloğu
                 let totalSystemBooks = 0;
                 let totalSystemTaken = 0;
                 let totalSystemRead = 0;
-                
+
                 allGroupKeys.forEach(gKey => {
                     let gDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
                     if (!gDataRaw) return;
                     let gData = JSON.parse(gDataRaw);
                     let mCount = gData.members ? gData.members.length : 0;
                     let totalU = 0, takenU = 0, readU = 0;
-                    
                     if (gData.books && gData.bookPages) {
                         gData.books.forEach(b => {
                             totalU += b.totalUnits;
@@ -815,7 +742,8 @@ Güncellenmiş Tam Kod Bloğu
                 modalOverlay.id = "detailed-analysis-modal";
                 modalOverlay.style.cssText = `
                     position: fixed;
-                    top: 0; left: 0; width: 100%; height: 100%;
+                    top: 0; left: 0;
+                    width: 100%; height: 100%;
                     background: rgba(0, 0, 0, 0.6);
                     z-index: 99999;
                     display: flex;
@@ -865,7 +793,6 @@ Güncellenmiş Tam Kod Bloğu
                                     </div>
                                 </div>
                             </div>
-
                             <div id="mtab-2" class="m-tab-content" style="display: none;">
                                 <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">⚔️ Tüm Grupları Karşılaştırma</h3>
                                 <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
@@ -880,7 +807,6 @@ Güncellenmiş Tam Kod Bloğu
                                     <tbody>${groupsComparisonHtml}</tbody>
                                 </table>
                             </div>
-
                             <div id="mtab-3" class="m-tab-content" style="display: none;">
                                 <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">👥 Üye Performansları (${currentGroup.replace(/_/g, ' ').toUpperCase()})</h3>
                                 <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
@@ -894,7 +820,6 @@ Güncellenmiş Tam Kod Bloğu
                                     <tbody>${membersListHtml}</tbody>
                                 </table>
                             </div>
-
                             <div id="mtab-4" class="m-tab-content" style="display: none;">
                                 <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📜 Detaylı Okuma Günlüğü</h3>
                                 <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
@@ -909,7 +834,6 @@ Güncellenmiş Tam Kod Bloğu
                                     <tbody>${logsHtml}</tbody>
                                 </table>
                             </div>
-
                             <div id="mtab-5" class="m-tab-content" style="display: none;">
                                 <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📚 Eserler ve Hatim Döngü Durumu</h3>
                                 <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
@@ -935,14 +859,17 @@ Güncellenmiş Tam Kod Bloğu
 
                 tabBtns.forEach(btn => {
                     btn.addEventListener("click", (e) => {
-                        tabBtns.forEach(b => { b.style.background = "var(--card-bg)"; b.style.color = "var(--text-main)"; });
+                        tabBtns.forEach(b => {
+                            b.style.background = "var(--card-bg)";
+                            b.style.color = "var(--text-main)";
+                        });
                         tabContents.forEach(c => c.style.display = "none");
-
                         e.currentTarget.style.background = "var(--gold-primary)";
                         e.currentTarget.style.color = "#fff";
                         document.getElementById(e.currentTarget.getAttribute("data-target")).style.display = "block";
                     });
                 });
+
                 tabBtns[0].style.background = "var(--gold-primary)";
                 tabBtns[0].style.color = "#fff";
 
@@ -962,7 +889,6 @@ Güncellenmiş Tam Kod Bloğu
                 } else {
                     container.appendChild(bottomContainer);
                 }
-
                 bottomContainer.style.cssText = "margin: 20px 0; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg);";
 
                 let allGroups = getAllGroupKeys();
@@ -1042,7 +968,6 @@ Güncellenmiş Tam Kod Bloğu
                             let groupKey = newG.trim().toLowerCase().replace(/\s+/g, '_');
                             let groupPwd = prompt("Bu gruba şifre koymak ister misiniz? (İstemiyorsanız boş bırakın):") || "";
                             currentGroup = groupKey;
-
                             const todayStr = new Date().toLocaleDateString("tr-TR");
                             let freshBooks = JSON.parse(JSON.stringify(defaultBooksTemplate));
                             let freshPages = {};
@@ -1140,10 +1065,14 @@ Güncellenmiş Tam Kod Bloğu
                                 if (idx !== -1) {
                                     appData.members[idx] = cleanNew;
                                     Object.keys(appData.bookPages).forEach(bId => {
-                                        appData.bookPages[bId].forEach(p => { if (p.owner === oldName) p.owner = cleanNew; });
+                                        appData.bookPages[bId].forEach(p => {
+                                            if (p.owner === oldName) p.owner = cleanNew;
+                                        });
                                     });
                                     if (appData.readingLogs) {
-                                        appData.readingLogs.forEach(l => { if (l.member === oldName) l.member = cleanNew; });
+                                        appData.readingLogs.forEach(l => {
+                                            if (l.member === oldName) l.member = cleanNew;
+                                        });
                                     }
                                     saveGroupData();
                                     await loadGroupData();
@@ -1204,7 +1133,6 @@ Güncellenmiş Tam Kod Bloğu
                     let baseArray = appData.bookPages[book.id];
                     let defModes = bookModesDefs[book.id] || createPageModes(book.totalUnits || 100);
                     let modeKeys = Object.keys(defModes);
-                    
                     if (!modeKeys.includes(book.currentMode)) book.currentMode = modeKeys[0];
                     let items = defModes[book.currentMode].getItems();
 
@@ -1212,12 +1140,12 @@ Güncellenmiş Tam Kod Bloğu
                     let primaryKey = book.type === "bab" ? "on_bab" : "yirmi_sayfa";
                     if (!defModes[primaryKey]) primaryKey = modeKeys[0];
                     let primaryItems = defModes[primaryKey].getItems();
-
                     primaryItems.forEach(pi => {
                         let st = getRangeStatus(baseArray, pi.start, pi.end);
                         if (st.statusType === "taken" || st.statusType === "read") takenCount++;
                     });
                     const totalCount = primaryItems.length;
+
                     const currentHatimInfo = appData.bookHatims[book.id];
                     const historyList = appData.bookHistory[book.id] || [];
 
@@ -1310,7 +1238,12 @@ Güncellenmiş Tam Kod Bloğu
                             const bId = e.target.getAttribute("data-bookid");
                             if (!confirm("Hatmi tamamlayıp yeni döngüye geçmek istiyor musunuz?")) return;
                             const endDateStr = new Date().toLocaleDateString("tr-TR");
-                            appData.bookHistory[bId].push({ hatimNo: currentHatimInfo.hatimNo, startDate: currentHatimInfo.startDate, endDate: endDateStr, prayerDone: currentHatimInfo.prayerDone });
+                            appData.bookHistory[bId].push({
+                                hatimNo: currentHatimInfo.hatimNo,
+                                startDate: currentHatimInfo.startDate,
+                                endDate: endDateStr,
+                                prayerDone: currentHatimInfo.prayerDone
+                            });
                             appData.bookHatims[bId] = { hatimNo: currentHatimInfo.hatimNo + 1, startDate: endDateStr, prayerDone: false };
                             appData.bookPages[bId] = Array(book.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
                             saveGroupData();
@@ -1345,16 +1278,26 @@ Güncellenmiş Tam Kod Bloğu
                         const row = document.createElement("div");
                         let statusClass = "", statusText = "Boş", actionText = "Al";
                         let st = getRangeStatus(baseArray, item.start, item.end);
-                        
-                        if (st.statusType === "read") { statusClass = "read"; statusText = `✓ Okundu: ${st.owner}`; actionText = "Okundu"; }
-                        else if (st.statusType === "taken") { statusClass = "taken"; statusText = `Alan: ${st.owner}`; actionText = isAdmin ? "Yönet" : "Bırak"; }
-                        else if (st.statusType === "mixed") { statusClass = "taken"; statusText = `Kısmen Alınmış`; actionText = isAdmin ? "Yönet" : "Dolu"; }
+
+                        if (st.statusType === "read") {
+                            statusClass = "read";
+                            statusText = `✓ Okundu: ${st.owner}`;
+                            actionText = "Okundu";
+                        } else if (st.statusType === "taken") {
+                            statusClass = "taken";
+                            statusText = `Alan: ${st.owner}`;
+                            actionText = isAdmin ? "Yönet" : "Bırak";
+                        } else if (st.statusType === "mixed") {
+                            statusClass = "taken";
+                            statusText = `Kısmen Alınmış`;
+                            actionText = isAdmin ? "Yönet" : "Dolu";
+                        }
 
                         row.className = `part-row ${statusClass}`;
                         row.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; margin-bottom: 6px; border-radius: 6px; font-size: 13px; cursor: pointer; border: 1px solid var(--border-color); background: var(--card-bg);";
+
                         let targetPage = item.start + 1;
                         let hasPdf = bookPdfMap[book.id] ? true : false;
-
                         let rowButtonsHtml = `<div style="display: flex; align-items: center; gap: 8px;">`;
                         if (hasPdf) rowButtonsHtml += `<button class="row-pdf-btn" data-bookid="${book.id}" data-page="${targetPage}" title="PDF" style="padding: 4px 8px; font-size: 11px; cursor: pointer; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 4px; font-weight: bold;">📄 PDF</button>`;
                         if (st.statusType === "taken" && st.owner === loggedInMember) rowButtonsHtml += `<button class="mark-read-btn" data-bookid="${book.id}" data-start="${item.start}" data-end="${item.end}" style="padding: 4px 8px; font-size: 11px; cursor: pointer; border: none; background: #27ae60; color: #fff; border-radius: 4px; font-weight: bold;">✓ Okudum</button>`;
@@ -1386,7 +1329,6 @@ Güncellenmiş Tam Kod Bloğu
                             let todayStr = new Date().toLocaleDateString("tr-TR");
 
                             for (let i = start; i < end; i++) bArr[i].isRead = true;
-
                             if (!appData.readingLogs) appData.readingLogs = [];
                             appData.readingLogs.push({
                                 member: loggedInMember,
@@ -1396,7 +1338,6 @@ Güncellenmiş Tam Kod Bloğu
                                 date: todayStr,
                                 timestamp: Date.now()
                             });
-
                             saveGroupData();
                             renderAnalysisSection();
                             renderBooks();
@@ -1436,7 +1377,10 @@ Güncellenmiş Tam Kod Bloğu
             }
 
             function handleItemClick(bookIndex, modeKey, itemIndex) {
-                if (!loggedInMember) { alert("Lütfen önce isminizi seçin!"); return; }
+                if (!loggedInMember) {
+                    alert("Lütfen önce isminizi seçin!");
+                    return;
+                }
                 const book = appData.books[bookIndex];
                 let baseArray = appData.bookPages[book.id];
                 let item = bookModesDefs[book.id][modeKey].getItems()[itemIndex];
@@ -1444,18 +1388,24 @@ Güncellenmiş Tam Kod Bloğu
 
                 if (st.statusType === "free") {
                     for (let i = item.start; i < item.end; i++) baseArray[i] = { owner: loggedInMember, isRead: false };
-                    saveGroupData(); renderAnalysisSection(); renderBooks();
+                    saveGroupData();
+                    renderAnalysisSection();
+                    renderBooks();
                 } else {
                     if (isAdmin) {
                         if (confirm(`[Yönetici] Bu hisseyi boşa çıkarmak istiyor musunuz?`)) {
                             for (let i = item.start; i < item.end; i++) baseArray[i] = { owner: "", isRead: false };
-                            saveGroupData(); renderAnalysisSection(); renderBooks();
+                            saveGroupData();
+                            renderAnalysisSection();
+                            renderBooks();
                         }
                     } else {
                         if (st.owner === loggedInMember) {
                             if (confirm(`Bu hisseyi bırakmak ister misiniz?`)) {
                                 for (let i = item.start; i < item.end; i++) baseArray[i] = { owner: "", isRead: false };
-                                saveGroupData(); renderAnalysisSection(); renderBooks();
+                                saveGroupData();
+                                renderAnalysisSection();
+                                renderBooks();
                             }
                         } else alert(`Bu kısım başka bir üyeye (${st.owner}) ait.`);
                     }
@@ -1483,3 +1433,4 @@ Güncellenmiş Tam Kod Bloğu
     </script>
 </body>
 </html>
+
