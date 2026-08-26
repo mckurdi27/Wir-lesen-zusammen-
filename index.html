@@ -628,10 +628,11 @@
                 let percentRead = totalUnitsAll > 0 ? Math.round((totalReadUnits / totalUnitsAll) * 100) : 0;
 
                 analysisContainer.innerHTML = `
-                    <h3 style="margin-bottom: 10px; font-size: 15px; display: flex; justify-content: space-between; align-items: center;">
-                        <span>📈 Genel Grup İlerleme Paneli</span>
-                        <span style="font-size: 11px; background: #27ae60; color: #fff; padding: 3px 8px; border-radius: 4px;">Grup: ${currentGroup.replace(/_/g, ' ').toUpperCase()}</span>
-                    </h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                        <h3 style="margin: 0; font-size: 15px;">📈 Genel Grup İlerleme Paneli</h3>
+                        <button id="open-detailed-analysis-btn" style="padding: 6px 12px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;">📊 Detaylı Analiz Paneli</button>
+                    </div>
+                    <div style="font-size: 11px; color: var(--gold-dark); margin-bottom: 10px; font-weight: bold;">Grup: ${currentGroup.replace(/_/g, ' ').toUpperCase()}</div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-top: 10px;">
                         <div style="padding: 10px; border-radius: 6px; border-left: 4px solid #3498db; border: 1px solid var(--border-color);">
                             <div style="font-size: 11px; opacity: 0.8;">Toplam Eser</div>
@@ -646,17 +647,11 @@
                             <div style="font-size: 17px; font-weight: bold;">${totalReadUnits} / ${totalUnitsAll} (%${percentRead})</div>
                         </div>
                     </div>
-                    <div style="margin-top: 12px; text-align: right;">
-                        <button id="open-analysis-modal-btn" style="padding: 8px 14px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">📊 Detaylı Analiz / Rapor Görüntüle</button>
-                    </div>
                 `;
 
-                const openModalBtn = document.getElementById("open-analysis-modal-btn");
-                if (openModalBtn) {
-                    openModalBtn.addEventListener("click", () => {
-                        openDetailedAnalysisWindow();
-                    });
-                }
+                document.getElementById("open-detailed-analysis-btn").addEventListener("click", () => {
+                    openDetailedAnalysisWindow();
+                });
             }
 
             function openDetailedAnalysisWindow() {
@@ -745,10 +740,9 @@
                                     if (p.owner === m && p.isRead) mRead++;
                                 });
                             });
-                            let isCurrentActiveMember = (m === loggedInMember);
                             membersListHtml += `
-                                <tr style="${isCurrentActiveMember ? 'background: rgba(212,175,55,0.15);' : ''}">
-                                    <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${m} ${isCurrentActiveMember ? '⭐ (Seçili)' : ''}</td>
+                                <tr>
+                                    <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${m}</td>
                                     <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color); text-align: center;">${mTaken} Hisse</td>
                                     <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${mRead} Hisse</td>
                                 </tr>
@@ -780,7 +774,7 @@
                     modal.innerHTML = `
                         <div style="background: var(--card-bg); color: var(--text-main); width: 100%; max-width: 900px; max-height: 90vh; border-radius: 12px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
                             <div style="padding: 16px 20px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border-bottom: 2px solid var(--gold-primary); display: flex; justify-content: space-between; align-items: center;">
-                                <div style="font-size: 16px; font-weight: bold; color: #8a6d3b;">📊 Detaylı Analiz ve Rapor Paneli</div>
+                                <div style="font-size: 16px; font-weight: bold; color: #8a6d3b;">📊 Yönetici Detaylı Analiz ve Rapor Paneli</div>
                                 <button id="close-modal-btn" style="background: #e74c3c; color: white; border: none; width: 30px; height: 30px; border-radius: 50%; font-weight: bold; cursor: pointer; font-size: 14px;">✕</button>
                             </div>
                             <div style="padding: 20px; overflow-y: auto; flex: 1; font-size: 13px;">
@@ -793,7 +787,7 @@
                                 </div>
 
                                 <div style="margin-bottom: 15px; padding: 10px 14px; background: var(--card-bg); border-radius: 6px; border: 1px solid var(--border-color);">
-                                    <strong>Aktif Üye:</strong> ${loggedInMember ? loggedInMember : 'Seçilmedi (Genel Görünüm)'} | <strong>Grup Özeti:</strong> ${selectedGroupForAnalysis.replace(/_/g, ' ').toUpperCase()} | Üye Sayısı: ${mCount} | Alınan: ${takenU}/${totalU} (%${tPct}) | Okunan: ${readU}/${totalU} (%${rPct})
+                                    <strong>Seçilen Grup Özeti:</strong> ${selectedGroupForAnalysis.replace(/_/g, ' ').toUpperCase()} | Üye Sayısı: ${mCount} | Alınan: ${takenU}/${totalU} (%${tPct}) | Okunan: ${readU}/${totalU} (%${rPct})
                                 </div>
 
                                 <h3 style="font-size: 14px; border-left: 4px solid var(--gold-primary); padding-left: 8px; margin: 20px 0 10px 0; color: var(--gold-dark);">⚔️ Tüm Grupları Karşılaştırma Paneli</h3>
