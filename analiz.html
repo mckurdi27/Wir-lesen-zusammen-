@@ -62,7 +62,7 @@
                         </tr>
                     </thead>
                     <tbody id="bireysel-tablo-govde">
-                        <!-- Dinamik doldurulacak -->
+                        <tr><td colspan="4" class="text-center text-gray-500">Veriler yükleniyor...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -72,7 +72,7 @@
         <div id="icerik-grup" class="sekme-icerik card-box p-4 space-y-3 hidden">
             <h2 class="text-xs font-bold text-gray-800 border-b pb-1">Grup Bazlı Detaylı Dağılım</h2>
             <div id="grup-detay-alan" class="space-y-2 text-xs">
-                <!-- Dinamik doldurulacak -->
+                <div class="p-2 text-gray-500">Veriler yükleniyor...</div>
             </div>
         </div>
 
@@ -89,7 +89,7 @@
                         </tr>
                     </thead>
                     <tbody id="gruplar-arasi-govde">
-                        <!-- Dinamik doldurulacak -->
+                        <tr><td colspan="3" class="text-center text-gray-500">Veriler yükleniyor...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -102,13 +102,13 @@
                 <table class="w-full table-custom">
                     <thead>
                         <tr>
-                            <th>Tarih</th>
+                            <th>Tarih / Zaman</th>
                             <th>Grup / Üye</th>
                             <th>Eser / Detay</th>
                         </tr>
                     </thead>
                     <tbody id="gunluk-tablo-govde">
-                        <!-- Dinamik doldurulacak -->
+                        <tr><td colspan="3" class="text-center text-gray-500">Kayıt bulunamadı.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -133,62 +133,121 @@
             aktifBtn.classList.add('border-b-2', 'border-amber-700', 'text-amber-900', 'bg-white');
         }
 
-        // Tamamen dinamik veri çekme ve işleme fonksiyonu
         function verileriDinamikYukle() {
             let hamVeri = null;
-            
-            // localStorage içerisindeki kayıtları tarayarak ana uygulama verisini bulmaya çalışalım
+            let bulunanAnahtar = "";
+
+            // localStorage içerisindeki tüm anahtarları tarayarak anlamlı hatim verisini bulalım
             for (let i = 0; i < localStorage.length; i++) {
                 let anahtar = localStorage.key(i);
                 try {
                     let parseEdilmis = JSON.parse(localStorage.getItem(anahtar));
-                    // Eğer veride grup yapısı veya dizi formatı varsa yakala
-                    if (parseEdilmis && (parseEdilmis.gruplar || Array.isArray(parseEdilmis))) {
-                        hamVeri = parseEdilmis;
-                        break;
+                    if (parseEdilmis) {
+                        // Eğer veri bir dizi veya içinde grup/üyeler barındıran bir nesne ise yakala
+                        if (Array.isArray(parseEdilmis) || parseEdilmis.gruplar || parseEdilmis.groups || typeof parseEdilmis === 'object') {
+                            hamVeri = parseEdilmis;
+                            bulunanAnahtar = anahtar;
+                            break;
+                        }
                     }
                 } catch (e) {}
             }
 
-            // HTML alanlarını seçelim
             const genelOzetAlan = document.getElementById('genel-ozet-alan');
             const bireyselGovde = document.getElementById('bireysel-tablo-govde');
             const grupDetayAlan = document.getElementById('grup-detay-alan');
             const gruplarArasiGovde = document.getElementById('gruplar-arasi-govde');
             const gunlukGovde = document.getElementById('gunluk-tablo-govde');
 
-            // Eğer localStorage'da veri bulunamazsa kullanıcıyı bilgilendir
             if (!hamVeri) {
-                genelOzetAlan.innerHTML = "⚠️ Ana sayfaya ait kayıtlı veri bulunamadı. Lütfen önce ana sayfada grup ve üye işlemlerini gerçekleştirin.";
+                genelOzetAlan.innerHTML = "⚠️ Ana sayfaya ait kayıtlı veri bulunamadı. Lütfen önce ana sayfada grup ve üye işlemleri yapın.";
                 bireyselGovde.innerHTML = `<tr><td colspan="4" class="text-center text-gray-500">Veri bulunamadı.</td></tr>`;
                 grupDetayAlan.innerHTML = `<div class="p-2 text-gray-500">Görüntülenecek grup verisi yok.</div>`;
                 gruplarArasiGovde.innerHTML = `<tr><td colspan="3" class="text-center text-gray-500">Veri bulunamadı.</td></tr>`;
-                gunlukGovde.innerHTML = `<tr><td colspan="3" class="text-center text-gray-500">Kayıt bulunamadı.</td></tr>`;
                 return;
             }
 
-            // Verinin yapısına göre grupları ve kişileri dinamik olarak dönelim
-            // (Ana dosyadaki yapı diziyse veya nesne içindeki .gruplar dizisiyse otomatik algılar)
-            let gruplarDizisi = Array.isArray(hamVeri) ? hamVeri : (hamVeri.gruplar || []);
+            // Verileri standart bir dizi formatına dönüştürelim
+            let gruplarDizisi = [];
+            if (Array.isArray(hamVeri)) {
+                gruplarDizisi = hamVeri;
+            } else if (hamVeri.gruplar && Array.isArray(hamVeri.gruplar)) {
+                gruplarDizisi = hamVeri.gruplar;
+            } else if (hamVeri.groups && Array.isArray(hamVeri.groups)) {
+                gruplarDizisi = hamVeri.groups;
+            } else {
+                // Eğer nesne tabanlıysa anahtarları grup gibi ele alalım
+                gruplarDizisi = Object.keys(hamVeri).map(key => ({ ad: key, ...hamVeri[key] }));
+            }
 
             let toplamGrupSayisi = gruplarDizisi.length;
             let toplamUyeSayisi = 0;
+            let toplamAlinanHisse = 0;
+            let toplamOkunanHisse = 0;
 
-            bireyselGovde.innerHTML = '';
-            grupDetayAlan.innerHTML = '';
-            gruplarArasiGovde.innerHTML = '';
             let bireyselHTML = '';
             let grupDetayHTML = '';
             let arasiHTML = '';
 
-            gruplarDizisiherDonus => {
-                // Her grubu ve üyelerini dinamik işleme sokuyoruz
-            };
+            gruplarDizisi.forEach((grup, gIndex) => {
+                let grupAdi = grup.ad || grup.grup Adi || grup.name || `Grup ${gIndex + 1}`;
+                let uyeler = grup.uyeler || grup.members || grup.kisiler || [];
+                
+                toplamUyeSayisi += uyeler.length;
+                let grupAlinan = 0;
+                let grupOkunan = 0;
 
-            // Örnek dinamik döngü yapısı (Ana dosyadaki gerçek veri anahtarlarına tam oturması için 
-            // index.html'deki veri nesnesinin anahtar adını -örneğin 'gruplar' veya 'ogrenciler'- doğrudan buraya uyarlayabiliriz)
-            
-            genelOzetAlan.innerHTML = `Sistemde toplam <strong>${toplamGrupSayisi}</strong> grup ve kayıtlı üyeler aktif olarak listelenmektedir.`;
+                if (uyeler.length > 0) {
+                    uyeler.forEach(uye => {
+                        let uyeAdi = uye.ad || uye.name || "İsimsiz Üye";
+                        let alinan = uye.alinanHisse || uye.hisse || uye.shares || 0;
+                        let okunan = uye.okunanHisse || uye.okunan || 0;
+
+                        grupAlinan += Number(alinan);
+                        grupOkunan += Number(okunan);
+
+                        bireyselHTML += `
+                            <tr>
+                                <td>${grupAdi}</td>
+                                <td><strong>${uyeAdi}</strong></td>
+                                <td>${alinan}</td>
+                                <td class="text-green-700 font-semibold">${okunan}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    bireyselHTML += `<tr><td colspan="4" class="text-center text-gray-400">${grupAdi} grubunda kayıtlı üye bulunmuyor.</td></tr>`;
+                }
+
+                toplamAlinanHisse += grupAlinan;
+                toplamOkunanHisse += grupOkunan;
+
+                // Grup Detayları
+                grupDetayHTML += `
+                    <div class="p-3 bg-amber-50/30 border border-amber-200 rounded">
+                        <strong>${grupAdi}</strong> - Üye Sayısı: ${uyeler.length} | Alınan: ${grupAlinan} | Okunan: ${grupOkunan}
+                    </div>
+                `;
+
+                // Gruplar Arası
+                arasiHTML += `
+                    <tr>
+                        <td><strong>${grupAdi}</strong></td>
+                        <td>${uyeler.length}</td>
+                        <td>${grupAlinan} / <span class="text-green-700 font-semibold">${grupOkunan}</span></td>
+                    </tr>
+                `;
+            });
+
+            if (!bireyselHTML) bireyselHTML = `<tr><td colspan="4" class="text-center text-gray-500">Üye kaydı bulunamadı.</td></tr>`;
+            if (!grupDetayHTML) grupDetayHTML = `<div class="p-2 text-gray-500">Grup detayı bulunamadı.</div>`;
+            if (!arasiHTML) arasiHTML = `<tr><td colspan="3" class="text-center text-gray-500">Grup bulunamadı.</td></tr>`;
+
+            // HTML Alanlarını Güncelle
+            genelOzetAlan.innerHTML = `Sistemde aktif olarak toplam <strong>${toplamGrupSayisi}</strong> grup, <strong>${toplamUyeSayisi}</strong> üye bulunmaktadır. Toplam Alınan Hisse: <strong>${toplamAlinanHisse}</strong>, Okunan Toplam Hisse: <strong class="text-green-700">${toplamOkunanHisse}</strong>.`;
+            bireyselGovde.innerHTML = bireyselHTML;
+            grupDetayAlan.innerHTML = grupDetayHTML;
+            gruplarArasiGovde.innerHTML = arasiHTML;
         }
 
         window.onload = verileriDinamikYukle;
