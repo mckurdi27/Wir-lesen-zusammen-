@@ -67,7 +67,6 @@ window.rebiulevvel_veri = {
             "hicri_tarih": "13 Rebiülevvel",
             "ayet": { "meal": "Şüphesiz Allah ve melekleri Peygambere salat ederler...", "kaynak": "Ahzâb Suresi, 56" },
             "hadis": { "meal": "Kimin yanımda anılırsam üzerime salavat getirmezse cimridir.", "kaynak": "Tirmizî, Deavât 100" }
-            "özlü söz": { "meal": "Kimin yanımda anılırsam üzerime salavat getirmezse cimridir.", "kaynak": "Tirmizî, Deavât 111" }
         },
         "14": {
             "hicri_tarih": "14 Rebiülevvel",
