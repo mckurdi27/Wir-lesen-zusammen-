@@ -1,10 +1,14 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    // 1. HTML dosyasında statik olarak kalan eski ortadaki "Ortak Hatim ve Dua Takip Sistemi" panelini DOM'dan tamamen temizle
-    document.querySelectorAll('div').forEach(div => {
-        if (div.textContent && div.textContent.includes("Ortak Hatim ve Dua Takip Sistemi") && !div.id.includes("main-title")) {
-            div.remove();
-        }
-    });
+    // 1. Ortadaki eski statik paneli DOM'dan ve ekrandan tamamen kazı
+    function removeStuckPanel() {
+        document.querySelectorAll('div').forEach(div => {
+            if (div.textContent && div.textContent.includes("Ortak Hatim ve Dua Takip Sistemi") && !div.id.includes("main-title-ornate-section") && (div.querySelector('select') || div.innerHTML.includes("Yönetici Modu"))) {
+                div.remove();
+            }
+        });
+    }
+    removeStuckPanel();
+    setTimeout(removeStuckPanel, 100);
 
     // Oryantal Motifler ve Tema (Açık & Koyu Mod) Stillerini Enjekte Etme
     function injectOrientalStyles() {
@@ -26,6 +30,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 background-color: var(--bg-primary);
                 color: var(--text-main);
                 font-family: 'Georgia', serif;
+            }
+
+            /* Eski statik panellerin kalıntısı varsa CSS ile de kesin olarak gizle */
+            div:not(#main-title-ornate-section):not(.book-card):not(#books-grid):not(.container) {
+                /* Güvenlik filtresi */
             }
 
             /* --- KOYU MOD: Gece Mavisi ve Parlayan Altın Vektör Konsepti --- */
@@ -50,7 +59,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     border-color: #d4af37 !important;
                     box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25) !important;
                 }
-                #daily-inspiration-section, #analysis-section, #admin-message-section, #user-controls-section, #admin-panel-section {
+                #daily-inspiration-section, #analysis-section, #admin-message-section, #user-controls-section, #admin-panel-section, #admin-bottom-section {
                     background: #131b31 !important;
                     border-color: #22304a !important;
                     color: #e2e8f0 !important;
@@ -100,7 +109,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             }
 
-            /* Ortak Oryantal Çerçeve Dokunuşları */
             .book-card {
                 border: 2px solid var(--gold-primary) !important;
                 border-radius: 12px !important;
@@ -274,6 +282,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             border-left: 4px solid #27ae60;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            background: var(--card-bg);
         `;
 
         inspirationContainer.innerHTML = `
@@ -382,6 +391,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function loadGroupData() {
+        removeStuckPanel();
         const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
         appData = savedData ? JSON.parse(savedData) : { members: ["Ahmet", "Mehmet", "Ayşe"] };
         if (!appData.members) appData.members = [];
@@ -417,8 +427,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         renderMainTitleHeader();
         await renderDailyInspiration();
         renderUserControls();
-        renderAnalysisSection();
         renderBooks();
+        renderAnalysisSection(); // Kitapların altında yer alacak
         renderAdminSectionAtBottom();
     }
 
@@ -539,14 +549,67 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    function renderAnalysisSection() {
+        let analysisContainer = document.getElementById("analysis-section");
+        if (!analysisContainer) {
+            analysisContainer = document.createElement("div");
+            analysisContainer.id = "analysis-section";
+            container.appendChild(analysisContainer); // En alta, kitapların altına eklendi
+        } else {
+            // Zaten varsa en sona taşı
+            container.appendChild(analysisContainer);
+        }
+
+        analysisContainer.style.cssText = "margin: 20px 0; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.05);";
+
+        let totalBooks = appData.books.length;
+        let totalTakenUnits = 0, totalReadUnits = 0, totalUnitsAll = 0;
+
+        appData.books.forEach(book => {
+            let baseArray = appData.bookPages[book.id];
+            totalUnitsAll += book.totalUnits;
+            baseArray.forEach(p => {
+                if (p.owner) totalTakenUnits++;
+                if (p.isRead) totalReadUnits++;
+            });
+        });
+
+        let percentTaken = totalUnitsAll > 0 ? Math.round((totalTakenUnits / totalUnitsAll) * 100) : 0;
+        let percentRead = totalUnitsAll > 0 ? Math.round((totalReadUnits / totalUnitsAll) * 100) : 0;
+
+        analysisContainer.innerHTML = `
+            <h3 style="margin-bottom: 10px; font-size: 15px; display: flex; justify-content: space-between; align-items: center;">
+                <span>📈 Genel Grup İlerleme Paneli</span>
+                <span style="font-size: 11px; background: #27ae60; color: #fff; padding: 3px 8px; border-radius: 4px;">Grup: ${currentGroup.replace(/_/g, ' ').toUpperCase()}</span>
+            </h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-top: 10px;">
+                <div style="padding: 10px; border-radius: 6px; border-left: 4px solid #3498db; border: 1px solid var(--border-color);">
+                    <div style="font-size: 11px; opacity: 0.8;">Toplam Eser</div>
+                    <div style="font-size: 17px; font-weight: bold;">${totalBooks} Adet</div>
+                </div>
+                <div style="padding: 10px; border-radius: 6px; border-left: 4px solid #f39c12; border: 1px solid var(--border-color);">
+                    <div style="font-size: 11px; opacity: 0.8;">Alınan Hisseler</div>
+                    <div style="font-size: 17px; font-weight: bold;">${totalTakenUnits} / ${totalUnitsAll} (%${percentTaken})</div>
+                </div>
+                <div style="padding: 10px; border-radius: 6px; border-left: 4px solid #27ae60; border: 1px solid var(--border-color);">
+                    <div style="font-size: 11px; opacity: 0.8;">Okunan Hisseler</div>
+                    <div style="font-size: 17px; font-weight: bold;">${totalReadUnits} / ${totalUnitsAll} (%${percentRead})</div>
+                </div>
+            </div>
+        `;
+    }
+
     function renderAdminSectionAtBottom() {
         let bottomContainer = document.getElementById("admin-bottom-section");
         if (!bottomContainer) {
             bottomContainer = document.createElement("div");
             bottomContainer.id = "admin-bottom-section";
-            bottomContainer.style.cssText = "margin-top: 30px; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05); background: var(--card-bg);";
+            container.appendChild(bottomContainer);
+        } else {
             container.appendChild(bottomContainer);
         }
+
+        bottomContainer.style.cssText = "margin: 20px 0; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05); background: var(--card-bg);";
 
         let allGroups = getAllGroupKeys();
         let groupsHtml = allGroups.map(g => `<option value="${g}" ${g === currentGroup ? "selected" : ""}>${g.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
@@ -703,56 +766,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         renderUserControls();
         await renderDailyInspiration();
-        renderAnalysisSection();
         renderBooks();
+        renderAnalysisSection();
         renderAdminSectionAtBottom();
-    }
-
-    function renderAnalysisSection() {
-        let analysisContainer = document.getElementById("analysis-section");
-        if (!analysisContainer) {
-            analysisContainer = document.createElement("div");
-            analysisContainer.id = "analysis-section";
-            analysisContainer.style.cssText = "margin-bottom: 20px; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05);";
-            const userControlsSec = document.getElementById("user-controls-section");
-            userControlsSec.parentNode.insertBefore(analysisContainer, userControlsSec.nextSibling);
-        }
-
-        let totalBooks = appData.books.length;
-        let totalTakenUnits = 0, totalReadUnits = 0, totalUnitsAll = 0;
-
-        appData.books.forEach(book => {
-            let baseArray = appData.bookPages[book.id];
-            totalUnitsAll += book.totalUnits;
-            baseArray.forEach(p => {
-                if (p.owner) totalTakenUnits++;
-                if (p.isRead) totalReadUnits++;
-            });
-        });
-
-        let percentTaken = totalUnitsAll > 0 ? Math.round((totalTakenUnits / totalUnitsAll) * 100) : 0;
-        let percentRead = totalUnitsAll > 0 ? Math.round((totalReadUnits / totalUnitsAll) * 100) : 0;
-
-        analysisContainer.innerHTML = `
-            <h3 style="margin-bottom: 10px; font-size: 15px; display: flex; justify-content: space-between; align-items: center;">
-                <span>📈 Genel Grup İlerleme Paneli</span>
-                <span style="font-size: 11px; background: #27ae60; color: #fff; padding: 3px 8px; border-radius: 4px;">Grup: ${currentGroup.replace(/_/g, ' ').toUpperCase()}</span>
-            </h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-top: 10px;">
-                <div style="padding: 10px; border-radius: 6px; border-left: 4px solid #3498db; border: 1px solid var(--border-color);">
-                    <div style="font-size: 11px; opacity: 0.8;">Toplam Eser</div>
-                    <div style="font-size: 17px; font-weight: bold;">${totalBooks} Adet</div>
-                </div>
-                <div style="padding: 10px; border-radius: 6px; border-left: 4px solid #f39c12; border: 1px solid var(--border-color);">
-                    <div style="font-size: 11px; opacity: 0.8;">Alınan Hisseler</div>
-                    <div style="font-size: 17px; font-weight: bold;">${totalTakenUnits} / ${totalUnitsAll} (%${percentTaken})</div>
-                </div>
-                <div style="padding: 10px; border-radius: 6px; border-left: 4px solid #27ae60; border: 1px solid var(--border-color);">
-                    <div style="font-size: 11px; opacity: 0.8;">Okunan Hisseler</div>
-                    <div style="font-size: 17px; font-weight: bold;">${totalReadUnits} / ${totalUnitsAll} (%${percentRead})</div>
-                </div>
-            </div>
-        `;
     }
 
     function getRangeStatus(baseArray, start, end) {
@@ -821,14 +837,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                 `;
             }
 
+            // Kutu altındaki yazıların rahat okunması için yükseklik ve alan ferahlığı artırıldı
             let historyHtml = `
-                <div style="margin-top: 15px; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px;">
-                    <div style="font-weight: bold; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="margin-top: 15px; padding: 14px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; background: rgba(0,0,0,0.01);">
+                    <div style="font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 5px;">
                         <span>📚 Mevcut Döngü: <strong style="color: #27ae60;">${currentHatimInfo.hatimNo}. Hatim</strong></span>
                         <span style="font-size: 11px; opacity: 0.8; font-weight: normal;">Başlangıç: ${currentHatimInfo.startDate}</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
-                        <span>Dua Durumu: <strong>${currentHatimInfo.prayerDone ? "✓ Yapıldı" : "Yapılacak"}</strong></span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+                        <span>Dua Durumu: <strong style="color: ${currentHatimInfo.prayerDone ? '#27ae60' : '#e67e22'};">${currentHatimInfo.prayerDone ? "✓ Yapıldı" : "Yapılacak"}</strong></span>
                     </div>
                     ${historyList.length > 0 ? `
                         <div style="margin-top: 10px; border-top: 1px dashed var(--border-color); padding-top: 6px;">
@@ -851,10 +868,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <span class="toggle-icon" style="font-size: 12px;">▼</span>
                     </div>
                 </div>
-                <div class="book-body" style="padding: 12px; display: none;">
+                <div class="book-body" style="padding: 14px; display: none;">
                     ${adminHeaderControls}
                     ${modesHtml}
-                    <div class="items-list" id="list-${bookIndex}" style="max-height: 170px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; margin-top: 8px; padding-right: 4px;"></div>
+                    <div class="items-list" id="list-${bookIndex}" style="max-height: 220px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; margin-top: 10px; padding-right: 4px;"></div>
                     ${historyHtml}
                 </div>
             `;
