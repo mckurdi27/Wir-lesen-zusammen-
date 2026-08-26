@@ -1,4 +1,4 @@
-{
+window.zilkade_veri = {
     "ay_kodu": "11",
     "ay_adi": "Zilkade",
     "aciklama": "Hicri takvimin on birinci ayıdır. Haram aylardandır.",
@@ -154,4 +154,4 @@
             "hadis": { "meal": "Ameller ancak niyetlere göredir.", "kaynak": "Buhârî, Bed'ü'l-vahy 1" }
         }
     }
-}
+};
