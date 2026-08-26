@@ -1327,46 +1327,45 @@
                     }
 
                     const addBookBtn = document.getElementById("admin-add-book-btn");
-if (addBookBtn) {
-    addBookBtn.addEventListener("click", () => {
-        let bName = prompt("Eser adını girin:");
-        if (!bName || !bName.trim()) return;
+                    if (addBookBtn) {
+                        addBookBtn.addEventListener("click", () => {
+                            let bName = prompt("Eser adını girin:");
+                            if (!bName || !bName.trim()) return;
         
-        let bUnitsStr = prompt("Toplam sayfa/birim sayısını girin (Örn: 100):", "100");
-        let bUnits = parseInt(bUnitsStr, 10);
-        if (isNaN(bUnits) || bUnits <= 0) {
-            alert("Geçersiz birim sayısı!");
-            return;
-        }
+                            let bUnitsStr = prompt("Toplam sayfa/birim sayısını girin (Örn: 100):", "100");
+                            let bUnits = parseInt(bUnitsStr, 10);
+                            if (isNaN(bUnits) || bUnits <= 0) {
+                                alert("Geçersiz birim sayısı!");
+                                return;
+                            }
         
-        let bTypeInput = prompt("Birim türü nedir? ('sayfa' veya 'bab' yazın)", "sayfa");
-        let bType = (bTypeInput && bTypeInput.trim().toLowerCase() === "bab") ? "bab" : "page";
+                            let bTypeInput = prompt("Birim türü nedir? ('sayfa' veya 'bab' yazın)", "sayfa");
+                            let bType = (bTypeInput && bTypeInput.trim().toLowerCase() === "bab") ? "bab" : "page";
         
-        // 1. Yeni Eser için PDF linki / dosya adı isteme adımı eklendi
-        let bPdf = prompt("PDF dosya yolunu veya linkini girin (Boş bırakabilirsiniz):", "") || "";
+                            // 1. Yeni Eser için PDF linki / dosya adı isteme adımı eklendi
+                            let bPdf = prompt("PDF dosya yolunu veya linkini girin (Boş bırakabilirsiniz):", "") || "";
         
-        let bId = "book_" + Date.now();
+                            let bId = "book_" + Date.now();
 
-        appData.books.push({
-            id: bId,
-            name: bName.trim(),
-            totalUnits: bUnits,
-            type: bType,
-            defaultMode: bType === "bab" ? "on_bab" : "yirmi_sayfa",
-            currentMode: bType === "bab" ? "on_bab" : "yirmi_sayfa",
-            pdf: bPdf.trim() // 2. Butonların tetiklenmesi için nesneye pdf alanı eklendi
-        });
+                            appData.books.push({
+                                id: bId,
+                                name: bName.trim(),
+                                totalUnits: bUnits,
+                                type: bType,
+                                defaultMode: bType === "bab" ? "on_bab" : "yirmi_sayfa",
+                                currentMode: bType === "bab" ? "on_bab" : "yirmi_sayfa",
+                                pdf: bPdf.trim() // 2. Butonların tetiklenmesi için nesneye pdf alanı eklendi
+                             });
 
-        appData.bookPages[bId] = Array(bUnits).fill(null).map(() => ({ owner: "", isRead: false }));
-        appData.bookHatims[bId] = { hatimNo: 1, startDate: new Date().toLocaleDateString("tr-TR"), prayerDone: false };
-        appData.bookHistory[bId] = [];
+                             appData.bookPages[bId] = Array(bUnits).fill(null).map(() => ({ owner: "", isRead: false }));
+                             appData.bookHatims[bId] = { hatimNo: 1, startDate: new Date().toLocaleDateString("tr-TR"), prayerDone: false };
+                             appData.bookHistory[bId] = [];
 
-        saveGroupData();
-        loadGroupData();
-    });
-}
-
-
+                             saveGroupData();
+                             loadGroupData();
+                          });
+                      }
+                    
                     document.querySelectorAll(".admin-edit-book").forEach(btn => {
                         btn.addEventListener("click", (e) => {
                             let bId = e.target.getAttribute("data-id");
