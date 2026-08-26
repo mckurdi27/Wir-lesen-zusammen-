@@ -1,4 +1,4 @@
-{
+window.zilhicce_veri = {
     "ay_kodu": "12",
     "ay_adi": "Zilhicce",
     "aciklama": "Hicri takvimin on ikinci ve son ayıdır. Hac ibadeti, Zilhicce'nin ilk on günü ve Kurban Bayramı ile faziletlidir.",
@@ -154,4 +154,4 @@
             "hadis": { "meal": "Ameller ancak niyetlere göredir.", "kaynak": "Buhârî, Bed'ü'l-vahy 1" }
         }
     }
-}
+};
