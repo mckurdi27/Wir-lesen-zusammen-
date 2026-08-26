@@ -113,17 +113,29 @@
             };
 
             function bugunkuHicriTarihiAl() {
+                const ayAdlari = {
+                    "01": "Muharrem", "02": "Sefer", "03": "Rebiülevvel", "04": "Rebiülahir",
+                    "05": "Cemaziyelevvel", "06": "Cemaziyelahir", "07": "Recep", "08": "Şaban",
+                    "09": "Ramazan", "10": "Şevval", "11": "Zilkade", "12": "Zilhicce"
+                };
                 try {
                     const formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', { day: 'numeric', month: 'numeric', year: 'numeric' });
                     const parts = formatter.formatToParts(new Date());
-                    let gun = "1", ay = "3";
+                    let gun = "1", ay = "3", yil = "1448";
                     for (const part of parts) {
                         if (part.type === 'day') gun = part.value;
                         if (part.type === 'month') ay = part.value;
+                        if (part.type === 'year') yil = part.value.replace(/[^0-9]/g, '');
                     }
-                    return { ayKodu: String(ay).padStart(2, '0'), gunNumarasi: parseInt(gun, 10) };
+                    let ayKoduStr = String(ay).padStart(2, '0');
+                    let ayAdi = ayAdlari[ayKoduStr] || "Rebiülevvel";
+                    return {
+                        ayKodu: ayKoduStr,
+                        gunNumarasi: parseInt(gun, 10),
+                        fullStr: `${gun} ${ayAdi} ${yil}`
+                    };
                 } catch (hata) {
-                    return { ayKodu: "03", gunNumarasi: 1 };
+                    return { ayKodu: "03", gunNumarasi: 1, fullStr: "1 Rebiülevvel 1448" };
                 }
             }
 
@@ -143,7 +155,6 @@
                     monthlyInspirationCache[ayKodu] = data;
                     return data;
                 } catch (e) {
-                    // Fallback veri seti (JSON yüklenemezse veya hata alırsak uygulamanın çökmemesi için)
                     return {
                         "1": {
                             ayet: { meal: "Şüphesiz güçlükle beraber bir kolaylık vardır.", kaynak: "İnşirah, 5-6" },
@@ -159,12 +170,7 @@
                 const hicriInfo = bugunkuHicriTarihiAl();
                 let hDay = hicriInfo.gunNumarasi;
                 let hMonth = hicriInfo.ayKodu;
-                
-                let todayHijriStr = `${hDay}.${hMonth}.1448`;
-                try {
-                    const displayFormatter = new Intl.DateTimeFormat('tr-TR-u-ca-islamic-umalqura', { day: 'numeric', month: 'numeric', year: 'numeric' });
-                    todayHijriStr = displayFormatter.format(new Date());
-                } catch (e) {}
+                let todayHijriStr = hicriInfo.fullStr;
 
                 let jsonData = await fetchHijriMonthData(hMonth);
                 let item = null;
@@ -359,7 +365,8 @@
             async function loadGroupData() {
                 removeStuckPanel();
                 const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
-                appData = savedData ? JSON.parse(savedData) : { members: ["Ahmet", "Mehmet", "Ayşe"] };
+                // Her grup kendi bağımsız verisine ve boş/özel üyelerine sahip olmalıdır
+                appData = savedData ? JSON.parse(savedData) : { members: currentGroup === "grup_1" ? ["Ahmet", "Mehmet", "Ayşe"] : [] };
                 if (!appData.members) appData.members = [];
 
                 const savedSession = localStorage.getItem(`hatim_session_${currentGroup}`);
@@ -456,6 +463,24 @@
                     let newG = prompt("Yeni grup adını girin:");
                     if (newG && newG.trim()) {
                         currentGroup = newG.trim().toLowerCase().replace(/\s+/g, '_');
+                        // Yeni grup için sıfırdan bağımsız veri yapısı başlatıyoruz (önceki grubun üyeleri kopyalanmaz)
+                        const todayStr = new Date().toLocaleDateString("tr-TR");
+                        let freshBooks = JSON.parse(JSON.stringify(defaultBooksTemplate));
+                        let freshPages = {};
+                        let freshHatims = {};
+                        let freshHistory = {};
+                        freshBooks.forEach(defBook => {
+                            freshPages[defBook.id] = Array(defBook.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
+                            freshHatims[defBook.id] = { hatimNo: 1, startDate: todayStr, prayerDone: false };
+                            freshHistory[defBook.id] = [];
+                        });
+                        appData = {
+                            members: [],
+                            books: freshBooks,
+                            bookPages: freshPages,
+                            bookHatims: freshHatims,
+                            bookHistory: freshHistory
+                        };
                         saveGroupData();
                         await loadGroupData();
                     }
@@ -638,6 +663,23 @@
                         let newG = prompt("Yeni grup adı:");
                         if (newG && newG.trim()) {
                             currentGroup = newG.trim().toLowerCase().replace(/\s+/g, '_');
+                            const todayStr = new Date().toLocaleDateString("tr-TR");
+                            let freshBooks = JSON.parse(JSON.stringify(defaultBooksTemplate));
+                            let freshPages = {};
+                            let freshHatims = {};
+                            let freshHistory = {};
+                            freshBooks.forEach(defBook => {
+                                freshPages[defBook.id] = Array(defBook.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
+                                freshHatims[defBook.id] = { hatimNo: 1, startDate: todayStr, prayerDone: false };
+                                freshHistory[defBook.id] = [];
+                            });
+                            appData = {
+                                members: [],
+                                books: freshBooks,
+                                bookPages: freshPages,
+                                bookHatims: freshHatims,
+                                bookHistory: freshHistory
+                            };
                             saveGroupData();
                             await loadGroupData();
                         }
