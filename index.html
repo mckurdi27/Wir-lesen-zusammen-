@@ -1,3 +1,9 @@
+Şifreli grupların ana grup seçim listesinde görünmemesi ve yan yana grup adı ile şifre girilerek açılabilmesi için gerekli düzenlemeleri tamamladım.
+Yapılacaklar ve Yapılan Düzenlemeler:
+ * Şifreli Grupların Gizlenmesi: Şifre koruması bulunan gruplar, ana grup seçim listesinden (dropdown) tamamen gizlendi. Bu sayede şifresi bilinmeyen gruplar listede görünmeyecek.
+ * Şifreli Gruba Katıl Paneli: Kullanıcı kontrol paneline yan yana iki yeni alan (Grup İsmi ve Şifre) ile bir "Katıl" butonu eklendi.
+ * Oturum Bazlı Kilit Açma: Kullanıcı, şifreli grubun adını ve şifresini yazıp "Katıl" butonuna bastığında şifre doğrulanır; doğruysa grup aktif hale gelir ve oturum süresince listede görünür olur.
+Güncellenmiş Tam Kod Bloğu
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -379,9 +385,23 @@
 
             function getAllGroupKeys() {
                 let keys = [];
+                let unlockedProtected = JSON.parse(sessionStorage.getItem("unlocked_protected_groups") || "[]");
                 for (let i = 0; i < localStorage.length; i++) {
                     let key = localStorage.key(i);
-                    if (key && key.startsWith("hatim_group_")) keys.push(key.replace("hatim_group_", ""));
+                    if (key && key.startsWith("hatim_group_")) {
+                        let gName = key.replace("hatim_group_", "");
+                        let d = localStorage.getItem(key);
+                        let isProtected = false;
+                        if (d) {
+                            try {
+                                let parsed = JSON.parse(d);
+                                if (parsed.password && parsed.password.trim() !== "") isProtected = true;
+                            } catch(e){}
+                        }
+                        if (!isProtected || unlockedProtected.includes(gName) || gName === currentGroup) {
+                            keys.push(gName);
+                        }
+                    }
                 }
                 if (keys.length === 0) keys.push("grup_1");
                 else keys.sort((a, b) => a.localeCompare(b, 'tr', { numeric: true }));
@@ -394,19 +414,25 @@
                 appData = savedData ? JSON.parse(savedData) : { members: currentGroup === "grup_1" ? ["Ahmet", "Mehmet", "Ayşe"] : [], password: "" };
                 
                 if (appData.password && !isAdmin) {
-                    let enteredPwd = prompt(`"${currentGroup.replace(/_/g, ' ').toUpperCase()}" grubu şifrelidir. Lütfen şifreyi girin:`);
-                    if (enteredPwd !== appData.password) {
-                        alert("Hatalı veya boş şifre! Şifreyi bilmediğiniz için bu gruba erişilemiyor.");
-                        let allGroups = getAllGroupKeys();
-                        let fallback = allGroups.find(g => {
-                            let d = localStorage.getItem(`hatim_group_${g}`);
-                            if (!d) return true;
-                            let parsed = JSON.parse(d);
-                            return !parsed.password;
-                        }) || "grup_1";
-                        currentGroup = fallback;
-                        const savedDataFallback = localStorage.getItem(`hatim_group_${currentGroup}`);
-                        appData = savedDataFallback ? JSON.parse(savedDataFallback) : { members: currentGroup === "grup_1" ? ["Ahmet", "Mehmet", "Ayşe"] : [], password: "" };
+                    let unlockedProtected = JSON.parse(sessionStorage.getItem("unlocked_protected_groups") || "[]");
+                    if (!unlockedProtected.includes(currentGroup)) {
+                        let enteredPwd = prompt(`"${currentGroup.replace(/_/g, ' ').toUpperCase()}" grubu şifrelidir. Lütfen şifreyi girin:`);
+                        if (enteredPwd === appData.password) {
+                            unlockedProtected.push(currentGroup);
+                            sessionStorage.setItem("unlocked_protected_groups", JSON.stringify(unlockedProtected));
+                        } else {
+                            alert("Hatalı veya boş şifre! Şifreyi bilmediğiniz için bu gruba erişilemiyor.");
+                            let allGroups = getAllGroupKeys();
+                            let fallback = allGroups.find(g => {
+                                let d = localStorage.getItem(`hatim_group_${g}`);
+                                if (!d) return true;
+                                let parsed = JSON.parse(d);
+                                return !parsed.password;
+                            }) || "grup_1";
+                            currentGroup = fallback;
+                            const savedDataFallback = localStorage.getItem(`hatim_group_${currentGroup}`);
+                            appData = savedDataFallback ? JSON.parse(savedDataFallback) : { members: currentGroup === "grup_1" ? ["Ahmet", "Mehmet", "Ayşe"] : [], password: "" };
+                        }
                     }
                 }
 
@@ -469,13 +495,7 @@
 
                 let allGroups = getAllGroupKeys();
                 let groupsHtml = allGroups.map(g => {
-                    let d = localStorage.getItem(`hatim_group_${g}`);
-                    let isLocked = false;
-                    if (d) {
-                        try { let parsed = JSON.parse(d); if (parsed.password) isLocked = true; } catch(e){}
-                    }
-                    let lockIcon = isLocked ? " 🔒" : "";
-                    return `<option value="${g}" ${g === currentGroup ? "selected" : ""}>${g.replace(/_/g, ' ').toUpperCase()}${lockIcon}</option>`;
+                    return `<option value="${g}" ${g === currentGroup ? "selected" : ""}>${g.replace(/_/g, ' ').toUpperCase()}</option>`;
                 }).join('');
 
                 let membersOptions = '<option value="">-- İsminizi Seçin --</option>' + appData.members.map(m => `<option value="${m}" ${m === loggedInMember ? "selected" : ""}>${m}</option>`).join('');
@@ -496,7 +516,17 @@
                         </select>
                         <button id="user-new-group-btn" style="padding: 6px 10px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">+ Yeni Grup</button>
                     </div>
-                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px;">
+                    
+                    <div style="margin-top: 10px; margin-bottom: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
+                        <div style="font-size: 12px; font-weight: bold; margin-bottom: 6px;">🔐 Şifreli Gruba Katıl</div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <input type="text" id="locked-group-name" placeholder="Grup Adı" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 110px;">
+                            <input type="password" id="locked-group-pwd" placeholder="Grup Şifresi" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 110px;">
+                            <button id="join-locked-group-btn" style="padding: 6px 12px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">Katıl</button>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
                         <label style="font-weight: bold; font-size: 13px; min-width: 65px;">👤 İsminiz:</label>
                         <select id="user-member-select" style="padding: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 14px; flex: 1; min-width: 180px;">
                             ${membersOptions}
@@ -512,6 +542,38 @@
                     currentGroup = e.target.value;
                     await loadGroupData();
                 });
+
+                const joinBtn = document.getElementById("join-locked-group-btn");
+                if (joinBtn) {
+                    joinBtn.addEventListener("click", async () => {
+                        let gInput = document.getElementById("locked-group-name").value.trim().toLowerCase().replace(/\s+/g, '_');
+                        let pInput = document.getElementById("locked-group-pwd").value;
+                        if (!gInput) { alert("Lütfen grup adını yazın."); return; }
+                        let targetKey = `hatim_group_${gInput}`;
+                        let targetDataRaw = localStorage.getItem(targetKey);
+                        if (!targetDataRaw) {
+                            alert("Bu isimde kayıtlı bir grup bulunamadı!");
+                            return;
+                        }
+                        try {
+                            let parsed = JSON.parse(targetDataRaw);
+                            if (parsed.password && parsed.password === pInput) {
+                                let unlocked = JSON.parse(sessionStorage.getItem("unlocked_protected_groups") || "[]");
+                                if (!unlocked.includes(gInput)) {
+                                    unlocked.push(gInput);
+                                    sessionStorage.setItem("unlocked_protected_groups", JSON.stringify(unlocked));
+                                }
+                                currentGroup = gInput;
+                                alert("Şifre doğru! Gruba başarıyla giriş yapıldı.");
+                                await loadGroupData();
+                            } else {
+                                alert("Hatalı şifre veya grup adı!");
+                            }
+                        } catch(e) {
+                            alert("Grup verisi okunamadı.");
+                        }
+                    });
+                }
 
                 document.getElementById("user-new-group-btn").addEventListener("click", async () => {
                     let newG = prompt("Yeni grup adını girin:");
@@ -649,7 +711,6 @@
                 `;
             }
 
-            // GÜVENLİ VE MOBİL UYUMLU 5 SEKMELİ ANALİZ MODAL (PENCERE) SİSTEMİ
             function openDetailedAnalysisModal() {
                 let existingModal = document.getElementById("detailed-analysis-modal");
                 if (existingModal) existingModal.remove();
@@ -869,7 +930,6 @@
 
                 document.body.appendChild(modalOverlay);
 
-                // Modal İçi Sekme Geçiş Mantığı
                 const tabBtns = modalOverlay.querySelectorAll(".m-tab-btn");
                 const tabContents = modalOverlay.querySelectorAll(".m-tab-content");
 
@@ -883,7 +943,6 @@
                         document.getElementById(e.currentTarget.getAttribute("data-target")).style.display = "block";
                     });
                 });
-                // İlk sekmeyi aktif yap
                 tabBtns[0].style.background = "var(--gold-primary)";
                 tabBtns[0].style.color = "#fff";
 
