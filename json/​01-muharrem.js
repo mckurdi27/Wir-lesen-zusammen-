@@ -1,4 +1,4 @@
-{
+window.muharrem_veri = {
     "ay_kodu": "01",
     "ay_adi": "Muharrem",
     "aciklama": "Hicri takvimin ilk ayıdır ve haram aylardandır.",
@@ -154,4 +154,4 @@
             "hadis": { "meal": "Allah'ım! Beni senin zikrine, şükrüne ve sana güzel ibadet etmeye muvaffak kıl.", "kaynak": "Ebu Dâvûd, Vitir 26" }
         }
     }
-}
+};
