@@ -1,8 +1,23 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    // 1. Ortadaki eski statik paneli DOM'dan ve ekrandan tamamen kazı
+    // Güvenli Container ve Grid Seçimi (Bulunamazsa Body'ye ekle)
+    let container = document.querySelector(".container");
+    if (!container) {
+        container = document.createElement("div");
+        container.className = "container";
+        document.body.appendChild(container);
+    }
+
+    let booksGrid = document.getElementById("books-grid");
+    if (!booksGrid) {
+        booksGrid = document.createElement("div");
+        booksGrid.id = "books-grid";
+        container.appendChild(booksGrid);
+    }
+
+    // Eski statik panellerin kalıntısı varsa temizle
     function removeStuckPanel() {
         document.querySelectorAll('div').forEach(div => {
-            if (div.textContent && div.textContent.includes("Ortak Hatim ve Dua Takip Sistemi") && !div.id.includes("main-title-ornate-section") && (div.querySelector('select') || div.innerHTML.includes("Yönetici Modu"))) {
+            if (div && div.textContent && div.textContent.includes("Ortak Hatim ve Dua Takip Sistemi") && !div.id.includes("main-title-ornate-section") && (div.querySelector('select') || div.innerHTML.includes("Yönetici Modu"))) {
                 div.remove();
             }
         });
@@ -10,13 +25,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     removeStuckPanel();
     setTimeout(removeStuckPanel, 100);
 
-    // Oryantal Motifler ve Tema (Açık & Koyu Mod) Stillerini Enjekte Etme
+    // Oryantal Motifler ve Tema Stilleri
     function injectOrientalStyles() {
         if (document.getElementById("oriental-motif-styles")) return;
         const styleEl = document.createElement("style");
         styleEl.id = "oriental-motif-styles";
         styleEl.innerHTML = `
-            /* --- AÇIK MOD: Krem, Şampanya ve Altın Yaldız Motifleri --- */
             :root {
                 --bg-primary: #fdfbf7;
                 --card-bg: #ffffff;
@@ -25,19 +39,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                 --text-main: #3e2723;
                 --border-color: #e3dcd2;
             }
-
             body {
                 background-color: var(--bg-primary);
                 color: var(--text-main);
                 font-family: 'Georgia', serif;
+                margin: 0;
+                padding: 10px;
             }
-
-            /* Eski statik panellerin kalıntısı varsa CSS ile de kesin olarak gizle */
-            div:not(#main-title-ornate-section):not(.book-card):not(#books-grid):not(.container) {
-                /* Güvenlik filtresi */
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
             }
-
-            /* --- KOYU MOD: Gece Mavisi ve Parlayan Altın Vektör Konsepti --- */
             @media (prefers-color-scheme: dark) {
                 :root {
                     --bg-primary: #0b1329;
@@ -51,80 +63,23 @@ document.addEventListener("DOMContentLoaded", async () => {
                     background-color: #0b1329 !important;
                     color: #f1f5f9 !important;
                 }
-                .container {
-                    background-color: #0b1329 !important;
-                }
-                #main-title-ornate-section {
-                    background: linear-gradient(135deg, #131b31 0%, #0b1329 100%) !important;
-                    border-color: #d4af37 !important;
-                    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25) !important;
-                }
-                #daily-inspiration-section, #analysis-section, #admin-message-section, #user-controls-section, #admin-panel-section, #admin-bottom-section {
-                    background: #131b31 !important;
-                    border-color: #22304a !important;
-                    color: #e2e8f0 !important;
-                }
-                .book-card {
-                    background: #131b31 !important;
-                    border-color: #22304a !important;
-                    box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
-                }
-                .book-header {
-                    background: linear-gradient(to right, #1a2642, #131b31) !important;
-                    color: #f6e05e !important;
-                    border-bottom: 1px solid #22304a !important;
-                }
-                .book-name {
-                    color: #f6e05e !important;
-                }
-                .book-body {
-                    background: #131b31 !important;
-                }
-                .sub-modes {
-                    background: #131b31 !important;
-                    border-bottom-color: #22304a !important;
-                }
-                .sub-btn {
-                    background: #0b1329 !important;
-                    color: #cbd5e1 !important;
-                    border: 1px solid #22304a !important;
-                }
-                .sub-btn.active {
-                    background: #d4af37 !important;
-                    color: #0b1329 !important;
-                    border-color: #f6e05e !important;
-                }
-                .part-row {
-                    background: #0b1329 !important;
-                    border: 1px solid #22304a !important;
-                    color: #e2e8f0 !important;
-                }
-                .part-row.taken {
-                    background: #28220b !important;
-                    border-color: #b78103 !important;
-                }
-                .part-row.read {
-                    background: #064e3b !important;
-                    border-color: #059669 !important;
-                }
             }
-
             .book-card {
                 border: 2px solid var(--gold-primary) !important;
                 border-radius: 12px !important;
                 overflow: hidden;
+                margin-bottom: 15px;
+                background: var(--card-bg);
             }
             .book-header {
                 border-bottom: 2px solid var(--gold-primary);
+                background: linear-gradient(to right, rgba(212,175,55,0.1), transparent);
             }
         `;
         document.head.appendChild(styleEl);
     }
 
     injectOrientalStyles();
-
-    const container = document.querySelector(".container");
-    const booksGrid = document.getElementById("books-grid");
 
     let currentGroup = "grup_1";
     let isAdmin = false;
@@ -149,11 +104,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function bugunkuHicriTarihiAl() {
         try {
-            const formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
-                day: 'numeric',
-                month: 'numeric',
-                year: 'numeric'
-            });
+            const formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', { day: 'numeric', month: 'numeric', year: 'numeric' });
             const parts = formatter.formatToParts(new Date());
             let gun = "", ay = "";
             for (const part of parts) {
@@ -177,7 +128,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         let filePath = fileMap[ayKodu] || "json/03-rebiulevvel.json";
         try {
             let response = await fetch(filePath);
-            if (!response.ok) throw new Error(`${filePath} yüklenemedi`);
+            if (!response.ok) throw new Error();
             let data = await response.json();
             monthlyInspirationCache[ayKodu] = data;
             return data;
@@ -202,11 +153,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         let item = null;
         if (jsonData) {
             item = jsonData[String(hDay)] || jsonData[hDay] || jsonData[String(hDay).padStart(2, '0')];
-            if (!item) {
-                for (let key in jsonData) {
-                    if (parseInt(key, 10) === parseInt(hDay, 10)) { item = jsonData[key]; break; }
-                }
-            }
         }
 
         let verseText = "Şüphesiz güçlükle beraber bir kolaylık vardır. (İnşirah, 5-6)";
@@ -239,22 +185,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!titleSection) {
             titleSection = document.createElement("div");
             titleSection.id = "main-title-ornate-section";
-            titleSection.style.cssText = `
-                margin-bottom: 20px;
-                padding: 22px;
-                background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%);
-                border: 2px solid #d4af37;
-                border-top: 6px solid #8a6d3b;
-                border-radius: 12px;
-                box-shadow: 0 4px 15px rgba(138, 109, 59, 0.2);
-                text-align: center;
-                position: relative;
-            `;
             container.insertBefore(titleSection, container.firstChild);
         }
 
+        titleSection.style.cssText = `
+            margin-bottom: 20px;
+            padding: 22px;
+            background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%);
+            border: 2px solid #d4af37;
+            border-top: 6px solid #8a6d3b;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(138, 109, 59, 0.2);
+            text-align: center;
+        `;
+
         titleSection.innerHTML = `
-            <div style="font-size: 21px; font-weight: bold; font-family: 'Georgia', serif; margin-bottom: 6px; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
+            <div style="font-size: 21px; font-weight: bold; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
                 <span>⚜️ 📖</span>
                 <span>Ortak Hatim ve Duada Buluşuyoruz</span>
                 <span>📖 ⚜️</span>
@@ -272,7 +218,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             inspirationContainer = document.createElement("div");
             inspirationContainer.id = "daily-inspiration-section";
             const mainTitleSec = document.getElementById("main-title-ornate-section");
-            container.insertBefore(inspirationContainer, mainTitleSec.nextSibling);
+            if (mainTitleSec && mainTitleSec.nextSibling) {
+                container.insertBefore(inspirationContainer, mainTitleSec.nextSibling);
+            } else {
+                container.appendChild(inspirationContainer);
+            }
         }
 
         inspirationContainer.style.cssText = `
@@ -281,7 +231,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             border: 1px solid #e3dcd2;
             border-left: 4px solid #27ae60;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             background: var(--card-bg);
         `;
 
@@ -428,7 +377,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         await renderDailyInspiration();
         renderUserControls();
         renderBooks();
-        renderAnalysisSection(); // Kitapların altında yer alacak
+        renderAnalysisSection();
         renderAdminSectionAtBottom();
     }
 
@@ -442,7 +391,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             controlsContainer = document.createElement("div");
             controlsContainer.id = "user-controls-section";
             const inspSec = document.getElementById("daily-inspiration-section");
-            container.insertBefore(controlsContainer, inspSec.nextSibling);
+            if (inspSec && inspSec.nextSibling) {
+                container.insertBefore(controlsContainer, inspSec.nextSibling);
+            } else {
+                container.appendChild(controlsContainer);
+            }
         }
 
         let allGroups = getAllGroupKeys();
@@ -453,7 +406,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             padding: 16px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
             margin-bottom: 20px;
             background: var(--card-bg);
         `;
@@ -516,7 +468,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     renderBooks();
                     renderAdminSectionAtBottom();
                 } else {
-                    alert("Bu isim zaten var.");
                     loggedInMember = clean;
                     document.getElementById("user-member-select").value = clean;
                     localStorage.setItem(`hatim_session_${currentGroup}`, loggedInMember);
@@ -549,18 +500,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    // Genel Grup İlerleme Paneli (Kitapların Altında, Yönetici Alanının Üstünde)
     function renderAnalysisSection() {
         let analysisContainer = document.getElementById("analysis-section");
         if (!analysisContainer) {
             analysisContainer = document.createElement("div");
             analysisContainer.id = "analysis-section";
-            container.appendChild(analysisContainer); // En alta, kitapların altına eklendi
+            container.appendChild(analysisContainer);
         } else {
-            // Zaten varsa en sona taşı
             container.appendChild(analysisContainer);
         }
 
-        analysisContainer.style.cssText = "margin: 20px 0; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.05);";
+        analysisContainer.style.cssText = "margin: 20px 0; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg);";
 
         let totalBooks = appData.books.length;
         let totalTakenUnits = 0, totalReadUnits = 0, totalUnitsAll = 0;
@@ -609,7 +560,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             container.appendChild(bottomContainer);
         }
 
-        bottomContainer.style.cssText = "margin: 20px 0; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05); background: var(--card-bg);";
+        bottomContainer.style.cssText = "margin: 20px 0; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg);";
 
         let allGroups = getAllGroupKeys();
         let groupsHtml = allGroups.map(g => `<option value="${g}" ${g === currentGroup ? "selected" : ""}>${g.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
@@ -706,7 +657,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         appData.members.push(clean);
                         saveGroupData();
                         await loadGroupData();
-                    } else alert("Bu isim zaten var.");
+                    }
                 }
             });
 
@@ -744,19 +695,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("send-admin-msg-btn").addEventListener("click", () => {
             let text = document.getElementById("admin-msg-input").value.trim();
             if (!text) return;
-            window.open(`https://wa.me/905XXXXXXXXX?text=${encodeURIComponent(text)}`, "_blank");
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
         });
     }
 
     async function triggerAdminToggle() {
         if (isAdmin) {
             isAdmin = false;
-            alert("Yönetici modu kapatıldı.");
         } else {
             const enteredPassword = prompt("Yönetici şifresi:");
             if (enteredPassword === ADMIN_PASSWORD) {
                 isAdmin = true;
-                alert("Yönetici modu açıldı.");
             } else if (enteredPassword !== null) {
                 alert("Hatalı şifre!");
                 return;
@@ -819,7 +768,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             modeKeys.forEach(mKey => {
                 const mObj = defModes[mKey];
                 const activeClass = mKey === book.currentMode ? "active" : "";
-                modesHtml += `<button class="sub-btn ${activeClass}" data-book="${bookIndex}" data-mode="${mKey}">${mObj.name}</button>`;
+                modesHtml += `<button class="sub-btn ${activeClass}" data-book="${bookIndex}" data-mode="${mKey}" style="padding: 4px 8px; margin-right: 4px; border-radius: 4px; cursor: pointer; border: 1px solid var(--border-color); background: ${activeClass ? 'var(--gold-primary)' : 'var(--card-bg)'}; color: ${activeClass ? '#000' : 'var(--text-main)'};">${mObj.name}</button>`;
             });
             modesHtml += `</div>`;
 
@@ -827,7 +776,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (isAdmin) {
                 adminHeaderControls = `
                     <div style="margin-top: 10px; padding: 10px; border: 1px solid var(--gold-primary); border-radius: 6px; display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
-                        <span style="font-size: 12px; font-weight: bold; color: var(--gold-dark);">🛠️ Yönetici (${currentHatimInfo.hatimNo}. Hatim)</span>
+                        <span style="font-size: 12px; font-weight: bold;">🛠️ Yönetici (${currentHatimInfo.hatimNo}. Hatim)</span>
                         <div style="display: flex; gap: 5px; flex-wrap: wrap;">
                             <button class="toggle-prayer-btn" data-bookid="${book.id}" style="padding: 4px 8px; font-size: 11px; cursor: pointer; background: #f39c12; color: #fff; border: none; border-radius: 3px;">Dua: ${currentHatimInfo.prayerDone ? "✓ Yapıldı" : "Yapılacak"}</button>
                             <button class="finish-hatim-btn" data-bookid="${book.id}" style="padding: 4px 8px; font-size: 11px; background: #27ae60; color: #fff; border: none; border-radius: 3px; font-weight: bold; cursor: pointer;">🏁 Hatmi Bitir</button>
@@ -837,9 +786,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 `;
             }
 
-            // Kutu altındaki yazıların rahat okunması için yükseklik ve alan ferahlığı artırıldı
+            // Kutu içerisindeki yükseklik ferahlatıldı ("Mevcut Döngü" ve "Dua Durumu" net görünsün diye)
             let historyHtml = `
-                <div style="margin-top: 15px; padding: 14px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; background: rgba(0,0,0,0.01);">
+                <div style="margin-top: 15px; padding: 14px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; background: rgba(0,0,0,0.02);">
                     <div style="font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 5px;">
                         <span>📚 Mevcut Döngü: <strong style="color: #27ae60;">${currentHatimInfo.hatimNo}. Hatim</strong></span>
                         <span style="font-size: 11px; opacity: 0.8; font-weight: normal;">Başlangıç: ${currentHatimInfo.startDate}</span>
@@ -871,7 +820,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <div class="book-body" style="padding: 14px; display: none;">
                     ${adminHeaderControls}
                     ${modesHtml}
-                    <div class="items-list" id="list-${bookIndex}" style="max-height: 220px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; margin-top: 10px; padding-right: 4px;"></div>
+                    <div class="items-list" id="list-${bookIndex}" style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; margin-top: 10px; padding-right: 4px;"></div>
                     ${historyHtml}
                 </div>
             `;
@@ -893,7 +842,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 e.stopPropagation();
                 const pdfPath = bookPdfMap[e.target.getAttribute("data-bookid")];
                 if (pdfPath) window.open(pdfPath, "_blank");
-                else alert("Bu kitap için PDF bulunamadı.");
             });
 
             cardEl.querySelectorAll(".finish-hatim-btn").forEach(btn => {
@@ -908,7 +856,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     saveGroupData();
                     renderAnalysisSection();
                     renderBooks();
-                    alert("Yeni hatim başlatıldı.");
                 });
             });
 
@@ -944,7 +891,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 else if (st.statusType === "mixed") { statusClass = "taken"; statusText = `Kısmen Alınmış`; actionText = isAdmin ? "Yönet" : "Dolu"; }
 
                 row.className = `part-row ${statusClass}`;
-                row.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; margin-bottom: 4px; border-radius: 4px; font-size: 13px; cursor: pointer;";
+                row.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; margin-bottom: 4px; border-radius: 4px; font-size: 13px; cursor: pointer; border: 1px solid var(--border-color); background: var(--card-bg);";
                 let targetPage = item.start + 1;
                 let hasPdf = bookPdfMap[book.id] ? true : false;
 
