@@ -13,3 +13,4 @@ window.HicriTakvimAnaListe = {
     "11": typeof window.zilkade_veri !== 'undefined' ? window.zilkade_veri : null,
     "12": typeof window.zilhicce_veri !== 'undefined' ? window.zilhicce_veri : null
 };
+
