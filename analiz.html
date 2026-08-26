@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yönetici Detaylı Analiz ve Rapor Paneli</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #fcfbfa; color: #333; font-family: system-ui, -apple-system, sans-serif; }
+        .card-box { background: #fffdfa; border: 2px solid #e6dcc3; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .table-custom th { background-color: #f4ebd0; color: #5a4a28; font-size: 11px; padding: 6px; border: 1px solid #e6dcc3; text-align: left; }
+        .table-custom td { font-size: 11px; padding: 6px; border: 1px solid #e6dcc3; background: #fff; }
+    </style>
+</head>
+<body class="p-3 max-w-3xl mx-auto">
+
+    <!-- ÜST KISIM VE GERİ DÖN -->
+    <div class="flex items-center justify-between mb-4 card-box p-3 bg-amber-50/40">
+        <div class="flex items-center gap-2">
+            <a href="index.html" class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded text-xs font-semibold flex items-center gap-1">
+                <i class="fa-solid fa-arrow-left"></i> Ana Sayfa
+            </a>
+            <h1 class="text-xs font-bold text-amber-900">📊 Yönetici Detaylı Analiz ve Rapor Paneli</h1>
+        </div>
+        <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-semibold flex items-center gap-1">
+            <i class="fa-solid fa-print"></i> Raporu Yazdır / PDF
+        </button>
+    </div>
+
+    <!-- 5 BÖLÜMLÜ SEKME / KONTROL MENÜSÜ -->
+    <div class="flex border-b border-gray-300 bg-gray-100 rounded-t-lg overflow-x-auto text-xs font-bold mb-4">
+        <button onclick="aktifSekmeGoster('ozet')" id="tab-btn-ozet" class="flex-1 py-2.5 px-3 text-center border-b-2 border-amber-700 text-amber-900 bg-white whitespace-nowrap">1. Genel Özet</button>
+        <button onclick="aktifSekmeGoster('bireysel')" id="tab-btn-bireysel" class="flex-1 py-2.5 px-3 text-center text-gray-600 hover:text-amber-900 whitespace-nowrap">2. Bireysel Analiz</button>
+        <button onclick="aktifSekmeGoster('grup')" id="tab-btn-grup" class="flex-1 py-2.5 px-3 text-center text-gray-600 hover:text-amber-900 whitespace-nowrap">3. Grup Analizi</button>
+        <button onclick="aktifSekmeGoster('arasi')" id="tab-btn-arasi" class="flex-1 py-2.5 px-3 text-center text-gray-600 hover:text-amber-900 whitespace-nowrap">4. Gruplar Arası</button>
+        <button onclick="aktifSekmeGoster('karsilastirmali')" id="tab-btn-karsilastirmali" class="flex-1 py-2.5 px-3 text-center text-gray-600 hover:text-amber-900 whitespace-nowrap">5. Okuma Günlüğü</button>
+    </div>
+
+    <!-- İÇERİK ALANLARI (5 BÖLÜM) -->
+    <div class="space-y-4">
+
+        <!-- 1. GENEL ÖZET -->
+        <div id="icerik-ozet" class="sekme-icerik card-box p-4 space-y-3">
+            <h2 class="text-xs font-bold text-gray-800 border-b pb-1">Aktif İnceleme Grubu Özeti</h2>
+            <div class="text-xs text-gray-700 bg-amber-50/50 p-2.5 rounded border border-amber-200">
+                Aktif İncelenen Grup: <strong class="text-gray-900">GRUP 1</strong> | Toplam Eser Hissesi: <strong>1596</strong> | Alınan: <strong>15</strong> | Okunan: <strong>12</strong>
+            </div>
+        </div>
+
+        <!-- 2. BİREYSEL ANALİZ -->
+        <div id="icerik-bireysel" class="sekme-icerik card-box p-4 space-y-3 hidden">
+            <h2 class="text-xs font-bold text-gray-800 border-b pb-1">Aktif Grup Üyeleri ve Bireysel Durumları</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full table-custom">
+                    <thead>
+                        <tr>
+                            <th>Üye Adı</th>
+                            <th>Aldığı Toplam Hisse</th>
+                            <th>Okuduğu Toplam Hisse</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-bold text-gray-800">Ahmet</td>
+                            <td>15 Hisse</td>
+                            <td class="text-emerald-700 font-bold">12 Hisse</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 3. GRUP ANALİZİ -->
+        <div id="icerik-grup" class="sekme-icerik card-box p-4 space-y-3 hidden">
+            <h2 class="text-xs font-bold text-gray-800 border-b pb-1">Grup Bazlı Detaylı Dağılım</h2>
+            <div class="text-xs text-gray-600 bg-gray-50 p-3 rounded border">
+                GRUP 1 içerisindeki tüm üyelerin genel tamamlama oranları ve performans istatistikleri bu alanda listelenmektedir.
+            </div>
+        </div>
+
+        <!-- 4. GRUPLAR ARASI KARŞILAŞTIRMA -->
+        <div id="icerik-arasi" class="sekme-icerik card-box p-4 space-y-3 hidden">
+            <h2 class="text-xs font-bold text-gray-800 border-b pb-1">Tüm Grupları Karşılaştırma Paneli</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full table-custom">
+                    <thead>
+                        <tr>
+                            <th>Grup Adı</th>
+                            <th>Üye Sayısı</th>
+                            <th>Alınan Hisseler</th>
+                            <th>Okunan Hisseler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-bold">GRUP 1</td>
+                            <td>1 Üye</td>
+                            <td>15 / 1596 <span class="text-xs text-blue-600 font-semibold">%1</span></td>
+                            <td>12 / 1596 <span class="text-xs text-emerald-600 font-semibold">%1</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 5. DETAYLI OKUMA GÜNLÜĞÜ (KİM NE ZAMAN NE OKUMUŞ?) -->
+        <div id="icerik-karsilastirmali" class="sekme-icerik card-box p-4 space-y-3 hidden">
+            <h2 class="text-xs font-bold text-gray-800 border-b pb-1">Detaylı Okuma Günlüğü (Kim Ne Zaman Ne Okumuş?)</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full table-custom">
+                    <thead>
+                        <tr>
+                            <th>Tarih</th>
+                            <th>Üye</th>
+                            <th>Eser Adı</th>
+                            <th>Miktar / Aralık</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>26.08.2026</td>
+                            <td class="font-bold">Ahmet</td>
+                            <td>4. Celcelûtiye</td>
+                            <td class="text-blue-700 font-medium">18 Sayfa / Bölüm (1-18)</td>
+                        </tr>
+                        <tr>
+                            <td>25.08.2026</td>
+                            <td class="font-bold">Ahmet</td>
+                            <td>4. Celcelûtiye</td>
+                            <td class="text-blue-700 font-medium">4. Bölüm / Sayfa (1-4)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT -->
+    <script>
+        function aktifSekmeGoster(sekmeAdi) {
+            const sekmeler = ['ozet', 'bireysel', 'grup', 'arasi', 'karsilastirmali'];
+            sekmeler.forEach(s => {
+                document.getElementById('icerik-' + s).classList.add('hidden');
+                const btn = document.getElementById('tab-btn-' + s);
+                btn.classList.remove('border-b-2', 'border-amber-700', 'text-amber-900', 'bg-white');
+                btn.classList.add('text-gray-600');
+            });
+
+            document.getElementById('icerik-' + sekmeAdi).classList.remove('hidden');
+            const aktifBtn = document.getElementById('tab-btn-' + sekmeAdi);
+            aktifBtn.classList.remove('text-gray-600');
+            aktifBtn.classList.add('border-b-2', 'border-amber-700', 'text-amber-900', 'bg-white');
+        }
+    </script>
+</body>
+</html>
