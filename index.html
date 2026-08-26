@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ortak Hatim ve Dua Takip Sistemi</title>
+    <title>Ortak Hatim dan Dua Takip Sistemi</title>
 </head>
 <body>
     <div class="container">
@@ -656,107 +656,26 @@
                     return;
                 }
 
-                let allGroupKeys = getAllGroupKeys();
-                let groupsComparisonHtml = '';
-                let totalSystemBooks = 0;
-                let totalSystemTaken = 0;
-                let totalSystemRead = 0;
-                
-                allGroupKeys.forEach(gKey => {
-                    let gDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
-                    if (!gDataRaw) return;
-                    let gData = JSON.parse(gDataRaw);
-                    let mCount = gData.members ? gData.members.length : 0;
-                    let totalU = 0, takenU = 0, readU = 0;
-                    
-                    if (gData.books && gData.bookPages) {
-                        gData.books.forEach(b => {
-                            totalU += b.totalUnits;
-                            if (gData.bookPages[b.id]) {
-                                gData.bookPages[b.id].forEach(p => {
-                                    if (p.owner) takenU++;
-                                    if (p.isRead) readU++;
-                                });
-                            }
-                        });
-                    }
-                    if (gKey === currentGroup) {
-                        totalSystemBooks = totalU;
-                        totalSystemTaken = takenU;
-                        totalSystemRead = readU;
-                    }
-                    let tPct = totalU > 0 ? Math.round((takenU / totalU) * 100) : 0;
-                    let rPct = totalU > 0 ? Math.round((readU / totalU) * 100) : 0;
-
-                    groupsComparisonHtml += `
-                        <tr>
-                            <td style="padding: 12px 15px; border-bottom: 1px solid #e3dcd2; font-weight: bold; color: #3e2723;">${gKey.replace(/_/g, ' ').toUpperCase()}</td>
-                            <td style="padding: 12px 15px; border-bottom: 1px solid #e3dcd2; text-align: center;">${mCount} Üye</td>
-                            <td style="padding: 12px 15px; border-bottom: 1px solid #e3dcd2; text-align: center;">${takenU} / ${totalU} <span style="font-size: 11px; color: #8a6d3b; font-weight: bold;">(%${tPct})</span></td>
-                            <td style="padding: 12px 15px; border-bottom: 1px solid #e3dcd2; text-align: center;">${readU} / ${totalU} <span style="font-size: 11px; color: #27ae60; font-weight: bold;">(%${rPct})</span></td>
-                        </tr>
-                    `;
-                });
-
-                let membersListHtml = '';
-                if (appData.members && appData.members.length > 0) {
-                    appData.members.forEach(m => {
-                        let mTaken = 0, mRead = 0;
-                        Object.keys(appData.bookPages).forEach(bId => {
-                            appData.bookPages[bId].forEach(p => {
-                                if (p.owner === m) mTaken++;
-                                if (p.owner === m && p.isRead) mRead++;
-                            });
-                        });
-                        membersListHtml += `
-                            <tr>
-                                <td style="padding: 12px 15px; border-bottom: 1px solid #e3dcd2; font-weight: bold;">${m}</td>
-                                <td style="padding: 12px 15px; border-bottom: 1px solid #e3dcd2; text-align: center;">${mTaken} Hisse</td>
-                                <td style="padding: 12px 15px; border-bottom: 1px solid #e3dcd2; text-align: center; color: #27ae60; font-weight: bold;">${mRead} Hisse</td>
-                            </tr>
-                        `;
-                    });
-                } else {
-                    membersListHtml = `<tr><td colspan="3" style="padding: 15px; text-align: center; color: #777;">Bu grupta kayıtlı üye bulunmuyor.</td></tr>`;
-                }
-
-                let logsHtml = '';
-                if (appData.readingLogs && appData.readingLogs.length > 0) {
-                    let sortedLogs = [...appData.readingLogs].reverse();
-                    sortedLogs.forEach(log => {
-                        logsHtml += `
-                            <tr>
-                                <td style="padding: 10px 15px; border-bottom: 1px solid #e3dcd2; color: #666; font-size: 12px;">${log.date}</td>
-                                <td style="padding: 10px 15px; border-bottom: 1px solid #e3dcd2; font-weight: bold; color: #2c3e50;">${log.member}</td>
-                                <td style="padding: 10px 15px; border-bottom: 1px solid #e3dcd2;">${log.bookName}</td>
-                                <td style="padding: 10px 15px; border-bottom: 1px solid #e3dcd2; text-align: center; font-weight: bold; color: #27ae60;">${log.count} Sayfa / Bölüm <span style="font-size: 11px; color: #666; font-weight: normal;">(${log.range})</span></td>
-                            </tr>
-                        `;
-                    });
-                } else {
-                    logsHtml = `<tr><td colspan="4" style="padding: 15px; text-align: center; color: #777;">Henüz okundu olarak işaretlenen bir kayıt bulunmuyor.</td></tr>`;
-                }
-
                 win.document.write(`
                     <!DOCTYPE html>
                     <html lang="tr">
                     <head>
                         <meta charset="UTF-8">
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>Yönetici Detaylı Analiz ve Rapor Paneli</title>
+                        <title>Yönetici Seçenekli Analiz ve Karşılaştırma Paneli</title>
                         <style>
                             body {
                                 font-family: 'Georgia', serif;
                                 background-color: #fdfbf7;
                                 color: #3e2723;
                                 margin: 0;
-                                padding: 30px;
+                                padding: 25px;
                             }
                             .report-container {
                                 max-width: 1100px;
                                 margin: 0 auto;
                                 background: #ffffff;
-                                padding: 30px;
+                                padding: 25px;
                                 border-radius: 12px;
                                 border: 2px solid #d4af37;
                                 box-shadow: 0 4px 20px rgba(138, 109, 59, 0.15);
@@ -766,69 +685,45 @@
                                 justify-content: space-between;
                                 align-items: center;
                                 border-bottom: 3px solid #d4af37;
-                                padding-bottom: 15px;
-                                margin-bottom: 25px;
+                                padding-bottom: 12px;
+                                margin-bottom: 20px;
                                 flex-wrap: wrap;
                                 gap: 15px;
                             }
-                            h1 {
-                                font-size: 22px;
-                                color: #8a6d3b;
-                                margin: 0;
-                            }
+                            h1 { font-size: 20px; color: #8a6d3b; margin: 0; }
                             .print-btn {
-                                background: #2980b9;
-                                color: white;
-                                border: none;
-                                padding: 10px 18px;
-                                border-radius: 6px;
-                                cursor: pointer;
-                                font-weight: bold;
-                                font-size: 13px;
-                                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                                background: #2980b9; color: white; border: none; padding: 8px 14px;
+                                border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;
                             }
-                            .print-btn:hover {
-                                background: #2471a3;
+                            .print-btn:hover { background: #2471a3; }
+                            .options-bar {
+                                display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+                                background: #f4ebd0; padding: 14px; border-radius: 8px; margin-bottom: 20px;
+                                border: 1px solid #d4af37;
+                            }
+                            .options-bar label { font-weight: bold; font-size: 13px; }
+                            .options-bar select {
+                                padding: 6px 10px; border-radius: 6px; border: 1px solid #d4af37;
+                                background: #fff; color: #3e2723; font-size: 13px;
                             }
                             h2 {
-                                font-size: 16px;
-                                margin-top: 35px;
-                                margin-bottom: 12px;
-                                color: #3e2723;
-                                border-left: 5px solid #d4af37;
-                                padding-left: 10px;
+                                font-size: 15px; margin-top: 25px; margin-bottom: 10px; color: #3e2723;
+                                border-left: 4px solid #d4af37; padding-left: 8px;
                                 background: linear-gradient(to right, rgba(212,175,55,0.1), transparent);
-                                padding-top: 6px;
-                                padding-bottom: 6px;
+                                padding-top: 5px; padding-bottom: 5px;
                             }
                             table {
-                                width: 100%;
-                                border-collapse: collapse;
-                                background: #fff;
-                                border-radius: 8px;
-                                overflow: hidden;
-                                border: 1px solid #e3dcd2;
-                                margin-bottom: 10px;
+                                width: 100%; border-collapse: collapse; background: #fff;
+                                border-radius: 8px; overflow: hidden; border: 1px solid #e3dcd2; margin-bottom: 15px;
                             }
                             th {
-                                background: #f4ebd0;
-                                color: #3e2723;
-                                padding: 12px 15px;
-                                text-align: left;
-                                font-size: 13px;
-                                border-bottom: 2px solid #d4af37;
+                                background: #f9f6ef; color: #3e2723; padding: 10px 12px;
+                                text-align: left; font-size: 12px; border-bottom: 2px solid #d4af37;
                             }
-                            td {
-                                font-size: 13px;
-                            }
-                            .meta-info {
-                                font-size: 13px;
-                                opacity: 0.85;
-                                margin-bottom: 20px;
-                                background: #f9f6ef;
-                                padding: 12px 15px;
-                                border-radius: 6px;
-                                border: 1px solid #e3dcd2;
+                            td { padding: 10px 12px; font-size: 12px; border-bottom: 1px solid #e3dcd2; }
+                            .meta-box {
+                                font-size: 12px; background: #f9f6ef; padding: 10px 14px;
+                                border-radius: 6px; border: 1px solid #e3dcd2; margin-bottom: 15px;
                             }
                         </style>
                     </head>
@@ -836,63 +731,212 @@
                         <div class="report-container">
                             <div class="header-flex">
                                 <div>
-                                    <h1>📊 Yönetici Detaylı Analiz ve Rapor Paneli</h1>
-                                    <div style="font-size: 12px; color: #666; margin-top: 4px;">Sistem Raporu ve İstatistik Merkezi</div>
+                                    <h1>📊 Yönetici Seçenekli Analiz ve Karşılaştırma Paneli</h1>
+                                    <div style="font-size: 11px; color: #666; margin-top: 3px;">Esnek Grup, Kişi ve Kıyaslama Merkezi</div>
                                 </div>
-                                <button class="print-btn" onclick="window.print()">🖨️ Raporu Yazdır / PDF Kaydet</button>
+                                <button class="print-btn" onclick="window.print()">🖨️ Raporu Yazdır / PDF</button>
                             </div>
 
-                            <div class="meta-info">
-                                Aktif İncelenen Grup: <strong>${currentGroup.replace(/_/g, ' ').toUpperCase()}</strong> | 
-                                Toplam Eser Hissesi: <strong>${totalSystemBooks}</strong> | 
-                                Alınan: <strong>${totalSystemTaken}</strong> | 
-                                Okunan: <strong>${totalSystemRead}</strong>
+                            <div class="options-bar">
+                                <div>
+                                    <label>🔍 Analiz Türü:</label>
+                                    <select id="analysis-type-select">
+                                        <option value="all_groups">Tüm Grupları Karşılaştır</option>
+                                        <option value="group_detail">Grup İçi Detay ve Üyeler</option>
+                                        <option value="individual_member">Tekil Kişi Analizi</option>
+                                        <option value="reading_logs">Tüm Okuma Günlüğü</option>
+                                    </select>
+                                </div>
+                                <div id="group-select-wrapper" style="display: none;">
+                                    <label>👥 Grup:</label>
+                                    <select id="target-group-select"></select>
+                                </div>
+                                <div id="member-select-wrapper" style="display: none;">
+                                    <label>👤 Kişi:</label>
+                                    <select id="target-member-select"></select>
+                                </div>
                             </div>
 
-                            <h2>⚔️ Tüm Grupları Karşılaştırma Paneli</h2>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Grup Adı</th>
-                                        <th style="text-align: center;">Üye Sayısı</th>
-                                        <th style="text-align: center;">Alınan Hisseler</th>
-                                        <th style="text-align: center;">Okunan Hisseler</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${groupsComparisonHtml}
-                                </tbody>
-                            </table>
-
-                            <h2>👥 Aktif Grup Üyeleri ve Bireysel Durumları (${currentGroup.replace(/_/g, ' ').toUpperCase()})</h2>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Üye Adı</th>
-                                        <th style="text-align: center;">Aldığı Toplam Hisse</th>
-                                        <th style="text-align: center;">Okuduğu Toplam Hisse</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${membersListHtml}
-                                </tbody>
-                            </table>
-
-                            <h2>📜 Detaylı Okuma Günlüğü (Kim Ne Zaman Ne Okumuş?)</h2>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Tarih</th>
-                                        <th>Üye</th>
-                                        <th>Eser Adı</th>
-                                        <th style="text-align: center;">Miktar / Aralık</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${logsHtml}
-                                </tbody>
-                            </table>
+                            <div id="analysis-content-area"></div>
                         </div>
+
+                        <script>
+                            function getAllGroupKeys() {
+                                let keys = [];
+                                for (let i = 0; i < localStorage.length; i++) {
+                                    let key = localStorage.key(i);
+                                    if (key && key.startsWith("hatim_group_")) keys.push(key.replace("hatim_group_", ""));
+                                }
+                                if (keys.length === 0) keys.push("grup_1");
+                                else keys.sort((a, b) => a.localeCompare(b, 'tr', { numeric: true }));
+                                return keys;
+                            }
+
+                            const typeSelect = document.getElementById("analysis-type-select");
+                            const groupWrapper = document.getElementById("group-select-wrapper");
+                            const groupSelect = document.getElementById("target-group-select");
+                            const memberWrapper = document.getElementById("member-select-wrapper");
+                            const memberSelect = document.getElementById("target-member-select");
+                            const contentArea = document.getElementById("analysis-content-area");
+
+                            function populateGroups() {
+                                let groups = getAllGroupKeys();
+                                groupSelect.innerHTML = groups.map(g => \`<option value="\${g}">\${g.replace(/_/g, ' ').toUpperCase()}</option>\`).join('');
+                                updateMembers();
+                            }
+
+                            function updateMembers() {
+                                let gKey = groupSelect.value;
+                                let raw = localStorage.getItem("hatim_group_" + gKey);
+                                let members = [];
+                                if (raw) {
+                                    try { let parsed = JSON.parse(raw); members = parsed.members || []; } catch(e){}
+                                }
+                                memberSelect.innerHTML = members.length > 0 ? members.map(m => \`<option value="\${m}">\${m}</option>\`).join('') : '<option value="">Üye yok</option>';
+                            }
+
+                            groupSelect.addEventListener("change", () => {
+                                updateMembers();
+                                renderAnalysis();
+                            });
+
+                            memberSelect.addEventListener("change", () => {
+                                renderAnalysis();
+                            });
+
+                            typeSelect.addEventListener("change", () => {
+                                let val = typeSelect.value;
+                                groupWrapper.style.display = (val === "group_detail" || val === "individual_member") ? "block" : "none";
+                                memberWrapper.style.display = (val === "individual_member") ? "block" : "none";
+                                renderAnalysis();
+                            });
+
+                            function renderAnalysis() {
+                                let type = typeSelect.value;
+                                let allGroups = getAllGroupKeys();
+
+                                if (type === "all_groups") {
+                                    let html = '<h2>⚔️ Tüm Grupları Karşılaştırma Paneli</h2><table><thead><tr><th>Grup Adı</th><th style="text-align: center;">Üye Sayısı</th><th style="text-align: center;">Alınan Hisseler</th><th style="text-align: center;">Okunan Hisseler</th></tr></thead><tbody>';
+                                    allGroups.forEach(gKey => {
+                                        let raw = localStorage.getItem("hatim_group_" + gKey);
+                                        if (!raw) return;
+                                        let gData = JSON.parse(raw);
+                                        let mCount = gData.members ? gData.members.length : 0;
+                                        let totalU = 0, takenU = 0, readU = 0;
+                                        if (gData.books && gData.bookPages) {
+                                            gData.books.forEach(b => {
+                                                totalU += b.totalUnits;
+                                                if (gData.bookPages[b.id]) {
+                                                    gData.bookPages[b.id].forEach(p => {
+                                                        if (p.owner) takenU++;
+                                                        if (p.isRead) readU++;
+                                                    });
+                                                }
+                                            });
+                                        }
+                                        let tPct = totalU > 0 ? Math.round((takenU / totalU) * 100) : 0;
+                                        let rPct = totalU > 0 ? Math.round((readU / totalU) * 100) : 0;
+                                        html += \`<tr><td style="font-weight: bold;">\${gKey.replace(/_/g, ' ').toUpperCase()}</td><td style="text-align: center;">\${mCount} Üye</td><td style="text-align: center;">\${takenU} / \${totalU} (%<b>\${tPct}</b>)</td><td style="text-align: center; color: #27ae60;">\${readU} / \${totalU} (%<b>\${rPct}</b>)</td></tr>\`;
+                                    });
+                                    html += '</tbody></table>';
+                                    contentArea.innerHTML = html;
+                                } 
+                                else if (type === "group_detail") {
+                                    let gKey = groupSelect.value;
+                                    let raw = localStorage.getItem("hatim_group_" + gKey);
+                                    if (!raw) { contentArea.innerHTML = "<p>Grup verisi bulunamadı.</p>"; return; }
+                                    let gData = JSON.parse(raw);
+                                    let members = gData.members || [];
+                                    let membersHtml = '';
+                                    if (members.length > 0) {
+                                        members.forEach(m => {
+                                            let mTaken = 0, mRead = 0;
+                                            if (gData.bookPages) {
+                                                Object.keys(gData.bookPages).forEach(bId => {
+                                                    gData.bookPages[bId].forEach(p => {
+                                                        if (p.owner === m) mTaken++;
+                                                        if (p.owner === m && p.isRead) mRead++;
+                                                    });
+                                                });
+                                            }
+                                            membersHtml += \`<tr><td style="font-weight: bold;">\${m}</td><td style="text-align: center;">\${mTaken} Hisse</td><td style="text-align: center; color: #27ae60; font-weight: bold;">\${mRead} Hisse</td></tr>\`;
+                                        });
+                                    } else {
+                                        membersHtml = '<tr><td colspan="3" style="text-align: center; color: #777;">Bu grupta üye bulunmuyor.</td></tr>';
+                                    }
+                                    contentArea.innerHTML = \`<h2>👥 \${gKey.replace(/_/g, ' ').toUpperCase()} - Grup Üyeleri ve Durumları</h2><table><thead><tr><th>Üye Adı</th><th style="text-align: center;">Aldığı Toplam Hisse</th><th style="text-align: center;">Okuduğu Toplam Hisse</th></tr></thead><tbody>\${membersHtml}</tbody></table>\`;
+                                }
+                                else if (type === "individual_member") {
+                                    let gKey = groupSelect.value;
+                                    let mName = memberSelect.value;
+                                    let raw = localStorage.getItem("hatim_group_" + gKey);
+                                    if (!raw || !mName) { contentArea.innerHTML = "<p>Kişi veya grup seçilmedi.</p>"; return; }
+                                    let gData = JSON.parse(raw);
+                                    let bookSummaryHtml = '';
+                                    let totalMTaken = 0, totalMRead = 0;
+
+                                    if (gData.books && gData.bookPages) {
+                                        gData.books.forEach(b => {
+                                            let bTaken = 0, bRead = 0;
+                                            gData.bookPages[b.id].forEach(p => {
+                                                if (p.owner === mName) { bTaken++; if (p.isRead) bRead++; }
+                                            });
+                                            totalMTaken += bTaken; totalMRead += bRead;
+                                            if (bTaken > 0) {
+                                                bookSummaryHtml += \`<tr><td style="font-weight: bold;">\${b.name}</td><td style="text-align: center;">\${bTaken} Hisse</td><td style="text-align: center; color: #27ae60; font-weight: bold;">\${bRead} Okunan</td></tr>\`;
+                                            }
+                                        });
+                                    }
+
+                                    let logs = (gData.readingLogs || []).filter(l => l.member === mName);
+                                    let logsHtml = '';
+                                    if (logs.length > 0) {
+                                        logs.slice().reverse().forEach(l => {
+                                            logsHtml += \`<tr><td>\${l.date}</td><td>\${l.bookName}</td><td style="text-align: center; font-weight: bold; color: #27ae60;">\${l.count} Sayfa (\${l.range})</td></tr>\`;
+                                        });
+                                    } else {
+                                        logsHtml = '<tr><td colspan="3" style="text-align: center; color: #777;">Bu üyeye ait okuma kaydı bulunmuyor.</td></tr>';
+                                    }
+
+                                    contentArea.innerHTML = \`
+                                        <div class="meta-box">👤 <b>\${mName}</b> (\${gKey.replace(/_/g, ' ').toUpperCase()} Grubu) Bireysel Performans Özeti | Toplam Alınan: <b>\${totalMTaken}</b>, Okunan: <b style="color:#27ae60;">\${totalMRead}</b></div>
+                                        <h2>📖 \${mName} - Eser Bazlı Dağılımı</h2>
+                                        <table><thead><tr><th>Eser Adı</th><th style="text-align: center;">Aldığı Hisse</th><th style="text-align: center;">Okuduğu Hisse</th></tr></thead><tbody>\${bookSummaryHtml || '<tr><td colspan="3" style="text-align: center; color: #777;">Alınmış hisse bulunmuyor.</td></tr>'}</tbody></table>
+                                        <h2>📜 \${mName} - Okuma Günlüğü</h2>
+                                        <table><thead><tr><th>Tarih</th><th>Eser Adı</th><th style="text-align: center;">Miktar / Aralık</th></tr></thead><tbody>\${logsHtml}</tbody></table>
+                                    \`;
+                                }
+                                else if (type === "reading_logs") {
+                                    let allLogs = [];
+                                    allGroups.forEach(g => {
+                                        let raw = localStorage.getItem("hatim_group_" + g);
+                                        if (raw) {
+                                            try {
+                                                let parsed = JSON.parse(raw);
+                                                if (parsed.readingLogs) {
+                                                    parsed.readingLogs.forEach(l => {
+                                                        allLogs.push({ ...l, group: g });
+                                                    });
+                                                }
+                                            } catch(e){}
+                                        }
+                                    });
+                                    allLogs.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                                    let logsHtml = '';
+                                    if (allLogs.length > 0) {
+                                        allLogs.forEach(l => {
+                                            logsHtml += \`<tr><td>\${l.date}</td><td style="font-weight: bold; color:#8a6d3b;">[\${l.group.toUpperCase()}]</td><td style="font-weight: bold;">\${l.member}</td><td>\${l.bookName}</td><td style="text-align: center; font-weight: bold; color: #27ae60;">\${l.count} Bölüm (\${l.range})</td></tr>\`;
+                                        });
+                                    } else {
+                                        logsHtml = '<tr><td colspan="5" style="text-align: center; color: #777;">Hiç okuma kaydı bulunmuyor.</td></tr>';
+                                    }
+                                    contentArea.innerHTML = \`<h2>📜 Tüm Sistem Okuma Günlüğü</h2><table><thead><tr><th>Tarih</th><th>Grup</th><th>Üye</th><th>Eser Adı</th><th style="text-align: center;">Miktar / Aralık</th></tr></thead><tbody>\${logsHtml}</tbody></table>\`;
+                                }
+                            }
+
+                            populateGroups();
+                            renderAnalysis();
+                        </script>
                     </body>
                     </html>
                 `);
@@ -931,7 +975,7 @@
                         <div id="admin-panel-section" style="background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold-primary); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
                             <h3 style="color: var(--gold-dark); font-size: 15px; margin-bottom: 10px;">🛠️ Yönetici Kontrol Paneli</h3>
                             <div style="margin-bottom: 12px;">
-                                <button id="admin-open-analysis-page" style="width: 100%; padding: 10px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">📊 Detaylı Analiz ve Grup Karşılaştırma Sayfası</button>
+                                <button id="admin-open-analysis-page" style="width: 100%; padding: 10px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">📊 Seçenekli Analiz ve Grup Karşılaştırma Sayfası</button>
                             </div>
                             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
                                 <label style="font-weight: bold; font-size: 13px;">Grup:</label>
