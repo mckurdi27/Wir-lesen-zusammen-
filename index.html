@@ -1,16 +1,30 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+    <!-- ================================================================= -->
+    <!-- HEAD BÖLÜMÜ VE META AYARLARI -->
+    <!-- ================================================================= -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ortak Hatim ve Dua Takip Sistemi</title>
 </head>
 <body>
+    <!-- ================================================================= -->
+    <!-- ANA İÇERİK KAPSAYICISI -->
+    <!-- ================================================================= -->
     <div class="container">
         <div id="books-grid"></div>
     </div>
+
+    <!-- ================================================================= -->
+    <!-- JAVASCRIPT UYGULAMA MANTIĞI -->
+    <!-- ================================================================= -->
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
+            
+            /* ========================================================= */
+            /* DOM ELEMANLARINI KONTROL ET VE OLUŞTUR                      */
+            /* ========================================================= */
             let container = document.querySelector(".container");
             if (!container) {
                 container = document.createElement("div");
@@ -25,6 +39,9 @@
                 container.appendChild(booksGrid);
             }
 
+            /* ========================================================= */
+            /* ESKİ VEYA HATALI PANELLERİ TEMİZLEME FONKSİYONU             */
+            /* ========================================================= */
             function removeStuckPanel() {
                 document.querySelectorAll('div').forEach(div => {
                     if (div && div.textContent && div.textContent.includes("Ortak Hatim ve Dua Takip Sistemi") && !div.id.includes("main-title-ornate-section") && (div.querySelector('select') || div.innerHTML.includes("Yönetici Modu"))) {
@@ -35,6 +52,9 @@
             removeStuckPanel();
             setTimeout(removeStuckPanel, 100);
 
+            /* ========================================================= */
+            /* ORYANTAL MOTİFLER VE GENEL STİLLERİN ENJEKTE EDİLMESİ      */
+            /* ========================================================= */
             function injectOrientalStyles() {
                 if (document.getElementById("oriental-motif-styles")) return;
                 const styleEl = document.createElement("style");
@@ -89,6 +109,9 @@
             }
             injectOrientalStyles();
 
+            /* ========================================================= */
+            /* GLOBAL UYGULAMA DEĞİŞKENLERİ VE YAPILANDIRMA              */
+            /* ========================================================= */
             let currentGroup = "grup_1";
             let isAdmin = false;
             let appData = null;
@@ -96,6 +119,9 @@
             let monthlyInspirationCache = {};
             const ADMIN_PASSWORD = "1234";
 
+            /* ========================================================= */
+            /* ESERLER İÇİN PDF DOSYA YOLLARI EŞLEŞTİRMESİ               */
+            /* ========================================================= */
             const bookPdfMap = {
                 "kuran": "pdf/Kuran-ı Kerim.pdf",
                 "cevsen": "pdf/Cevşen.pdf",
@@ -109,6 +135,9 @@
                 "dilekce_ar": "pdf/Bir Kırık Dilekçe Ar.pdf"
             };
 
+            /* ========================================================= */
+            /* BUGÜNKÜ HİCRİ TARİHİ HESAPLAMA FONKSİYONU                  */
+            /* ========================================================= */
             function bugunkuHicriTarihiAl() {
                 const ayAdlari = {
                     "01": "Muharrem", "02": "Sefer", "03": "Rebiülevvel", "04": "Rebiülahir",
@@ -132,6 +161,9 @@
                 }
             }
 
+            /* ========================================================= */
+            /* HİCRİ AY VERİLERİNİ ASENKRON OLARAK ÇEKME FONKSİYONU      */
+            /* ========================================================= */
             async function fetchHijriMonthData(ayKodu) {
                 if (monthlyInspirationCache[ayKodu]) return monthlyInspirationCache[ayKodu];
                 const fileMap = {
@@ -152,6 +184,9 @@
                 }
             }
 
+            /* ========================================================= */
+            /* MANEVİ VE DİL İLHAMI VERİLERİNİ HAZIRLAMA                 */
+            /* ========================================================= */
             async function getHijriInspiration() {
                 const todayMiladiStr = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
                 const hicriInfo = bugunkuHicriTarihiAl();
@@ -205,6 +240,9 @@
                 return { fullDateStr: todayHijriStr, miladiDateStr: todayMiladiStr, verse: verseText, hadish: hadishText, proverb: proverbText, quote: quoteText, german: { quote: germanQuote, translation: germanTrans } };
             }
 
+            /* ========================================================= */
+            /* ANA BAŞLIK BÖLÜMÜNÜ OLUŞTURMA VE RENDER ETME              */
+            /* ========================================================= */
             function renderMainTitleHeader() {
                 let titleSection = document.getElementById("main-title-ornate-section");
                 if (!titleSection) {
@@ -234,6 +272,9 @@
                 `;
             }
 
+            /* ========================================================= */
+            /* GÜNLÜK İLHAM KÖŞESİNİ RENDER ETME FONKSİYONU              */
+            /* ========================================================= */
             async function renderDailyInspiration() {
                 const inspirationData = await getHijriInspiration();
                 let inspirationContainer = document.getElementById("daily-inspiration-section");
@@ -273,6 +314,9 @@
                 `;
             }
 
+            /* ========================================================= */
+            /* SAYFA MODLARI OLUŞTURUCU (SAYFA TABANLI ESERLER İÇİN)     */
+            /* ========================================================= */
             function createPageModes(totalPages) {
                 return {
                     yirmi_sayfa: { name: "20 Sayfa", getItems: () => { let items = [], count = Math.ceil(totalPages / 20); for (let i = 0; i < count; i++) { let start = i * 20, end = Math.min((i + 1) * 20, totalPages); items.push({ id: i + 1, name: `${i + 1}. Cüz / Sayfa ${start + 1}-${end}`, start, end }); } return items; }},
@@ -282,6 +326,9 @@
                 };
             }
 
+            /* ========================================================= */
+            /* BAB MODLARI OLUŞTURUCU (BAB TABANLI ESERLER İÇİN)         */
+            /* ========================================================= */
             function createBabModes(totalBabs) {
                 return {
                     on_bab: { name: "10 Bab", getItems: () => { let items = [], count = Math.ceil(totalBabs / 10); for (let i = 0; i < count; i++) { let start = i * 10, end = Math.min((i + 1) * 10, totalBabs); items.push({ id: i + 1, name: `${start + 1}-${end}. Bablar`, start, end }); } return items; }},
@@ -290,6 +337,9 @@
                 };
             }
 
+            /* ========================================================= */
+            /* VARSAYILAN ESERLER ŞABLONU                                */
+            /* ========================================================= */
             const defaultBooksTemplate = [
                 { id: "kuran", name: "1. Kur'ân-ı Kerîm", totalUnits: 604, type: "page", defaultMode: "yirmi_sayfa" },
                 { id: "cevsen", name: "2. Cevşen", totalUnits: 100, type: "bab", defaultMode: "on_bab" },
@@ -316,6 +366,9 @@
                 }
             }
 
+            /* ========================================================= */
+            /* TÜM GRUP ANAHTARLARINI LİSTELEME FONKSİYONU               */
+            /* ========================================================= */
             function getAllGroupKeys() {
                 let keys = [];
                 let unlockedProtected = JSON.parse(localStorage.getItem("unlocked_protected_groups") || "[]");
@@ -341,6 +394,9 @@
                 return keys;
             }
 
+            /* ========================================================= */
+            /* GRUP VERİLERİNİ YÜKLEME VE DOĞRULAMA FONKSİYONU           */
+            /* ========================================================= */
             async function loadGroupData() {
                 removeStuckPanel();
                 const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
@@ -400,7 +456,6 @@
                     });
                 }
 
-                // Ensure bookPages match totalUnits
                 appData.books.forEach(b => {
                     if (!appData.bookPages[b.id]) {
                         appData.bookPages[b.id] = Array(b.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
@@ -431,6 +486,9 @@
                 localStorage.setItem(`hatim_group_${currentGroup}`, JSON.stringify(appData));
             }
 
+            /* ========================================================= */
+            /* KULLANICI KONTROLLERİ VE ARAYÜZÜ OLUŞTURMA                */
+            /* ========================================================= */
             function renderUserControls() {
                 let controlsContainer = document.getElementById("user-controls-section");
                 if (!controlsContainer) {
@@ -619,6 +677,9 @@
                 }
             }
 
+            /* ========================================================= */
+            /* GENEL ANALİZ VE İLERLEME PANELİNİ OLUŞTURMA               */
+            /* ========================================================= */
             function renderAnalysisSection() {
                 let analysisContainer = document.getElementById("analysis-section");
                 if (!analysisContainer) {
@@ -666,12 +727,14 @@
                 `;
             }
 
+            /* ========================================================= */
+            /* DETAYLI 5 SEKMELİ ANALİZ MODAL PENCERESİ                  */
+            /* ========================================================= */
             function openDetailedAnalysisModal() {
                 let existingModal = document.getElementById("detailed-analysis-modal");
                 if (existingModal) existingModal.remove();
 
                 let allGroupKeys = getAllGroupKeys();
-
                 let totalSystemBooks = 0, totalSystemTaken = 0, totalSystemRead = 0;
                 allGroupKeys.forEach(gKey => {
                     let gDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
@@ -750,7 +813,7 @@
                                 <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">⚔️ Tüm Grupları Karşılaştırma</h3>
                                 <div style="background: rgba(0,0,0,0.02); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 12px;">
                                     <div style="font-weight: bold; font-size: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
-                                        <span>🔍 Grup Filtreleme (Tümü, Tek Tek veya Birkaçı):</span>
+                                        <span>🔍 Grup Filtreleme:</span>
                                         <div>
                                             <button id="t2-select-all" style="padding: 2px 8px; font-size: 11px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 3px;">Tümünü Seç</button>
                                             <button id="t2-clear-all" style="padding: 2px 8px; font-size: 11px; cursor: pointer; background: #e74c3c; color: white; border: none; border-radius: 3px;">Temizle</button>
@@ -1161,6 +1224,9 @@
                 });
             }
 
+            /* ========================================================= */
+            /* ALT YÖNETİCİ KONTROL PANELİNİ OLUŞTURMA                   */
+            /* ========================================================= */
             function renderAdminSectionAtBottom() {
                 let bottomContainer = document.getElementById("admin-bottom-section");
                 if (!bottomContainer) {
@@ -1260,7 +1326,6 @@
                         });
                     }
 
-                    // Eser Ekleme Butonu
                     const addBookBtn = document.getElementById("admin-add-book-btn");
                     if (addBookBtn) {
                         addBookBtn.addEventListener("click", () => {
@@ -1294,7 +1359,6 @@
                         });
                     }
 
-                    // Eser Düzenleme Butonları
                     document.querySelectorAll(".admin-edit-book").forEach(btn => {
                         btn.addEventListener("click", (e) => {
                             let bId = e.target.getAttribute("data-id");
@@ -1310,7 +1374,6 @@
                             if (newName.trim()) bookObj.name = newName.trim();
                             if (!isNaN(newUnits) && newUnits > 0) {
                                 bookObj.totalUnits = newUnits;
-                                // Adjust bookPages array length
                                 if (!appData.bookPages[bId]) {
                                     appData.bookPages[bId] = Array(newUnits).fill(null).map(() => ({ owner: "", isRead: false }));
                                 } else if (appData.bookPages[bId].length < newUnits) {
@@ -1327,7 +1390,6 @@
                         });
                     });
 
-                    // Eser Silme Butonları
                     document.querySelectorAll(".admin-remove-book").forEach(btn => {
                         btn.addEventListener("click", (e) => {
                             let bId = e.target.getAttribute("data-id");
@@ -1477,6 +1539,9 @@
                 });
             }
 
+            /* ========================================================= */
+            /* YÖNETİCİ MODU DEĞİŞTİRME FONKSİYONU                      */
+            /* ========================================================= */
             async function triggerAdminToggle() {
                 if (isAdmin) {
                     isAdmin = false;
@@ -1498,6 +1563,9 @@
                 renderAdminSectionAtBottom();
             }
 
+            /* ========================================================= */
+            /* HİSSE ARALIĞI DURUMUNU SORGULAMA FONKSİYONU               */
+            /* ========================================================= */
             function getRangeStatus(baseArray, start, end) {
                 let subset = baseArray.slice(start, end);
                 let allFree = subset.every(p => !p.owner);
@@ -1513,6 +1581,9 @@
                 }
             }
 
+            /* ========================================================= */
+            /* ESERLERİ VE LİSTELERİ RENDER ETME FONKSİYONU              */
+            /* ========================================================= */
             function renderBooks() {
                 const openBookIds = Array.from(document.querySelectorAll(".book-card.open")).map(el => el.getAttribute("data-book-id"));
                 booksGrid.innerHTML = "";
@@ -1735,88 +1806,55 @@
                         if (markUnreadBtn) markUnreadBtn.addEventListener("click", (e) => {
                             e.stopPropagation();
                             let start = parseInt(e.target.getAttribute("data-start")), end = parseInt(e.target.getAttribute("data-end"));
-                            let bArr = appData.bookPages[e.target.getAttribute("data-bookid")];
+                            let bId = e.target.getAttribute("data-bookid");
+                            let bArr = appData.bookPages[bId];
                             for (let i = start; i < end; i++) bArr[i].isRead = false;
                             saveGroupData();
                             renderAnalysisSection();
                             renderBooks();
                         });
 
-                        row.addEventListener("click", () => handleItemClick(bookIndex, book.currentMode, itemIndex));
-                        listContainer.appendChild(row);
-                    });
-                });
-
-                document.querySelectorAll(".sub-btn").forEach(btn => {
-                    btn.addEventListener("click", (e) => {
-                        e.stopPropagation();
-                        appData.books[e.target.getAttribute("data-book")].currentMode = e.target.getAttribute("data-mode");
-                        saveGroupData();
-                        renderBooks();
-                    });
-                });
-
-                document.querySelectorAll(".book-whatsapp-btn").forEach(btn => {
-                    btn.addEventListener("click", (e) => {
-                        e.stopPropagation();
-                        shareBookToWhatsApp(e.target.getAttribute("data-whatsapp"));
-                    });
-                });
-            }
-
-            function handleItemClick(bookIndex, modeKey, itemIndex) {
-                if (!loggedInMember) {
-                    alert("Lütfen önce isminizi seçin!");
-                    return;
-                }
-                const book = appData.books[bookIndex];
-                let baseArray = appData.bookPages[book.id];
-                let item = bookModesDefs[book.id][modeKey].getItems()[itemIndex];
-                let st = getRangeStatus(baseArray, item.start, item.end);
-
-                if (st.statusType === "free") {
-                    for (let i = item.start; i < item.end; i++) baseArray[i] = { owner: loggedInMember, isRead: false };
-                    saveGroupData();
-                    renderAnalysisSection();
-                    renderBooks();
-                } else {
-                    if (isAdmin) {
-                        if (confirm(`[Yönetici] Bu hisseyi boşa çıkarmak istiyor musunuz?`)) {
-                            for (let i = item.start; i < item.end; i++) baseArray[i] = { owner: "", isRead: false };
-                            saveGroupData();
-                            renderAnalysisSection();
-                            renderBooks();
-                        }
-                    } else {
-                        if (st.owner === loggedInMember) {
-                            if (confirm(`Bu hisseyi bırakmak ister misiniz?`)) {
-                                for (let i = item.start; i < item.end; i++) baseArray[i] = { owner: "", isRead: false };
+                        row.addEventListener("click", () => {
+                            if (!loggedInMember) {
+                                alert("Lütfen önce isminizi seçin veya ekleyin!");
+                                return;
+                            }
+                            if (st.statusType === "free") {
+                                for (let i = item.start; i < item.end; i++) {
+                                    baseArray[i].owner = loggedInMember;
+                                    baseArray[i].isRead = false;
+                                }
                                 saveGroupData();
                                 renderAnalysisSection();
                                 renderBooks();
+                            } else if (st.statusType === "taken" || st.statusType === "read") {
+                                if (st.owner === loggedInMember || isAdmin) {
+                                    if (confirm(`"${item.name}" hissesini bırakmak istiyor musunuz?`)) {
+                                        for (let i = item.start; i < item.end; i++) {
+                                            baseArray[i].owner = "";
+                                            baseArray[i].isRead = false;
+                                        }
+                                        saveGroupData();
+                                        renderAnalysisSection();
+                                        renderBooks();
+                                    }
+                                } else {
+                                    alert(`Bu hisse "${st.owner}" üyesine aittir. Sadece sahibi veya yönetici işlem yapabilir.`);
+                                }
+                            } else if (st.statusType === "mixed") {
+                                alert("Bu aralıkta farklı üyelere ait hisseler karışık bulunmaktadır. Yönetici panelinden ya da tekli seçimlerle düzenlenebilir.");
                             }
-                        } else alert(`Bu kısım başka bir üyeye (${st.owner}) ait.`);
-                    }
-                }
-            }
+                        });
 
-            function shareBookToWhatsApp(bookIndex) {
-                const book = appData.books[bookIndex];
-                let baseArray = appData.bookPages[book.id];
-                let defModes = bookModesDefs[book.id];
-                let primaryKey = book.type === "bab" ? "on_bab" : "yirmi_sayfa";
-                if (!defModes[primaryKey]) primaryKey = Object.keys(defModes)[0];
-                let active = [];
-                defModes[primaryKey].getItems().forEach(pi => {
-                    let st = getRangeStatus(baseArray, pi.start, pi.end);
-                    if (st.owner) active.push(`• *${st.owner}*, *${pi.name}*'nü ${st.isRead ? "Okundu ✓" : "Aldı"}.`);
+                        listContainer.appendChild(row);
+                    });
                 });
-                let msg = `*[${currentGroup.replace(/_/g, ' ').toUpperCase()}] ${book.name} (${appData.bookHatims[book.id].hatimNo}. Hatim)*\n\n`;
-                msg += active.length === 0 ? "Henüz pay alan kimse yok." : active.join("\n");
-                window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
             }
 
-            await loadGroupData();
+            /* ========================================================= */
+            /* UYGULAMANIN BAŞLATILMASI                                  */
+            /* ========================================================= */
+            loadGroupData();
         });
     </script>
 </body>
