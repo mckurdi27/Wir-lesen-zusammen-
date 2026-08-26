@@ -1,4 +1,4 @@
-{
+window.ramazan_veri = {
     "ay_kodu": "09",
     "ay_adi": "Ramazan",
     "aciklama": "Hicri takvimin dokuzuncu ayıdır. Oruç ve Kur'an ayıdır.",
@@ -126,7 +126,7 @@
         "25": {
             "hicri_tarih": "25 Ramazan",
             "ayet": { "meal": "Kim Allah'a tevekkül ederse, O, ona yeter.", "kaynak": "Talâk Suresi, 3" },
-            "hadis": { "meal": "Eğer siz Allah'a gereği gibi tevekkül etseydiniz, kuşları rızıklandırdığı gibi sizi de rızıklandırırdı.", "kaynak": "Tirmizî, Zühd 33" }
+            "hadis": { "meal": "Eğer siz Allah'ا gereği gibi tevekkül etseydiniz, kuşları rızıklandırdığı gibi sizi de rızıklandırırdı.", "kaynak": "Tirmizî, Zühd 33" }
         },
         "26": {
             "hicri_tarih": "26 Ramazan",
@@ -154,4 +154,4 @@
             "hadis": { "meal": "Müminin silahı dua, dinin direği namazdır.", "kaynak": "Hakim, Müstedrek, 1/492" }
         }
     }
-}
+};
