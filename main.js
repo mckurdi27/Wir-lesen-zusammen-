@@ -1,4 +1,4 @@
-// Ana dizin: main.js
+// Ana dizin: main.js    
 window.HicriTakvimAnaListe = {
     "01": typeof window.muharrem_veri !== 'undefined' ? window.muharrem_veri : null,
     "02": typeof window.safer_veri !== 'undefined' ? window.safer_veri : null,
