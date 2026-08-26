@@ -1,4 +1,11 @@
 document.addEventListener("DOMContentLoaded", async () => {
+    // 1. HTML dosyasında statik olarak kalan eski ortadaki "Ortak Hatim ve Dua Takip Sistemi" panelini DOM'dan tamamen temizle
+    document.querySelectorAll('div').forEach(div => {
+        if (div.textContent && div.textContent.includes("Ortak Hatim ve Dua Takip Sistemi") && !div.id.includes("main-title")) {
+            div.remove();
+        }
+    });
+
     // Oryantal Motifler ve Tema (Açık & Koyu Mod) Stillerini Enjekte Etme
     function injectOrientalStyles() {
         if (document.getElementById("oriental-motif-styles")) return;
