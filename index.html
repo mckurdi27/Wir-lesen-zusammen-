@@ -643,100 +643,8 @@
                 let existingModal = document.getElementById("detailed-analysis-modal");
                 if (existingModal) existingModal.remove();
 
-                let allGroupKeys = getAllGroupKeys();
-                let groupsComparisonHtml = '';
-                let totalSystemBooks = 0;
-                let totalSystemTaken = 0;
-                let totalSystemRead = 0;
-
-                allGroupKeys.forEach(gKey => {
-                    let gDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
-                    if (!gDataRaw) return;
-                    let gData = JSON.parse(gDataRaw);
-                    let mCount = gData.members ? gData.members.length : 0;
-                    let totalU = 0, takenU = 0, readU = 0;
-                    if (gData.books && gData.bookPages) {
-                        gData.books.forEach(b => {
-                            totalU += b.totalUnits;
-                            if (gData.bookPages[b.id]) {
-                                gData.bookPages[b.id].forEach(p => {
-                                    if (p.owner) takenU++;
-                                    if (p.isRead) readU++;
-                                });
-                            }
-                        });
-                    }
-                    if (gKey === currentGroup) {
-                        totalSystemBooks = totalU;
-                        totalSystemTaken = takenU;
-                        totalSystemRead = readU;
-                    }
-                    let tPct = totalU > 0 ? Math.round((takenU / totalU) * 100) : 0;
-                    let rPct = totalU > 0 ? Math.round((readU / totalU) * 100) : 0;
-
-                    groupsComparisonHtml += `
-                        <tr>
-                            <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${gKey.replace(/_/g, ' ').toUpperCase()}</td>
-                            <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${mCount} Üye</td>
-                            <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${takenU} / ${totalU} (%${tPct})</td>
-                            <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${readU} / ${totalU} (%${rPct})</td>
-                        </tr>
-                    `;
-                });
-
-                let membersListHtml = '';
-                if (appData.members && appData.members.length > 0) {
-                    appData.members.forEach(m => {
-                        let mTaken = 0, mRead = 0;
-                        Object.keys(appData.bookPages).forEach(bId => {
-                            appData.bookPages[bId].forEach(p => {
-                                if (p.owner === m) mTaken++;
-                                if (p.owner === m && p.isRead) mRead++;
-                            });
-                        });
-                        membersListHtml += `
-                            <tr>
-                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${m}</td>
-                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${mTaken} Hisse</td>
-                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${mRead} Hisse</td>
-                            </tr>
-                        `;
-                    });
-                } else {
-                    membersListHtml = `<tr><td colspan="3" style="padding: 15px; text-align: center; color: #777;">Bu grupta kayıtlı üye bulunmuyor.</td></tr>`;
-                }
-
-                let logsHtml = '';
-                if (appData.readingLogs && appData.readingLogs.length > 0) {
-                    let sortedLogs = [...appData.readingLogs].reverse();
-                    sortedLogs.forEach(log => {
-                        logsHtml += `
-                            <tr>
-                                <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-size: 11px; opacity: 0.8;">${log.date}</td>
-                                <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${log.member}</td>
-                                <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color);">${log.bookName}</td>
-                                <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${log.count} Birim (${log.range})</td>
-                            </tr>
-                        `;
-                    });
-                } else {
-                    logsHtml = `<tr><td colspan="4" style="padding: 15px; text-align: center; color: #777;">Henüz okundu olarak işaretlenen kayıt bulunmuyor.</td></tr>`;
-                }
-
-                let bookStatusHtml = '';
-                if (appData.books && appData.bookHatims) {
-                    appData.books.forEach(b => {
-                        let hInfo = appData.bookHatims[b.id] || { hatimNo: 1, prayerDone: false };
-                        bookStatusHtml += `
-                            <tr>
-                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${b.name}</td>
-                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${hInfo.hatimNo}. Hatim</td>
-                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: ${hInfo.prayerDone ? '#27ae60' : '#e67e22'}; font-weight: bold;">${hInfo.prayerDone ? '✓ Yapıldı' : 'Yapılacak'}</td>
-                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${b.totalUnits} Birim</td>
-                            </tr>
-                        `;
-                    });
-                }
+                let modalSelectedGroup = currentGroup;
+                let modalSelectedMember = "";
 
                 let modalOverlay = document.createElement("div");
                 modalOverlay.id = "detailed-analysis-modal";
@@ -753,128 +661,272 @@
                     box-sizing: border-box;
                 `;
 
-                modalOverlay.innerHTML = `
-                    <div style="background: var(--card-bg); color: var(--text-main); width: 100%; max-width: 900px; max-height: 90vh; border-radius: 12px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.3);">
-                        <div style="padding: 15px 20px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border-bottom: 2px solid var(--gold-primary); display: flex; justify-content: space-between; align-items: center; color: #3e2723;">
-                            <div>
-                                <h2 style="margin: 0; font-size: 18px; color: #8a6d3b;">📊 Yönetici 5 Sekmeli Analiz ve Rapor Paneli</h2>
-                                <div style="font-size: 11px; opacity: 0.8; margin-top: 3px;">Aktif Grup: ${currentGroup.replace(/_/g, ' ').toUpperCase()}</div>
-                            </div>
-                            <div style="display: flex; gap: 8px;">
-                                <button id="modal-print-btn" style="background: #2980b9; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;">🖨️ Yazdır</button>
-                                <button id="modal-close-btn" style="background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;">✕ Kapat</button>
-                            </div>
-                        </div>
+                function updateModalContent() {
+                    let gDataRaw = localStorage.getItem(`hatim_group_${modalSelectedGroup}`);
+                    let gData = gDataRaw ? JSON.parse(gDataRaw) : { members: [], books: defaultBooksTemplate, bookPages: {}, bookHatims: {}, bookHistory: [], readingLogs: [] };
+                    if (!gData.books) gData.books = defaultBooksTemplate;
+                    if (!gData.bookPages) gData.bookPages = {};
+                    if (!gData.bookHatims) gData.bookHatims = {};
+                    if (!gData.bookHistory) gData.bookHistory = {};
+                    if (!gData.readingLogs) gData.readingLogs = [];
 
-                        <div style="display: flex; gap: 4px; padding: 10px 15px 0 15px; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border-color); overflow-x: auto;">
-                            <button class="m-tab-btn active" data-target="mtab-1" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">1. Genel Özet</button>
-                            <button class="m-tab-btn" data-target="mtab-2" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">2. Grup Karşılaştırma</button>
-                            <button class="m-tab-btn" data-target="mtab-3" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">3. Üye Performansı</button>
-                            <button class="m-tab-btn" data-target="mtab-4" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">4. Okuma Günlüğü</button>
-                            <button class="m-tab-btn" data-target="mtab-5" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">5. Eser Durumu</button>
-                        </div>
+                    let allGroupKeys = getAllGroupKeys();
+                    let groupsComparisonHtml = '';
+                    let totalSystemBooks = 0;
+                    let totalSystemTaken = 0;
+                    let totalSystemRead = 0;
 
-                        <div style="padding: 20px; overflow-y: auto; flex: 1; font-size: 13px;">
-                            <div id="mtab-1" class="m-tab-content">
-                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📈 Sistem Genel Özeti</h3>
-                                <p>Bu panel üzerinden tüm grupların ve üyelerin ilerleme durumunu detaylıca takip edebilirsiniz.</p>
-                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 15px;">
-                                    <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; border-left: 4px solid #3498db;">
-                                        <div style="font-size: 11px; opacity: 0.8;">Aktif Grup</div>
-                                        <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${currentGroup.replace(/_/g, ' ').toUpperCase()}</div>
-                                    </div>
-                                    <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; border-left: 4px solid #f39c12;">
-                                        <div style="font-size: 11px; opacity: 0.8;">Alınan Hisseler</div>
-                                        <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${totalSystemTaken} / ${totalSystemBooks}</div>
-                                    </div>
-                                    <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; border-left: 4px solid #27ae60;">
-                                        <div style="font-size: 11px; opacity: 0.8;">Okunan Hisseler</div>
-                                        <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${totalSystemRead} / ${totalSystemBooks}</div>
-                                    </div>
+                    allGroupKeys.forEach(gKey => {
+                        let itemDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
+                        if (!itemDataRaw) return;
+                        let itemData = JSON.parse(itemDataRaw);
+                        let mCount = itemData.members ? itemData.members.length : 0;
+                        let totalU = 0, takenU = 0, readU = 0;
+                        if (itemData.books && itemData.bookPages) {
+                            itemData.books.forEach(b => {
+                                totalU += b.totalUnits;
+                                if (itemData.bookPages[b.id]) {
+                                    itemData.bookPages[b.id].forEach(p => {
+                                        if (p.owner) takenU++;
+                                        if (p.isRead) readU++;
+                                    });
+                                }
+                            });
+                        }
+                        if (gKey === modalSelectedGroup) {
+                            totalSystemBooks = totalU;
+                            totalSystemTaken = takenU;
+                            totalSystemRead = readU;
+                        }
+                        let tPct = totalU > 0 ? Math.round((takenU / totalU) * 100) : 0;
+                        let rPct = totalU > 0 ? Math.round((readU / totalU) * 100) : 0;
+
+                        groupsComparisonHtml += `
+                            <tr>
+                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${gKey.replace(/_/g, ' ').toUpperCase()}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${mCount} Üye</td>
+                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${takenU} / ${totalU} (%${tPct})</td>
+                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${readU} / ${totalU} (%${rPct})</td>
+                            </tr>
+                        `;
+                    });
+
+                    let membersListHtml = '';
+                    let filteredMembers = modalSelectedMember ? gData.members.filter(m => m === modalSelectedMember) : gData.members;
+                    if (filteredMembers && filteredMembers.length > 0) {
+                        filteredMembers.forEach(m => {
+                            let mTaken = 0, mRead = 0;
+                            Object.keys(gData.bookPages).forEach(bId => {
+                                if (gData.bookPages[bId]) {
+                                    gData.bookPages[bId].forEach(p => {
+                                        if (p.owner === m) mTaken++;
+                                        if (p.owner === m && p.isRead) mRead++;
+                                    });
+                                }
+                            });
+                            membersListHtml += `
+                                <tr>
+                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${m}</td>
+                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${mTaken} Hisse</td>
+                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${mRead} Hisse</td>
+                                </tr>
+                            `;
+                        });
+                    } else {
+                        membersListHtml = `<tr><td colspan="3" style="padding: 15px; text-align: center; color: #777;">Seçilen kritere uygun üye bulunmuyor.</td></tr>`;
+                    }
+
+                    let logsHtml = '';
+                    if (gData.readingLogs && gData.readingLogs.length > 0) {
+                        let filteredLogs = modalSelectedMember ? gData.readingLogs.filter(l => l.member === modalSelectedMember) : gData.readingLogs;
+                        let sortedLogs = [...filteredLogs].reverse();
+                        if (sortedLogs.length > 0) {
+                            sortedLogs.forEach(log => {
+                                logsHtml += `
+                                    <tr>
+                                        <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-size: 11px; opacity: 0.8;">${log.date}</td>
+                                        <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${log.member}</td>
+                                        <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color);">${log.bookName}</td>
+                                        <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${log.count} Birim (${log.range})</td>
+                                    </tr>
+                                `;
+                            });
+                        } else {
+                            logsHtml = `<tr><td colspan="4" style="padding: 15px; text-align: center; color: #777;">Seçilen üyeye ait okuma kaydı bulunmuyor.</td></tr>`;
+                        }
+                    } else {
+                        logsHtml = `<tr><td colspan="4" style="padding: 15px; text-align: center; color: #777;">Henüz okundu olarak işaretlenen kayıt bulunmuyor.</td></tr>`;
+                    }
+
+                    let bookStatusHtml = '';
+                    if (gData.books && gData.bookHatims) {
+                        gData.books.forEach(b => {
+                            let hInfo = gData.bookHatims[b.id] || { hatimNo: 1, prayerDone: false };
+                            bookStatusHtml += `
+                                <tr>
+                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${b.name}</td>
+                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${hInfo.hatimNo}. Hatim</td>
+                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: ${hInfo.prayerDone ? '#27ae60' : '#e67e22'}; font-weight: bold;">${hInfo.prayerDone ? '✓ Yapıldı' : 'Yapılacak'}</td>
+                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${b.totalUnits} Birim</td>
+                                </tr>
+                            `;
+                        });
+                    }
+
+                    let groupOptionsHtml = allGroupKeys.map(g => `<option value="${g}" ${g === modalSelectedGroup ? "selected" : ""}>${g.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
+                    let memberOptionsHtml = '<option value="">-- Tüm Kişiler --</option>' + (gData.members ? gData.members.map(m => `<option value="${m}" ${m === modalSelectedMember ? "selected" : ""}>${m}</option>`).join('') : '');
+
+                    modalOverlay.innerHTML = `
+                        <div style="background: var(--card-bg); color: var(--text-main); width: 100%; max-width: 900px; max-height: 90vh; border-radius: 12px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.3);">
+                            <div style="padding: 15px 20px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border-bottom: 2px solid var(--gold-primary); display: flex; justify-content: space-between; align-items: center; color: #3e2723;">
+                                <div>
+                                    <h2 style="margin: 0; font-size: 18px; color: #8a6d3b;">📊 Yönetici 5 Sekmeli Analiz ve Rapor Paneli</h2>
+                                    <div style="font-size: 11px; opacity: 0.8; margin-top: 3px;">Seçilen Grup: ${modalSelectedGroup.replace(/_/g, ' ').toUpperCase()}</div>
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <button id="modal-print-btn" style="background: #2980b9; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;">🖨️ Yazdır</button>
+                                    <button id="modal-close-btn" style="background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;">✕ Kapat</button>
                                 </div>
                             </div>
-                            <div id="mtab-2" class="m-tab-content" style="display: none;">
-                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">⚔️ Tüm Grupları Karşılaştırma</h3>
-                                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                                    <thead>
-                                        <tr style="background: rgba(212,175,55,0.1);">
-                                            <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Grup Adı</th>
-                                            <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Üye Sayısı</th>
-                                            <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Alınan</th>
-                                            <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okunan</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>${groupsComparisonHtml}</tbody>
-                                </table>
+
+                            <div style="display: flex; gap: 12px; padding: 12px 15px; background: rgba(212,175,55,0.06); border-bottom: 1px solid var(--border-color); align-items: center; flex-wrap: wrap;">
+                                <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 220px;">
+                                    <label style="font-weight: bold; font-size: 12px; white-space: nowrap;">📁 Grup Seçimi:</label>
+                                    <select id="modal-group-select" style="padding: 6px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); flex: 1; font-size: 12px; font-weight: bold;">
+                                        ${groupOptionsHtml}
+                                    </select>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 220px;">
+                                    <label style="font-weight: bold; font-size: 12px; white-space: nowrap;">👤 Kişi / Üye Seç:</label>
+                                    <select id="modal-member-select" style="padding: 6px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); flex: 1; font-size: 12px; font-weight: bold;">
+                                        ${memberOptionsHtml}
+                                    </select>
+                                </div>
                             </div>
-                            <div id="mtab-3" class="m-tab-content" style="display: none;">
-                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">👥 Üye Performansları (${currentGroup.replace(/_/g, ' ').toUpperCase()})</h3>
-                                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                                    <thead>
-                                        <tr style="background: rgba(212,175,55,0.1);">
-                                            <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye Adı</th>
-                                            <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Aldığı Toplam</th>
-                                            <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okuduğu Toplam</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>${membersListHtml}</tbody>
-                                </table>
+
+                            <div style="display: flex; gap: 4px; padding: 10px 15px 0 15px; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border-color); overflow-x: auto;">
+                                <button class="m-tab-btn active" data-target="mtab-1" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">1. Genel Özet</button>
+                                <button class="m-tab-btn" data-target="mtab-2" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">2. Grup Karşılaştırma</button>
+                                <button class="m-tab-btn" data-target="mtab-3" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">3. Üye Performansı</button>
+                                <button class="m-tab-btn" data-target="mtab-4" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">4. Okuma Günlüğü</button>
+                                <button class="m-tab-btn" data-target="mtab-5" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">5. Eser Durumu</button>
                             </div>
-                            <div id="mtab-4" class="m-tab-content" style="display: none;">
-                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📜 Detaylı Okuma Günlüğü</h3>
-                                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                                    <thead>
-                                        <tr style="background: rgba(212,175,55,0.1);">
-                                            <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Tarih</th>
-                                            <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye</th>
-                                            <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser</th>
-                                            <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Miktar / Aralık</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>${logsHtml}</tbody>
-                                </table>
-                            </div>
-                            <div id="mtab-5" class="m-tab-content" style="display: none;">
-                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📚 Eserler ve Hatim Döngü Durumu</h3>
-                                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                                    <thead>
-                                        <tr style="background: rgba(212,175,55,0.1);">
-                                            <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser Adı</th>
-                                            <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Mevcut Hatim</th>
-                                            <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Dua Durumu</th>
-                                            <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Toplam Birim</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>${bookStatusHtml}</tbody>
-                                </table>
+
+                            <div style="padding: 20px; overflow-y: auto; flex: 1; font-size: 13px;">
+                                <div id="mtab-1" class="m-tab-content">
+                                    <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📈 Seçilen Grup Özeti (${modalSelectedGroup.replace(/_/g, ' ').toUpperCase()})</h3>
+                                    <p>Bu panel üzerinden seçilen grubun ilerleme durumunu takip edebilirsiniz.</p>
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 15px;">
+                                        <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; border-left: 4px solid #3498db;">
+                                            <div style="font-size: 11px; opacity: 0.8;">Seçilen Grup</div>
+                                            <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${modalSelectedGroup.replace(/_/g, ' ').toUpperCase()}</div>
+                                        </div>
+                                        <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; border-left: 4px solid #f39c12;">
+                                            <div style="font-size: 11px; opacity: 0.8;">Alınan Hisseler</div>
+                                            <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${totalSystemTaken} / ${totalSystemBooks}</div>
+                                        </div>
+                                        <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; border-left: 4px solid #27ae60;">
+                                            <div style="font-size: 11px; opacity: 0.8;">Okunan Hisseler</div>
+                                            <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${totalSystemRead} / ${totalSystemBooks}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="mtab-2" class="m-tab-content" style="display: none;">
+                                    <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">⚔️ Tüm Grupları Karşılaştırma</h3>
+                                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                                        <thead>
+                                            <tr style="background: rgba(212,175,55,0.1);">
+                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Grup Adı</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Üye Sayısı</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Alınan</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okunan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>${groupsComparisonHtml}</tbody>
+                                    </table>
+                                </div>
+                                <div id="mtab-3" class="m-tab-content" style="display: none;">
+                                    <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">👥 Üye Performansları (${modalSelectedGroup.replace(/_/g, ' ').toUpperCase()}) ${modalSelectedMember ? `(Filtrelenen: ${modalSelectedMember})` : ''}</h3>
+                                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                                        <thead>
+                                            <tr style="background: rgba(212,175,55,0.1);">
+                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye Adı</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Aldığı Toplam</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okuduğu Toplam</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>${membersListHtml}</tbody>
+                                    </table>
+                                </div>
+                                <div id="mtab-4" class="m-tab-content" style="display: none;">
+                                    <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📜 Detaylı Okuma Günlüğü ${modalSelectedMember ? `(${modalSelectedMember})` : ''}</h3>
+                                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                                        <thead>
+                                            <tr style="background: rgba(212,175,55,0.1);">
+                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Tarih</th>
+                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye</th>
+                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Miktar / Aralık</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>${logsHtml}</tbody>
+                                    </table>
+                                </div>
+                                <div id="mtab-5" class="m-tab-content" style="display: none;">
+                                    <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📚 Eserler ve Hatim Döngü Durumu</h3>
+                                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                                        <thead>
+                                            <tr style="background: rgba(212,175,55,0.1);">
+                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser Adı</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Mevcut Hatim</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Dua Durumu</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Toplam Birim</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>${bookStatusHtml}</tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `;
+                    `;
 
-                document.body.appendChild(modalOverlay);
-
-                const tabBtns = modalOverlay.querySelectorAll(".m-tab-btn");
-                const tabContents = modalOverlay.querySelectorAll(".m-tab-content");
-
-                tabBtns.forEach(btn => {
-                    btn.addEventListener("click", (e) => {
-                        tabBtns.forEach(b => {
-                            b.style.background = "var(--card-bg)";
-                            b.style.color = "var(--text-main)";
-                        });
-                        tabContents.forEach(c => c.style.display = "none");
-                        e.currentTarget.style.background = "var(--gold-primary)";
-                        e.currentTarget.style.color = "#fff";
-                        document.getElementById(e.currentTarget.getAttribute("data-target")).style.display = "block";
+                    // Event listeners for modal filters & tabs inside modal
+                    modalOverlay.querySelector("#modal-group-select").addEventListener("change", (e) => {
+                        modalSelectedGroup = e.target.value;
+                        modalSelectedMember = ""; // Reset member filter on group change
+                        updateModalContent();
                     });
-                });
 
-                tabBtns[0].style.background = "var(--gold-primary)";
-                tabBtns[0].style.color = "#fff";
+                    modalOverlay.querySelector("#modal-member-select").addEventListener("change", (e) => {
+                        modalSelectedMember = e.target.value;
+                        updateModalContent();
+                    });
 
-                modalOverlay.querySelector("#modal-close-btn").addEventListener("click", () => modalOverlay.remove());
-                modalOverlay.querySelector("#modal-print-btn").addEventListener("click", () => window.print());
+                    const tabBtns = modalOverlay.querySelectorAll(".m-tab-btn");
+                    const tabContents = modalOverlay.querySelectorAll(".m-tab-content");
+
+                    tabBtns.forEach(btn => {
+                        btn.addEventListener("click", (e) => {
+                            tabBtns.forEach(b => {
+                                b.style.background = "var(--card-bg)";
+                                b.style.color = "var(--text-main)";
+                            });
+                            tabContents.forEach(c => c.style.display = "none");
+                            e.currentTarget.style.background = "var(--gold-primary)";
+                            e.currentTarget.style.color = "#fff";
+                            document.getElementById(e.currentTarget.getAttribute("data-target")).style.display = "block";
+                        });
+                    });
+
+                    tabBtns[0].style.background = "var(--gold-primary)";
+                    tabBtns[0].style.color = "#fff";
+
+                    modalOverlay.querySelector("#modal-close-btn").addEventListener("click", () => modalOverlay.remove());
+                    modalOverlay.querySelector("#modal-print-btn").addEventListener("click", () => window.print());
+                }
+
+                updateModalContent();
+                document.body.appendChild(modalOverlay);
                 modalOverlay.addEventListener("click", (e) => {
                     if (e.target === modalOverlay) modalOverlay.remove();
                 });
@@ -1433,4 +1485,3 @@
     </script>
 </body>
 </html>
-
