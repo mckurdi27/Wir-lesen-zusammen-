@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <!-- ================================================================= -->
-    <!-- HEAD BÖLÜMÜ VE META AYARLARI -->
+    <!-- HEAD BÖLÜMÜ VE META AYARLARI[span_10](start_span)[span_10](end_span) -->
     <!-- ================================================================= -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,22 +10,31 @@
 </head>
 <body>
     <!-- ================================================================= -->
-    <!-- ANA İÇERİK KAPSAYICISI -->
+    <!-- ANA İÇERİK KAPSAYICISI[span_11](start_span)[span_11](end_span) -->
     <!-- ================================================================= -->
     <div class="container">
-        <!-- 3 SÜTUNLU MANEVİ YERLEŞİM (Mescid-i Nebevi - Namaz Vakitleri - Kâbe) -->
-        <div id="spiritual-grid-banner" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; text-align: center;">
-            <div style="padding: 12px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px;">
-                <div style="font-size: 24px;">🕌</div>
-                <div style="font-size: 12px; font-weight: bold; margin-top: 4px;">Mescid-i Nebevî</div>
+        <!-- 3 Sütunlu Manevi Yerleşim Konumu (Mescid-i Nebevi | Namaz Vakitleri | Kâbe) -->
+        <div id="spiritual-three-column-section" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px;">
+            <!-- Sol: Mescid-i Nebevi -->
+            <div style="background: var(--card-bg); border: 2px solid var(--gold-primary); border-radius: 10px; padding: 14px; text-align: center; box-shadow: 0 3px 10px rgba(0,0,0,0.05);">
+                <div style="font-size: 24px; margin-bottom: 6px;">🕌</div>
+                <div style="font-weight: bold; font-size: 14px; color: var(--gold-dark);">Mescid-i Nebevi</div>
+                <div style="font-size: 11px; opacity: 0.8; margin-top: 4px;">Medine-i Münevvere</div>
+                <div id="medina-status" style="font-size: 11px; margin-top: 8px; padding: 3px; background: rgba(39, 174, 96, 0.1); border-radius: 4px; color: #27ae60; font-weight: bold;">Huzur İklimi Aktif</div>
             </div>
-            <div style="padding: 12px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px;">
-                <div style="font-size: 24px;">⏳</div>
-                <div style="font-size: 12px; font-weight: bold; margin-top: 4px;">Namaz Vakitleri</div>
+            <!-- Orta: Namaz Vakitleri -->
+            <div style="background: var(--card-bg); border: 2px solid var(--gold-primary); border-radius: 10px; padding: 14px; text-align: center; box-shadow: 0 3px 10px rgba(0,0,0,0.05);">
+                <div style="font-size: 24px; margin-bottom: 6px;">⏳</div>
+                <div style="font-weight: bold; font-size: 14px; color: var(--gold-dark);">Namaz Vakitleri</div>
+                <div id="prayer-times-display" style="font-size: 12px; margin-top: 6px; font-weight: bold;">Vakitler Yükleniyor...</div>
+                <div style="font-size: 10px; opacity: 0.7; margin-top: 4px;">Ortak Dua ve Vakit Takibi</div>
             </div>
-            <div style="padding: 12px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px;">
-                <div style="font-size: 24px;">🕋</div>
-                <div style="font-size: 12px; font-weight: bold; margin-top: 4px;">Kâbe-i Muazzama</div>
+            <!-- Sağ: Kâbe -->
+            <div style="background: var(--card-bg); border: 2px solid var(--gold-primary); border-radius: 10px; padding: 14px; text-align: center; box-shadow: 0 3px 10px rgba(0,0,0,0.05);">
+                <div style="font-size: 24px; margin-bottom: 6px;">🕋</div>
+                <div style="font-weight: bold; font-size: 14px; color: var(--gold-dark);">Kâbe-i Muazzama</div>
+                <div style="font-size: 11px; opacity: 0.8; margin-top: 4px;">Mekke-i Mükerreme</div>
+                <div id="kaaba-status" style="font-size: 11px; margin-top: 8px; padding: 3px; background: rgba(212, 175, 55, 0.1); border-radius: 4px; color: var(--gold-dark); font-weight: bold;">Kıble Rehberi</div>
             </div>
         </div>
 
@@ -33,13 +42,13 @@
     </div>
 
     <!-- ================================================================= -->
-    <!-- JAVASCRIPT UYGULAMA MANTIĞI -->
+    <!-- JAVASCRIPT UYGULAMA MANTIĞI[span_12](start_span)[span_12](end_span) -->
     <!-- ================================================================= -->
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
             
             /* ========================================================= */
-            /* DOM ELEMANLARINI KONTROL ET VE OLUŞTUR                      */
+            /* DOM ELEMANLARINI KONTROL ET VE OLUŞTUR[span_13](start_span)[span_13](end_span)          */
             /* ========================================================= */
             let container = document.querySelector(".container");
             if (!container) {
@@ -56,7 +65,7 @@
             }
 
             /* ========================================================= */
-            /* ESKİ VEYA HATALI PANELLERİ TEMİZLEME FONKSİYONU             */
+            /* ESKİ VEYA HATALI PANELLERİ TEMİZLEME FONKSİYONU[span_14](start_span)[span_14](end_span)   */
             /* ========================================================= */
             function removeStuckPanel() {
                 document.querySelectorAll('div').forEach(div => {
@@ -69,7 +78,7 @@
             setTimeout(removeStuckPanel, 100);
 
             /* ========================================================= */
-            /* ORYANTAL MOTİFLER VE GENEL STİLLERİN ENJEKTE EDİLMESİ      */
+            /* ORYANTAL MOTİFLER VE GENEL STİLLERİN ENJEKTE EDİLMESİ[span_15](start_span)[span_15](end_span) */
             /* ========================================================= */
             function injectOrientalStyles() {
                 if (document.getElementById("oriental-motif-styles")) return;
@@ -92,7 +101,7 @@
                         padding: 10px;
                     }
                     .container {
-                        max-width: 800px;
+                        max-width: 900px;
                         margin: 0 auto;
                     }
                     @media (prefers-color-scheme: dark) {
@@ -126,7 +135,7 @@
             injectOrientalStyles();
 
             /* ========================================================= */
-            /* GLOBAL UYGULAMA DEĞİŞKENLERİ VE YAPILANDIRMA              */
+            /* GLOBAL UYGULAMA DEĞİŞKENLERİ VE YAPILANDIRMA[span_16](start_span)[span_16](end_span)     */
             /* ========================================================= */
             let currentGroup = "grup_1";
             let isAdmin = false;
@@ -136,7 +145,7 @@
             const ADMIN_PASSWORD = "1234";
 
             /* ========================================================= */
-            /* ESERLER İÇİN PDF DOSYA YOLLARI EŞLEŞTİRMESİ               */
+            /* ESERLER İÇİN PDF DOSYA YOLLARI EŞLEŞTİRMESİ[span_17](start_span)[span_17](end_span)     */
             /* ========================================================= */
             const bookPdfMap = {
                 "kuran": "pdf/Kuran-ı Kerim.pdf",
@@ -152,60 +161,71 @@
             };
 
             /* ========================================================= */
-            /* STABİL PDF OKUYUCU VE SAYFAYA ANINDA ZIPLAMA FONKSİYONU   */
+            /* STABİL PDF OKUYUCU VE SAYFA ZIPLAMA MODÜLÜ                */
             /* ========================================================= */
-            function openStablePdfReader(bookId, bookName) {
-                let pdfUrl = bookPdfMap[bookId] || "";
-                let existingModal = document.getElementById("stable-pdf-modal");
-                if (existingModal) existingModal.remove();
+            function openAdvancedPdfViewer(bookId, bookName) {
+                let existingViewer = document.getElementById("stable-pdf-modal");
+                if (existingViewer) existingViewer.remove();
 
+                let pdfUrl = bookPdfMap[bookId] || "";
+                
                 let modal = document.createElement("div");
                 modal.id = "stable-pdf-modal";
                 modal.style.cssText = `
                     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                    background: rgba(0,0,0,0.7); z-index: 99999; display: flex;
-                    flex-direction: column; justify-content: center; align-items: center; padding: 10px; box-sizing: border-box;
+                    background: rgba(0,0,0,0.7); z-index: 999999; display: flex;
+                    flex-direction: column; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;
                 `;
 
                 modal.innerHTML = `
-                    <div style="background: var(--card-bg); width: 100%; max-width: 900px; height: 90vh; border-radius: 12px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow: hidden;">
-                        <div style="padding: 12px 16px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border-bottom: 2px solid var(--gold-primary); display: flex; justify-content: space-between; align-items: center; color: #3e2723;">
-                            <div style="font-weight: bold; font-size: 15px;">📖 ${bookName} - Stabil PDF Okuyucu</div>
-                            <div style="display: flex; gap: 8px; align-items: center;">
-                                <label style="font-size: 12px; font-weight: bold;">Sayfa Zıpla:</label>
-                                <input type="number" id="pdf-jump-input" min="1" placeholder="Sayfa No" style="width: 70px; padding: 4px; border-radius: 4px; border: 1px solid var(--border-color);">
-                                <button id="pdf-jump-btn" style="background: #27ae60; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">Git</button>
-                                <button id="pdf-close-btn" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">✕ Kapat</button>
+                    <div style="background: var(--card-bg); width: 100%; max-width: 900px; height: 90vh; border-radius: 12px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.4);">
+                        <div style="padding: 12px 18px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border-bottom: 2px solid var(--gold-primary); display: flex; justify-content: space-between; align-items: center; color: #3e2723;">
+                            <div>
+                                <h3 style="margin: 0; font-size: 16px; color: #8a6d3b;">📄 Stabil PDF Okuyucu: ${bookName}</h3>
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <div style="display: flex; gap: 4px; align-items: center;">
+                                    <span style="font-size: 12px; font-weight: bold; color: #3e2723;">Sayfa Zıpla:</span>
+                                    <input type="number" id="pdf-target-page" placeholder="Sayfa No" min="1" style="width: 70px; padding: 4px; border: 1px solid var(--gold-primary); border-radius: 4px; font-size: 12px;">
+                                    <button id="pdf-jump-btn" style="background: var(--gold-dark); color: #fff; border: none; padding: 5px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold;">Git</button>
+                                </div>
+                                <button id="pdf-close-modal" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px;">✕ Kapat</button>
                             </div>
                         </div>
-                        <div style="flex: 1; width: 100%; background: #555; position: relative;">
-                            <iframe id="pdf-iframe" src="${pdfUrl}" style="width: 100%; height: 100%; border: none;"></iframe>
+                        <div style="flex: 1; background: #555; position: relative; display: flex; justify-content: center; align-items: center;">
+                            ${pdfUrl ? `
+                                <iframe id="pdf-frame" src="${pdfUrl}" style="width: 100%; height: 100%; border: none;"></iframe>
+                            ` : `
+                                <div style="color: #fff; text-align: center; padding: 20px;">
+                                    <p>Bu eser için tanımlı doğrudan PDF dosyası bulunamadı.</p>
+                                    <a href="https://www.google.com/search?q=${encodeURIComponent(bookName + ' PDF')} " target="_blank" style="color: var(--gold-primary); font-weight: bold;">Web'de Ara</a>
+                                </div>
+                            `}
                         </div>
                     </div>
                 `;
 
                 document.body.appendChild(modal);
 
-                const jumpAction = () => {
-                    let pageNum = document.getElementById("pdf-jump-input").value;
-                    if (!pageNum) return;
-                    let iframe = document.getElementById("pdf-iframe");
-                    // PDF.js parametre desteği ile sayfa numarasına anında zıplama (#page=N)
-                    iframe.src = `${pdfUrl}#page=${pageNum}`;
-                };
-
-                modal.querySelector("#pdf-jump-btn").addEventListener("click", jumpAction);
-                modal.querySelector("#pdf-jump-input").addEventListener("keypress", (e) => {
-                    if (e.key === "Enter") jumpAction();
-                });
-                modal.querySelector("#pdf-close-btn").addEventListener("click", () => modal.remove());
+                modal.querySelector("#pdf-close-modal").addEventListener("click", () => modal.remove());
                 modal.addEventListener("click", (e) => {
                     if (e.target === modal) modal.remove();
                 });
+
+                const jumpBtn = modal.querySelector("#pdf-jump-btn");
+                if (jumpBtn) {
+                    jumpBtn.addEventListener("click", () => {
+                        let pageNo = modal.querySelector("#pdf-target-page").value;
+                        let iframe = modal.querySelector("#pdf-frame");
+                        if (iframe && pageNo) {
+                            iframe.src = `${pdfUrl}#page=${pageNo}`;
+                        }
+                    });
+                }
             }
 
             /* ========================================================= */
-            /* BUGÜNKÜ HİCRİ TARİHİ HESAPLAMA FONKSİYONU                  */
+            /* BUGÜNKÜ HİCRİ TARİHİ HESAPLAMA FONKSİYONU[span_18](start_span)[span_18](end_span)          */
             /* ========================================================= */
             function bugunkuHicriTarihiAl() {
                 const ayAdlari = {
@@ -231,7 +251,7 @@
             }
 
             /* ========================================================= */
-            /* HİCRİ AY VERİLERİNİ ASENKRON OLARAK ÇEKME FONKSİYONU      */
+            /* HİCRİ AY VERİLERİNİ ASENKRON OLARAK ÇEKME[span_19](start_span)[span_19](end_span)      */
             /* ========================================================= */
             async function fetchHijriMonthData(ayKodu) {
                 if (monthlyInspirationCache[ayKodu]) return monthlyInspirationCache[ayKodu];
@@ -248,13 +268,12 @@
                     monthlyInspirationCache[ayKodu] = data;
                     return data;
                 } catch (e) {
-                    console.error("JavaScript modülü yükleme hatası:", e);
                     return null;
                 }
             }
 
             /* ========================================================= */
-            /* MANEVİ VE DİL İLHAMI VERİLERİNİ HAZIRLAMA                 */
+            /* MANEVİ VE DİL İLHAMI VERİLERİNİ HAZIRLAMA[span_20](start_span)[span_20](end_span)         */
             /* ========================================================= */
             async function getHijriInspiration() {
                 const todayMiladiStr = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -310,16 +329,16 @@
             }
 
             /* ========================================================= */
-            /* ANA BAŞLIK BÖLÜMÜNÜ OLUŞTURMA VE RENDER ETME              */
+            /* ANA BAŞLIK BÖLÜMÜNÜ OLUŞTURMA[span_21](start_span)[span_21](end_span)                  */
             /* ========================================================= */
             function renderMainTitleHeader() {
                 let titleSection = document.getElementById("main-title-ornate-section");
                 if (!titleSection) {
                     titleSection = document.createElement("div");
                     titleSection.id = "main-title-ornate-section";
-                    const gridBanner = document.getElementById("spiritual-grid-banner");
-                    if (gridBanner && gridBanner.nextSibling) {
-                        container.insertBefore(titleSection, gridBanner.nextSibling);
+                    const threeCol = document.getElementById("spiritual-three-column-section");
+                    if (threeCol && threeCol.nextSibling) {
+                        container.insertBefore(titleSection, threeCol.nextSibling);
                     } else {
                         container.insertBefore(titleSection, container.firstChild);
                     }
@@ -347,7 +366,7 @@
             }
 
             /* ========================================================= */
-            /* GÜNLÜK İLHAM KÖŞESİNİ RENDER ETME FONKSİYONU              */
+            /* GÜNLÜK İLHAM KÖŞESİNİ RENDER ETME[span_22](start_span)[span_22](end_span)              */
             /* ========================================================= */
             async function renderDailyInspiration() {
                 const inspirationData = await getHijriInspiration();
@@ -382,14 +401,14 @@
                         <p style="margin-bottom: 6px;">📖 <strong>Ayet:</strong> ${inspirationData.verse}</p>
                         <p style="margin-bottom: 6px;">📜 <strong>Hadis:</strong> ${inspirationData.hadish}</p>
                         <p style="margin-bottom: 6px;">💬 <strong>Atasözü:</strong> ${inspirationData.proverb}</p>
-                        <p style="margin-bottom: 6px;">✨ <strong>Özlü Sözü:</strong> ${inspirationData.quote}</p>
+                        <p style="margin-bottom: 6px;">✨ <strong>Özlü Söz:</strong> ${inspirationData.quote}</p>
                         <p style="margin-bottom: 2px;">🇩🇪 <strong>Tägliche Weisheit:</strong> <em>"${inspirationData.german.quote}"</em> <span style="opacity: 0.8;">(${inspirationData.german.translation})</span></p>
                     </div>
                 `;
             }
 
             /* ========================================================= */
-            /* SAYFA MODLARI OLUŞTURUCU (SAYFA TABANLI ESERLER İÇİN)     */
+            /* SAYFA MODLARI OLUŞTURUCU[span_23](start_span)[span_23](end_span)                       */
             /* ========================================================= */
             function createPageModes(totalPages) {
                 return {
@@ -401,7 +420,7 @@
             }
 
             /* ========================================================= */
-            /* BAB MODLARI OLUŞTURUCU (BAB TABANLI ESERLER İÇİN)         */
+            /* BAB MODLARI OLUŞTURUCU[span_24](start_span)[span_24](end_span)                         */
             /* ========================================================= */
             function createBabModes(totalBabs) {
                 return {
@@ -412,7 +431,7 @@
             }
 
             /* ========================================================= */
-            /* VARSAYILAN ESERLER ŞABLONU                                */
+            /* VARSAYILAN ESERLER ŞABLONU[span_25](start_span)[span_25](end_span)                      */
             /* ========================================================= */
             const defaultBooksTemplate = [
                 { id: "kuran", name: "1. Kur'ân-ı Kerîm", totalUnits: 604, type: "page", defaultMode: "yirmi_sayfa" },
@@ -441,7 +460,7 @@
             }
 
             /* ========================================================= */
-            /* TÜM GRUP ANAHTARLARINI LİSTELEME FONKSİYONU               */
+            /* TÜM GRUP ANAHTARLARINI LİSTELEME[span_26](start_span)[span_26](end_span)                */
             /* ========================================================= */
             function getAllGroupKeys() {
                 let keys = [];
@@ -469,7 +488,7 @@
             }
 
             /* ========================================================= */
-            /* GRUP VERİLERİNİ YÜKLEME VE DOĞRULAMA FONKSİYONU           */
+            /* GRUP VERİLERİNİ YÜKLEME VE DOĞRULAMA[span_27](start_span)[span_27](end_span)            */
             /* ========================================================= */
             async function loadGroupData() {
                 removeStuckPanel();
@@ -561,7 +580,7 @@
             }
 
             /* ========================================================= */
-            /* KULLANICI KONTROLLERİ VE ARAYÜZÜ OLUŞTURMA                */
+            /* KULLANICI KONTROLLERİ VE ARAYÜZÜ[span_28](start_span)[span_28](end_span)                */
             /* ========================================================= */
             function renderUserControls() {
                 let controlsContainer = document.getElementById("user-controls-section");
@@ -752,7 +771,7 @@
             }
 
             /* ========================================================= */
-            /* GENEL ANALİZ VE İLERLEME PANELİNİ OLUŞTURMA               */
+            /* GENEL ANALİZ VE İLERLEME PANELİ[span_29](start_span)[span_29](end_span)                 */
             /* ========================================================= */
             function renderAnalysisSection() {
                 let analysisContainer = document.getElementById("analysis-section");
@@ -802,497 +821,7 @@
             }
 
             /* ========================================================= */
-            /* DETAYLI 5 SEKMELİ ANALİZ MODAL PENCERESİ                  */
-            /* ========================================================= */
-            function openDetailedAnalysisModal() {
-                let existingModal = document.getElementById("detailed-analysis-modal");
-                if (existingModal) existingModal.remove();
-
-                let allGroupKeys = getAllGroupKeys();
-                let totalSystemBooks = 0, totalSystemTaken = 0, totalSystemRead = 0;
-                allGroupKeys.forEach(gKey => {
-                    let gDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
-                    if (!gDataRaw) return;
-                    let gData = JSON.parse(gDataRaw);
-                    if (gData.books && gData.bookPages) {
-                        gData.books.forEach(b => {
-                            if (gKey === currentGroup) totalSystemBooks += b.totalUnits;
-                            gData.bookPages[b.id].forEach(p => {
-                                if (gKey === currentGroup) {
-                                    if (p.owner) totalSystemTaken++;
-                                    if (p.isRead) totalSystemRead++;
-                                }
-                            });
-                        });
-                    }
-                });
-
-                let modalOverlay = document.createElement("div");
-                modalOverlay.id = "detailed-analysis-modal";
-                modalOverlay.style.cssText = `
-                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                    background: rgba(0, 0, 0, 0.6); z-index: 99999; display: flex;
-                    justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;
-                `;
-
-                modalOverlay.innerHTML = `
-                    <div style="background: var(--card-bg); color: var(--text-main); width: 100%; max-width: 950px; max-height: 90vh; border-radius: 12px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.3);">
-                        <div style="padding: 15px 20px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border-bottom: 2px solid var(--gold-primary); display: flex; justify-content: space-between; align-items: center; color: #3e2723;">
-                            <div>
-                                <h2 style="margin: 0; font-size: 18px; color: #8a6d3b;">📊 Yönetici 5 Sekmeli Analiz ve Rapor Paneli</h2>
-                                <div style="font-size: 11px; opacity: 0.8; margin-top: 3px;">Aktif Grup: ${currentGroup.replace(/_/g, ' ').toUpperCase()}</div>
-                            </div>
-                            <div style="display: flex; gap: 8px;">
-                                <button id="modal-print-btn" style="background: #2980b9; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;">🖨️ Yazdır</button>
-                                <button id="modal-close-btn" style="background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;">✕ Kapat</button>
-                            </div>
-                        </div>
-
-                        <div style="display: flex; gap: 4px; padding: 10px 15px 0 15px; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border-color); overflow-x: auto;">
-                            <button class="m-tab-btn active" data-target="mtab-1" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">1. Genel Özet</button>
-                            <button class="m-tab-btn" data-target="mtab-2" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">2. Grup Karşılaştırma</button>
-                            <button class="m-tab-btn" data-target="mtab-3" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">3. Üye Performansı</button>
-                            <button class="m-tab-btn" data-target="mtab-4" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">4. Okuma Günlüğü</button>
-                            <button class="m-tab-btn" data-target="mtab-5" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">5. Eser Durumu</button>
-                        </div>
-
-                        <div style="padding: 20px; overflow-y: auto; flex: 1; font-size: 13px;">
-                            <div id="mtab-1" class="m-tab-content">
-                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📈 Sistem Genel Özeti</h3>
-                                <p>Bu panel üzerinden tüm grupların ve üyelerin ilerleme durumunu detaylıca takip edebilirsiniz.</p>
-                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 15px;">
-                                    <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; border-left: 4px solid #3498db;">
-                                        <div style="font-size: 11px; opacity: 0.8;">Aktif Grup</div>
-                                        <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${currentGroup.replace(/_/g, ' ').toUpperCase()}</div>
-                                    </div>
-                                    <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; border-left: 4px solid #f39c12;">
-                                        <div style="font-size: 11px; opacity: 0.8;">Alınan Hisseler</div>
-                                        <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${totalSystemTaken} / ${totalSystemBooks}</div>
-                                    </div>
-                                    <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; border-left: 4px solid #27ae60;">
-                                        <div style="font-size: 11px; opacity: 0.8;">Okunan Hisseler</div>
-                                        <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${totalSystemRead} / ${totalSystemBooks}</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div id="mtab-2" class="m-tab-content" style="display: none;">
-                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">⚔️ Tüm Grupları Karşılaştırma</h3>
-                                <div style="background: rgba(0,0,0,0.02); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 12px;">
-                                    <div style="font-weight: bold; font-size: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
-                                        <span>🔍 Grup Filtreleme:</span>
-                                        <div>
-                                            <button id="t2-select-all" style="padding: 2px 8px; font-size: 11px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 3px;">Tümünü Seç</button>
-                                            <button id="t2-clear-all" style="padding: 2px 8px; font-size: 11px; cursor: pointer; background: #e74c3c; color: white; border: none; border-radius: 3px;">Temizle</button>
-                                        </div>
-                                    </div>
-                                    <div id="t2-group-checkboxes" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
-                                </div>
-                                <div style="overflow-x: auto;">
-                                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                                        <thead>
-                                            <tr style="background: rgba(212,175,55,0.1);">
-                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Grup Adı</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Üye Sayısı</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Alınan</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okunan</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="t2-table-body"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <div id="mtab-3" class="m-tab-content" style="display: none;">
-                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">👥 Üye Performansları</h3>
-                                <div style="background: rgba(0,0,0,0.02); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                    <div>
-                                        <div style="font-weight: bold; font-size: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
-                                            <span>📁 Gruplar:</span>
-                                            <div>
-                                                <button id="t3-group-all" style="padding: 2px 6px; font-size: 10px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 3px;">Tümü</button>
-                                                <button id="t3-group-clear" style="padding: 2px 6px; font-size: 10px; cursor: pointer; background: #e74c3c; color: white; border: none; border-radius: 3px;">Temizle</button>
-                                            </div>
-                                        </div>
-                                        <div id="t3-group-checkboxes" style="display: flex; flex-wrap: wrap; gap: 8px; max-height: 80px; overflow-y: auto;"></div>
-                                    </div>
-                                    <div>
-                                        <div style="font-weight: bold; font-size: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
-                                            <span>👤 Üyeler:</span>
-                                            <div>
-                                                <button id="t3-member-all" style="padding: 2px 6px; font-size: 10px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 3px;">Tümü</button>
-                                                <button id="t3-member-clear" style="padding: 2px 6px; font-size: 10px; cursor: pointer; background: #e74c3c; color: white; border: none; border-radius: 3px;">Temizle</button>
-                                            </div>
-                                        </div>
-                                        <div id="t3-member-checkboxes" style="display: flex; flex-wrap: wrap; gap: 8px; max-height: 80px; overflow-y: auto;"></div>
-                                    </div>
-                                </div>
-                                <div style="overflow-x: auto;">
-                                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                                        <thead>
-                                            <tr style="background: rgba(212,175,55,0.1);">
-                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Grup</th>
-                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye Adı</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Aldığı Toplam</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okuduğu Toplam</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="t3-table-body"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <div id="mtab-4" class="m-tab-content" style="display: none;">
-                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📜 Detaylı Okuma Günlüğü</h3>
-                                <div style="background: rgba(0,0,0,0.02); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                    <div>
-                                        <div style="font-weight: bold; font-size: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
-                                            <span>📁 Gruplar:</span>
-                                            <div>
-                                                <button id="t4-group-all" style="padding: 2px 6px; font-size: 10px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 3px;">Tümü</button>
-                                                <button id="t4-group-clear" style="padding: 2px 6px; font-size: 10px; cursor: pointer; background: #e74c3c; color: white; border: none; border-radius: 3px;">Temizle</button>
-                                            </div>
-                                        </div>
-                                        <div id="t4-group-checkboxes" style="display: flex; flex-wrap: wrap; gap: 8px; max-height: 80px; overflow-y: auto;"></div>
-                                    </div>
-                                    <div>
-                                        <div style="font-weight: bold; font-size: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
-                                            <span>👤 Üyeler:</span>
-                                            <div>
-                                                <button id="t4-member-all" style="padding: 2px 6px; font-size: 10px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 3px;">Tümü</button>
-                                                <button id="t4-member-clear" style="padding: 2px 6px; font-size: 10px; cursor: pointer; background: #e74c3c; color: white; border: none; border-radius: 3px;">Temizle</button>
-                                            </div>
-                                        </div>
-                                        <div id="t4-member-checkboxes" style="display: flex; flex-wrap: wrap; gap: 8px; max-height: 80px; overflow-y: auto;"></div>
-                                    </div>
-                                </div>
-                                <div style="overflow-x: auto;">
-                                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                                        <thead>
-                                            <tr style="background: rgba(212,175,55,0.1);">
-                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Tarih</th>
-                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Grup</th>
-                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye</th>
-                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Miktar / Aralık</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="t4-table-body"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <div id="mtab-5" class="m-tab-content" style="display: none;">
-                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📚 Eserler ve Hatim Döngü Durumu (${currentGroup.replace(/_/g, ' ').toUpperCase()})</h3>
-                                <div style="overflow-x: auto;">
-                                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                                        <thead>
-                                            <tr style="background: rgba(212,175,55,0.1);">
-                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser Adı</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Mevcut Hatim</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Dua Durumu</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Toplam Birim</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            ${appData.books.map(b => {
-                                                let hInfo = appData.bookHatims[b.id] || { hatimNo: 1, prayerDone: false };
-                                                return `
-                                                    <tr>
-                                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${b.name}</td>
-                                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${hInfo.hatimNo}. Hatim</td>
-                                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: ${hInfo.prayerDone ? '#27ae60' : '#e67e22'}; font-weight: bold;">${hInfo.prayerDone ? '✓ Yapıldı' : 'Yapılacak'}</td>
-                                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${b.totalUnits} Birim</td>
-                                                    </tr>
-                                                `;
-                                            }).join('')}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                document.body.appendChild(modalOverlay);
-
-                function renderTab2() {
-                    let containerEl = modalOverlay.querySelector("#t2-group-checkboxes");
-                    let tbodyEl = modalOverlay.querySelector("#t2-table-body");
-                    containerEl.innerHTML = "";
-
-                    allGroupKeys.forEach(gKey => {
-                        let label = document.createElement("label");
-                        label.style.cssText = "display: flex; align-items: center; gap: 4px; font-size: 12px; cursor: pointer; font-weight: bold;";
-                        label.innerHTML = `<input type="checkbox" value="${gKey}" checked style="cursor: pointer;"> ${gKey.replace(/_/g, ' ').toUpperCase()}`;
-                        containerEl.appendChild(label);
-                    });
-
-                    function updateTable() {
-                        let checkedGroups = Array.from(modalOverlay.querySelectorAll("#t2-group-checkboxes input:checked")).map(i => i.value);
-                        let html = "";
-                        checkedGroups.forEach(gKey => {
-                            let gDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
-                            if (!gDataRaw) return;
-                            let gData = JSON.parse(gDataRaw);
-                            let mCount = gData.members ? gData.members.length : 0;
-                            let totalU = 0, takenU = 0, readU = 0;
-                            if (gData.books && gData.bookPages) {
-                                gData.books.forEach(b => {
-                                    totalU += b.totalUnits;
-                                    gData.bookPages[b.id].forEach(p => {
-                                        if (p.owner) takenU++;
-                                        if (p.isRead) readU++;
-                                    });
-                                });
-                            }
-                            let tPct = totalU > 0 ? Math.round((takenU / totalU) * 100) : 0;
-                            let rPct = totalU > 0 ? Math.round((readU / totalU) * 100) : 0;
-
-                            html += `
-                                <tr>
-                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${gKey.replace(/_/g, ' ').toUpperCase()}</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${mCount} Üye</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${takenU} / ${totalU} (%${tPct})</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${readU} / ${totalU} (%${rPct})</td>
-                                </tr>
-                            `;
-                        });
-                        if (!html) html = `<tr><td colspan="4" style="padding: 15px; text-align: center; color: #777;">Lütfen en az bir grup seçin.</td></tr>`;
-                        tbodyEl.innerHTML = html;
-                    }
-
-                    modalOverlay.querySelectorAll("#t2-group-checkboxes input").forEach(chk => chk.addEventListener("change", updateTable));
-                    modalOverlay.querySelector("#t2-select-all").addEventListener("click", () => {
-                        modalOverlay.querySelectorAll("#t2-group-checkboxes input").forEach(i => i.checked = true);
-                        updateTable();
-                    });
-                    modalOverlay.querySelector("#t2-clear-all").addEventListener("click", () => {
-                        modalOverlay.querySelectorAll("#t2-group-checkboxes input").forEach(i => i.checked = false);
-                        updateTable();
-                    });
-                    updateTable();
-                }
-
-                function renderTab3() {
-                    let gContainer = modalOverlay.querySelector("#t3-group-checkboxes");
-                    let mContainer = modalOverlay.querySelector("#t3-member-checkboxes");
-                    let tbodyEl = modalOverlay.querySelector("#t3-table-body");
-
-                    gContainer.innerHTML = "";
-                    allGroupKeys.forEach(gKey => {
-                        let label = document.createElement("label");
-                        label.style.cssText = "display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer; font-weight: bold;";
-                        label.innerHTML = `<input type="checkbox" value="${gKey}" checked style="cursor: pointer;"> ${gKey.replace(/_/g, ' ').toUpperCase()}`;
-                        gContainer.appendChild(label);
-                    });
-
-                    function updateMembersList() {
-                        let selectedGroups = Array.from(modalOverlay.querySelectorAll("#t3-group-checkboxes input:checked")).map(i => i.value);
-                        let allMembersSet = new Set();
-                        selectedGroups.forEach(gKey => {
-                            let dRaw = localStorage.getItem(`hatim_group_${gKey}`);
-                            if (dRaw) {
-                                let parsed = JSON.parse(dRaw);
-                                if (parsed.members) parsed.members.forEach(m => allMembersSet.add(m));
-                            }
-                        });
-
-                        mContainer.innerHTML = "";
-                        allMembersSet.forEach(mName => {
-                            let label = document.createElement("label");
-                            label.style.cssText = "display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer;";
-                            label.innerHTML = `<input type="checkbox" value="${mName}" checked style="cursor: pointer;"> ${mName}`;
-                            mContainer.appendChild(label);
-                        });
-
-                        mContainer.querySelectorAll("input").forEach(chk => chk.addEventListener("change", updateTable3));
-                        updateTable3();
-                    }
-
-                    function updateTable3() {
-                        let selectedGroups = Array.from(modalOverlay.querySelectorAll("#t3-group-checkboxes input:checked")).map(i => i.value);
-                        let selectedMembers = Array.from(modalOverlay.querySelectorAll("#t3-member-checkboxes input:checked")).map(i => i.value);
-                        let html = "";
-
-                        selectedGroups.forEach(gKey => {
-                            let dRaw = localStorage.getItem(`hatim_group_${gKey}`);
-                            if (!dRaw) return;
-                            let gData = JSON.parse(dRaw);
-                            if (!gData.members || !gData.bookPages) return;
-
-                            gData.members.forEach(m => {
-                                if (!selectedMembers.includes(m)) return;
-                                let mTaken = 0, mRead = 0;
-                                Object.keys(gData.bookPages).forEach(bId => {
-                                    gData.bookPages[bId].forEach(p => {
-                                        if (p.owner === m) mTaken++;
-                                        if (p.owner === m && p.isRead) mRead++;
-                                    });
-                                });
-
-                                html += `
-                                    <tr>
-                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${gKey.replace(/_/g, ' ').toUpperCase()}</td>
-                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${m}</td>
-                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${mTaken} Hisse</td>
-                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${mRead} Hisse</td>
-                                    </tr>
-                                `;
-                            });
-                        });
-
-                        if (!html) html = `<tr><td colspan="4" style="padding: 15px; text-align: center; color: #777;">Seçilen kriterlere uygun üye performans kaydı bulunamadı.</td></tr>`;
-                        tbodyEl.innerHTML = html;
-                    }
-
-                    modalOverlay.querySelectorAll("#t3-group-checkboxes input").forEach(chk => chk.addEventListener("change", updateMembersList));
-                    modalOverlay.querySelector("#t3-group-all").addEventListener("click", () => {
-                        modalOverlay.querySelectorAll("#t3-group-checkboxes input").forEach(i => i.checked = true);
-                        updateMembersList();
-                    });
-                    modalOverlay.querySelector("#t3-group-clear").addEventListener("click", () => {
-                        modalOverlay.querySelectorAll("#t3-group-checkboxes input").forEach(i => i.checked = false);
-                        updateMembersList();
-                    });
-                    modalOverlay.querySelector("#t3-member-all").addEventListener("click", () => {
-                        modalOverlay.querySelectorAll("#t3-member-checkboxes input").forEach(i => i.checked = true);
-                        updateTable3();
-                    });
-                    modalOverlay.querySelector("#t3-member-clear").addEventListener("click", () => {
-                        modalOverlay.querySelectorAll("#t3-member-checkboxes input").forEach(i => i.checked = false);
-                        updateTable3();
-                    });
-
-                    updateMembersList();
-                }
-
-                function renderTab4() {
-                    let gContainer = modalOverlay.querySelector("#t4-group-checkboxes");
-                    let mContainer = modalOverlay.querySelector("#t4-member-checkboxes");
-                    let tbodyEl = modalOverlay.querySelector("#t4-table-body");
-
-                    gContainer.innerHTML = "";
-                    allGroupKeys.forEach(gKey => {
-                        let label = document.createElement("label");
-                        label.style.cssText = "display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer; font-weight: bold;";
-                        label.innerHTML = `<input type="checkbox" value="${gKey}" checked style="cursor: pointer;"> ${gKey.replace(/_/g, ' ').toUpperCase()}`;
-                        gContainer.appendChild(label);
-                    });
-
-                    function updateMembersList4() {
-                        let selectedGroups = Array.from(modalOverlay.querySelectorAll("#t4-group-checkboxes input:checked")).map(i => i.value);
-                        let allMembersSet = new Set();
-                        selectedGroups.forEach(gKey => {
-                            let dRaw = localStorage.getItem(`hatim_group_${gKey}`);
-                            if (dRaw) {
-                                let parsed = JSON.parse(dRaw);
-                                if (parsed.members) parsed.members.forEach(m => allMembersSet.add(m));
-                            }
-                        });
-
-                        mContainer.innerHTML = "";
-                        allMembersSet.forEach(mName => {
-                            let label = document.createElement("label");
-                            label.style.cssText = "display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer;";
-                            label.innerHTML = `<input type="checkbox" value="${mName}" checked style="cursor: pointer;"> ${mName}`;
-                            mContainer.appendChild(label);
-                        });
-
-                        mContainer.querySelectorAll("input").forEach(chk => chk.addEventListener("change", updateTable4));
-                        updateTable4();
-                    }
-
-                    function updateTable4() {
-                        let selectedGroups = Array.from(modalOverlay.querySelectorAll("#t4-group-checkboxes input:checked")).map(i => i.value);
-                        let selectedMembers = Array.from(modalOverlay.querySelectorAll("#t4-member-checkboxes input:checked")).map(i => i.value);
-                        let combinedLogs = [];
-
-                        selectedGroups.forEach(gKey => {
-                            let dRaw = localStorage.getItem(`hatim_group_${gKey}`);
-                            if (!dRaw) return;
-                            let gData = JSON.parse(dRaw);
-                            if (gData.readingLogs) {
-                                gData.readingLogs.forEach(log => {
-                                    if (selectedMembers.includes(log.member)) {
-                                        combinedLogs.push({ ...log, groupName: gKey });
-                                    }
-                                });
-                            }
-                        });
-
-                        combinedLogs.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-
-                        let html = "";
-                        combinedLogs.forEach(log => {
-                            html += `
-                                <tr>
-                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-size: 11px; opacity: 0.8;">${log.date}</td>
-                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${log.groupName.replace(/_/g, ' ').toUpperCase()}</td>
-                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color);">${log.member}</td>
-                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color);">${log.bookName}</td>
-                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${log.count} Birim (${log.range})</td>
-                                </tr>
-                            `;
-                        });
-
-                        if (!html) html = `<tr><td colspan="5" style="padding: 15px; text-align: center; color: #777;">Seçilen kriterlere uygun okuma günlüğü kaydı bulunmuyor.</td></tr>`;
-                        tbodyEl.innerHTML = html;
-                    }
-
-                    modalOverlay.querySelectorAll("#t4-group-checkboxes input").forEach(chk => chk.addEventListener("change", updateMembersList4));
-                    modalOverlay.querySelector("#t4-group-all").addEventListener("click", () => {
-                        modalOverlay.querySelectorAll("#t4-group-checkboxes input").forEach(i => i.checked = true);
-                        updateMembersList4();
-                    });
-                    modalOverlay.querySelector("#t4-group-clear").addEventListener("click", () => {
-                        modalOverlay.querySelectorAll("#t4-group-checkboxes input").forEach(i => i.checked = false);
-                        updateMembersList4();
-                    });
-                    modalOverlay.querySelector("#t4-member-all").addEventListener("click", () => {
-                        modalOverlay.querySelectorAll("#t4-member-checkboxes input").forEach(i => i.checked = true);
-                        updateTable4();
-                    });
-                    modalOverlay.querySelector("#t4-member-clear").addEventListener("click", () => {
-                        modalOverlay.querySelectorAll("#t4-member-checkboxes input").forEach(i => i.checked = false);
-                        updateTable4();
-                    });
-
-                    updateMembersList4();
-                }
-
-                renderTab2();
-                renderTab3();
-                renderTab4();
-
-                const tabBtns = modalOverlay.querySelectorAll(".m-tab-btn");
-                const tabContents = modalOverlay.querySelectorAll(".m-tab-content");
-
-                tabBtns.forEach(btn => {
-                    btn.addEventListener("click", (e) => {
-                        tabBtns.forEach(b => {
-                            b.style.background = "var(--card-bg)";
-                            b.style.color = "var(--text-main)";
-                        });
-                        tabContents.forEach(c => c.style.display = "none");
-                        e.currentTarget.style.background = "var(--gold-primary)";
-                        e.currentTarget.style.color = "#fff";
-                        document.getElementById(e.currentTarget.getAttribute("data-target")).style.display = "block";
-                    });
-                });
-
-                tabBtns[0].style.background = "var(--gold-primary)";
-                tabBtns[0].style.color = "#fff";
-
-                modalOverlay.querySelector("#modal-close-btn").addEventListener("click", () => modalOverlay.remove());
-                modalOverlay.querySelector("#modal-print-btn").addEventListener("click", () => window.print());
-                modalOverlay.addEventListener("click", (e) => {
-                    if (e.target === modalOverlay) modalOverlay.remove();
-                });
-            }
-
-            /* ========================================================= */
-            /* ALT YÖNETİCİ KONTROL PANELİNİ OLUŞTURMA                   */
+            /* ALT YÖNETİCİ KONTROL PANELİNİ OLUŞTURMA[span_30](start_span)[span_30](end_span)           */
             /* ========================================================= */
             function renderAdminSectionAtBottom() {
                 let bottomContainer = document.getElementById("admin-bottom-section");
@@ -1334,9 +863,6 @@
                     adminPanelHtml = `
                         <div id="admin-panel-section" style="background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold-primary); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
                             <h3 style="color: var(--gold-dark); font-size: 15px; margin-bottom: 10px;">🛠️ Yönetici Kontrol Paneli</h3>
-                            <div style="margin-bottom: 12px;">
-                                <button id="admin-open-analysis-page" style="width: 100%; padding: 10px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">📊 Detaylı 5 Sekmeli Analiz ve Rapor Paneli</button>
-                            </div>
                             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
                                 <label style="font-weight: bold; font-size: 13px;">Grup:</label>
                                 <select id="admin-group-select" style="padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); flex: 1;">${groupsHtml}</select>
@@ -1349,7 +875,6 @@
                                 <button id="admin-set-password" style="background: #8e44ad; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">🔑 Şifre Belirle / Kaldır</button>
                             </div>
                             
-                            <!-- ESER VE SAYFA DÜZENLEME BÖLÜMÜ -->
                             <div style="border-top: 1px solid var(--border-color); padding-top: 10px; margin-bottom: 12px;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                     <span style="font-weight: bold; font-size: 13px;">📚 Eserler ve Sayfa/Birim Yönetimi:</span>
@@ -1386,13 +911,6 @@
                 document.getElementById("admin-toggle-btn-custom").addEventListener("click", () => triggerAdminToggle());
 
                 if (isAdmin) {
-                    const analysisBtn = document.getElementById("admin-open-analysis-page");
-                    if (analysisBtn) {
-                        analysisBtn.addEventListener("click", () => {
-                            openDetailedAnalysisModal();
-                        });
-                    }
-
                     const addBookBtn = document.getElementById("admin-add-book-btn");
                     if (addBookBtn) {
                         addBookBtn.addEventListener("click", () => {
@@ -1410,7 +928,6 @@
                             let bType = (bTypeInput && bTypeInput.trim().toLowerCase() === "bab") ? "bab" : "page";
         
                             let bPdf = prompt("PDF dosya yolunu veya linkini girin (Boş bırakabilirsiniz):", "") || "";
-        
                             let bId = "book_" + Date.now();
 
                             appData.books.push({
@@ -1421,16 +938,16 @@
                                 defaultMode: bType === "bab" ? "on_bab" : "yirmi_sayfa",
                                 currentMode: bType === "bab" ? "on_bab" : "yirmi_sayfa",
                                 pdf: bPdf.trim()
-                             });
+                            });
 
-                             appData.bookPages[bId] = Array(bUnits).fill(null).map(() => ({ owner: "", isRead: false }));
-                             appData.bookHatims[bId] = { hatimNo: 1, startDate: new Date().toLocaleDateString("tr-TR"), prayerDone: false };
-                             appData.bookHistory[bId] = [];
+                            appData.bookPages[bId] = Array(bUnits).fill(null).map(() => ({ owner: "", isRead: false }));
+                            appData.bookHatims[bId] = { hatimNo: 1, startDate: new Date().toLocaleDateString("tr-TR"), prayerDone: false };
+                            appData.bookHistory[bId] = [];
 
-                             saveGroupData();
-                             loadGroupData();
-                          });
-                      }
+                            saveGroupData();
+                            loadGroupData();
+                        });
+                    }
                     
                     document.querySelectorAll(".admin-edit-book").forEach(btn => {
                         btn.addEventListener("click", (e) => {
@@ -1613,7 +1130,7 @@
             }
 
             /* ========================================================= */
-            /* YÖNETİCİ MODU DEĞİŞTİRME FONKSİYONU                      */
+            /* YÖNETİCİ MODU DEĞİŞTİRME[span_31](start_span)[span_31](end_span)                       */
             /* ========================================================= */
             async function triggerAdminToggle() {
                 if (isAdmin) {
@@ -1637,7 +1154,7 @@
             }
 
             /* ========================================================= */
-            /* HİSSE ARALIĞI DURUMUNU SORGULAMA FONKSİYONU               */
+            /* HİSSE ARALIĞI DURUMUNU SORGULAMA[span_32](start_span)[span_32](end_span)                */
             /* ========================================================= */
             function getRangeStatus(baseArray, start, end) {
                 let subset = baseArray.slice(start, end);
@@ -1655,7 +1172,7 @@
             }
 
             /* ========================================================= */
-            /* ESERLERİ VE LİSTELERİ RENDER ETME FONKSİYONU              */
+            /* ESERLERİ VE LİSTELERİ RENDER ETME[span_33](start_span)[span_33](end_span)               */
             /* ========================================================= */
             function renderBooks() {
                 const openBookIds = Array.from(document.querySelectorAll(".book-card.open")).map(el => el.getAttribute("data-book-id"));
@@ -1760,9 +1277,9 @@
 
                     cardEl.querySelector(".book-pdf-btn").addEventListener("click", (e) => {
                         e.stopPropagation();
-                        let bId = e.target.getAttribute("data-bookid");
-                        let bName = e.target.getAttribute("data-bookname");
-                        openStablePdfReader(bId, bName);
+                        const bId = e.target.getAttribute("data-bookid");
+                        const bName = e.target.getAttribute("data-bookname");
+                        openAdvancedPdfViewer(bId, bName);
                     });
 
                     cardEl.querySelectorAll(".finish-hatim-btn").forEach(btn => {
@@ -1819,126 +1336,118 @@
                         } else if (st.statusType === "taken") {
                             statusClass = "taken";
                             statusText = `Alan: ${st.owner}`;
-                            actionText = isAdmin ? "Yönet" : "Bırak";
+                            actionText = isAdmin ? "Yönetici" : "Bırak";
                         } else if (st.statusType === "mixed") {
                             statusClass = "mixed";
                             statusText = `Karışık: ${st.owner}`;
                             actionText = "İncele";
                         }
 
-                        row.className = `item-row ${statusClass}`;
                         row.style.cssText = `
                             display: flex; justify-content: space-between; align-items: center;
                             padding: 8px 12px; border-bottom: 1px solid var(--border-color); font-size: 13px;
                         `;
                         row.innerHTML = `
-                            <div style="flex: 1;">
-                                <span style="font-weight: bold;">${item.name}</span>
-                                <span style="font-size: 11px; opacity: 0.8; display: block; margin-top: 2px;">Durum: ${statusText}</span>
-                            </div>
-                            <div style="display: flex; gap: 5px;">
-                                <button class="action-btn" data-book="${bookIndex}" data-item="${itemIndex}" style="padding: 4px 10px; font-size: 11px; cursor: pointer; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-weight: bold;">${actionText}</button>
+                            <span><strong>${item.name}</strong> <span style="font-size: 11px; opacity: 0.8;">(${statusText})</span></span>
+                            <div style="display: flex; gap: 6px;">
+                                <button class="action-btn" data-book="${bookIndex}" data-item="${itemIndex}" style="padding: 4px 10px; border-radius: 4px; cursor: pointer; border: 1px solid var(--border-color); font-size: 12px; font-weight: bold; background: #3498db; color: white;">${actionText}</button>
                             </div>
                         `;
-
-                        row.querySelector(".action-btn").addEventListener("click", () => {
-                            handleItemAction(book, item, st);
-                        });
-
                         listContainer.appendChild(row);
                     });
 
-                    cardEl.querySelectorAll(".sub-btn").forEach(sBtn => {
-                        sBtn.addEventListener("click", (e) => {
-                            let mKey = e.target.getAttribute("data-mode");
-                            book.currentMode = mKey;
+                    cardEl.querySelectorAll(".sub-btn").forEach(btn => {
+                        btn.addEventListener("click", (e) => {
+                            book.currentMode = e.target.getAttribute("data-mode");
                             saveGroupData();
                             renderBooks();
                         });
                     });
 
-                    cardEl.querySelectorAll(".book-whatsapp-btn").forEach(wBtn => {
-                        wBtn.addEventListener("click", (e) => {
-                            e.stopPropagation();
-                            let summary = [];
-                            primaryItems.forEach(pi => {
-                                let st = getRangeStatus(baseArray, pi.start, pi.end);
-                                if (st.owner) summary.push(`• ${pi.name}: *${st.owner}*`);
-                            });
-                            let msg = `*[${currentGroup.replace(/_/g, ' ').toUpperCase()}] ${book.name} (${currentHatimInfo.hatimNo}. Hatim)*\n\n` + (summary.length > 0 ? summary.join("\n") : "Henüz alınan hisse bulunmuyor.");
-                            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+                    cardEl.querySelectorAll(".action-btn").forEach(btn => {
+                        btn.addEventListener("click", (e) => {
+                            if (!loggedInMember && !isAdmin) {
+                                alert("Lütfen önce isminizi seçin.");
+                                return;
+                            }
+                            let bIdx = parseInt(e.target.getAttribute("data-book"), 10);
+                            let iIdx = parseInt(e.target.getAttribute("data-item"), 10);
+                            let bObj = appData.books[bIdx];
+                            let mDefs = bookModesDefs[bObj.id][bObj.currentMode].getItems()[iIdx];
+                            let targetArray = appData.bookPages[bObj.id];
+                            let st = getRangeStatus(targetArray, mDefs.start, mDefs.end);
+
+                            let activeUser = isAdmin ? (appData.members[0] || "Yönetici") : loggedInMember;
+
+                            if (st.statusType === "free") {
+                                for (let k = mDefs.start; k < mDefs.end; k++) {
+                                    targetArray[k].owner = activeUser;
+                                    targetArray[k].isRead = false;
+                                }
+                                if (!appData.readingLogs) appData.readingLogs = [];
+                                appData.readingLogs.push({
+                                    timestamp: Date.now(),
+                                    date: new Date().toLocaleDateString("tr-TR") + " " + new Date().toLocaleTimeString("tr-TR", {hour: '2-digit', minute:'2-digit'}),
+                                    member: activeUser,
+                                    bookName: bObj.name,
+                                    count: (mDefs.end - mDefs.start),
+                                    range: mDefs.name
+                                });
+                            } else if (st.statusType === "taken" || st.statusType === "read") {
+                                if (st.owner === activeUser || isAdmin) {
+                                    if (st.statusType === "taken") {
+                                        for (let k = mDefs.start; k < mDefs.end; k++) {
+                                            targetArray[k].isRead = true;
+                                        }
+                                    } else {
+                                        for (let k = mDefs.start; k < mDefs.end; k++) {
+                                            targetArray[k].owner = "";
+                                            targetArray[k].isRead = false;
+                                        }
+                                    }
+                                } else {
+                                    alert(`Bu hisse ${st.owner} kişisine aittir.`);
+                                    return;
+                                }
+                            } else {
+                                if (confirm("Bu aralıkta farklı kişilere ait hisseler var. Tümünü sıfırlamak ister misiniz?")) {
+                                    for (let k = mDefs.start; k < mDefs.end; k++) {
+                                        targetArray[k].owner = "";
+                                        targetArray[k].isRead = false;
+                                    }
+                                }
+                            }
+
+                            saveGroupData();
+                            renderAnalysisSection();
+                            renderBooks();
                         });
+                    });
+
+                    cardEl.querySelector(".book-whatsapp-btn").addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        let bObj = appData.books[bookIndex];
+                        let baseArr = appData.bookPages[bObj.id];
+                        let defs = bookModesDefs[bObj.id];
+                        let pKey = bObj.type === "bab" ? "on_bab" : "yirmi_sayfa";
+                        if (!defs[pKey]) pKey = Object.keys(defs)[0];
+                        let summaryLines = [];
+                        defs[pKey].getItems().forEach(pi => {
+                            let s = getRangeStatus(baseArr, pi.start, pi.end);
+                            if (s.owner) {
+                                let stStr = s.statusType === "read" ? "Okundu ✓" : "Alındı";
+                                summaryLines.push(`• ${pi.name}: *${s.owner}* (${stStr})`);
+                            } else {
+                                summaryLines.push(`• ${pi.name}: _Boş_`);
+                            }
+                        });
+                        let wMsg = `*[${currentGroup.replace(/_/g, ' ').toUpperCase()}] ${bObj.name} Takip Durumu*\n\n` + summaryLines.join("\n");
+                        window.open(`https://wa.me/?text=${encodeURIComponent(wMsg)}`, "_blank");
                     });
                 });
             }
 
-            /* ========================================================= */
-            /* BİRİM / HİSSE İŞLEM YÖNETİMİ                              */
-            /* ========================================================= */
-            function handleItemAction(book, item, st) {
-                if (!loggedInMember && !isAdmin) {
-                    alert("Lütfen önce üst kısımdan isminizi seçin.");
-                    return;
-                }
-                let baseArray = appData.bookPages[book.id];
-
-                if (st.statusType === "free") {
-                    for (let i = item.start; i < item.end; i++) {
-                        baseArray[i].owner = loggedInMember;
-                        baseArray[i].isRead = false;
-                    }
-                    if (!appData.readingLogs) appData.readingLogs = [];
-                    appData.readingLogs.push({
-                        timestamp: Date.now(),
-                        date: new Date().toLocaleString("tr-TR"),
-                        member: loggedInMember,
-                        bookName: book.name,
-                        count: item.end - item.start,
-                        range: item.name
-                    });
-                    saveGroupData();
-                    renderAnalysisSection();
-                    renderBooks();
-                } else if (st.statusType === "taken" || st.statusType === "read") {
-                    if (isAdmin || st.owner === loggedInMember) {
-                        let actionChoice = prompt(`"${item.name}" hissesi ${st.owner} üzerindedir.\n\n1: Okundu olarak işaretle / Kaldır\n2: Hisseyi tamamen bırak\n\nLütfen 1 veya 2 yazın:`, "1");
-                        if (actionChoice === "1") {
-                            let newReadState = !st.isRead;
-                            for (let i = item.start; i < item.end; i++) {
-                                baseArray[i].isRead = newReadState;
-                            }
-                            saveGroupData();
-                            renderAnalysisSection();
-                            renderBooks();
-                        } else if (actionChoice === "2") {
-                            for (let i = item.start; i < item.end; i++) {
-                                baseArray[i].owner = "";
-                                baseArray[i].isRead = false;
-                            }
-                            saveGroupData();
-                            renderAnalysisSection();
-                            renderBooks();
-                        }
-                    } else {
-                        alert(`Bu hisse "${st.owner}" kişisine aittir. Sadece sahibi veya yönetici işlem yapabilir.`);
-                    }
-                } else {
-                    let forceRelease = confirm(`Bu aralıkta birden fazla kişiye ait hisseler var. Hepsini boşa çıkartmak istiyor musunuz?`);
-                    if (forceRelease) {
-                        for (let i = item.start; i < item.end; i++) {
-                            baseArray[i].owner = "";
-                            baseArray[i].isRead = false;
-                        }
-                        saveGroupData();
-                        renderAnalysisSection();
-                        renderBooks();
-                    }
-                }
-            }
-
-            /* ========================================================= */
-            /* UYGULAMAYI İLK ÇALIŞTIRMA                                 */
-            /* ========================================================= */
+            // İlk Yükleme Çağrısı
             await loadGroupData();
         });
     </script>
