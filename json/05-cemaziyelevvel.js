@@ -1,4 +1,4 @@
-{
+window.cemaziyelahir_veri = {
     "ay_kodu": "05",
     "ay_adi": "Cemaziyelevvel",
     "aciklama": "Hicri takvimin beşinci ayıdır.",
@@ -154,4 +154,4 @@
             "hadis": { "meal": "Doğruluktan ayrılmayın; çünkü doğruluk iyiliğe, iyilik de cennete götürür.", "kaynak": "Buhârî, Edeb 69" }
         }
     }
-}
+};
