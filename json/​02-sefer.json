@@ -1,4 +1,4 @@
-{
+window.sefer_veri = {
     "ay_kodu": "02",
     "ay_adi": "Sefer",
     "aciklama": "Hicri takvimin ikinci ayıdır.",
@@ -136,7 +136,7 @@
         "27": {
             "hicri_tarih": "27 Sefer",
             "ayet": { "meal": "Şüphesiz Allah, adaletli davrananları sever.", "kaynak": "Hucurât Suresi, 9" },
-            "hadis": { "meal": "Hak tecelli edecektir, adil olanlarnurdan minberler üzerine oturacaklardır.", "kaynak": "Müslim, İmâre 18" }
+            "hadis": { "meal": "Hak tecelli edecektir, adil olanlar nurdan minberler üzerine oturacaklardır.", "kaynak": "Müslim, İmâre 18" }
         },
         "28": {
             "hicri_tarih": "28 Sefer",
@@ -154,4 +154,4 @@
             "hadis": { "meal": "Müminin silahı dua, dinin direği namaz, göklerin ve yerin nuru oruçtur.", "kaynak": "Hakim, Müstedrek, 1/492" }
         }
     }
-}
+};
