@@ -1,4 +1,4 @@
-{
+window.muharrem_veri = {
     "ay_kodu": "01",
     "ay_adi": "Muharrem",
     "aciklama": "Hicri takvimin ilk ayıdır ve haram aylardandır.",
