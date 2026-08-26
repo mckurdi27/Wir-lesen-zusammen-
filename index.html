@@ -9,6 +9,66 @@
     <title>Ortak Hatim ve Dua Takip Sistemi</title>
 </head>
 <body>
+    <!-- Başlığın Altındaki İkinci Satır: Nebevi, Namaz Vakitleri, Kâbe -->
+<div class="top-cards-container" style="display: flex; justify-content: space-between; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+    
+    <!-- Sol Kart: Mescid-i Nebevi -->
+    <div class="card nebevi-card" style="flex: 1; min-width: 250px; text-align: center; border: 1px solid #ddd; padding: 10px; border-radius: 8px; background: #fff;">
+        <img src="img/Nebevi.jpg" alt="Mescid-i Nebevi" style="width: 100%; height: 120px; object-fit: cover; border-radius: 6px;">
+        <h4 style="margin: 10px 0 5px;">Mescid-i Nebevi</h4>
+        <p style="font-size: 13px; color: #666;">Medine-i Münevvere</p>
+    </div>
+
+    <!-- Orta Kart: Şehir Seçmeli Namaz Vakitleri Modülü -->
+    <div class="card prayer-card" style="flex: 1; min-width: 250px; text-align: center; border: 1px solid #ddd; padding: 10px; border-radius: 8px; background: #fff;">
+        <h4 style="margin: 10px 0 5px;">Namaz Vakitleri</h4>
+        <div style="margin-bottom: 8px;">
+            <select id="citySelect" onchange="fetchPrayerTimes()" style="padding: 4px; border-radius: 4px; width: 80%;">
+                <option value="Istanbul">İstanbul</option>
+                <option value="Ankara">Ankara</option>
+                <option value="Izmir">İzmir</option>
+                <option value="Berlin">Berlin</option>
+                <option value="Frankfurt">Frankfurt</option>
+            </select>
+        </div>
+        <div id="prayerTimesResult" style="font-size: 12px; color: #333; line-height: 1.4;">Vakitler yükleniyor...</div>
+    </div>
+
+    <!-- Sağ Kart: Kâbe-i Muazzama -->
+    <div class="card kabe-card" style="flex: 1; min-width: 250px; text-align: center; border: 1px solid #ddd; padding: 10px; border-radius: 8px; background: #fff;">
+        <img src="img/Kabe.jpg" alt="Kâbe-i Muazzama" style="width: 100%; height: 120px; object-fit: cover; border-radius: 6px;">
+        <h4 style="margin: 10px 0 5px;">Kâbe-i Muazzama</h4>
+        <p style="font-size: 13px; color: #666;">Mekke-i Mükerreme</p>
+    </div>
+
+</div>
+
+<!-- Namaz Vakitleri Çalışma Scripti -->
+<script>
+async function fetchPrayerTimes() {
+    const city = document.getElementById('citySelect').value;
+    const resultDiv = document.getElementById('prayerTimesResult');
+    try {
+        const response = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=13`);
+        const data = await response.json();
+        if(data && data.data && data.data.timings) {
+            const t = data.data.timings;
+            resultDiv.innerHTML = `
+                <b>${city}</b><br>
+                İmsak: ${t.Imsak} | Güneş: ${t.Sunrise}<br>
+                Öğle: ${t.Dhuhr} | İkindi: ${t.Asr}<br>
+                Akşam: ${t.Maghrib} | Yatsı: ${t.Isha}
+            `;
+        } else {
+            resultDiv.innerHTML = "Vakitler alınamadı.";
+        }
+    } catch (error) {
+        resultDiv.innerHTML = "Bağlantı hatası.";
+    }
+}
+document.addEventListener("DOMContentLoaded", fetchPrayerTimes);
+</script>
+
     <!-- ================================================================= -->
     <!-- ANA İÇERİK KAPSAYICISI[span_11](start_span)[span_11](end_span) -->
     <!-- ================================================================= -->
