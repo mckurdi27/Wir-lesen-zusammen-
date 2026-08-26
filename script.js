@@ -110,7 +110,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const container = document.querySelector(".container");
     const booksGrid = document.getElementById("books-grid");
-    const adminToggleBtn = document.getElementById("admin-toggle-btn");
 
     let currentGroup = "grup_1";
     let isAdmin = false;
@@ -413,8 +412,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         renderUserControls();
         renderAnalysisSection();
         renderBooks();
-        renderAdminPanel();
-        renderAdminMessageSection();
+        renderAdminSectionAtBottom();
     }
 
     function saveGroupData() {
@@ -499,7 +497,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     localStorage.setItem(`hatim_session_${currentGroup}`, loggedInMember);
                     renderUserControls();
                     renderBooks();
-                    renderAdminPanel();
+                    renderAdminSectionAtBottom();
                 } else {
                     alert("Bu isim zaten var.");
                     loggedInMember = clean;
@@ -534,34 +532,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    function renderAdminPanel() {
-        let adminContainer = document.getElementById("admin-panel-section");
-        if (!adminContainer) {
-            adminContainer = document.createElement("div");
-            adminContainer.id = "admin-panel-section";
-            // Sayfanın en altına (admin mesaj bölümünden önce) yerleştiriyoruz
-            const adminMsgSec = document.getElementById("admin-message-section");
-            if (adminMsgSec) {
-                container.insertBefore(adminContainer, adminMsgSec);
-            } else {
-                container.appendChild(adminContainer);
-            }
+    function renderAdminSectionAtBottom() {
+        let bottomContainer = document.getElementById("admin-bottom-section");
+        if (!bottomContainer) {
+            bottomContainer = document.createElement("div");
+            bottomContainer.id = "admin-bottom-section";
+            bottomContainer.style.cssText = "margin-top: 30px; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05); background: var(--card-bg);";
+            container.appendChild(bottomContainer);
         }
-
-        if (!isAdmin) {
-            adminContainer.style.display = "none";
-            return;
-        }
-
-        adminContainer.style.display = "block";
-        adminContainer.style.cssText = `
-            background: rgba(212, 175, 55, 0.1);
-            border: 1px solid var(--gold-primary);
-            padding: 16px;
-            border-radius: 8px;
-            margin-top: 30px;
-            margin-bottom: 20px;
-        `;
 
         let allGroups = getAllGroupKeys();
         let groupsHtml = allGroups.map(g => `<option value="${g}" ${g === currentGroup ? "selected" : ""}>${g.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
@@ -576,122 +554,138 @@ document.addEventListener("DOMContentLoaded", async () => {
             </div>
         `).join('');
 
-        adminContainer.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <h3 style="color: var(--gold-dark); font-size: 15px; margin: 0;">🛠️ Yönetici Kontrol Paneli</h3>
-                <button id="admin-toggle-btn-custom" style="padding: 6px 12px; background: #c0392b; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">🔓 Kapat</button>
-            </div>
-            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
-                <label style="font-weight: bold; font-size: 13px;">Grup:</label>
-                <select id="admin-group-select" style="padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); flex: 1;">${groupsHtml}</select>
-                <button id="admin-add-group" style="background: #27ae60; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">+ Ekle</button>
-                <button id="admin-edit-group" style="background: #f39c12; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Düzenle</button>
-                <button id="admin-delete-group" style="background: #e74c3c; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Sil</button>
-            </div>
-            <div style="border-top: 1px solid var(--border-color); padding-top: 10px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <span style="font-weight: bold; font-size: 13px;">Gruptaki Üyeler:</span>
-                    <button id="admin-add-member" style="background: #2980b9; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">+ Üye Ekle</button>
+        let adminPanelHtml = "";
+        if (isAdmin) {
+            adminPanelHtml = `
+                <div id="admin-panel-section" style="background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold-primary); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="color: var(--gold-dark); font-size: 15px; margin-bottom: 10px;">🛠️ Yönetici Kontrol Paneli</h3>
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
+                        <label style="font-weight: bold; font-size: 13px;">Grup:</label>
+                        <select id="admin-group-select" style="padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); flex: 1;">${groupsHtml}</select>
+                        <button id="admin-add-group" style="background: #27ae60; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">+ Ekle</button>
+                        <button id="admin-edit-group" style="background: #f39c12; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Düzenle</button>
+                        <button id="admin-delete-group" style="background: #e74c3c; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Sil</button>
+                    </div>
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-weight: bold; font-size: 13px;">Gruptaki Üyeler:</span>
+                            <button id="admin-add-member" style="background: #2980b9; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">+ Üye Ekle</button>
+                        </div>
+                        <div style="max-height: 120px; overflow-y: auto; border: 1px solid var(--border-color); padding: 5px; border-radius: 4px;">
+                            ${appData.members.length > 0 ? membersHtml : '<div style="font-size: 12px; text-align: center; padding: 5px;">Kayıtlı üye yok.</div>'}
+                        </div>
+                    </div>
                 </div>
-                <div style="max-height: 120px; overflow-y: auto; border: 1px solid var(--border-color); padding: 5px; border-radius: 4px;">
-                    ${appData.members.length > 0 ? membersHtml : '<div style="font-size: 12px; text-align: center; padding: 5px;">Kayıtlı üye yok.</div>'}
-                </div>
-            </div>
-        `;
+            `;
+        }
 
-        document.getElementById("admin-group-select").addEventListener("change", async (e) => {
-            currentGroup = e.target.value;
-            await loadGroupData();
-        });
+        bottomContainer.innerHTML = `
+            ${adminPanelHtml}
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                <h3 style="font-size: 15px; margin: 0;">📢 Yöneticiye Mesaj Gönder</h3>
+                <button id="admin-toggle-btn-custom" style="padding: 6px 12px; background: ${isAdmin ? '#c0392b' : '#f39c12'}; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">${isAdmin ? '🔓 Yönetici Modu: AÇIK' : '🔐 Yönetici Modu: Kapalı'}</button>
+            </div>
+            <textarea id="admin-msg-input" placeholder="Mesajınızı buraya yazın..." style="width: 100%; height: 60px; padding: 10px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 4px; margin-bottom: 10px;"></textarea>
+            <button id="send-admin-msg-btn" style="background: #25D366; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">💬 WhatsApp ile Gönder</button>
+        `;
 
         document.getElementById("admin-toggle-btn-custom").addEventListener("click", () => triggerAdminToggle());
 
-        document.getElementById("admin-add-group").addEventListener("click", async () => {
-            let newG = prompt("Yeni grup adı:");
-            if (newG && newG.trim()) {
-                currentGroup = newG.trim().toLowerCase().replace(/\s+/g, '_');
-                saveGroupData();
+        if (isAdmin) {
+            document.getElementById("admin-group-select").addEventListener("change", async (e) => {
+                currentGroup = e.target.value;
                 await loadGroupData();
-            }
-        });
+            });
 
-        document.getElementById("admin-edit-group").addEventListener("click", async () => {
-            let newName = prompt("Grubun yeni adı:", currentGroup.replace(/_/g, ' '));
-            if (newName && newName.trim()) {
-                let newKey = newName.trim().toLowerCase().replace(/\s+/g, '_');
-                if (newKey !== currentGroup) {
-                    localStorage.setItem(`hatim_group_${newKey}`, JSON.stringify(appData));
-                    localStorage.removeItem(`hatim_group_${currentGroup}`);
-                    currentGroup = newKey;
-                    await loadGroupData();
-                }
-            }
-        });
-
-        document.getElementById("admin-delete-group").addEventListener("click", async () => {
-            if (confirm(`"${currentGroup}" grubunu silmek istiyor musunuz?`)) {
-                localStorage.removeItem(`hatim_group_${currentGroup}`);
-                let keys = getAllGroupKeys();
-                currentGroup = keys[0];
-                await loadGroupData();
-            }
-        });
-
-        document.getElementById("admin-add-member").addEventListener("click", async () => {
-            let mName = prompt("Eklenecek üye adı:");
-            if (mName && mName.trim()) {
-                let clean = mName.trim();
-                if (!appData.members.includes(clean)) {
-                    appData.members.push(clean);
-                    saveGroupData();
-                    await loadGroupData();
-                } else alert("Bu isim zaten var.");
-            }
-        });
-
-        document.querySelectorAll(".admin-remove-member").forEach(btn => {
-            btn.addEventListener("click", async (e) => {
-                let nameToRemove = e.target.getAttribute("data-name");
-                if (confirm(`"${nameToRemove}" adlı üyeyi çıkartmak istiyor musunuz?`)) {
-                    appData.members = appData.members.filter(m => m !== nameToRemove);
+            document.getElementById("admin-add-group").addEventListener("click", async () => {
+                let newG = prompt("Yeni grup adı:");
+                if (newG && newG.trim()) {
+                    currentGroup = newG.trim().toLowerCase().replace(/\s+/g, '_');
                     saveGroupData();
                     await loadGroupData();
                 }
             });
-        });
 
-        document.querySelectorAll(".admin-edit-member").forEach(btn => {
-            btn.addEventListener("click", async (e) => {
-                let oldName = e.target.getAttribute("data-name");
-                let editedName = prompt("Yeni ad:", oldName);
-                if (editedName && editedName.trim() && editedName.trim() !== oldName) {
-                    let cleanNew = editedName.trim();
-                    let idx = appData.members.indexOf(oldName);
-                    if (idx !== -1) {
-                        appData.members[idx] = cleanNew;
-                        Object.keys(appData.bookPages).forEach(bId => {
-                            appData.bookPages[bId].forEach(p => { if (p.owner === oldName) p.owner = cleanNew; });
-                        });
-                        saveGroupData();
+            document.getElementById("admin-edit-group").addEventListener("click", async () => {
+                let newName = prompt("Grubun yeni adı:", currentGroup.replace(/_/g, ' '));
+                if (newName && newName.trim()) {
+                    let newKey = newName.trim().toLowerCase().replace(/\s+/g, '_');
+                    if (newKey !== currentGroup) {
+                        localStorage.setItem(`hatim_group_${newKey}`, JSON.stringify(appData));
+                        localStorage.removeItem(`hatim_group_${currentGroup}`);
+                        currentGroup = newKey;
                         await loadGroupData();
                     }
                 }
             });
+
+            document.getElementById("admin-delete-group").addEventListener("click", async () => {
+                if (confirm(`"${currentGroup}" grubunu silmek istiyor musunuz?`)) {
+                    localStorage.removeItem(`hatim_group_${currentGroup}`);
+                    let keys = getAllGroupKeys();
+                    currentGroup = keys[0];
+                    await loadGroupData();
+                }
+            });
+
+            document.getElementById("admin-add-member").addEventListener("click", async () => {
+                let mName = prompt("Eklenecek üye adı:");
+                if (mName && mName.trim()) {
+                    let clean = mName.trim();
+                    if (!appData.members.includes(clean)) {
+                        appData.members.push(clean);
+                        saveGroupData();
+                        await loadGroupData();
+                    } else alert("Bu isim zaten var.");
+                }
+            });
+
+            document.querySelectorAll(".admin-remove-member").forEach(btn => {
+                btn.addEventListener("click", async (e) => {
+                    let nameToRemove = e.target.getAttribute("data-name");
+                    if (confirm(`"${nameToRemove}" adlı üyeyi çıkartmak istiyor musunuz?`)) {
+                        appData.members = appData.members.filter(m => m !== nameToRemove);
+                        saveGroupData();
+                        await loadGroupData();
+                    }
+                });
+            });
+
+            document.querySelectorAll(".admin-edit-member").forEach(btn => {
+                btn.addEventListener("click", async (e) => {
+                    let oldName = e.target.getAttribute("data-name");
+                    let editedName = prompt("Yeni ad:", oldName);
+                    if (editedName && editedName.trim() && editedName.trim() !== oldName) {
+                        let cleanNew = editedName.trim();
+                        let idx = appData.members.indexOf(oldName);
+                        if (idx !== -1) {
+                            appData.members[idx] = cleanNew;
+                            Object.keys(appData.bookPages).forEach(bId => {
+                                appData.bookPages[bId].forEach(p => { if (p.owner === oldName) p.owner = cleanNew; });
+                            });
+                            saveGroupData();
+                            await loadGroupData();
+                        }
+                    }
+                });
+            });
+        }
+
+        document.getElementById("send-admin-msg-btn").addEventListener("click", () => {
+            let text = document.getElementById("admin-msg-input").value.trim();
+            if (!text) return;
+            window.open(`https://wa.me/905XXXXXXXXX?text=${encodeURIComponent(text)}`, "_blank");
         });
     }
 
     async function triggerAdminToggle() {
         if (isAdmin) {
             isAdmin = false;
-            adminToggleBtn.textContent = "🔐 Yönetici Modu: Kapalı";
-            adminToggleBtn.classList.remove("active");
             alert("Yönetici modu kapatıldı.");
         } else {
             const enteredPassword = prompt("Yönetici şifresi:");
             if (enteredPassword === ADMIN_PASSWORD) {
                 isAdmin = true;
-                adminToggleBtn.textContent = "🔓 Yönetici Modu: AÇIK";
-                adminToggleBtn.classList.add("active");
                 alert("Yönetici modu açıldı.");
             } else if (enteredPassword !== null) {
                 alert("Hatalı şifre!");
@@ -704,10 +698,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         await renderDailyInspiration();
         renderAnalysisSection();
         renderBooks();
-        renderAdminPanel();
+        renderAdminSectionAtBottom();
     }
-
-    adminToggleBtn.addEventListener("click", () => triggerAdminToggle());
 
     function renderAnalysisSection() {
         let analysisContainer = document.getElementById("analysis-section");
@@ -1037,26 +1029,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         let msg = `*[${currentGroup.replace(/_/g, ' ').toUpperCase()}] ${book.name} (${appData.bookHatims[book.id].hatimNo}. Hatim)*\n\n`;
         msg += active.length === 0 ? "Henüz pay alan kimse yok." : active.join("\n");
         window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
-    }
-
-    function renderAdminMessageSection() {
-        let sec = document.getElementById("admin-message-section");
-        if (!sec) {
-            sec = document.createElement("div");
-            sec.id = "admin-message-section";
-            sec.style.cssText = "margin-top: 30px; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05);";
-            sec.innerHTML = `
-                <h3 style="margin-bottom: 10px; font-size: 15px;">📢 Yöneticiye Mesaj Gönder</h3>
-                <textarea id="admin-msg-input" placeholder="Mesajınızı buraya yazın..." style="width: 100%; height: 60px; padding: 10px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 4px; margin-bottom: 10px;"></textarea>
-                <button id="send-admin-msg-btn" style="background: #25D366; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">💬 WhatsApp ile Gönder</button>
-            `;
-            container.appendChild(sec);
-            document.getElementById("send-admin-msg-btn").addEventListener("click", () => {
-                let text = document.getElementById("admin-msg-input").value.trim();
-                if (!text) return;
-                window.open(`https://wa.me/905XXXXXXXXX?text=${encodeURIComponent(text)}`, "_blank");
-            });
-        }
     }
 
     await loadGroupData();
