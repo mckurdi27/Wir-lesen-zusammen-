@@ -1,4 +1,4 @@
-{
+window.saban_veri = {
     "ay_kodu": "08",
     "ay_adi": "Şaban",
     "aciklama": "Hicri takvimin sekizinci ayıdır. Ramazan ayının müjdecisidir.",
@@ -154,4 +154,4 @@
             "hadis": { "meal": "Müminin silahı dua, dinin direği namaz, göklerin ve yerin nuru oruçtur.", "kaynak": "Hakim, Müstedrek, 1/492" }
         }
     }
-}
+};
