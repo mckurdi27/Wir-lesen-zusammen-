@@ -6,7 +6,7 @@
     <!-- ================================================================= -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ortak Hatim ve Dua Takip Sistemi</title>
+    <title>Ortak Hatim und Dua Takip Sistemi</title>
 </head>
 <body>
     <!-- ================================================================= -->
@@ -17,19 +17,19 @@
         <div id="main-title-ornate-section" style="margin-bottom: 20px; padding: 10px 15px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border: 2px solid #d4af37; border-top: 6px solid #8a6d3b; border-radius: 12px; box-shadow: 0 4px 15px rgba(138, 109, 59, 0.2);">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
                 
-                <!-- Sol Kart: Mescid-i Nebevi Resmi (Genişletilmiş ve Uzatılmış) -->
-                <div style="flex: 0 0 220px; text-align: center;">
-                    <img src="img/Nebevi.jpg" alt="Mescid-i Nebevi" style="width: 100%; height: 155px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
+                <!-- Sol Kart: Mescid-i Nebevi Resmi (2 Satır Uzatıldı) -->
+                <div style="flex: 0 0 190px; text-align: center;">
+                    <img src="img/Nebevi.jpg" alt="Mescid-i Nebevi" style="width: 100%; height: 157px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
                     <div style="font-size: 11px; font-weight: bold; margin-top: 2px; color: #3e2723;">Mescid-i Nebevi</div>
                 </div>
 
                 <!-- Orta Kısım: Başlık ve Namaz Vakitleri Modülü -->
                 <div style="flex: 1; min-width: 220px; text-align: center;">
-                    <div style="font-size: 18px; font-weight: bold; margin-bottom: 4px; color: #3e2723; line-height: 1.3;">
-                        Ortak Hatim<br>Duada Buluşuyoruz
+                    <div style="font-size: 18px; font-weight: bold; margin-bottom: 4px; color: #3e2723; display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; text-align: center;">
+                        <span>Ortak Hatim ve<br>Dualarda Buluşuyoruz</span>
                     </div>
                     <div style="font-size: 12px; opacity: 0.85; font-style: italic; margin-bottom: 8px; max-width: 260px; margin-left: auto; margin-right: auto; line-height: 1.4;">
-                        Grubunuzu seçin, isminizi belirleyin ve<br>manevi iklimde ortak hatim halkamıza katılın.
+                        Grubunuzu seçin,<br>İsminizi belirleyin ve<br>manevi iklimde<br>ortak hatim halkamıza katılın.
                     </div>
                     
                     <!-- Namaz Vakitleri Mini Modülü -->
@@ -55,9 +55,9 @@
                     </div>
                 </div>
 
-                <!-- Sağ Kart: Kâbe-i Muazzama Resmi (Genişletilmiş ve Uzatılmış) -->
-                <div style="flex: 0 0 220px; text-align: center;">
-                    <img src="img/Kabe.jpg" alt="Kâbe-i Muazzama" style="width: 100%; height: 155px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
+                <!-- Sağ Kart: Kâbe-i Muazzama Resmi (2 Satır Uzatıldı) -->
+                <div style="flex: 0 0 190px; text-align: center;">
+                    <img src="img/Kabe.jpg" alt="Kâbe-i Muazzama" style="width: 100%; height: 157px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
                     <div style="font-size: 11px; font-weight: bold; margin-top: 2px; color: #3e2723;">Kâbe-i Muazzama</div>
                 </div>
 
@@ -1714,65 +1714,72 @@
                                         </div>
                                     `;
                                 } else if (st.statusType === "read") {
-                                    actionButtons = `<button class="unread-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 8px 12px; background: #f39c12; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: bold;">Okunmadı Çek</button>`;
+                                    actionButtons = `<button class="unread-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 8px 12px; background: #e67e22; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: bold;">Okunmadı Say</button>`;
                                 }
-                            } else if (isAdmin) {
-                                actionButtons = `<button class="admin-force-free-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 6px 10px; background: #c0392b; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">Yönetici: Boşa Çıkart</button>`;
                             }
                         }
 
                         return `
-                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; margin-bottom: 8px; border-radius: 6px; border: 1px solid var(--border-color); ${bgStyle}; flex-wrap: wrap; gap: 8px;">
-                                <div style="font-weight: bold; font-size: 13px;">${pi.name}</div>
-                                <div style="font-size: 12px;">Durum: <strong>${statusText}</strong></div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; margin-bottom: 6px; border-radius: 6px; border: 1px solid var(--border-color); ${bgStyle} flex-wrap: wrap; gap: 8px;">
+                                <div style="display: flex; flex-direction: column;">
+                                    <span style="font-weight: bold; font-size: 13px;">${pi.name}</span>
+                                    <span style="font-size: 11px; opacity: 0.8; margin-top: 2px;">Durum: ${statusText}</span>
+                                </div>
                                 <div>${actionButtons}</div>
                             </div>
                         `;
                     }).join('');
 
                     card.innerHTML = `
-                        <div class="book-header" style="padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: linear-gradient(to right, rgba(212,175,55,0.1), transparent); border-bottom: 2px solid var(--gold-primary);">
-                            <div>
-                                <h3 style="margin: 0; font-size: 15px; color: var(--gold-dark);">${book.name}</h3>
-                                <div style="font-size: 11px; opacity: 0.8; margin-top: 3px;">Hatim No: ${hatimInfo.hatimNo} | İlerleme: %${percent} (${takenCount}/${book.totalUnits})</div>
+                        <div class="book-header" style="padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; flex-wrap: wrap; gap: 10px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 16px; font-weight: bold; color: var(--text-main);">${book.name}</span>
+                                <span style="font-size: 11px; background: var(--gold-primary); color: #fff; padding: 2px 6px; border-radius: 4px;">Hatim #${hatimInfo.hatimNo}</span>
                             </div>
-                            <div style="display: flex; gap: 6px; align-items: center;">
-                                <button class="open-pdf-btn" data-book-id="${book.id}" data-book-name="${book.name}" style="background: #e67e22; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">📄 PDF Oku</button>
-                                <span style="font-size: 13px; font-weight: bold; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--gold-primary);">${isOpen ? '▼ Gizle' : '▶ Göster'}</span>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 12px; font-weight: bold;">Alınan: %${percent}</span>
+                                <span style="font-size: 12px; font-weight: bold; background: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 4px;">${isOpen ? '▲ Gizle' : '▼ Göster'}</span>
                             </div>
                         </div>
-                        <div class="book-body" style="display: ${isOpen ? 'block' : 'none'}; padding: 15px; background: var(--card-bg);">
-                            <div style="margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: wrap;">
-                                <span style="font-size: 12px; font-weight: bold; align-self: center; margin-right: 4px;">Görünüm:</span>
-                                ${modeButtonsHtml}
+                        <div class="book-content" style="display: ${isOpen ? 'block' : 'none'}; padding: 14px; border-top: 1px solid var(--border-color);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                                <div style="display: flex; gap: 4px; flex-wrap: wrap;">${modeButtonsHtml}</div>
+                                <div style="display: flex; gap: 6px;">
+                                    <button class="open-pdf-modal-btn" data-book-id="${book.id}" data-book-name="${book.name}" style="padding: 6px 12px; background: #8e44ad; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">📄 PDF Oku</button>
+                                </div>
                             </div>
-                            <div style="max-height: 350px; overflow-y: auto; padding-right: 4px;">
-                                ${itemsHtml}
-                            </div>
+                            <div style="max-height: 350px; overflow-y: auto; padding-right: 4px;">${itemsHtml}</div>
                         </div>
                     `;
 
                     card.querySelector(".book-header").addEventListener("click", (e) => {
-                        if (e.target.classList.contains("open-pdf-btn")) return;
+                        if (e.target.tagName === 'BUTTON') return;
                         card.classList.toggle("open");
                         renderBooks();
                     });
 
-                    card.querySelector(".open-pdf-btn").addEventListener("click", (e) => {
-                        e.stopPropagation();
-                        openPdfReaderModal(book.id, book.name);
-                    });
+                    booksGrid.appendChild(card);
+                });
 
-                    card.querySelectorAll(".mode-btn").forEach(btn => {
-                        btn.addEventListener("click", (e) => {
-                            e.stopPropagation();
-                            book.currentMode = e.target.getAttribute("data-mode");
+                document.querySelectorAll(".mode-btn").forEach(btn => {
+                    btn.addEventListener("click", (e) => {
+                        let bId = e.target.getAttribute("data-book-id");
+                        let mKey = e.target.getAttribute("data-mode");
+                        let bookObj = appData.books.find(b => b.id === bId);
+                        if (bookObj) {
+                            bookObj.currentMode = mKey;
                             saveGroupData();
                             renderBooks();
-                        });
+                        }
                     });
+                });
 
-                    booksGrid.appendChild(card);
+                document.querySelectorAll(".open-pdf-modal-btn").forEach(btn => {
+                    btn.addEventListener("click", (e) => {
+                        let bId = e.target.getAttribute("data-book-id");
+                        let bName = e.target.getAttribute("data-book-name");
+                        openPdfReaderModal(bId, bName);
+                    });
                 });
 
                 document.querySelectorAll(".take-range-btn").forEach(btn => {
@@ -1785,23 +1792,25 @@
                         let start = parseInt(e.target.getAttribute("data-start"), 10);
                         let end = parseInt(e.target.getAttribute("data-end"), 10);
                         let baseArray = appData.bookPages[bId];
-
                         for (let i = start; i < end; i++) {
                             baseArray[i].owner = loggedInMember;
+                        }
+                        saveGroupData();
+                        renderBooks();
+                        renderAnalysisSection();
+                    });
+                });
+
+                document.querySelectorAll(".release-range-btn").forEach(btn => {
+                    btn.addEventListener("click", (e) => {
+                        let bId = e.target.getAttribute("data-book-id");
+                        let start = parseInt(e.target.getAttribute("data-start"), 10);
+                        let end = parseInt(e.target.getAttribute("data-end"), 10);
+                        let baseArray = appData.bookPages[bId];
+                        for (let i = start; i < end; i++) {
+                            baseArray[i].owner = "";
                             baseArray[i].isRead = false;
                         }
-
-                        if (!appData.readingLogs) appData.readingLogs = [];
-                        let bObj = appData.books.find(b => b.id === bId);
-                        appData.readingLogs.push({
-                            date: new Date().toLocaleDateString("tr-TR"),
-                            timestamp: Date.now(),
-                            member: loggedInMember,
-                            bookName: bObj ? bObj.name : bId,
-                            count: (end - start),
-                            range: `${start + 1}-${end}`
-                        });
-
                         saveGroupData();
                         renderBooks();
                         renderAnalysisSection();
@@ -1814,10 +1823,28 @@
                         let start = parseInt(e.target.getAttribute("data-start"), 10);
                         let end = parseInt(e.target.getAttribute("data-end"), 10);
                         let baseArray = appData.bookPages[bId];
-
                         for (let i = start; i < end; i++) {
                             baseArray[i].isRead = true;
                         }
+                        let bookObj = appData.books.find(b => b.id === bId);
+                        let bookNameStr = bookObj ? bookObj.name : bId;
+                        let defModes = bookModesDefs[bId];
+                        let modeName = "Aralık";
+                        Object.keys(defModes).forEach(mk => {
+                            defModes[mk].getItems().forEach(pi => {
+                                if (pi.start === start && pi.end === end) modeName = pi.name;
+                            });
+                        });
+
+                        if (!appData.readingLogs) appData.readingLogs = [];
+                        appData.readingLogs.push({
+                            timestamp: Date.now(),
+                            date: new Date().toLocaleDateString("tr-TR") + " " + new Date().toLocaleTimeString("tr-TR", {hour: '2-digit', minute:'2-digit'}),
+                            member: loggedInMember,
+                            bookName: bookNameStr,
+                            range: modeName,
+                            count: (end - start)
+                        });
 
                         saveGroupData();
                         renderBooks();
@@ -1831,47 +1858,9 @@
                         let start = parseInt(e.target.getAttribute("data-start"), 10);
                         let end = parseInt(e.target.getAttribute("data-end"), 10);
                         let baseArray = appData.bookPages[bId];
-
                         for (let i = start; i < end; i++) {
                             baseArray[i].isRead = false;
                         }
-
-                        saveGroupData();
-                        renderBooks();
-                        renderAnalysisSection();
-                    });
-                });
-
-                document.querySelectorAll(".release-range-btn").forEach(btn => {
-                    btn.addEventListener("click", (e) => {
-                        let bId = e.target.getAttribute("data-book-id");
-                        let start = parseInt(e.target.getAttribute("data-start"), 10);
-                        let end = parseInt(e.target.getAttribute("data-end"), 10);
-                        let baseArray = appData.bookPages[bId];
-
-                        for (let i = start; i < end; i++) {
-                            baseArray[i].owner = "";
-                            baseArray[i].isRead = false;
-                        }
-
-                        saveGroupData();
-                        renderBooks();
-                        renderAnalysisSection();
-                    });
-                });
-
-                document.querySelectorAll(".admin-force-free-btn").forEach(btn => {
-                    btn.addEventListener("click", (e) => {
-                        let bId = e.target.getAttribute("data-book-id");
-                        let start = parseInt(e.target.getAttribute("data-start"), 10);
-                        let end = parseInt(e.target.getAttribute("data-end"), 10);
-                        let baseArray = appData.bookPages[bId];
-
-                        for (let i = start; i < end; i++) {
-                            baseArray[i].owner = "";
-                            baseArray[i].isRead = false;
-                        }
-
                         saveGroupData();
                         renderBooks();
                         renderAnalysisSection();
