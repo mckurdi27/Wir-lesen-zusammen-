@@ -308,6 +308,14 @@
                 bookModesDefs[b.id] = b.type === "bab" ? createBabModes(b.totalUnits) : createPageModes(b.totalUnits);
             });
 
+            function rebuildBookModesDefs() {
+                if (appData && appData.books) {
+                    appData.books.forEach(b => {
+                        bookModesDefs[b.id] = b.type === "bab" ? createBabModes(b.totalUnits) : createPageModes(b.totalUnits);
+                    });
+                }
+            }
+
             function getAllGroupKeys() {
                 let keys = [];
                 let unlockedProtected = JSON.parse(localStorage.getItem("unlocked_protected_groups") || "[]");
@@ -391,6 +399,25 @@
                         }
                     });
                 }
+
+                // Ensure bookPages match totalUnits
+                appData.books.forEach(b => {
+                    if (!appData.bookPages[b.id]) {
+                        appData.bookPages[b.id] = Array(b.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
+                    } else if (appData.bookPages[b.id].length !== b.totalUnits) {
+                        if (appData.bookPages[b.id].length < b.totalUnits) {
+                            while (appData.bookPages[b.id].length < b.totalUnits) {
+                                appData.bookPages[b.id].push({ owner: "", isRead: false });
+                            }
+                        } else {
+                            appData.bookPages[b.id] = appData.bookPages[b.id].slice(0, b.totalUnits);
+                        }
+                    }
+                    if (!appData.bookHatims[b.id]) appData.bookHatims[b.id] = { hatimNo: 1, startDate: todayStr, prayerDone: false };
+                    if (!appData.bookHistory[b.id]) appData.bookHistory[b.id] = [];
+                });
+
+                rebuildBookModesDefs();
                 saveGroupData();
                 renderMainTitleHeader();
                 await renderDailyInspiration();
@@ -1158,6 +1185,16 @@
                     </div>
                 `).join('');
 
+                let booksEditHtml = appData.books.map(b => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; margin-bottom: 4px; border-radius: 4px; font-size: 13px; border: 1px solid var(--border-color);">
+                        <span>📖 <strong>${b.name}</strong> (${b.totalUnits} ${b.type === 'bab' ? 'Bab' : 'Sayfa'})</span>
+                        <div style="display: flex; gap: 4px;">
+                            <button class="admin-edit-book" data-id="${b.id}" style="background: #f39c12; color: #fff; border: none; padding: 3px 6px; border-radius: 3px; font-size: 11px; cursor: pointer;">Düzenle</button>
+                            <button class="admin-remove-book" data-id="${b.id}" style="background: #e74c3c; color: #fff; border: none; padding: 3px 6px; border-radius: 3px; font-size: 11px; cursor: pointer;">Sil</button>
+                        </div>
+                    </div>
+                `).join('');
+
                 let adminPanelHtml = "";
                 if (isAdmin) {
                     let hasPassword = appData.password ? true : false;
@@ -1178,6 +1215,18 @@
                                 <span style="font-size: 13px; font-weight: bold;">Grup Şifre Durumu: <span style="color: ${hasPassword ? '#27ae60' : '#e67e22'};">${hasPassword ? '🔒 Şifreli' : '🔓 Şifresiz'}</span></span>
                                 <button id="admin-set-password" style="background: #8e44ad; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">🔑 Şifre Belirle / Kaldır</button>
                             </div>
+                            
+                            <!-- ESER VE SAYFA DÜZENLEME BÖLÜMÜ -->
+                            <div style="border-top: 1px solid var(--border-color); padding-top: 10px; margin-bottom: 12px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <span style="font-weight: bold; font-size: 13px;">📚 Eserler ve Sayfa/Birim Yönetimi:</span>
+                                    <button id="admin-add-book-btn" style="background: #27ae60; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">+ Yeni Eser Ekle</button>
+                                </div>
+                                <div style="max-height: 140px; overflow-y: auto; border: 1px solid var(--border-color); padding: 5px; border-radius: 4px; background: var(--card-bg);">
+                                    ${booksEditHtml}
+                                </div>
+                            </div>
+
                             <div style="border-top: 1px solid var(--border-color); padding-top: 10px;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                     <span style="font-weight: bold; font-size: 13px;">Gruptaki Üyeler:</span>
@@ -1210,6 +1259,91 @@
                             openDetailedAnalysisModal();
                         });
                     }
+
+                    // Eser Ekleme Butonu
+                    const addBookBtn = document.getElementById("admin-add-book-btn");
+                    if (addBookBtn) {
+                        addBookBtn.addEventListener("click", () => {
+                            let bName = prompt("Eser adını girin:");
+                            if (!bName || !bName.trim()) return;
+                            let bUnitsStr = prompt("Toplam sayfa/birim sayısını girin (Örn: 100):", "100");
+                            let bUnits = parseInt(bUnitsStr, 10);
+                            if (isNaN(bUnits) || bUnits <= 0) {
+                                alert("Geçersiz birim sayısı!");
+                                return;
+                            }
+                            let bTypeInput = prompt("Birim türü nedir? ('sayfa' veya 'bab' yazın)", "sayfa");
+                            let bType = (bTypeInput && bTypeInput.trim().toLowerCase() === "bab") ? "bab" : "page";
+                            let bId = "book_" + Date.now();
+
+                            appData.books.push({
+                                id: bId,
+                                name: bName.trim(),
+                                totalUnits: bUnits,
+                                type: bType,
+                                defaultMode: bType === "bab" ? "on_bab" : "yirmi_sayfa",
+                                currentMode: bType === "bab" ? "on_bab" : "yirmi_sayfa"
+                            });
+
+                            appData.bookPages[bId] = Array(bUnits).fill(null).map(() => ({ owner: "", isRead: false }));
+                            appData.bookHatims[bId] = { hatimNo: 1, startDate: new Date().toLocaleDateString("tr-TR"), prayerDone: false };
+                            appData.bookHistory[bId] = [];
+
+                            saveGroupData();
+                            loadGroupData();
+                        });
+                    }
+
+                    // Eser Düzenleme Butonları
+                    document.querySelectorAll(".admin-edit-book").forEach(btn => {
+                        btn.addEventListener("click", (e) => {
+                            let bId = e.target.getAttribute("data-id");
+                            let bookObj = appData.books.find(b => b.id === bId);
+                            if (!bookObj) return;
+
+                            let newName = prompt("Eserin yeni adı:", bookObj.name);
+                            if (newName === null) return;
+                            let newUnitsStr = prompt("Toplam birim/sayfa sayısı:", bookObj.totalUnits);
+                            if (newUnitsStr === null) return;
+                            let newUnits = parseInt(newUnitsStr, 10);
+
+                            if (newName.trim()) bookObj.name = newName.trim();
+                            if (!isNaN(newUnits) && newUnits > 0) {
+                                bookObj.totalUnits = newUnits;
+                                // Adjust bookPages array length
+                                if (!appData.bookPages[bId]) {
+                                    appData.bookPages[bId] = Array(newUnits).fill(null).map(() => ({ owner: "", isRead: false }));
+                                } else if (appData.bookPages[bId].length < newUnits) {
+                                    while (appData.bookPages[bId].length < newUnits) {
+                                        appData.bookPages[bId].push({ owner: "", isRead: false });
+                                    }
+                                } else {
+                                    appData.bookPages[bId] = appData.bookPages[bId].slice(0, newUnits);
+                                }
+                            }
+
+                            saveGroupData();
+                            loadGroupData();
+                        });
+                    });
+
+                    // Eser Silme Butonları
+                    document.querySelectorAll(".admin-remove-book").forEach(btn => {
+                        btn.addEventListener("click", (e) => {
+                            let bId = e.target.getAttribute("data-id");
+                            let bookObj = appData.books.find(b => b.id === bId);
+                            if (!bookObj) return;
+
+                            if (confirm(`"${bookObj.name}" eserini silmek istiyor musunuz?`)) {
+                                appData.books = appData.books.filter(b => b.id !== bId);
+                                delete appData.bookPages[bId];
+                                delete appData.bookHatims[bId];
+                                delete appData.bookHistory[bId];
+                                saveGroupData();
+                                loadGroupData();
+                            }
+                        });
+                    });
 
                     document.getElementById("admin-group-select").addEventListener("change", async (e) => {
                         currentGroup = e.target.value;
