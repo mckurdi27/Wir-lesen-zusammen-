@@ -1,7 +1,7 @@
-// Ana dizin: main.js    
+// Ana dizin: main.js (Tüm 12 ay merkezi yönetim dosyası)
 window.HicriTakvimAnaListe = {
     "01": typeof window.muharrem_veri !== 'undefined' ? window.muharrem_veri : null,
-    "02": typeof window.safer_veri !== 'undefined' ? window.safer_veri : null,
+    "02": typeof window.sefer_veri !== 'undefined' ? window.sefer_veri : null, // Düzeltildi (sefer)
     "03": typeof window.rebiulevvel_veri !== 'undefined' ? window.rebiulevvel_veri : null,
     "04": typeof window.rebiulahir_veri !== 'undefined' ? window.rebiulahir_veri : null,
     "05": typeof window.cemaziyelevvel_veri !== 'undefined' ? window.cemaziyelevvel_veri : null,
