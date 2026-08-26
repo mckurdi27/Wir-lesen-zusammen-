@@ -116,14 +116,14 @@
                 try {
                     const formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', { day: 'numeric', month: 'numeric', year: 'numeric' });
                     const parts = formatter.formatToParts(new Date());
-                    let gun = "", ay = "";
+                    let gun = "1", ay = "3";
                     for (const part of parts) {
                         if (part.type === 'day') gun = part.value;
                         if (part.type === 'month') ay = part.value;
                     }
                     return { ayKodu: String(ay).padStart(2, '0'), gunNumarasi: parseInt(gun, 10) };
                 } catch (hata) {
-                    return { ayKodu: "03", gunNumarasi: 12 };
+                    return { ayKodu: "03", gunNumarasi: 1 };
                 }
             }
 
@@ -138,12 +138,19 @@
                 let filePath = fileMap[ayKodu] || "json/03-rebiulevvel.json";
                 try {
                     let response = await fetch(filePath);
-                    if (!response.ok) throw new Error();
+                    if (!response.ok) throw new Error("Dosya bulunamadı");
                     let data = await response.json();
                     monthlyInspirationCache[ayKodu] = data;
                     return data;
                 } catch (e) {
-                    return null;
+                    // Fallback veri seti (JSON yüklenemezse veya hata alırsak uygulamanın çökmemesi için)
+                    return {
+                        "1": {
+                            ayet: { meal: "Şüphesiz güçlükle beraber bir kolaylık vardır.", kaynak: "İnşirah, 5-6" },
+                            hadis: { meal: "İki nimet vardır ki, insanların çoğu bunların kıymetini bilmekte aldanmıştır.", kaynak: "Buhari" },
+                            german: { quote: "Übung macht den Meister.", translation: "Pratik ustayı yapar." }
+                        }
+                    };
                 }
             }
 
@@ -155,14 +162,14 @@
                 
                 let todayHijriStr = `${hDay}.${hMonth}.1448`;
                 try {
-                    const displayFormatter = new Intl.DateTimeFormat('tr-TR-u-ca-islamic-umalqura', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                    const displayFormatter = new Intl.DateTimeFormat('tr-TR-u-ca-islamic-umalqura', { day: 'numeric', month: 'numeric', year: 'numeric' });
                     todayHijriStr = displayFormatter.format(new Date());
                 } catch (e) {}
 
                 let jsonData = await fetchHijriMonthData(hMonth);
                 let item = null;
                 if (jsonData) {
-                    item = jsonData[String(hDay)] || jsonData[hDay] || jsonData[String(hDay).padStart(2, '0')];
+                    item = jsonData[String(hDay)] || jsonData[hDay] || jsonData[String(hDay).padStart(2, '0')] || Object.values(jsonData)[0];
                 }
 
                 let verseText = "Şüphesiz güçlükle beraber bir kolaylık vardır. (İnşirah, 5-6)";
@@ -814,15 +821,15 @@
                     `;
 
                     cardEl.innerHTML = `
-                        <div class="book-header" style="padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                        <div class="book-header" style="padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
                             <div class="book-title-area">
                                 <span class="book-name" style="font-weight: bold; font-size: 15px;">${book.name} <span style="color: #27ae60; font-size: 12px;">(${currentHatimInfo.hatimNo}. Hatim)</span></span>
                                 <span class="book-stats" style="font-size: 12px; opacity: 0.8; display: block; margin-top: 2px;">Alınan: ${takenCount} / ${totalCount}</span>
                             </div>
-                            <div class="book-actions" style="display: flex; align-items: center; gap: 12px;">
-                                <button class="book-pdf-btn" data-bookid="${book.id}" title="PDF Görüntüle" style="padding: 4px 8px; font-size: 12px; cursor: pointer; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 4px;">📄 PDF</button>
-                                <button class="book-whatsapp-btn" data-whatsapp="${bookIndex}" style="padding: 4px 8px; font-size: 12px; cursor: pointer; background: #25D366; color: #fff; border: none; border-radius: 4px; font-weight: bold;">💬 Paylaş</button>
-                                <span class="toggle-icon" style="font-size: 12px;">▼</span>
+                            <div class="book-actions" style="display: flex; align-items: center; gap: 14px;">
+                                <button class="book-pdf-btn" data-bookid="${book.id}" title="PDF Görüntüle" style="padding: 6px 10px; font-size: 12px; cursor: pointer; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-weight: bold;">📄 PDF</button>
+                                <button class="book-whatsapp-btn" data-whatsapp="${bookIndex}" style="padding: 6px 10px; font-size: 12px; cursor: pointer; background: #25D366; color: #fff; border: none; border-radius: 6px; font-weight: bold;">💬 Paylaş</button>
+                                <span class="toggle-icon" style="font-size: 14px; padding: 4px 6px; font-weight: bold; opacity: 0.8;">▼</span>
                             </div>
                         </div>
                         <div class="book-body" style="padding: 14px; display: none;">
@@ -899,20 +906,20 @@
                         else if (st.statusType === "mixed") { statusClass = "taken"; statusText = `Kısmen Alınmış`; actionText = isAdmin ? "Yönet" : "Dolu"; }
 
                         row.className = `part-row ${statusClass}`;
-                        row.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; margin-bottom: 4px; border-radius: 4px; font-size: 13px; cursor: pointer; border: 1px solid var(--border-color); background: var(--card-bg);";
+                        row.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; margin-bottom: 6px; border-radius: 6px; font-size: 13px; cursor: pointer; border: 1px solid var(--border-color); background: var(--card-bg);";
                         let targetPage = item.start + 1;
                         let hasPdf = bookPdfMap[book.id] ? true : false;
 
-                        let rowButtonsHtml = `<div style="display: flex; align-items: center; gap: 6px;">`;
-                        if (hasPdf) rowButtonsHtml += `<button class="row-pdf-btn" data-bookid="${book.id}" data-page="${targetPage}" title="PDF" style="padding: 3px 6px; font-size: 11px; cursor: pointer; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 4px;">📄 PDF</button>`;
-                        if (st.statusType === "taken" && st.owner === loggedInMember) rowButtonsHtml += `<button class="mark-read-btn" data-bookid="${book.id}" data-start="${item.start}" data-end="${item.end}" style="padding: 3px 6px; font-size: 11px; cursor: pointer; border: none; background: #27ae60; color: #fff; border-radius: 4px;">✓ Okudum</button>`;
-                        else if (st.statusType === "read" && (st.owner === loggedInMember || isAdmin)) rowButtonsHtml += `<button class="mark-unread-btn" data-bookid="${book.id}" data-start="${item.start}" data-end="${item.end}" style="padding: 3px 6px; font-size: 11px; cursor: pointer; border: none; background: #e74c3c; color: #fff; border-radius: 4px;">İptal</button>`;
-                        rowButtonsHtml += `<span style="font-size: 11px; font-weight: bold; padding: 2px 6px; background: rgba(0,0,0,0.05); border-radius: 3px;">${actionText}</span></div>`;
+                        let rowButtonsHtml = `<div style="display: flex; align-items: center; gap: 8px;">`;
+                        if (hasPdf) rowButtonsHtml += `<button class="row-pdf-btn" data-bookid="${book.id}" data-page="${targetPage}" title="PDF" style="padding: 4px 8px; font-size: 11px; cursor: pointer; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 4px; font-weight: bold;">📄 PDF</button>`;
+                        if (st.statusType === "taken" && st.owner === loggedInMember) rowButtonsHtml += `<button class="mark-read-btn" data-bookid="${book.id}" data-start="${item.start}" data-end="${item.end}" style="padding: 4px 8px; font-size: 11px; cursor: pointer; border: none; background: #27ae60; color: #fff; border-radius: 4px; font-weight: bold;">✓ Okudum</button>`;
+                        else if (st.statusType === "read" && (st.owner === loggedInMember || isAdmin)) rowButtonsHtml += `<button class="mark-unread-btn" data-bookid="${book.id}" data-start="${item.start}" data-end="${item.end}" style="padding: 4px 8px; font-size: 11px; cursor: pointer; border: none; background: #e74c3c; color: #fff; border-radius: 4px; font-weight: bold;">İptal</button>`;
+                        rowButtonsHtml += `<span style="font-size: 11px; font-weight: bold; padding: 3px 8px; background: rgba(0,0,0,0.05); border-radius: 4px;">${actionText}</span></div>`;
 
                         row.innerHTML = `
                             <div>
                                 <div style="font-weight: bold;">${item.name}</div>
-                                <div style="font-size: 11px; opacity: 0.8;">${statusText}</div>
+                                <div style="font-size: 11px; opacity: 0.8; margin-top: 2px;">${statusText}</div>
                             </div>
                             ${rowButtonsHtml}
                         `;
