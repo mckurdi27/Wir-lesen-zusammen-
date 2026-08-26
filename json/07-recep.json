@@ -1,4 +1,4 @@
-{
+window.recep_veri = {
     "ay_kodu": "07",
     "ay_adi": "Recep",
     "aciklama": "Hicri takvimin yedinci ayıdır. Mübarek üç ayların başlangıcıdır.",
@@ -154,4 +154,4 @@
             "hadis": { "meal": "Müminin silahı dua, dinin direği namazdır.", "kaynak": "Hakim, Müstedrek, 1/492" }
         }
     }
-}
+};
