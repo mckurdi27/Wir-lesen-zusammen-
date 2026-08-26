@@ -1,4 +1,4 @@
-{
+window.rebiülahir_veri = {
     "ay_kodu": "04",
     "ay_adi": "Rebiülahir",
     "aciklama": "Hicri takvimin dördüncü ayıdır.",
@@ -154,4 +154,4 @@
             "hadis": { "meal": "Müminin silahı dua, dinin direği namazdır.", "kaynak": "Hakim, Müstedrek, 1/492" }
         }
     }
-}
+};
