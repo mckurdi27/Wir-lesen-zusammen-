@@ -139,24 +139,25 @@
                 }
             }
 
+            // JavaScript dosyalarını dinamik modül olarak içe aktarma fonksiyonu
             async function fetchHijriMonthData(ayKodu) {
                 if (monthlyInspirationCache[ayKodu]) return monthlyInspirationCache[ayKodu];
                 const fileMap = {
-                    "01": "json/01-muharrem.json", "02": "json/02-sefer.json", "03": "json/03-rebiulevvel.json",
-                    "04": "json/04-rebiulahir.json", "05": "json/05-cemaziyelevvel.json", "06": "json/06-cemaziyelahir.json",
-                    "07": "json/07-recep.json", "08": "json/08-saban.json", "09": "json/09-ramazan.json",
-                    "10": "json/10-sevval.json", "11": "json/11-zilkade.json", "12": "json/12-zilhicce.json"
+                    "01": "js/01-muharrem.js", "02": "js/02-sefer.js", "03": "js/03-rebiulevvel.js",
+                    "04": "js/04-rebiulahir.js", "05": "js/05-cemaziyelevvel.js", "06": "js/06-cemaziyelahir.js",
+                    "07": "js/07-recep.js", "08": "js/08-saban.js", "09": "js/09-ramazan.js",
+                    "10": "js/10-sevval.js", "11": "js/11-zilkade.js", "12": "js/12-zilhicce.js"
                 };
-                let filePath = fileMap[ayKodu] || "json/03-rebiulevvel.json";
+                let filePath = fileMap[ayKodu] || "js/03-rebiulevvel.js";
                 try {
-                    let response = await fetch(filePath);
-                    if (!response.ok) throw new Error("JSON dosyası bulunamadı: " + filePath);
-                    let data = await response.json();
+                    // .js dosyalarını import() ile yüklüyoruz
+                    let mod = await import(`./${filePath}`);
+                    let data = mod.default || mod.data || mod;
                     monthlyInspirationCache[ayKodu] = data;
                     return data;
                 } catch (e) {
-                    console.error(e);
-                    return {}; // Sabit örnekler kaldırıldı, dosya okunamazsa boş döner.
+                    console.error("JavaScript modülü yükleme hatası (Yerel sunucu veya dosya yolu kontrolü):", e);
+                    return null;
                 }
             }
 
@@ -169,12 +170,20 @@
 
                 let jsonData = await fetchHijriMonthData(hMonth);
                 let item = null;
+                
                 if (jsonData) {
-                    item = jsonData[String(hDay)] || jsonData[hDay] || jsonData[String(hDay).padStart(2, '0')];
+                    if (Array.isArray(jsonData)) {
+                        item = jsonData[hDay] || jsonData[hDay - 1];
+                    } else if (typeof jsonData === 'object') {
+                        item = jsonData[hDay] || 
+                               jsonData[String(hDay)] || 
+                               jsonData[String(hDay).padStart(2, '0')] || 
+                               jsonData[String(parseInt(hDay, 10))];
+                    }
                 }
 
-                let verseText = "Bu güne ait ayet verisi JSON dosyasında bulunamadı.";
-                let hadishText = "Bu güne ait hadis verisi JSON dosyasında bulunamadı.";
+                let verseText = "Bu güne ait ayet verisi JavaScript dosyasında bulunamadı.";
+                let hadishText = "Bu güne ait hadis verisi JavaScript dosyasında bulunamadı.";
                 let germanQuote = "Verfügbar nicht.";
                 let germanTrans = "Çeviri bulunamadı.";
 
