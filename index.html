@@ -265,7 +265,7 @@
             let monthlyInspirationCache = {};
             const ADMIN_PASSWORD = "1234";
 
-            // PDF Haritası
+            // PDF Haritası (sadece butonlar için kullanılacak)
             const bookPdfMap = {
                 "kuran": "pdf/Kuran-ı Kerim.pdf",
                 "cevsen": "pdf/Cevşen.pdf",
@@ -279,55 +279,10 @@
                 "dilekce_ar": "pdf/Bir Kırık Dilekçe Ar.pdf"
             };
 
-            // PDF Okuyucu Modal
-            function openPdfReaderModal(bookId, bookName) {
+            // PDF'yi yeni sekmede aç (Modal yerine)
+            function openPdfInNewTab(bookId, bookName) {
                 let pdfPath = bookPdfMap[bookId] || appData.books.find(b => b.id === bookId)?.pdf || "pdf/Kuran-ı Kerim.pdf";
-                let existingModal = document.getElementById("pdf-reader-modal");
-                if (existingModal) existingModal.remove();
-
-                let modal = document.createElement("div");
-                modal.id = "pdf-reader-modal";
-                modal.style.cssText = `
-                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                    background: rgba(0,0,0,0.7); z-index: 999999;
-                    display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
-                `;
-                modal.innerHTML = `
-                    <div style="background: var(--card-bg); color: var(--text-main); width: 100%; max-width: 900px; height: 90vh; border-radius: 12px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.4);">
-                        <div style="padding: 12px 20px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border-bottom: 2px solid var(--gold-primary); display: flex; justify-content: space-between; align-items: center; color: #3e2723; flex-wrap: wrap; gap: 8px;">
-                            <div style="font-weight: bold; font-size: 16px;">📄 ${bookName} - PDF Okuyucu</div>
-                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                                <span style="font-size: 12px; font-weight: bold;">Sayfa Zıpla:</span>
-                                <input type="number" id="pdf-target-page" min="1" placeholder="Sayfa No" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
-                                <button id="pdf-jump-btn" style="background: #2980b9; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">Git</button>
-                                <button id="pdf-close-btn" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">✕ Kapat</button>
-                            </div>
-                        </div>
-                        <div style="flex: 1; width: 100%; background: #525659; position: relative;">
-                            <iframe id="pdf-iframe" src="${pdfPath}" style="width: 100%; height: 100%; border: none;"></iframe>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(modal);
-
-                const jumpToPage = () => {
-                    let pageNum = document.getElementById("pdf-target-page").value;
-                    if (pageNum && !isNaN(pageNum) && pageNum > 0) {
-                        let iframe = document.getElementById("pdf-iframe");
-                        iframe.src = `${pdfPath}#page=${pageNum}`;
-                    } else {
-                        alert("Lütfen geçerli bir sayfa numarası girin.");
-                    }
-                };
-
-                document.getElementById("pdf-jump-btn").addEventListener("click", jumpToPage);
-                document.getElementById("pdf-target-page").addEventListener("keypress", (e) => {
-                    if (e.key === "Enter") jumpToPage();
-                });
-                document.getElementById("pdf-close-btn").addEventListener("click", () => modal.remove());
-                modal.addEventListener("click", (e) => {
-                    if (e.target === modal) modal.remove();
-                });
+                window.open(pdfPath, '_blank');
             }
 
             // =================================================================
@@ -353,9 +308,10 @@
                     return { ayKodu: ayKoduStr, gunNumarasi: parseInt(gun, 10), fullStr: `${gun} ${ayAdi} ${yil}` };
                 } catch (hata) {
                     return { ayKodu: "03", gunNumarasi: 1, fullStr: "1 Rebiülevvel 1448" };
+                }
             }
 
-            // DÜZELTİLMİŞ: JSON dosyaları json/ klasöründen yükleniyor
+            // JSON dosyaları json/ klasöründen yükleniyor
             async function fetchHijriMonthData(ayKodu) {
                 if (monthlyInspirationCache[ayKodu]) return monthlyInspirationCache[ayKodu];
                 const fileMap = {
@@ -377,7 +333,7 @@
                 }
             }
 
-            // DÜZELTİLMİŞ: Tarih formatı "27 Ağustos 2026" şeklinde
+            // Tarih formatı "27 Ağustos 2026" şeklinde
             async function getHijriInspiration() {
                 const now = new Date();
                 const gun = now.getDate();
@@ -401,10 +357,6 @@
                 }
                 let verseText = "Bu güne ait ayet verisi bulunamadı.";
                 let hadishText = "Bu güne ait hadis verisi bulunamadı.";
-                let proverbText = "Bu güne ait atasözü verisi bulunamadı.";
-                let quoteText = "Bu güne ait özlü söz verisi bulunamadı.";
-                let germanQuote = "Verfügbar nicht.";
-                let germanTrans = "Çeviri bulunamadı.";
                 if (item) {
                     if (item.ayet) {
                         let meal = typeof item.ayet === 'object' ? (item.ayet.meal || item.ayet.text || "") : String(item.ayet);
@@ -417,24 +369,8 @@
                         let kaynak = typeof h === 'object' ? (h.kaynak || h.source || "") : "";
                         hadishText = kaynak ? `${meal} (${kaynak})` : meal;
                     }
-                    let a = item.atasozu || item.atasözü;
-                    if (a) {
-                        let text = typeof a === 'object' ? (a.text || a.meal || "") : String(a);
-                        let kaynak = typeof a === 'object' ? (a.kaynak || a.source || "") : "";
-                        proverbText = kaynak ? `${text} (${kaynak})` : text;
-                    }
-                    let o = item.ozlu_soz || item.ozluSoz || item.soz;
-                    if (o) {
-                        let text = typeof o === 'object' ? (o.text || o.meal || "") : String(o);
-                        let kaynak = typeof o === 'object' ? (o.kaynak || o.source || "") : "";
-                        quoteText = kaynak ? `${text} (${kaynak})` : text;
-                    }
-                    if (item.german) {
-                        germanQuote = item.german.quote || germanQuote;
-                        germanTrans = item.german.translation || germanTrans;
-                    }
                 }
-                return { fullDateStr: todayHijriStr, miladiDateStr: todayMiladiStr, verse: verseText, hadish: hadishText, proverb: proverbText, quote: quoteText, german: { quote: germanQuote, translation: germanTrans } };
+                return { fullDateStr: todayHijriStr, miladiDateStr: todayMiladiStr, verse: verseText, hadish: hadishText };
             }
 
             async function renderDailyInspiration() {
@@ -1388,7 +1324,7 @@
                         });
                     }
 
-                    // Eseri Sıfırla Butonu (YENİ)
+                    // Eseri Sıfırla Butonu
                     const bulkResetBtn = bottomContainer.querySelector("#admin-bulk-reset-btn");
                     if (bulkResetBtn) {
                         bulkResetBtn.addEventListener("click", () => {
@@ -1803,7 +1739,7 @@
                     booksGrid.appendChild(card);
                 });
 
-                // Olay Dinleyicileri
+                // Olay Dinleyicileri - PDF butonları için yeni sekme açma
                 document.querySelectorAll(".book-header").forEach(header => {
                     header.addEventListener("click", (e) => {
                         if (e.target.closest(".read-pdf-btn")) return;
@@ -1816,7 +1752,9 @@
                 document.querySelectorAll(".read-pdf-btn").forEach(btn => {
                     btn.addEventListener("click", (e) => {
                         e.stopPropagation();
-                        openPdfReaderModal(btn.getAttribute("data-book-id"), btn.getAttribute("data-book-name"));
+                        let bookId = btn.getAttribute("data-book-id");
+                        let bookName = btn.getAttribute("data-book-name");
+                        openPdfInNewTab(bookId, bookName);
                     });
                 });
 
