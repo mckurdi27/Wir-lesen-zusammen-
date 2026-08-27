@@ -404,16 +404,26 @@
                     background: var(--card-bg);
                 `;
                 inspirationContainer.innerHTML = `
-                    <div style="text-align: center; font-weight: bold; font-size: 14px; border-bottom: 1px dashed rgba(150,150,150,0.3); padding-bottom: 8px; margin-bottom: 10px;">
-                        🌙 Manevi ve Dil İlhamı Köşesi
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-                        <span style="font-size: 12px; padding: 4px 10px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(150,150,150,0.2);">📅 Miladi: ${inspirationData.miladiDateStr}</span>
-                        <span style="font-size: 12px; padding: 4px 10px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(150,150,150,0.2);">🌙 Hicri: ${inspirationData.fullDateStr}</span>
-                    </div>
-                    <div style="font-size: 13px; line-height: 1.6;">
-                        <p style="margin-bottom: 6px;">📖 <strong>Ayet:</strong> ${inspirationData.verse}</p>
-                        <p style="margin-bottom: 6px;">📜 <strong>Hadis:</strong> ${inspirationData.hadish}</p>
+                <div style="text-align: center; font-weight: bold; font-size: 14px; border-bottom: 1px dashed rgba(150,150,150,0.3); padding-bottom: 8px; margin-bottom: 10px;">
+                   🌙 Manevi ve Dil İlhamı Köşesi
+             </div>
+    
+                   <!-- Tek Satır: Sol, Orta ve Sağ Yerleşimi -->
+                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; width: 100%;">
+                   <div style="flex: 1; text-align: left;">
+                   <span style="font-size: 11px; padding: 4px 8px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(150,150,150,0.2); display: inline-block;">📅 ${inspirationData.miladiDateStr}</span>
+              </div>
+                    <div style="flex: 1; text-align: center;">
+                    <span style="font-size: 11px; padding: 4px 8px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(150,150,150,0.2); display: inline-block;">⭐ [Orta Alan]</span>
+               </div>
+                    <div style="flex: 1; text-align: right;">
+                         <span style="font-size: 11px; padding: 4px 8px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(150,150,150,0.2); display: inline-block;">🌙 ${inspirationData.fullDateStr}</span>
+                     </div>
+                 </div>
+
+                       <div style="font-size: 13px; line-height: 1.6;">
+                          <p style="margin-bottom: 6px;">📖 <strong>Ayet:</strong> ${inspirationData.verse}</p>
+                          <p style="margin-bottom: 6px;">📜 <strong>Hadis:</strong> ${inspirationData.hadish}</p>
         
                     </div>
                 `;
