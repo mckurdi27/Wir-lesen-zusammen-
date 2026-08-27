@@ -6,7 +6,7 @@
     <!-- ================================================================= -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ortak Hatim und Dua Takip Sistemi</title>
+    <title>Ortak Hatim ve Dua Takip Sistemi</title>
 </head>
 <body>
     <!-- ================================================================= -->
@@ -272,69 +272,6 @@
             let loggedInMember = "";
             let monthlyInspirationCache = {};
             const ADMIN_PASSWORD = "1234";
-
-            const bookPdfMap = {
-                "kuran": "pdf/Kuran-ı Kerim.pdf",
-                "cevsen": "pdf/Cevşen.pdf",
-                "tevhidname": "pdf/Tevhidname Mealli.pdf",
-                "celcelutiye": "pdf/Celcelutiye.pdf",
-                "buyuk_cevsen": "pdf/Büyük Cevşen.pdf",
-                "ashabi_bedr": "pdf/Ashabı Bedr ve Şühedayı Uhud.pdf",
-                "dalail": "pdf/Dalail ul khairat_text.pdf",
-                "dua_mecmuasi": "pdf/Dua Mecmuasi Mealli.pdf",
-                "dilekce_tr": "pdf/Bir Kırık Dilekçe Tr.pdf",
-                "dilekce_ar": "pdf/Bir Kırık Dilekçe Ar.pdf"
-            };
-
-            function openPdfReaderModal(bookId, bookName) {
-                let pdfPath = bookPdfMap[bookId] || appData.books.find(b => b.id === bookId)?.pdf || "pdf/Kuran-ı Kerim.pdf";
-                let existingModal = document.getElementById("pdf-reader-modal");
-                if (existingModal) existingModal.remove();
-
-                let modal = document.createElement("div");
-                modal.id = "pdf-reader-modal";
-                modal.style.cssText = `
-                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                    background: rgba(0,0,0,0.7); z-index: 999999;
-                    display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
-                `;
-                modal.innerHTML = `
-                    <div style="background: var(--card-bg); color: var(--text-main); width: 100%; max-width: 900px; height: 90vh; border-radius: 12px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.4);">
-                        <div style="padding: 12px 20px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border-bottom: 2px solid var(--gold-primary); display: flex; justify-content: space-between; align-items: center; color: #3e2723;">
-                            <div style="font-weight: bold; font-size: 16px;">📄 ${bookName} - PDF Okuyucu</div>
-                            <div style="display: flex; gap: 8px; align-items: center;">
-                                <span style="font-size: 12px; font-weight: bold;">Sayfa Zıpla:</span>
-                                <input type="number" id="pdf-target-page" min="1" placeholder="Sayfa No" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
-                                <button id="pdf-jump-btn" style="background: #2980b9; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">Git</button>
-                                <button id="pdf-close-btn" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">✕ Kapat</button>
-                            </div>
-                        </div>
-                        <div style="flex: 1; width: 100%; background: #525659; position: relative;">
-                            <iframe id="pdf-iframe" src="${pdfPath}" style="width: 100%; height: 100%; border: none;"></iframe>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(modal);
-
-                const jumpToPage = () => {
-                    let pageNum = document.getElementById("pdf-target-page").value;
-                    if (pageNum && !isNaN(pageNum) && pageNum > 0) {
-                        let iframe = document.getElementById("pdf-iframe");
-                        iframe.src = `${pdfPath}#page=${pageNum}`;
-                    } else {
-                        alert("Lütfen geçerli bir sayfa numarası girin.");
-                    }
-                };
-
-                document.getElementById("pdf-jump-btn").addEventListener("click", jumpToPage);
-                document.getElementById("pdf-target-page").addEventListener("keypress", (e) => {
-                    if (e.key === "Enter") jumpToPage();
-                });
-                document.getElementById("pdf-close-btn").addEventListener("click", () => modal.remove());
-                modal.addEventListener("click", (e) => {
-                    if (e.target === modal) modal.remove();
-                });
-            }
 
             function bugunkuHicriTarihiAl() {
                 const ayAdlari = {
@@ -723,6 +660,234 @@
                 });
             }
 
+            // =================================================================
+            // SADE ANALİZ PANELİ - openSimpleAnalysisModal()
+            // =================================================================
+            function openSimpleAnalysisModal() {
+                let existingModal = document.getElementById("simple-analysis-modal");
+                if (existingModal) existingModal.remove();
+
+                // Tüm grupları topla
+                let allGroupKeys = getAllGroupKeys();
+                let groupStats = [];
+                let totalMembers = 0;
+                let totalBooks = 0;
+                let totalTaken = 0;
+                let totalRead = 0;
+
+                allGroupKeys.forEach(gKey => {
+                    let gDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
+                    if (!gDataRaw) return;
+                    let gData = JSON.parse(gDataRaw);
+                    
+                    let memberCount = gData.members ? gData.members.length : 0;
+                    totalMembers += memberCount;
+                    
+                    let groupBooks = 0;
+                    let groupTaken = 0;
+                    let groupRead = 0;
+                    
+                    if (gData.books && gData.bookPages) {
+                        gData.books.forEach(b => {
+                            groupBooks += b.totalUnits;
+                            totalBooks += b.totalUnits;
+                            gData.bookPages[b.id].forEach(p => {
+                                if (p.owner) {
+                                    groupTaken++;
+                                    totalTaken++;
+                                }
+                                if (p.isRead) {
+                                    groupRead++;
+                                    totalRead++;
+                                }
+                            });
+                        });
+                    }
+                    
+                    groupStats.push({
+                        name: gKey,
+                        members: memberCount,
+                        books: groupBooks,
+                        taken: groupTaken,
+                        read: groupRead,
+                        takenPercent: groupBooks > 0 ? Math.round((groupTaken / groupBooks) * 100) : 0,
+                        readPercent: groupBooks > 0 ? Math.round((groupRead / groupBooks) * 100) : 0
+                    });
+                });
+
+                // Aktif grup için detaylı veri
+                let activeGroupStats = groupStats.find(g => g.name === currentGroup);
+                let activeMemberDetails = [];
+                
+                if (appData && appData.members) {
+                    appData.members.forEach(m => {
+                        let mTaken = 0;
+                        let mRead = 0;
+                        Object.keys(appData.bookPages).forEach(bId => {
+                            appData.bookPages[bId].forEach(p => {
+                                if (p.owner === m) {
+                                    mTaken++;
+                                    if (p.isRead) mRead++;
+                                }
+                            });
+                        });
+                        activeMemberDetails.push({
+                            name: m,
+                            taken: mTaken,
+                            read: mRead,
+                            readPercent: mTaken > 0 ? Math.round((mRead / mTaken) * 100) : 0
+                        });
+                    });
+                    // En çok okuyan üye sıralaması
+                    activeMemberDetails.sort((a, b) => b.read - a.read);
+                }
+
+                let modalOverlay = document.createElement("div");
+                modalOverlay.id = "simple-analysis-modal";
+                modalOverlay.style.cssText = `
+                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                    background: rgba(0, 0, 0, 0.6); z-index: 99999;
+                    display: flex; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;
+                `;
+
+                modalOverlay.innerHTML = `
+                    <div style="background: var(--card-bg); color: var(--text-main); width: 100%; max-width: 800px; max-height: 90vh; border-radius: 12px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.3);">
+                        
+                        <!-- Başlık -->
+                        <div style="padding: 15px 20px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border-bottom: 2px solid var(--gold-primary); display: flex; justify-content: space-between; align-items: center; color: #3e2723;">
+                            <div>
+                                <h2 style="margin: 0; font-size: 18px; color: #8a6d3b;">📊 Sistem Analiz Paneli</h2>
+                                <div style="font-size: 11px; opacity: 0.8; margin-top: 3px;">Aktif Grup: ${currentGroup.replace(/_/g, ' ').toUpperCase()}</div>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button id="modal-simple-close-btn" style="background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;">✕ Kapat</button>
+                            </div>
+                        </div>
+
+                        <!-- İçerik -->
+                        <div style="padding: 20px; overflow-y: auto; flex: 1; font-size: 14px;">
+                            
+                            <!-- 1. Sistem Genel Özeti -->
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px;">
+                                <div style="padding: 12px; background: rgba(52, 152, 219, 0.1); border-radius: 8px; border-left: 4px solid #3498db; text-align: center;">
+                                    <div style="font-size: 11px; opacity: 0.7;">Toplam Grup</div>
+                                    <div style="font-size: 20px; font-weight: bold;">${allGroupKeys.length}</div>
+                                </div>
+                                <div style="padding: 12px; background: rgba(46, 204, 113, 0.1); border-radius: 8px; border-left: 4px solid #27ae60; text-align: center;">
+                                    <div style="font-size: 11px; opacity: 0.7;">Toplam Üye</div>
+                                    <div style="font-size: 20px; font-weight: bold;">${totalMembers}</div>
+                                </div>
+                                <div style="padding: 12px; background: rgba(241, 196, 15, 0.1); border-radius: 8px; border-left: 4px solid #f39c12; text-align: center;">
+                                    <div style="font-size: 11px; opacity: 0.7;">Toplam Alınan</div>
+                                    <div style="font-size: 20px; font-weight: bold;">${totalTaken}</div>
+                                </div>
+                                <div style="padding: 12px; background: rgba(155, 89, 182, 0.1); border-radius: 8px; border-left: 4px solid #8e44ad; text-align: center;">
+                                    <div style="font-size: 11px; opacity: 0.7;">Toplam Okunan</div>
+                                    <div style="font-size: 20px; font-weight: bold;">${totalRead}</div>
+                                </div>
+                            </div>
+
+                            <!-- 2. Aktif Grup İlerleme -->
+                            ${activeGroupStats ? `
+                            <div style="margin-bottom: 20px; padding: 15px; background: rgba(212, 175, 55, 0.08); border-radius: 8px; border: 1px solid var(--gold-primary);">
+                                <h3 style="margin-top: 0; font-size: 15px; color: var(--gold-dark);">📈 Aktif Grup: ${currentGroup.replace(/_/g, ' ').toUpperCase()}</h3>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px;">
+                                    <div><span style="opacity:0.7;">Üye:</span> <strong>${activeGroupStats.members}</strong></div>
+                                    <div><span style="opacity:0.7;">Alınan:</span> <strong>${activeGroupStats.taken} / ${activeGroupStats.books} (%${activeGroupStats.takenPercent})</strong></div>
+                                    <div><span style="opacity:0.7;">Okunan:</span> <strong>${activeGroupStats.read} / ${activeGroupStats.books} (%${activeGroupStats.readPercent})</strong></div>
+                                </div>
+                                <!-- İlerleme Çubuğu -->
+                                <div style="margin-top: 8px; background: #e9ecef; border-radius: 10px; height: 8px; overflow: hidden;">
+                                    <div style="background: linear-gradient(to right, #f39c12, #27ae60); width: ${activeGroupStats.takenPercent}%; height: 100%; border-radius: 10px; transition: 0.5s;"></div>
+                                </div>
+                                <div style="font-size: 11px; opacity: 0.7; margin-top: 3px; text-align: right;">${activeGroupStats.takenPercent}% ilerleme</div>
+                            </div>
+                            ` : ''}
+
+                            <!-- 3. Üye Sıralaması -->
+                            ${activeMemberDetails.length > 0 ? `
+                            <div style="margin-bottom: 20px;">
+                                <h3 style="font-size: 15px; color: var(--gold-dark); margin-top: 0;">🏆 Aktif Grup Üye Sıralaması</h3>
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                        <thead>
+                                            <tr style="background: rgba(212, 175, 55, 0.15);">
+                                                <th style="padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">#</th>
+                                                <th style="padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye Adı</th>
+                                                <th style="padding: 8px 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Aldığı</th>
+                                                <th style="padding: 8px 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okuduğu</th>
+                                                <th style="padding: 8px 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Tamamlama</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${activeMemberDetails.map((m, idx) => `
+                                                <tr style="${idx === 0 ? 'background: rgba(255, 215, 0, 0.1);' : ''}">
+                                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color);">${idx + 1}</td>
+                                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-weight: ${idx === 0 ? 'bold' : 'normal'};">
+                                                        ${idx === 0 ? '🥇 ' : ''}${m.name}
+                                                    </td>
+                                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${m.taken}</td>
+                                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${m.read}</td>
+                                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); text-align: center;">
+                                                        <span style="background: ${m.readPercent >= 80 ? '#27ae60' : m.readPercent >= 50 ? '#f39c12' : '#e74c3c'}; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px;">
+                                                            %${m.readPercent}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            ` : ''}
+
+                            <!-- 4. Tüm Gruplar Kıyas -->
+                            <div>
+                                <h3 style="font-size: 15px; color: var(--gold-dark); margin-top: 0;">⚖️ Tüm Gruplar Kıyas</h3>
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                        <thead>
+                                            <tr style="background: rgba(212, 175, 55, 0.15);">
+                                                <th style="padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Grup</th>
+                                                <th style="padding: 8px 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Üye</th>
+                                                <th style="padding: 8px 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Alınan</th>
+                                                <th style="padding: 8px 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okunan</th>
+                                                <th style="padding: 8px 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">İlerleme</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${groupStats.map(g => `
+                                                <tr style="${g.name === currentGroup ? 'background: rgba(212, 175, 55, 0.08); font-weight: bold;' : ''}">
+                                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color);">${g.name.replace(/_/g, ' ').toUpperCase()}</td>
+                                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${g.members}</td>
+                                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${g.taken} / ${g.books}</td>
+                                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60;">${g.read}</td>
+                                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); text-align: center;">
+                                                        <div style="background: #e9ecef; border-radius: 10px; height: 6px; width: 80px; display: inline-block; overflow: hidden;">
+                                                            <div style="background: ${g.takenPercent >= 80 ? '#27ae60' : g.takenPercent >= 50 ? '#f39c12' : '#e74c3c'}; width: ${g.takenPercent}%; height: 100%; border-radius: 10px;"></div>
+                                                        </div>
+                                                        <span style="font-size: 11px; margin-left: 4px;">%${g.takenPercent}</span>
+                                                    </td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(modalOverlay);
+
+                // Kapat butonu
+                modalOverlay.querySelector("#modal-simple-close-btn").addEventListener("click", () => modalOverlay.remove());
+                modalOverlay.addEventListener("click", (e) => {
+                    if (e.target === modalOverlay) modalOverlay.remove();
+                });
+            }
+
             async function loadGroupData() {
                 removeStuckPanel();
                 const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
@@ -841,7 +1006,31 @@
                 `;
 
                 controlsContainer.innerHTML = `
+                    <!-- 1. Grup Seç / Grup-isim -->
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px;">
+                        <label style="font-weight: bold; font-size: 13px; min-width: 65px;">Grup-isim:</label>
+                        <select id="user-group-select" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 140px;">
+                            ${groupsHtml}
+                        </select>
+                    </div>
+                    
+                    <!-- 2. Bireysel / Şifreli bölüm (Bireysel-İsim-Şifre) -->
+                    <div style="display: flex; gap: 6px; align-items: center; margin-top: 10px; margin-bottom: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px; flex-wrap: wrap;">
+                        <span style="font-weight: bold; font-size: 12px; white-space: nowrap;">Bireysel-İsim-Şifre:</span>
+                        <input type="text" id="locked-group-name" placeholder="Grup Adı" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 80px;">
+                        <input type="password" id="locked-group-pwd" placeholder="Şifre" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 70px;">
+                        <button id="join-locked-group-btn" style="padding: 6px 10px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; white-space: nowrap;">Katıl</button>
+                    </div>
 
+                    <!-- 3. İsim-isim (Üye Seçimi ve Üye Ekle) -->
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
+                        <label style="font-weight: bold; font-size: 13px; min-width: 65px;">İsim-isim:</label>
+                        <select id="user-member-select" style="padding: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 14px; flex: 1; min-width: 180px;">
+                            ${membersOptions}
+                        </select>
+                        <button id="user-add-member-btn" style="padding: 6px 10px; background: #2980b9; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">+ Üye Ekle</button>
+                    </div>
+                    
                     <div style="font-size: 11px; color: #e67e22; font-style: italic; margin-top: 5px;">
                         * Not: Hem bireysel hem de gruplardaki kişiler şifre girmeden sayfada değişiklik yapamayacaktır.
                     </div>
@@ -1000,492 +1189,6 @@
                 `;
             }
 
-            function openDetailedAnalysisModal() {
-                let existingModal = document.getElementById("detailed-analysis-modal");
-                if (existingModal) existingModal.remove();
-
-                let allGroupKeys = getAllGroupKeys();
-                let totalSystemBooks = 0, totalSystemTaken = 0, totalSystemRead = 0;
-                allGroupKeys.forEach(gKey => {
-                    let gDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
-                    if (!gDataRaw) return;
-                    let gData = JSON.parse(gDataRaw);
-                    if (gData.books && gData.bookPages) {
-                        gData.books.forEach(b => {
-                            if (gKey === currentGroup) totalSystemBooks += b.totalUnits;
-                            gData.bookPages[b.id].forEach(p => {
-                                if (gKey === currentGroup) {
-                                    if (p.owner) totalSystemTaken++;
-                                    if (p.isRead) totalSystemRead++;
-                                }
-                            });
-                        });
-                    }
-                });
-
-                let modalOverlay = document.createElement("div");
-                modalOverlay.id = "detailed-analysis-modal";
-                modalOverlay.style.cssText = `
-                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                    background: rgba(0, 0, 0, 0.6); z-index: 99999;
-                    display: flex; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;
-                `;
-
-                modalOverlay.innerHTML = `
-                    <div style="background: var(--card-bg); color: var(--text-main); width: 100%; max-width: 950px; max-height: 90vh; border-radius: 12px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.3);">
-                        <div style="padding: 15px 20px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border-bottom: 2px solid var(--gold-primary); display: flex; justify-content: space-between; align-items: center; color: #3e2723;">
-                            <div>
-                                <h2 style="margin: 0; font-size: 18px; color: #8a6d3b;">📊 Yönetici 5 Sekmeli Analiz ve Rapor Paneli</h2>
-                                <div style="font-size: 11px; opacity: 0.8; margin-top: 3px;">Aktif Grup: ${currentGroup.replace(/_/g, ' ').toUpperCase()}</div>
-                            </div>
-                            <div style="display: flex; gap: 8px;">
-                                <button id="modal-print-btn" style="background: #2980b9; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;">🖨️ Yazdır</button>
-                                <button id="modal-close-btn" style="background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;">✕ Kapat</button>
-                            </div>
-                        </div>
-
-                        <div style="display: flex; gap: 4px; padding: 10px 15px 0 15px; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border-color); overflow-x: auto;">
-                            <button class="m-tab-btn active" data-target="mtab-1" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">1. Genel Özet</button>
-                            <button class="m-tab-btn" data-target="mtab-2" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">2. Grup Karşılaştırma</button>
-                            <button class="m-tab-btn" data-target="mtab-3" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">3. Üye Performansı</button>
-                            <button class="m-tab-btn" data-target="mtab-4" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">4. Okuma Günlüğü</button>
-                            <button class="m-tab-btn" data-target="mtab-5" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">5. Eser Durumu</button>
-                        </div>
-
-                        <div style="padding: 20px; overflow-y: auto; flex: 1; font-size: 13px;">
-                            <div id="mtab-1" class="m-tab-content">
-                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📈 Sistem Genel Özeti</h3>
-                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 15px;">
-                                    <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; border-left: 4px solid #3498db;">
-                                        <div style="font-size: 11px; opacity: 0.8;">Aktif Grup</div>
-                                        <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${currentGroup.replace(/_/g, ' ').toUpperCase()}</div>
-                                    </div>
-                                    <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; border-left: 4px solid #f39c12;">
-                                        <div style="font-size: 11px; opacity: 0.8;">Alınan Hisseler</div>
-                                        <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${totalSystemTaken} / ${totalSystemBooks}</div>
-                                    </div>
-                                    <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; border-left: 4px solid #27ae60;">
-                                        <div style="font-size: 11px; opacity: 0.8;">Okunan Hisseler</div>
-                                        <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${totalSystemRead} / ${totalSystemBooks}</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div id="mtab-2" class="m-tab-content" style="display: none;">
-                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">⚔️ Tüm Grupları Karşılaştırma</h3>
-                                <div style="background: rgba(0,0,0,0.02); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 12px;">
-                                    <div style="font-weight: bold; font-size: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
-                                        <span>🔍 Grup Filtreleme:</span>
-                                        <div>
-                                            <button id="t2-select-all" style="padding: 2px 8px; font-size: 11px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 3px;">Tümünü Seç</button>
-                                            <button id="t2-clear-all" style="padding: 2px 8px; font-size: 11px; cursor: pointer; background: #e74c3c; color: white; border: none; border-radius: 3px;">Temizle</button>
-                                        </div>
-                                    </div>
-                                    <div id="t2-group-checkboxes" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
-                                </div>
-                                <div style="overflow-x: auto;">
-                                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                                        <thead>
-                                            <tr style="background: rgba(212,175,55,0.1);">
-                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Grup Adı</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Üye Sayısı</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Alınan</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okunan</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="t2-table-body"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <div id="mtab-3" class="m-tab-content" style="display: none;">
-                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">👥 Üye Performansları</h3>
-                                <div style="background: rgba(0,0,0,0.02); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                    <div>
-                                        <div style="font-weight: bold; font-size: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
-                                            <span>📁 Gruplar:</span>
-                                            <div>
-                                                <button id="t3-group-all" style="padding: 2px 6px; font-size: 10px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 3px;">Tümü</button>
-                                                <button id="t3-group-clear" style="padding: 2px 6px; font-size: 10px; cursor: pointer; background: #e74c3c; color: white; border: none; border-radius: 3px;">Temizle</button>
-                                            </div>
-                                        </div>
-                                        <div id="t3-group-checkboxes" style="display: flex; flex-wrap: wrap; gap: 8px; max-height: 80px; overflow-y: auto;"></div>
-                                    </div>
-                                    <div>
-                                        <div style="font-weight: bold; font-size: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
-                                            <span>👤 Üyeler:</span>
-                                            <div>
-                                                <button id="t3-member-all" style="padding: 2px 6px; font-size: 10px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 3px;">Tümü</button>
-                                                <button id="t3-member-clear" style="padding: 2px 6px; font-size: 10px; cursor: pointer; background: #e74c3c; color: white; border: none; border-radius: 3px;">Temizle</button>
-                                            </div>
-                                        </div>
-                                        <div id="t3-member-checkboxes" style="display: flex; flex-wrap: wrap; gap: 8px; max-height: 80px; overflow-y: auto;"></div>
-                                    </div>
-                                </div>
-                                <div style="overflow-x: auto;">
-                                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                                        <thead>
-                                            <tr style="background: rgba(212,175,55,0.1);">
-                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Grup</th>
-                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye Adı</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Aldığı Toplam</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okuduğu Toplam</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="t3-table-body"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <div id="mtab-4" class="m-tab-content" style="display: none;">
-                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📜 Detaylı Okuma Günlüğü</h3>
-                                <div style="background: rgba(0,0,0,0.02); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                    <div>
-                                        <div style="font-weight: bold; font-size: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
-                                            <span>📁 Gruplar:</span>
-                                            <div>
-                                                <button id="t4-group-all" style="padding: 2px 6px; font-size: 10px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 3px;">Tümü</button>
-                                                <button id="t4-group-clear" style="padding: 2px 6px; font-size: 10px; cursor: pointer; background: #e74c3c; color: white; border: none; border-radius: 3px;">Temizle</button>
-                                            </div>
-                                        </div>
-                                        <div id="t4-group-checkboxes" style="display: flex; flex-wrap: wrap; gap: 8px; max-height: 80px; overflow-y: auto;"></div>
-                                    </div>
-                                    <div>
-                                        <div style="font-weight: bold; font-size: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
-                                            <span>👤 Üyeler:</span>
-                                            <div>
-                                                <button id="t4-member-all" style="padding: 2px 6px; font-size: 10px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 3px;">Tümü</button>
-                                                <button id="t4-member-clear" style="padding: 2px 6px; font-size: 10px; cursor: pointer; background: #e74c3c; color: white; border: none; border-radius: 3px;">Temizle</button>
-                                            </div>
-                                        </div>
-                                        <div id="t4-member-checkboxes" style="display: flex; flex-wrap: wrap; gap: 8px; max-height: 80px; overflow-y: auto;"></div>
-                                    </div>
-                                </div>
-                                <div style="overflow-x: auto;">
-                                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                                        <thead>
-                                            <tr style="background: rgba(212,175,55,0.1);">
-                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Tarih</th>
-                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Grup</th>
-                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye</th>
-                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Miktar / Aralık</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="t4-table-body"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <div id="mtab-5" class="m-tab-content" style="display: none;">
-                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📚 Eserler ve Hatim Döngü Durumu (${currentGroup.replace(/_/g, ' ').toUpperCase()})</h3>
-                                <div style="overflow-x: auto;">
-                                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                                        <thead>
-                                            <tr style="background: rgba(212,175,55,0.1);">
-                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser Adı</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Mevcut Hatim</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Dua Durumu</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Toplam Birim</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            ${appData.books.map(b => {
-                                                let hInfo = appData.bookHatims[b.id] || { hatimNo: 1, prayerDone: false };
-                                                return `
-                                                    <tr>
-                                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${b.name}</td>
-                                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${hInfo.hatimNo}. Hatim</td>
-                                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: ${hInfo.prayerDone ? '#27ae60' : '#e67e22'}; font-weight: bold;">${hInfo.prayerDone ? '✓ Yapıldı' : 'Yapılacak'}</td>
-                                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${b.totalUnits} Birim</td>
-                                                    </tr>
-                                                `;
-                                            }).join('')}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                document.body.appendChild(modalOverlay);
-
-                function renderTab2() {
-                    let containerEl = modalOverlay.querySelector("#t2-group-checkboxes");
-                    let tbodyEl = modalOverlay.querySelector("#t2-table-body");
-                    containerEl.innerHTML = "";
-
-                    allGroupKeys.forEach(gKey => {
-                        let label = document.createElement("label");
-                        label.style.cssText = "display: flex; align-items: center; gap: 4px; font-size: 12px; cursor: pointer; font-weight: bold;";
-                        label.innerHTML = `<input type="checkbox" value="${gKey}" checked style="cursor: pointer;"> ${gKey.replace(/_/g, ' ').toUpperCase()}`;
-                        containerEl.appendChild(label);
-                    });
-
-                    function updateTable() {
-                        let checkedGroups = Array.from(modalOverlay.querySelectorAll("#t2-group-checkboxes input:checked")).map(i => i.value);
-                        let html = "";
-                        checkedGroups.forEach(gKey => {
-                            let gDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
-                            if (!gDataRaw) return;
-                            let gData = JSON.parse(gDataRaw);
-                            let mCount = gData.members ? gData.members.length : 0;
-                            let totalU = 0, takenU = 0, readU = 0;
-                            if (gData.books && gData.bookPages) {
-                                gData.books.forEach(b => {
-                                    totalU += b.totalUnits;
-                                    gData.bookPages[b.id].forEach(p => {
-                                        if (p.owner) takenU++;
-                                        if (p.isRead) readU++;
-                                    });
-                                });
-                            }
-                            let tPct = totalU > 0 ? Math.round((takenU / totalU) * 100) : 0;
-                            let rPct = totalU > 0 ? Math.round((readU / totalU) * 100) : 0;
-
-                            html += `
-                                <tr>
-                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${gKey.replace(/_/g, ' ').toUpperCase()}</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${mCount} Üye</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${takenU} / ${totalU} (%${tPct})</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${readU} / ${totalU} (%${rPct})</td>
-                                </tr>
-                            `;
-                        });
-                        if (!html) html = `<tr><td colspan="4" style="padding: 15px; text-align: center; color: #777;">Lütfen en az bir grup seçin.</td></tr>`;
-                        tbodyEl.innerHTML = html;
-                    }
-
-                    modalOverlay.querySelectorAll("#t2-group-checkboxes input").forEach(chk => chk.addEventListener("change", updateTable));
-                    modalOverlay.querySelector("#t2-select-all").addEventListener("click", () => {
-                        modalOverlay.querySelectorAll("#t2-group-checkboxes input").forEach(i => i.checked = true);
-                        updateTable();
-                    });
-                    modalOverlay.querySelector("#t2-clear-all").addEventListener("click", () => {
-                        modalOverlay.querySelectorAll("#t2-group-checkboxes input").forEach(i => i.checked = false);
-                        updateTable();
-                    });
-                    updateTable();
-                }
-
-                function renderTab3() {
-                    let gContainer = modalOverlay.querySelector("#t3-group-checkboxes");
-                    let mContainer = modalOverlay.querySelector("#t3-member-checkboxes");
-                    let tbodyEl = modalOverlay.querySelector("#t3-table-body");
-
-                    gContainer.innerHTML = "";
-                    allGroupKeys.forEach(gKey => {
-                        let label = document.createElement("label");
-                        label.style.cssText = "display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer; font-weight: bold;";
-                        label.innerHTML = `<input type="checkbox" value="${gKey}" checked style="cursor: pointer;"> ${gKey.replace(/_/g, ' ').toUpperCase()}`;
-                        gContainer.appendChild(label);
-                    });
-
-                    function updateMembersList() {
-                        let selectedGroups = Array.from(modalOverlay.querySelectorAll("#t3-group-checkboxes input:checked")).map(i => i.value);
-                        let allMembersSet = new Set();
-                        selectedGroups.forEach(gKey => {
-                            let dRaw = localStorage.getItem(`hatim_group_${gKey}`);
-                            if (dRaw) {
-                                let parsed = JSON.parse(dRaw);
-                                if (parsed.members) parsed.members.forEach(m => allMembersSet.add(m));
-                            }
-                        });
-
-                        mContainer.innerHTML = "";
-                        allMembersSet.forEach(mName => {
-                            let label = document.createElement("label");
-                            label.style.cssText = "display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer;";
-                            label.innerHTML = `<input type="checkbox" value="${mName}" checked style="cursor: pointer;"> ${mName}`;
-                            mContainer.appendChild(label);
-                        });
-
-                        mContainer.querySelectorAll("input").forEach(chk => chk.addEventListener("change", updateTable3));
-                        updateTable3();
-                    }
-
-                    function updateTable3() {
-                        let selectedGroups = Array.from(modalOverlay.querySelectorAll("#t3-group-checkboxes input:checked")).map(i => i.value);
-                        let selectedMembers = Array.from(modalOverlay.querySelectorAll("#t3-member-checkboxes input:checked")).map(i => i.value);
-                        let html = "";
-
-                        selectedGroups.forEach(gKey => {
-                            let dRaw = localStorage.getItem(`hatim_group_${gKey}`);
-                            if (!dRaw) return;
-                            let gData = JSON.parse(dRaw);
-                            if (!gData.members || !gData.bookPages) return;
-
-                            gData.members.forEach(m => {
-                                if (!selectedMembers.includes(m)) return;
-                                let mTaken = 0, mRead = 0;
-                                Object.keys(gData.bookPages).forEach(bId => {
-                                    gData.bookPages[bId].forEach(p => {
-                                        if (p.owner === m) mTaken++;
-                                        if (p.owner === m && p.isRead) mRead++;
-                                    });
-                                });
-
-                                html += `
-                                    <tr>
-                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${gKey.replace(/_/g, ' ').toUpperCase()}</td>
-                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${m}</td>
-                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${mTaken} Hisse</td>
-                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${mRead} Hisse</td>
-                                    </tr>
-                                `;
-                            });
-                        });
-
-                        if (!html) html = `<tr><td colspan="4" style="padding: 15px; text-align: center; color: #777;">Seçilen kriterlere uygun üye performans kaydı bulunamadı.</td></tr>`;
-                        tbodyEl.innerHTML = html;
-                    }
-
-                    modalOverlay.querySelectorAll("#t3-group-checkboxes input").forEach(chk => chk.addEventListener("change", updateMembersList));
-                    modalOverlay.querySelector("#t3-group-all").addEventListener("click", () => {
-                        modalOverlay.querySelectorAll("#t3-group-checkboxes input").forEach(i => i.checked = true);
-                        updateMembersList();
-                    });
-                    modalOverlay.querySelector("#t3-group-clear").addEventListener("click", () => {
-                        modalOverlay.querySelectorAll("#t3-group-checkboxes input").forEach(i => i.checked = false);
-                        updateMembersList();
-                    });
-                    modalOverlay.querySelector("#t3-member-all").addEventListener("click", () => {
-                        modalOverlay.querySelectorAll("#t3-member-checkboxes input").forEach(i => i.checked = true);
-                        updateTable3();
-                    });
-                    modalOverlay.querySelector("#t3-member-clear").addEventListener("click", () => {
-                        modalOverlay.querySelectorAll("#t3-member-checkboxes input").forEach(i => i.checked = false);
-                        updateTable3();
-                    });
-
-                    updateMembersList();
-                }
-
-                function renderTab4() {
-                    let gContainer = modalOverlay.querySelector("#t4-group-checkboxes");
-                    let mContainer = modalOverlay.querySelector("#t4-member-checkboxes");
-                    let tbodyEl = modalOverlay.querySelector("#t4-table-body");
-
-                    gContainer.innerHTML = "";
-                    allGroupKeys.forEach(gKey => {
-                        let label = document.createElement("label");
-                        label.style.cssText = "display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer; font-weight: bold;";
-                        label.innerHTML = `<input type="checkbox" value="${gKey}" checked style="cursor: pointer;"> ${gKey.replace(/_/g, ' ').toUpperCase()}`;
-                        gContainer.appendChild(label);
-                    });
-
-                    function updateMembersList4() {
-                        let selectedGroups = Array.from(modalOverlay.querySelectorAll("#t4-group-checkboxes input:checked")).map(i => i.value);
-                        let allMembersSet = new Set();
-                        selectedGroups.forEach(gKey => {
-                            let dRaw = localStorage.getItem(`hatim_group_${gKey}`);
-                            if (dRaw) {
-                                let parsed = JSON.parse(dRaw);
-                                if (parsed.members) parsed.members.forEach(m => allMembersSet.add(m));
-                            }
-                        });
-
-                        mContainer.innerHTML = "";
-                        allMembersSet.forEach(mName => {
-                            let label = document.createElement("label");
-                            label.style.cssText = "display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer;";
-                            label.innerHTML = `<input type="checkbox" value="${mName}" checked style="cursor: pointer;"> ${mName}`;
-                            mContainer.appendChild(label);
-                        });
-
-                        mContainer.querySelectorAll("input").forEach(chk => chk.addEventListener("change", updateTable4));
-                        updateTable4();
-                    }
-
-                    function updateTable4() {
-                        let selectedGroups = Array.from(modalOverlay.querySelectorAll("#t4-group-checkboxes input:checked")).map(i => i.value);
-                        let selectedMembers = Array.from(modalOverlay.querySelectorAll("#t4-member-checkboxes input:checked")).map(i => i.value);
-                        let combinedLogs = [];
-
-                        selectedGroups.forEach(gKey => {
-                            let dRaw = localStorage.getItem(`hatim_group_${gKey}`);
-                            if (!dRaw) return;
-                            let gData = JSON.parse(dRaw);
-                            if (gData.readingLogs) {
-                                gData.readingLogs.forEach(log => {
-                                    if (selectedMembers.includes(log.member)) {
-                                        combinedLogs.push({ ...log, groupName: gKey });
-                                    }
-                                });
-                            }
-                        });
-
-                        combinedLogs.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-
-                        let html = "";
-                        combinedLogs.forEach(log => {
-                            html += `
-                                <tr>
-                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-size: 11px; opacity: 0.8;">${log.date}</td>
-                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${log.groupName.replace(/_/g, ' ').toUpperCase()}</td>
-                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color);">${log.member}</td>
-                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color);">${log.bookName}</td>
-                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${log.count} Birim (${log.range})</td>
-                                </tr>
-                            `;
-                        });
-
-                        if (!html) html = `<tr><td colspan="5" style="padding: 15px; text-align: center; color: #777;">Seçilen kriterlere uygun okuma günlüğü kaydı bulunmuyor.</td></tr>`;
-                        tbodyEl.innerHTML = html;
-                    }
-
-                    modalOverlay.querySelectorAll("#t4-group-checkboxes input").forEach(chk => chk.addEventListener("change", updateMembersList4));
-                    modalOverlay.querySelector("#t4-group-all").addEventListener("click", () => {
-                        modalOverlay.querySelectorAll("#t4-group-checkboxes input").forEach(i => i.checked = true);
-                        updateMembersList4();
-                    });
-                    modalOverlay.querySelector("#t4-group-clear").addEventListener("click", () => {
-                        modalOverlay.querySelectorAll("#t4-group-checkboxes input").forEach(i => i.checked = false);
-                        updateMembersList4();
-                    });
-                    modalOverlay.querySelector("#t4-member-all").addEventListener("click", () => {
-                        modalOverlay.querySelectorAll("#t4-member-checkboxes input").forEach(i => i.checked = true);
-                        updateTable4();
-                    });
-                    modalOverlay.querySelector("#t4-member-clear").addEventListener("click", () => {
-                        modalOverlay.querySelectorAll("#t4-member-checkboxes input").forEach(i => i.checked = false);
-                        updateTable4();
-                    });
-
-                    updateMembersList4();
-                }
-
-                renderTab2();
-                renderTab3();
-                renderTab4();
-
-                const tabBtns = modalOverlay.querySelectorAll(".m-tab-btn");
-                const tabContents = modalOverlay.querySelectorAll(".m-tab-content");
-
-                tabBtns.forEach(btn => {
-                    btn.addEventListener("click", (e) => {
-                        tabBtns.forEach(b => {
-                            b.style.background = "var(--card-bg)";
-                            b.style.color = "var(--text-main)";
-                        });
-                        tabContents.forEach(c => c.style.display = "none");
-                        e.currentTarget.style.background = "var(--gold-primary)";
-                        e.currentTarget.style.color = "#fff";
-                        document.getElementById(e.currentTarget.getAttribute("data-target")).style.display = "block";
-                    });
-                });
-
-                tabBtns[0].style.background = "var(--gold-primary)";
-                tabBtns[0].style.color = "#fff";
-
-                modalOverlay.querySelector("#modal-close-btn").addEventListener("click", () => modalOverlay.remove());
-                modalOverlay.querySelector("#modal-print-btn").addEventListener("click", () => window.print());
-                modalOverlay.addEventListener("click", (e) => {
-                    if (e.target === modalOverlay) modalOverlay.remove();
-                });
-            }
-
             function renderAdminSectionAtBottom() {
                 let bottomContainer = document.getElementById("admin-bottom-section");
                 if (!bottomContainer) {
@@ -1527,10 +1230,10 @@
                         <div id="admin-panel-section" style="background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold-primary); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
                             <h3 style="color: var(--gold-dark); font-size: 15px; margin-bottom: 10px;">🛠️ Yönetici Kontrol Paneli</h3>
                             <div style="margin-bottom: 12px;">
-                                <button id="admin-open-analysis-page" style="width: 100%; padding: 10px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">📊 Detaylı 5 Sekmeli Analiz ve Rapor Paneli</button>
+                                <button id="admin-open-simple-analysis" style="width: 100%; padding: 10px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">📊 Analiz ve Rapor Paneli</button>
                             </div>
                             
-                            <!-- YENİ EKLENEN TOPLU ATAMA VE SİLME BÖLÜMÜ -->
+                            <!-- TOPLU ATAMA VE SİLME BÖLÜMÜ -->
                             <div style="border-top: 1px solid var(--border-color); padding-top: 10px; margin-bottom: 12px;">
                                 <div style="font-weight: bold; font-size: 13px; margin-bottom: 8px;">📚 Kitaplarda Toplu Atama ve Silme Bölümü:</div>
                                 <div style="display: flex; flex-direction: column; gap: 8px; background: var(--card-bg); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);">
@@ -1722,10 +1425,11 @@
                 document.getElementById("admin-toggle-btn-custom").addEventListener("click", () => triggerAdminToggle());
 
                 if (isAdmin) {
-                    const analysisBtn = document.getElementById("admin-open-analysis-page");
+                    // YENİ: Sade Analiz Butonu
+                    const analysisBtn = document.getElementById("admin-open-simple-analysis");
                     if (analysisBtn) {
                         analysisBtn.addEventListener("click", () => {
-                            openDetailedAnalysisModal();
+                            openSimpleAnalysisModal();
                         });
                     }
 
@@ -1745,7 +1449,6 @@
                             let bTypeInput = prompt("Birim türü nedir? ('sayfa' veya 'bab' yazın)", "sayfa");
                             let bType = (bTypeInput && bTypeInput.trim().toLowerCase() === "bab") ? "bab" : "page";
         
-                            let bPdf = prompt("PDF dosya yolunu veya linkini girin (Boş bırakabilirsiniz):", "") || "";
                             let bId = "book_" + Date.now();
 
                             appData.books.push({
@@ -1754,8 +1457,7 @@
                                 totalUnits: bUnits,
                                 type: bType,
                                 defaultMode: bType === "bab" ? "on_bab" : "yirmi_sayfa",
-                                currentMode: bType === "bab" ? "on_bab" : "yirmi_sayfa",
-                                pdf: bPdf.trim()
+                                currentMode: bType === "bab" ? "on_bab" : "yirmi_sayfa"
                             });
 
                             appData.bookPages[bId] = Array(bUnits).fill(null).map(() => ({ owner: "", isRead: false }));
@@ -2074,7 +1776,6 @@
                                 <div style="font-size: 11px; opacity: 0.8; margin-top: 3px;">Hatim No: ${hatimInfo.hatimNo} | İlerleme: %${percent} (${takenCount}/${book.totalUnits})</div>
                             </div>
                             <div style="display: flex; gap: 8px; align-items: center;">
-                                <button class="read-pdf-btn" data-book-id="${book.id}" data-book-name="${book.name}" style="background: #8e44ad; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold;">📄 PDF Oku</button>
                                 <span style="font-size: 12px; font-weight: bold; color: var(--gold-dark);">${isOpen ? '▲ Gizle' : '▼ Göster'}</span>
                             </div>
                         </div>
@@ -2094,17 +1795,9 @@
                 // Olay Dinleyicileri (Event Listeners)
                 document.querySelectorAll(".book-header").forEach(header => {
                     header.addEventListener("click", (e) => {
-                        if (e.target.closest(".read-pdf-btn")) return;
                         let card = header.closest(".book-card");
                         card.classList.toggle("open");
                         renderBooks();
-                    });
-                });
-
-                document.querySelectorAll(".read-pdf-btn").forEach(btn => {
-                    btn.addEventListener("click", (e) => {
-                        e.stopPropagation();
-                        openPdfReaderModal(btn.getAttribute("data-book-id"), btn.getAttribute("data-book-name"));
                     });
                 });
 
