@@ -64,6 +64,55 @@
             </div>
         </div>
 
+        <!-- ================================================================= -->
+        <!-- YENİ SADE GİRİŞ PANELİ - 2 SATIR 3 SÜTUN -->
+        <!-- ================================================================= -->
+        <div id="simple-login-panel" style="margin-bottom: 20px; padding: 20px; background: var(--card-bg); border-radius: 12px; border: 2px solid var(--gold-primary); box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+            
+            <!-- 1. SATIR: Başlıklar -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 8px; font-weight: bold; font-size: 14px; color: var(--gold-dark); text-align: center;">
+                <div>👤 İsim</div>
+                <div>🔑 Şifre</div>
+                <div>📂 Tip</div>
+            </div>
+
+            <!-- 2. SATIR: Giriş Alanları -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; align-items: center;">
+                <input type="text" id="login-user-name" placeholder="İsminizi yazın" style="padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box;">
+                
+                <input type="password" id="login-user-password" placeholder="Şifrenizi yazın" style="padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box;">
+                
+                <select id="login-user-type" style="padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box; cursor: pointer;">
+                    <option value="bireysel">🧑 Bireysel</option>
+                    <option value="grup">👥 Grup</option>
+                </select>
+            </div>
+
+            <!-- GRUP SEÇENEKLERİ (dinamik olarak gösterilir) -->
+            <div id="login-group-section" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; align-items: center;">
+                    <input type="text" id="login-group-name" placeholder="Grup adını yazın" style="padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box;">
+                    <input type="password" id="login-group-password" placeholder="Grup şifresi (isteğe bağlı)" style="padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box;">
+                    <button id="login-join-btn" style="padding: 10px 12px; background: #27ae60; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; width: 100%; box-sizing: border-box; transition: 0.3s;">➕ Katıl</button>
+                </div>
+                <div style="font-size: 11px; color: #7f8c8d; margin-top: 6px; text-align: center; font-style: italic;">
+                    💡 Yeni grup oluşturmak için grup adı yazıp Katıl'a basın. Şifreli gruplar listede görünmez.
+                </div>
+            </div>
+
+            <!-- MEVCUT GRUPLAR (Şifresiz olanlar listelenir) -->
+            <div id="login-group-list" style="margin-top: 15px; padding: 12px; background: rgba(0,0,0,0.02); border-radius: 6px; border: 1px solid var(--border-color);">
+                <div style="font-size: 12px; font-weight: bold; color: var(--gold-dark); margin-bottom: 8px;">📋 Mevcut Şifresiz Gruplar:</div>
+                <div id="login-free-groups" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <!-- JavaScript ile doldurulacak -->
+                    <span style="color: #95a5a6; font-size: 13px; font-style: italic;">Yükleniyor...</span>
+                </div>
+                <div style="font-size: 11px; color: #7f8c8d; margin-top: 8px;">
+                    🔓 Şifresiz gruplara tıklayarak katılın &nbsp;|&nbsp; 🔒 Şifreli gruplar gizlidir
+                </div>
+            </div>
+        </div>
+
         <div id="books-grid"></div>
 
         <!-- Namaz Vakitleri Çalışma Scripti -->
@@ -493,6 +542,187 @@
                 return keys;
             }
 
+            // =================================================================
+            // SADE GİRİŞ PANELİ - JAVASCRIPT MANTIĞI
+            // =================================================================
+
+            // Mevcut şifresiz grupları listele
+            function renderFreeGroups() {
+                const container = document.getElementById('login-free-groups');
+                if (!container) return;
+                
+                const allGroups = getAllGroupKeys();
+                let freeGroups = [];
+                
+                allGroups.forEach(gKey => {
+                    const data = localStorage.getItem(`hatim_group_${gKey}`);
+                    if (data) {
+                        try {
+                            const parsed = JSON.parse(data);
+                            // Şifresi olmayan grupları listele
+                            if (!parsed.password || parsed.password.trim() === '') {
+                                freeGroups.push(gKey);
+                            }
+                        } catch(e) {}
+                    }
+                });
+                
+                if (freeGroups.length === 0) {
+                    container.innerHTML = `<span style="color: #95a5a6; font-size: 13px; font-style: italic;">Henüz şifresiz grup yok.</span>`;
+                    return;
+                }
+                
+                container.innerHTML = freeGroups.map(gKey => `
+                    <span class="free-group-item" data-group="${gKey}" style="display: inline-block; padding: 6px 14px; background: #d4edda; color: #155724; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: bold; border: 2px solid transparent; transition: 0.3s;">
+                        📂 ${gKey.replace(/_/g, ' ').toUpperCase()}
+                    </span>
+                `).join('');
+                
+                // Tıklama olaylarını ekle
+                document.querySelectorAll('.free-group-item').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const groupName = this.getAttribute('data-group');
+                        const userName = document.getElementById('login-user-name').value.trim();
+                        
+                        if (!userName) {
+                            alert('❌ Lütfen önce isminizi girin!');
+                            return;
+                        }
+                        
+                        // Gruba katıl
+                        currentGroup = groupName;
+                        // Üyeyi ekle
+                        const data = localStorage.getItem(`hatim_group_${groupName}`);
+                        if (data) {
+                            try {
+                                const parsed = JSON.parse(data);
+                                if (!parsed.members.includes(userName)) {
+                                    parsed.members.push(userName);
+                                    localStorage.setItem(`hatim_group_${groupName}`, JSON.stringify(parsed));
+                                }
+                                loggedInMember = userName;
+                                localStorage.setItem(`hatim_session_${groupName}`, userName);
+                                alert(`✅ ${userName}, "${groupName.replace(/_/g, ' ').toUpperCase()}" grubuna katıldı!`);
+                                loadGroupData();
+                            } catch(e) {
+                                alert('❌ Grup verisi okunamadı.');
+                            }
+                        }
+                    });
+                });
+            }
+
+            // Tip değişince grup alanını göster/gizle
+            const typeSelect = document.getElementById('login-user-type');
+            const groupSection = document.getElementById('login-group-section');
+            
+            if (typeSelect) {
+                typeSelect.addEventListener('change', function() {
+                    if (this.value === 'grup') {
+                        groupSection.style.display = 'block';
+                    } else {
+                        groupSection.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Katıl butonu
+            const joinBtn = document.getElementById('login-join-btn');
+            if (joinBtn) {
+                joinBtn.addEventListener('click', function() {
+                    const userName = document.getElementById('login-user-name').value.trim();
+                    const userPassword = document.getElementById('login-user-password').value.trim();
+                    const userType = document.getElementById('login-user-type').value;
+                    const groupName = document.getElementById('login-group-name').value.trim();
+                    const groupPassword = document.getElementById('login-group-password').value.trim();
+                    
+                    if (!userName) {
+                        alert('❌ Lütfen isminizi girin!');
+                        return;
+                    }
+                    
+                    if (userType === 'bireysel') {
+                        // Bireysel giriş - ana gruba ekle
+                        if (!appData.members.includes(userName)) {
+                            appData.members.push(userName);
+                        }
+                        loggedInMember = userName;
+                        localStorage.setItem(`hatim_session_${currentGroup}`, userName);
+                        saveGroupData();
+                        alert(`✅ ${userName} bireysel olarak giriş yaptı!`);
+                        loadGroupData();
+                        return;
+                    }
+                    
+                    // Grup seçeneği
+                    if (!groupName) {
+                        alert('❌ Lütfen grup adı girin!');
+                        return;
+                    }
+                    
+                    const groupKey = groupName.toLowerCase().replace(/\s+/g, '_');
+                    
+                    // Mevcut grup mu kontrol et
+                    const existingData = localStorage.getItem(`hatim_group_${groupKey}`);
+                    
+                    if (existingData) {
+                        // Mevcut grup - şifre kontrolü
+                        try {
+                            const parsed = JSON.parse(existingData);
+                            if (parsed.password && parsed.password.trim() !== '') {
+                                // Şifreli grup
+                                if (groupPassword !== parsed.password) {
+                                    alert('❌ Hatalı grup şifresi!');
+                                    return;
+                                }
+                            }
+                            // Üyeyi ekle
+                            if (!parsed.members.includes(userName)) {
+                                parsed.members.push(userName);
+                            }
+                            localStorage.setItem(`hatim_group_${groupKey}`, JSON.stringify(parsed));
+                            currentGroup = groupKey;
+                            loggedInMember = userName;
+                            localStorage.setItem(`hatim_session_${groupKey}`, userName);
+                            alert(`✅ ${userName}, "${groupKey.replace(/_/g, ' ').toUpperCase()}" grubuna katıldı!`);
+                            loadGroupData();
+                        } catch(e) {
+                            alert('❌ Grup verisi okunamadı.');
+                        }
+                    } else {
+                        // Yeni grup oluştur
+                        const todayStr = new Date().toLocaleDateString("tr-TR");
+                        const freshBooks = JSON.parse(JSON.stringify(defaultBooksTemplate));
+                        const freshPages = {};
+                        const freshHatims = {};
+                        const freshHistory = {};
+                        
+                        freshBooks.forEach(defBook => {
+                            freshPages[defBook.id] = Array(defBook.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
+                            freshHatims[defBook.id] = { hatimNo: 1, startDate: todayStr, prayerDone: false };
+                            freshHistory[defBook.id] = [];
+                        });
+                        
+                        const newGroupData = {
+                            members: [userName],
+                            password: groupPassword || "",
+                            books: freshBooks,
+                            bookPages: freshPages,
+                            bookHatims: freshHatims,
+                            bookHistory: freshHistory,
+                            readingLogs: []
+                        };
+                        
+                        localStorage.setItem(`hatim_group_${groupKey}`, JSON.stringify(newGroupData));
+                        currentGroup = groupKey;
+                        loggedInMember = userName;
+                        localStorage.setItem(`hatim_session_${groupKey}`, userName);
+                        alert(`✅ "${groupKey.replace(/_/g, ' ').toUpperCase()}" grubu oluşturuldu ve ${userName} katıldı!`);
+                        loadGroupData();
+                    }
+                });
+            }
+
             async function loadGroupData() {
                 removeStuckPanel();
                 const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
@@ -575,6 +805,7 @@
                 renderBooks();
                 renderAnalysisSection();
                 renderAdminSectionAtBottom();
+                setTimeout(renderFreeGroups, 100);
             }
 
             function saveGroupData() {
@@ -609,7 +840,6 @@
                     background: var(--card-bg);
                 `;
 
-                // "+ Yeni Grup" butonu kullanıcı panelinden kaldırıldı (Yalnızca Yönetici Panelinde bulunur).
                 controlsContainer.innerHTML = `
                     <!-- 1. Grup Seç / Grup-isim -->
                     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px;">
@@ -637,7 +867,7 @@
                     </div>
                     
                     <div style="font-size: 11px; color: #e67e22; font-style: italic; margin-top: 5px;">
-                        * Not: Hem bireysel hem de gruplardaki kişiler şifre girmeden sayfada değişiklik yapamayacaktır[span_1](start_span)[span_1](end_span).
+                        * Not: Hem bireysel hem de gruplardaki kişiler şifre girmeden sayfada değişiklik yapamayacaktır.
                     </div>
 
                     <div id="bulk-share-area" style="display: ${loggedInMember ? 'block' : 'none'}; margin-top: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
