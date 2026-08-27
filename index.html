@@ -605,21 +605,29 @@
 
                 // İstenen iki satırlık üye giriş paneli tasarımı
                 controlsContainer.innerHTML = `
-                    <!-- 1. Satır: İsim, Şifre, Drop menülü bir seçenek (Tek Grup) -->
-                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px;">
-                        <input type="text" id="user-name-input" placeholder="İsim" value="${loggedInMember}" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 90px;">
-                        <input type="password" id="user-pwd-input" placeholder="Şifre" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 80px;">
-                        <select id="user-group-select" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 110px;">
-                            ${groupsHtml}
-                        </select>
-                     </div>
-                    
-                    <!-- 2. Satır: Grup ismi, Şifre, daha sonra da yanına Katıl butonu -->
-                    <div style="display: flex; gap: 8px; align-items: center; border-top: 1px dashed var(--border-color); padding-top: 10px; flex-wrap: wrap;">
-                        <input type="text" id="locked-group-name" placeholder="Grup İsmi" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 2; min-width: 120px;">
-                        <input type="password" id="locked-group-pwd" placeholder="Şifre" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 90px;">
-                        <button id="join-locked-group-btn" style="padding: 6px 12px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; white-space: nowrap;">Katıl</button>
-                    </div>
+                    <div class="simple-login-container">
+    <!-- 1. Satır: İsim, Şifre ve Tür Seçimi -->
+    <div class="login-row">
+        <input type="text" id="userName" placeholder="Adınız / İsminiz" class="login-input" required>
+        <input type="password" id="userPassword" placeholder="Şifreniz" class="login-input" required>
+        <select id="loginType" class="login-select">
+            <option value="bireysel">Bireysel</option>
+            <option value="grup">Grup</option>
+        </select>
+    </div>
+
+    <!-- 2. Satır: Grup İsmi ve Grup Şifresi (Başlangıçta gizli, 'Grup' seçilince açılır) -->
+            <div class="login-row" id="groupFieldsRow" style="display: none;">
+                  <input type="text" id="groupName" placeholder="Grup İsmi" class="login-input">
+                  <input type="password" id="groupPassword" placeholder="Grup Şifresi" class="login-input">
+                  </div>
+
+                      <!-- Katıl Butonu -->
+                      <div class="login-action-row">
+                      <button id="joinButton" class="btn-join">Katıl</button>
+                   </div>
+                   </div>
+
 
                     <div style="font-size: 11px; color: #e67e22; font-style: italic; margin-top: 5px;">
                         * Not: Hem bireysel hem de gruplardaki kişiler şifre girmeden sayfada değişiklik yapamayacaktır[span_0](start_span)[span_0](end_span).
