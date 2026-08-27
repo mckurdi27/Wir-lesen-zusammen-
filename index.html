@@ -605,53 +605,34 @@
                     background: var(--card-bg);
                 `;
 
-                // İstenen düzenlemelere göre güncellenen Grup ve İsim Seç / Katılım bölümü
                 controlsContainer.innerHTML = `
-                    <!-- 1. Grup Seçimi -->
+                    <!-- 1. Grup Seç / Grup-isim -->
                     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px;">
-                        <label style="font-weight: bold; font-size: 13px; min-width: 75px;">Grup:</label>
-                        <select id="user-group-select" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 140px;">
+                        <label style="font-weight: bold; font-size: 13px; min-width: 65px;">Grup-isim:</label>
+                        <select id="user-group-select" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 140px; height: 34px; box-sizing: border-box;">
                             ${groupsHtml}
                         </select>
                     </div>
                     
-                    <!-- 2. İsim ve Şifre (Birbiriyle uyuşacak büyüklükte) -->
-                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; border-top: 1px dashed var(--border-color); padding-top: 10px;">
-                        <label style="font-weight: bold; font-size: 13px; min-width: 75px;">İsim/Şifre:</label>
-                        <select id="user-member-select" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 2; min-width: 120px;">
+                    <!-- 2. Bireysel / Şifreli bölüm (Bireysel-İsim-Şifre) -->
+                    <div style="display: flex; gap: 6px; align-items: center; margin-top: 10px; margin-bottom: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px; flex-wrap: wrap;">
+                        <span style="font-weight: bold; font-size: 12px; white-space: nowrap;">Bireysel-İsim-Şifre:</span>
+                        <input type="text" id="locked-group-name" placeholder="Grup Adı" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 80px; height: 34px; box-sizing: border-box;">
+                        <input type="password" id="locked-group-pwd" placeholder="Şifre" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 80px; height: 34px; box-sizing: border-box;">
+                        <button id="join-locked-group-btn" style="padding: 6px 10px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; white-space: nowrap; height: 34px; box-sizing: border-box;">Katıl</button>
+                    </div>
+
+                    <!-- 3. İsim-isim (Üye Seçimi ve Üye Ekle) -->
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
+                        <label style="font-weight: bold; font-size: 13px; min-width: 65px;">İsim-isim:</label>
+                        <select id="user-member-select" style="padding: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 14px; flex: 1; min-width: 180px;">
                             ${membersOptions}
                         </select>
-                        <button id="user-add-member-btn" style="padding: 6px 10px; background: #2980b9; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; flex: 1; min-width: 80px;">+ Üye Ekle</button>
-                    </div>
-
-                    <!-- 3. Grup Şifre (İsim şifrenin altında) -->
-                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap;">
-                        <label style="font-weight: bold; font-size: 13px; min-width: 75px;">Grup Şifre:</label>
-                        <input type="text" id="locked-group-name" placeholder="Grup Adı" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 2; min-width: 120px;">
-                        <input type="password" id="locked-group-pwd" placeholder="Şifre" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 2; min-width: 120px;">
-                    </div>
-
-                    <!-- 4. Katılımın üstünde drop menü (Tek ve Grup) -->
-                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; border-top: 1px dashed var(--border-color); padding-top: 10px;">
-                        <label style="font-weight: bold; font-size: 13px; min-width: 75px;">Katılım Türü:</label>
-                        <select id="participation-type-select" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 120px;">
-                            <option value="tek">Tek</option>
-                            <option value="grup">Grup</option>
-                        </select>
-                    </div>
-
-                    <!-- 5. Katılım ve sonda küçük drop menü -->
-                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap;">
-                        <button id="join-locked-group-btn" style="padding: 6px 14px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; flex: 1;">Katıl</button>
-                        <select id="participation-size-select" style="padding: 4px 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 4px; font-size: 11px; width: 70px;" title="Katılım Boyutu">
-                            <option value="kucuk">Küçük</option>
-                            <option value="orta">Orta</option>
-                            <option value="buyuk">Büyük</option>
-                        </select>
+                        <button id="user-add-member-btn" style="padding: 6px 10px; background: #2980b9; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">+ Üye Ekle</button>
                     </div>
                     
                     <div style="font-size: 11px; color: #e67e22; font-style: italic; margin-top: 5px;">
-                        * Not: Hem bireysel hem de gruplardaki kişiler şifre girmeden sayfada değişiklik yapamayacaktır[span_3](start_span)[span_3](end_span).
+                        * Not: Hem bireysel hem de gruplardaki kişiler şifre girmeden sayfada değişiklik yapamayacaktır[span_0](start_span)[span_0](end_span).
                     </div>
 
                     <div id="bulk-share-area" style="display: ${loggedInMember ? 'block' : 'none'}; margin-top: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
@@ -1406,7 +1387,6 @@
                     <button id="send-admin-msg-btn" style="background: #25D366; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">💬 WhatsApp ile Gönder</button>
                 `;
 
-                // Toplu Atama / Silme Hedef Seçeneklerini Doldurma Mantığı
                 if (isAdmin) {
                     let targetSelect = bottomContainer.querySelector("#admin-bulk-target-select");
                     if (targetSelect) {
@@ -1436,7 +1416,6 @@
                         targetSelect.innerHTML = optionsHtml;
                     }
 
-                    // Toplu Atama Butonu İşleyicisi
                     const bulkAssignBtn = bottomContainer.querySelector("#admin-bulk-assign-btn");
                     if (bulkAssignBtn) {
                         bulkAssignBtn.addEventListener("click", () => {
@@ -1460,7 +1439,6 @@
                             }
 
                             if (type === "member") {
-                                // Seçilen üyeye tüm boş birimleri ata
                                 targetGroupData.bookPages[selectedBookId].forEach(p => {
                                     if (!p.owner) {
                                         p.owner = mName;
@@ -1469,7 +1447,6 @@
                                 localStorage.setItem(`hatim_group_${gKey}`, JSON.stringify(targetGroupData));
                                 alert(`"${selectedBookId}" eserinin boş birimleri sırayla "${mName}" adlı üyeye atandı.`);
                             } else if (type === "group") {
-                                // Gruptaki üyeler arasında eşit şekilde dağıt
                                 let members = targetGroupData.members;
                                 if (!members || members.length === 0) {
                                     alert("Bu grupta kayıtlı üye bulunmuyor!");
@@ -1489,7 +1466,6 @@
                         });
                     }
 
-                    // Toplu Silme Butonu İşleyicisi
                     const bulkDeleteBtn = bottomContainer.querySelector("#admin-bulk-delete-btn");
                     if (bulkDeleteBtn) {
                         bulkDeleteBtn.addEventListener("click", () => {
