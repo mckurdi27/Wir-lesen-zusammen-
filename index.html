@@ -1,38 +1,25 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <!-- ================================================================= -->
-    <!-- HEAD BÖLÜMÜ VE META AYARLARI -->
-    <!-- ================================================================= -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ortak Hatim ve Dua Takip Sistemi</title>
 </head>
 <body>
-    <!-- ================================================================= -->
-    <!-- ANA İÇERİK KAPSAYICISI -->
-    <!-- ================================================================= -->
     <div class="container">
-        <!-- En Üst Birleşik Ornate Başlık ve Görsel/Namaz Vakitleri Alanı -->
+        <!-- En Üst Başlık ve Görsel Alanı -->
         <div id="main-title-ornate-section" style="margin-bottom: 20px; padding: 10px 15px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border: 2px solid #d4af37; border-top: 6px solid #8a6d3b; border-radius: 12px; box-shadow: 0 4px 15px rgba(138, 109, 59, 0.2);">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
-                
-                <!-- Sol Kart: Mescid-i Nebevi Resmi -->
                 <div style="flex: 0 0 190px; text-align: center;">
                     <img src="img/Nebevi.jpg" alt="" style="width: 100%; height: 190px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
-                    <div style="font-size: 11px; font-weight: bold; margin-top: 2px; color: #3e2723;"> </div>
                 </div>
-
-                <!-- Orta Kısım: Başlık ve Namaz Vakitleri Modülü -->
                 <div style="flex: 1; min-width: 200px; text-align: center;">
-                    <div style="font-size: 18px; font-weight: bold; margin-bottom: 4px; color: #3e2723; display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; text-align: center;">
+                    <div style="font-size: 18px; font-weight: bold; margin-bottom: 4px; color: #3e2723;">
                         <span>Ortak Hatim<br>ve<br>Dualarda Buluşuyoruz</span>
                     </div>
                     <div style="font-size: 12px; opacity: 0.85; font-style: italic; margin-bottom: 8px; max-width: 260px; margin-left: auto; margin-right: auto; line-height: 1.4;">
                         Grubunuzu seçin, İsminizi belirleyin ve<br>manevi iklimde ortak hatim halkamıza katılın.
                     </div>
-                    
-                    <!-- Namaz Vakitleri Mini Modülü -->
                     <div style="background: rgba(255,255,255,0.85); padding: 8px; border-radius: 6px; border: 1px solid #d4af37;">
                         <div style="margin-bottom: 6px; display: flex; gap: 5px; justify-content: center; align-items: center;">
                             <select id="citySelect" onchange="fetchPrayerTimes()" style="padding: 3px; border-radius: 4px; width: 65%; font-size: 11px;">
@@ -54,39 +41,28 @@
                         <div id="prayerTimesResult" style="font-size: 11px; color: #333; line-height: 1.3;">Vakitler yükleniyor...</div>
                     </div>
                 </div>
-
-                <!-- Sağ Kart: Kâbe-i Muazzama Resmi -->
                 <div style="flex: 0 0 190px; text-align: center;">
                     <img src="img/Kabe.jpg" alt="" style="width: 100%; height: 190px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
-                    <div style="font-size: 11px; font-weight: bold; margin-top: 2px; color: #3e2723;"> </div>
                 </div>
-
             </div>
         </div>
 
-        <!-- ================================================================= -->
-        <!-- DÜZELTİLMİŞ GİRİŞ PANELİ - 2 SATIR 3 SÜTUN -->
-        <!-- ================================================================= -->
+        <!-- GİRİŞ PANELİ - 2 SATIR 3 SÜTUN -->
         <div id="simple-login-panel" style="margin-bottom: 20px; padding: 16px 20px; background: var(--card-bg); border-radius: 12px; border: 2px solid var(--gold-primary); box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
-            
-            <!-- 1. SATIR: Başlıklar -->
             <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 12px; margin-bottom: 6px; font-weight: bold; font-size: 13px; color: var(--gold-dark);">
                 <div>👤 İsim</div>
                 <div>🔑 Şifre</div>
                 <div>📂 Tip</div>
             </div>
-
-            <!-- 2. SATIR: Giriş Alanları -->
             <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 12px; align-items: center;">
                 <input type="text" id="login-user-name" list="user-name-list" placeholder="İsminizi yazın" style="padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box;">
+                <datalist id="user-name-list"></datalist>
                 <input type="password" id="login-user-password" placeholder="Şifrenizi yazın" style="padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box;">
                 <select id="login-user-type" style="padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box; cursor: pointer;">
                     <option value="bireysel">🧑 Bireysel</option>
                     <option value="grup">👥 Grup</option>
                 </select>
             </div>
-
-            <!-- GRUP ALANI (Tip = Grup seçilince görünür) -->
             <div id="login-group-section" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border-color);">
                 <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 12px; align-items: center;">
                     <div style="position: relative; width: 100%;">
@@ -97,17 +73,13 @@
                     <button id="login-join-btn" style="padding: 10px 12px; background: #27ae60; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; width: 100%; box-sizing: border-box; transition: 0.3s;">➕ Katıl</button>
                 </div>
             </div>
-
-            <!-- WhatsApp Paylaş Butonu -->
             <div id="bulk-share-area" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
                 <button id="bulk-whatsapp-btn" style="width: 100%; padding: 10px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">💬 Tüm Seçtiklerimi WhatsApp'ta Paylaş</button>
             </div>
-
         </div>
 
         <div id="books-grid"></div>
 
-        <!-- Namaz Vakitleri Çalışma Scripti -->
         <script>
         async function fetchPrayerTimes() {
             const city = document.getElementById('citySelect').value;
@@ -118,9 +90,7 @@
                 const data = await response.json();
                 if(data && data.data && data.data.timings) {
                     const t = data.data.timings;
-                    resultDiv.innerHTML = `
-                        İmsak: ${t.Imsak} | Güneş: ${t.Sunrise} | Öğle: ${t.Dhuhr}<br>İkindi: ${t.Asr} | Akşam: ${t.Maghrib} | Yatsı: ${t.Isha}
-                    `;
+                    resultDiv.innerHTML = `İmsak: ${t.Imsak} | Güneş: ${t.Sunrise} | Öğle: ${t.Dhuhr}<br>İkindi: ${t.Asr} | Akşam: ${t.Maghrib} | Yatsı: ${t.Isha}`;
                 } else {
                     resultDiv.innerHTML = "Vakitler alınamadı.";
                 }
@@ -128,13 +98,9 @@
                 resultDiv.innerHTML = "Bağlantı hatası.";
             }
         }
-
         async function fetchPrayerTimesByGPS() {
             const resultDiv = document.getElementById('prayerTimesResult');
-            if (!navigator.geolocation) {
-                resultDiv.innerHTML = "Tarayıcınız konum desteklemiyor.";
-                return;
-            }
+            if (!navigator.geolocation) { resultDiv.innerHTML = "Tarayıcınız konum desteklemiyor."; return; }
             resultDiv.innerHTML = "Konum alınıyor...";
             navigator.geolocation.getCurrentPosition(async (position) => {
                 const lat = position.coords.latitude;
@@ -144,9 +110,7 @@
                     const data = await response.json();
                     if(data && data.data && data.data.timings) {
                         const t = data.data.timings;
-                        resultDiv.innerHTML = `
-                            İmsak: ${t.Imsak} | Güneş: ${t.Sunrise} | Öğle: ${t.Dhuhr}<br>İkindi: ${t.Asr} | Akşam: ${t.Maghrib} | Yatsı: ${t.Isha}
-                        `;
+                        resultDiv.innerHTML = `İmsak: ${t.Imsak} | Güneş: ${t.Sunrise} | Öğle: ${t.Dhuhr}<br>İkindi: ${t.Asr} | Akşam: ${t.Maghrib} | Yatsı: ${t.Isha}`;
                     } else {
                         resultDiv.innerHTML = "Konuma göre vakitler alınamadı.";
                     }
@@ -157,17 +121,12 @@
                 resultDiv.innerHTML = "Konum izni reddedildi.";
             });
         }
-
         document.addEventListener("DOMContentLoaded", fetchPrayerTimes);
         </script>
     </div>
 
-    <!-- ================================================================= -->
-    <!-- JAVASCRIPT UYGULAMA MANTIĞI -->
-    <!-- ================================================================= -->
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
-            
             let container = document.querySelector(".container");
             if (!container) {
                 container = document.createElement("div");
@@ -181,16 +140,6 @@
                 booksGrid.id = "books-grid";
                 container.appendChild(booksGrid);
             }
-
-            function removeStuckPanel() {
-                document.querySelectorAll('div').forEach(div => {
-                    if (div && div.textContent && div.textContent.includes("Ortak Hatim und Dua Takip Sistemi") && !div.id.includes("main-title-ornate-section") && (div.querySelector('select') || div.innerHTML.includes("Yönetici Modu"))) {
-                        div.remove();
-                    }
-                });
-            }
-            removeStuckPanel();
-            setTimeout(removeStuckPanel, 100);
 
             function injectOrientalStyles() {
                 if (document.getElementById("oriental-motif-styles")) return;
@@ -217,16 +166,16 @@
                         max-width: 800px;
                         margin: 0 auto;
                     }
-                    .book-card p, .book-card span, .book-card div, .book-header, 
-                    #analysis-section, #admin-bottom-section,
-                    .book-card select, .book-card button, .mode-btn {
-                        font-size: calc(1rem + 3px) !important;
+                    .book-card {
+                        border: 2px solid var(--gold-primary) !important;
+                        border-radius: 12px !important;
+                        overflow: hidden;
+                        margin-bottom: 15px;
+                        background: var(--card-bg);
                     }
-                    .mode-btn, .take-range-btn, .read-range-btn, .release-range-btn, .unread-range-btn {
-                        margin-bottom: 12px !important;
-                        margin-top: 12px !important;
-                        margin-right: 8px !important;
-                        margin-left: 8px !important;
+                    .book-header {
+                        border-bottom: 2px solid var(--gold-primary);
+                        background: linear-gradient(to right, rgba(212,175,55,0.1), transparent);
                     }
                     @media (prefers-color-scheme: dark) {
                         :root {
@@ -242,17 +191,6 @@
                             color: #f1f5f9 !important;
                         }
                     }
-                    .book-card {
-                        border: 2px solid var(--gold-primary) !important;
-                        border-radius: 12px !important;
-                        overflow: hidden;
-                        margin-bottom: 15px;
-                        background: var(--card-bg);
-                    }
-                    .book-header {
-                        border-bottom: 2px solid var(--gold-primary);
-                        background: linear-gradient(to right, rgba(212,175,55,0.1), transparent);
-                    }
                 `;
                 document.head.appendChild(styleEl);
             }
@@ -265,7 +203,6 @@
             let monthlyInspirationCache = {};
             const ADMIN_PASSWORD = "1234";
 
-            // PDF Haritası (sadece butonlar için kullanılacak)
             const bookPdfMap = {
                 "kuran": "pdf/Kuran-ı Kerim.pdf",
                 "cevsen": "pdf/Cevşen.pdf",
@@ -279,15 +216,11 @@
                 "dilekce_ar": "pdf/Bir Kırık Dilekçe Ar.pdf"
             };
 
-            // PDF'yi yeni sekmede aç (Modal yerine)
             function openPdfInNewTab(bookId, bookName) {
                 let pdfPath = bookPdfMap[bookId] || appData.books.find(b => b.id === bookId)?.pdf || "pdf/Kuran-ı Kerim.pdf";
                 window.open(pdfPath, '_blank');
             }
 
-            // =================================================================
-            // DÜZELTİLMİŞ: Hicri Tarih ve JSON Yolu
-            // =================================================================
             function bugunkuHicriTarihiAl() {
                 const ayAdlari = {
                     "01": "Muharrem", "02": "Sefer", "03": "Rebiülevvel", "04": "Rebiülahir",
@@ -311,7 +244,6 @@
                 }
             }
 
-            // JSON dosyaları json/ klasöründen yükleniyor
             async function fetchHijriMonthData(ayKodu) {
                 if (monthlyInspirationCache[ayKodu]) return monthlyInspirationCache[ayKodu];
                 const fileMap = {
@@ -333,7 +265,6 @@
                 }
             }
 
-            // Tarih formatı "27 Ağustos 2026" şeklinde
             async function getHijriInspiration() {
                 const now = new Date();
                 const gun = now.getDate();
@@ -341,7 +272,6 @@
                 const ayAdi = ayAdlari[now.getMonth()];
                 const yil = now.getFullYear();
                 const todayMiladiStr = `${gun} ${ayAdi} ${yil}`;
-
                 const hicriInfo = bugunkuHicriTarihiAl();
                 let hDay = hicriInfo.gunNumarasi;
                 let hMonth = hicriInfo.ayKodu;
@@ -481,13 +411,7 @@
                 return keys;
             }
 
-            // =================================================================
-            // GİRİŞ PANELİ - JAVASCRIPT MANTIĞI
-            // =================================================================
-
-            // Autocomplete listelerini güncelle
             function updateAutocompleteLists() {
-                // Üye isimlerini topla
                 const allMembers = new Set();
                 const allGroups = getAllGroupKeys();
                 allGroups.forEach(gKey => {
@@ -501,14 +425,10 @@
                         } catch(e) {}
                     }
                 });
-
-                // İsim datalist'ini güncelle
                 const nameList = document.getElementById('user-name-list');
                 if (nameList) {
                     nameList.innerHTML = Array.from(allMembers).map(m => `<option value="${m}">`).join('');
                 }
-
-                // Grup datalist'ini güncelle (sadece şifresiz gruplar)
                 const groupList = document.getElementById('group-name-list');
                 if (groupList) {
                     const freeGroups = [];
@@ -527,10 +447,8 @@
                 }
             }
 
-            // Tip değişince grup alanını göster/gizle
             const typeSelect = document.getElementById('login-user-type');
             const groupSection = document.getElementById('login-group-section');
-            
             if (typeSelect) {
                 typeSelect.addEventListener('change', function() {
                     if (this.value === 'grup') {
@@ -540,8 +458,7 @@
                     }
                 });
             }
-            
-            // Katıl butonu
+
             const joinBtn = document.getElementById('login-join-btn');
             if (joinBtn) {
                 joinBtn.addEventListener('click', function() {
@@ -598,19 +515,16 @@
                             alert('❌ Grup verisi okunamadı.');
                         }
                     } else {
-                        // Yeni grup oluştur
                         const todayStr = new Date().toLocaleDateString("tr-TR");
                         const freshBooks = JSON.parse(JSON.stringify(defaultBooksTemplate));
                         const freshPages = {};
                         const freshHatims = {};
                         const freshHistory = {};
-                        
                         freshBooks.forEach(defBook => {
                             freshPages[defBook.id] = Array(defBook.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
                             freshHatims[defBook.id] = { hatimNo: 1, startDate: todayStr, prayerDone: false };
                             freshHistory[defBook.id] = [];
                         });
-                        
                         const newGroupData = {
                             members: [userName],
                             password: groupPassword || "",
@@ -620,7 +534,6 @@
                             bookHistory: freshHistory,
                             readingLogs: []
                         };
-                        
                         localStorage.setItem(`hatim_group_${groupKey}`, JSON.stringify(newGroupData));
                         currentGroup = groupKey;
                         loggedInMember = userName;
@@ -638,7 +551,6 @@
                 }
             }
 
-            // WhatsApp Paylaş Butonu
             document.addEventListener('click', function(e) {
                 if (e.target && e.target.id === 'bulk-whatsapp-btn') {
                     if (!loggedInMember) {
@@ -667,9 +579,9 @@
                 }
             });
 
-            // =================================================================
-            // DÜZELTİLMİŞ ANALİZ PANELİ - %100'den %0'a Sıralama
-            // =================================================================
+            // ============================================================
+            // ANALİZ PANELİ
+            // ============================================================
             function openSimpleAnalysisModal() {
                 let existingModal = document.getElementById("simple-analysis-modal");
                 if (existingModal) existingModal.remove();
@@ -685,33 +597,23 @@
                     let gDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
                     if (!gDataRaw) return;
                     let gData = JSON.parse(gDataRaw);
-                    
                     let memberCount = gData.members ? gData.members.length : 0;
                     totalMembers += memberCount;
-                    
                     let groupBooks = 0;
                     let groupTaken = 0;
                     let groupRead = 0;
-                    
                     if (gData.books && gData.bookPages) {
                         gData.books.forEach(b => {
                             groupBooks += b.totalUnits;
                             totalBooks += b.totalUnits;
                             if (gData.bookPages[b.id]) {
                                 gData.bookPages[b.id].forEach(p => {
-                                    if (p.owner) {
-                                        groupTaken++;
-                                        totalTaken++;
-                                    }
-                                    if (p.isRead) {
-                                        groupRead++;
-                                        totalRead++;
-                                    }
+                                    if (p.owner) { groupTaken++; totalTaken++; }
+                                    if (p.isRead) { groupRead++; totalRead++; }
                                 });
                             }
                         });
                     }
-                    
                     groupStats.push({
                         name: gKey,
                         members: memberCount,
@@ -723,12 +625,10 @@
                     });
                 });
 
-                // SIRALAMA: En iyiden en kötüye (%100'den %0'a)
                 groupStats.sort((a, b) => b.takenPercent - a.takenPercent);
 
                 let activeGroupStats = groupStats.find(g => g.name === currentGroup);
                 let activeMemberDetails = [];
-                
                 if (appData && appData.members) {
                     appData.members.forEach(m => {
                         let mTaken = 0;
@@ -736,10 +636,7 @@
                         Object.keys(appData.bookPages).forEach(bId => {
                             if (appData.bookPages[bId]) {
                                 appData.bookPages[bId].forEach(p => {
-                                    if (p.owner === m) {
-                                        mTaken++;
-                                        if (p.isRead) mRead++;
-                                    }
+                                    if (p.owner === m) { mTaken++; if (p.isRead) mRead++; }
                                 });
                             }
                         });
@@ -750,7 +647,6 @@
                             readPercent: mTaken > 0 ? Math.round((mRead / mTaken) * 100) : 0
                         });
                     });
-                    // SIRALAMA: En iyiden en kötüye (%100'den %0'a)
                     activeMemberDetails.sort((a, b) => b.readPercent - a.readPercent);
                 }
 
@@ -764,8 +660,6 @@
 
                 modalOverlay.innerHTML = `
                     <div style="background: var(--card-bg); color: var(--text-main); width: 100%; max-width: 950px; max-height: 90vh; border-radius: 12px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.3);">
-                        
-                        <!-- Başlık -->
                         <div style="padding: 15px 20px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border-bottom: 2px solid var(--gold-primary); display: flex; justify-content: space-between; align-items: center; color: #3e2723; flex-wrap: wrap; gap: 8px;">
                             <div>
                                 <h2 style="margin: 0; font-size: 18px; color: #8a6d3b;">📊 Detaylı Analiz Paneli</h2>
@@ -776,19 +670,13 @@
                                 <button id="modal-simple-close-btn" style="background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;">✕ Kapat</button>
                             </div>
                         </div>
-
-                        <!-- Sekmeler -->
                         <div style="display: flex; gap: 4px; padding: 10px 15px 0 15px; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border-color); overflow-x: auto;">
                             <button class="a-tab-btn active" data-target="atab-1" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">📊 Genel Özet</button>
                             <button class="a-tab-btn" data-target="atab-2" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">🏆 Grup Sıralama</button>
                             <button class="a-tab-btn" data-target="atab-3" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">👥 Üye Sıralama</button>
                             <button class="a-tab-btn" data-target="atab-4" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">📚 Eser Detayları</button>
                         </div>
-
-                        <!-- İçerik -->
                         <div style="padding: 20px; overflow-y: auto; flex: 1; font-size: 14px;">
-                            
-                            <!-- TAB 1: Genel Özet -->
                             <div id="atab-1" class="a-tab-content">
                                 <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📈 Sistem Genel Özeti</h3>
                                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px;">
@@ -809,7 +697,6 @@
                                         <div style="font-size: 22px; font-weight: bold;">${totalRead}</div>
                                     </div>
                                 </div>
-
                                 ${activeGroupStats ? `
                                 <div style="padding: 15px; background: rgba(212, 175, 55, 0.08); border-radius: 8px; border: 1px solid var(--gold-primary);">
                                     <h3 style="margin-top: 0; font-size: 15px; color: var(--gold-dark);">📌 Aktif Grup: ${currentGroup.replace(/_/g, ' ').toUpperCase()}</h3>
@@ -825,8 +712,6 @@
                                 </div>
                                 ` : ''}
                             </div>
-
-                            <!-- TAB 2: Grup Sıralama (En iyiden en kötüye) -->
                             <div id="atab-2" class="a-tab-content" style="display: none;">
                                 <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">🏆 Grup Sıralama (En İyiden En Kötüye)</h3>
                                 <div style="overflow-x: auto;">
@@ -835,19 +720,16 @@
                                             <tr style="background: rgba(212, 175, 55, 0.15);">
                                                 <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">#</th>
                                                 <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Grup Adı</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Üye Sayısı</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Üye</th>
                                                 <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">İlerleme</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Alınan / Okunan</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okunan</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             ${groupStats.map((g, idx) => `
                                                 <tr style="${g.name === currentGroup ? 'background: rgba(212, 175, 55, 0.1); font-weight: bold;' : ''}">
                                                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${idx + 1}</td>
-                                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">
-                                                        ${idx === 0 ? '🥇 ' : idx === 1 ? '🥈 ' : idx === 2 ? '🥉 ' : ''}
-                                                        ${g.name.replace(/_/g, ' ').toUpperCase()}
-                                                    </td>
+                                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${idx === 0 ? '🥇 ' : idx === 1 ? '🥈 ' : idx === 2 ? '🥉 ' : ''}${g.name.replace(/_/g, ' ').toUpperCase()}</td>
                                                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${g.members}</td>
                                                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">
                                                         <div style="display: flex; align-items: center; gap: 8px; justify-content: center;">
@@ -857,17 +739,13 @@
                                                             <span style="font-weight: bold; font-size: 13px;">%${g.takenPercent}</span>
                                                         </div>
                                                     </td>
-                                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; font-size: 12px;">
-                                                        ${g.taken} / ${g.read} okundu
-                                                    </td>
+                                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; font-size: 12px;">${g.read} / ${g.taken}</td>
                                                 </tr>
                                             `).join('')}
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
-
-                            <!-- TAB 3: Üye Sıralama (En iyiden en kötüye) -->
                             <div id="atab-3" class="a-tab-content" style="display: none;">
                                 <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">👥 Aktif Grup Üye Sıralaması</h3>
                                 ${activeMemberDetails.length > 0 ? `
@@ -887,15 +765,12 @@
                                                 <tr style="${idx === 0 ? 'background: rgba(255, 215, 0, 0.1);' : ''}">
                                                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${idx + 1}</td>
                                                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: ${idx === 0 ? 'bold' : 'normal'};">
-                                                        ${idx === 0 ? '🥇 ' : idx === 1 ? '🥈 ' : idx === 2 ? '🥉 ' : ''}
-                                                        ${m.name}
+                                                        ${idx === 0 ? '🥇 ' : idx === 1 ? '🥈 ' : idx === 2 ? '🥉 ' : ''}${m.name}
                                                     </td>
                                                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${m.taken}</td>
                                                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${m.read}</td>
                                                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">
-                                                        <span style="background: ${m.readPercent >= 80 ? '#27ae60' : m.readPercent >= 50 ? '#f39c12' : '#e74c3c'}; color: white; padding: 3px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
-                                                            %${m.readPercent}
-                                                        </span>
+                                                        <span style="background: ${m.readPercent >= 80 ? '#27ae60' : m.readPercent >= 50 ? '#f39c12' : '#e74c3c'}; color: white; padding: 3px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">%${m.readPercent}</span>
                                                     </td>
                                                 </tr>
                                             `).join('')}
@@ -904,8 +779,6 @@
                                 </div>
                                 ` : '<p style="color: #777; text-align: center; padding: 20px;">Bu grupta kayıtlı üye yok.</p>'}
                             </div>
-
-                            <!-- TAB 4: Eser Detayları -->
                             <div id="atab-4" class="a-tab-content" style="display: none;">
                                 <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📚 Aktif Grup Eser Detayları</h3>
                                 <div style="overflow-x: auto;">
@@ -950,31 +823,22 @@
                                     </table>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 `;
-
                 document.body.appendChild(modalOverlay);
 
-                // Tab değiştirme
                 const tabBtns = modalOverlay.querySelectorAll(".a-tab-btn");
                 const tabContents = modalOverlay.querySelectorAll(".a-tab-content");
-
                 tabBtns.forEach(btn => {
                     btn.addEventListener("click", (e) => {
-                        tabBtns.forEach(b => {
-                            b.style.background = "var(--card-bg)";
-                            b.style.color = "var(--text-main)";
-                        });
+                        tabBtns.forEach(b => { b.style.background = "var(--card-bg)"; b.style.color = "var(--text-main)"; });
                         tabContents.forEach(c => c.style.display = "none");
                         e.currentTarget.style.background = "var(--gold-primary)";
                         e.currentTarget.style.color = "#fff";
                         document.getElementById(e.currentTarget.getAttribute("data-target")).style.display = "block";
                     });
                 });
-
-                // Kapatma
                 modalOverlay.querySelector("#modal-simple-close-btn").addEventListener("click", () => modalOverlay.remove());
                 modalOverlay.querySelector("#modal-print-btn").addEventListener("click", () => window.print());
                 modalOverlay.addEventListener("click", (e) => {
@@ -982,119 +846,9 @@
                 });
             }
 
-            async function loadGroupData() {
-                removeStuckPanel();
-                const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
-                appData = savedData ? JSON.parse(savedData) : { members: currentGroup === "grup_1" ? [] : [], password: "" };
-
-                if (!appData.members) appData.members = [];
-                if (appData.password === undefined) appData.password = "";
-                if (!appData.readingLogs) appData.readingLogs = [];
-
-                const savedSession = localStorage.getItem(`hatim_session_${currentGroup}`);
-                loggedInMember = (savedSession && appData.members.includes(savedSession)) ? savedSession : "";
-
-                if (!appData.bookPages) appData.bookPages = {};
-                if (!appData.bookHatims) appData.bookHatims = {};
-                if (!appData.bookHistory) appData.bookHistory = {};
-
-                const todayStr = new Date().toLocaleDateString("tr-TR");
-                defaultBooksTemplate.forEach(defBook => {
-                    if (!appData.bookPages[defBook.id]) appData.bookPages[defBook.id] = Array(defBook.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
-                    if (!appData.bookHatims[defBook.id]) appData.bookHatims[defBook.id] = { hatimNo: 1, startDate: todayStr, prayerDone: false };
-                    if (!appData.bookHistory[defBook.id]) appData.bookHistory[defBook.id] = [];
-                });
-
-                if (!appData.books) {
-                    appData.books = JSON.parse(JSON.stringify(defaultBooksTemplate));
-                } else {
-                    defaultBooksTemplate.forEach(defBook => {
-                        let existing = appData.books.find(b => b.id === defBook.id);
-                        if (!existing) appData.books.push(JSON.parse(JSON.stringify(defBook)));
-                        else {
-                            if (!existing.currentMode) existing.currentMode = defBook.defaultMode;
-                            if (!existing.totalUnits) existing.totalUnits = defBook.totalUnits;
-                        }
-                    });
-                }
-
-                appData.books.forEach(b => {
-                    if (!appData.bookPages[b.id]) {
-                        appData.bookPages[b.id] = Array(b.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
-                    } else if (appData.bookPages[b.id].length !== b.totalUnits) {
-                        if (appData.bookPages[b.id].length < b.totalUnits) {
-                            while (appData.bookPages[b.id].length < b.totalUnits) {
-                                appData.bookPages[b.id].push({ owner: "", isRead: false });
-                            }
-                        } else {
-                            appData.bookPages[b.id] = appData.bookPages[b.id].slice(0, b.totalUnits);
-                        }
-                    }
-                    if (!appData.bookHatims[b.id]) appData.bookHatims[b.id] = { hatimNo: 1, startDate: todayStr, prayerDone: false };
-                    if (!appData.bookHistory[b.id]) appData.bookHistory[b.id] = [];
-                });
-
-                rebuildBookModesDefs();
-                saveGroupData();
-                await renderDailyInspiration();
-                renderBooks();
-                renderAnalysisSection();
-                renderAdminSectionAtBottom();
-                updateAutocompleteLists();
-                updateBulkShareVisibility();
-            }
-
-            function saveGroupData() {
-                localStorage.setItem(`hatim_group_${currentGroup}`, JSON.stringify(appData));
-            }
-
-            function renderAnalysisSection() {
-                let analysisContainer = document.getElementById("analysis-section");
-                if (!analysisContainer) {
-                    analysisContainer = document.createElement("div");
-                    analysisContainer.id = "analysis-section";
-                    container.appendChild(analysisContainer);
-                } else {
-                    container.appendChild(analysisContainer);
-                }
-                analysisContainer.style.cssText = "margin: 20px 0; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg);";
-
-                let totalBooks = appData.books.length;
-                let totalTakenUnits = 0, totalReadUnits = 0, totalUnitsAll = 0;
-                appData.books.forEach(book => {
-                    let baseArray = appData.bookPages[book.id];
-                    totalUnitsAll += book.totalUnits;
-                    baseArray.forEach(p => {
-                        if (p.owner) totalTakenUnits++;
-                        if (p.isRead) totalReadUnits++;
-                    });
-                });
-
-                let percentTaken = totalUnitsAll > 0 ? Math.round((totalTakenUnits / totalUnitsAll) * 100) : 0;
-                let percentRead = totalUnitsAll > 0 ? Math.round((totalReadUnits / totalUnitsAll) * 100) : 0;
-
-                analysisContainer.innerHTML = `
-                    <h3 style="margin-bottom: 10px; font-size: 15px; display: flex; justify-content: space-between; align-items: center;">
-                        <span>📈 Genel Grup İlerleme Paneli</span>
-                        <span style="font-size: 11px; background: #27ae60; color: #fff; padding: 3px 8px; border-radius: 4px;">Grup: ${currentGroup.replace(/_/g, ' ').toUpperCase()}</span>
-                    </h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-top: 10px;">
-                        <div style="padding: 10px; border-radius: 6px; border-left: 4px solid #3498db; border: 1px solid var(--border-color);">
-                            <div style="font-size: 11px; opacity: 0.8;">Toplam Eser</div>
-                            <div style="font-size: 17px; font-weight: bold;">${totalBooks} Adet</div>
-                        </div>
-                        <div style="padding: 10px; border-radius: 6px; border-left: 4px solid #f39c12; border: 1px solid var(--border-color);">
-                            <div style="font-size: 11px; opacity: 0.8;">Alınan Hisseler</div>
-                            <div style="font-size: 17px; font-weight: bold;">${totalTakenUnits} / ${totalUnitsAll} (%${percentTaken})</div>
-                        </div>
-                        <div style="padding: 10px; border-radius: 6px; border-left: 4px solid #27ae60; border: 1px solid var(--border-color);">
-                            <div style="font-size: 11px; opacity: 0.8;">Okunan Hisseler</div>
-                            <div style="font-size: 17px; font-weight: bold;">${totalReadUnits} / ${totalUnitsAll} (%${percentRead})</div>
-                        </div>
-                    </div>
-                `;
-            }
-
+            // ============================================================
+            // ADMIN PANELİ
+            // ============================================================
             function renderAdminSectionAtBottom() {
                 let bottomContainer = document.getElementById("admin-bottom-section");
                 if (!bottomContainer) {
@@ -1119,85 +873,103 @@
                     </div>
                 `).join('');
 
-                let booksEditHtml = appData.books.map(b => `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; margin-bottom: 4px; border-radius: 4px; font-size: 13px; border: 1px solid var(--border-color);">
-                        <span>📖 <strong>${b.name}</strong> (${b.totalUnits} ${b.type === 'bab' ? 'Bab' : 'Sayfa'})</span>
-                        <div style="display: flex; gap: 4px;">
-                            <button class="admin-edit-book" data-id="${b.id}" style="background: #f39c12; color: #fff; border: none; padding: 3px 6px; border-radius: 3px; font-size: 11px; cursor: pointer;">Düzenle</button>
-                            <button class="admin-remove-book" data-id="${b.id}" style="background: #e74c3c; color: #fff; border: none; padding: 3px 6px; border-radius: 3px; font-size: 11px; cursor: pointer;">Sil</button>
+                let groupSectionHtml = `
+                    <div id="admin-group-section" style="background: rgba(52, 152, 219, 0.05); border: 1px solid #3498db; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                        <h3 style="color: #2980b9; font-size: 15px; margin-bottom: 10px;">👥 Grup ve Üye Yönetimi</h3>
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
+                            <label style="font-weight: bold; font-size: 13px;">Grup:</label>
+                            <select id="admin-group-select" style="padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); flex: 1; min-width: 150px;">${groupsHtml}</select>
+                            <button id="admin-add-group" style="background: #27ae60; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">+ Ekle</button>
+                            <button id="admin-edit-group" style="background: #f39c12; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Düzenle</button>
+                            <button id="admin-delete-group" style="background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Sil</button>
+                            <button id="admin-set-password" style="background: #8e44ad; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">🔑 Şifre</button>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+                            <span style="font-weight: bold; font-size: 13px;">Gruptaki Üyeler:</span>
+                            <button id="admin-add-member" style="background: #2980b9; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">+ Üye Ekle</button>
+                        </div>
+                        <div style="max-height: 150px; overflow-y: auto; border: 1px solid var(--border-color); padding: 5px; border-radius: 4px; background: var(--card-bg);">
+                            ${appData.members.length > 0 ? membersHtml : '<div style="font-size: 12px; text-align: center; padding: 10px; color: #777;">Kayıtlı üye yok.</div>'}
+                        </div>
+                        <div style="font-size: 11px; color: #7f8c8d; margin-top: 8px; font-style: italic;">
+                            💡 Grup şifre durumu: <span style="font-weight: bold; color: ${appData.password ? '#27ae60' : '#e67e22'};">${appData.password ? '🔒 Şifreli' : '🔓 Şifresiz'}</span>
                         </div>
                     </div>
-                `).join('');
+                `;
 
-                let adminPanelHtml = "";
-                if (isAdmin) {
-                    let hasPassword = appData.password ? true : false;
-                    adminPanelHtml = `
-                        <div id="admin-panel-section" style="background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold-primary); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
-                            <h3 style="color: var(--gold-dark); font-size: 15px; margin-bottom: 10px;">🛠️ Yönetici Kontrol Paneli</h3>
-                            <div style="margin-bottom: 12px;">
-                                <button id="admin-open-simple-analysis" style="width: 100%; padding: 10px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">📊 Detaylı Analiz ve Rapor Paneli</button>
+                let booksEditHtml = appData.books.map(b => {
+                    let memberPages = {};
+                    if (appData.bookPages && appData.bookPages[b.id]) {
+                        appData.bookPages[b.id].forEach(p => {
+                            if (p.owner) {
+                                if (!memberPages[p.owner]) memberPages[p.owner] = 0;
+                                memberPages[p.owner]++;
+                            }
+                        });
+                    }
+                    let memberList = Object.keys(memberPages);
+                    let memberDetails = memberList.map(m => `${m}: ${memberPages[m]} sayfa`).join(', ');
+                    return `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; margin-bottom: 4px; border-radius: 4px; font-size: 13px; border: 1px solid var(--border-color); flex-wrap: wrap; gap: 4px;">
+                            <div style="flex: 1; min-width: 150px;">
+                                <strong>${b.name}</strong> 
+                                <span style="font-size: 11px; opacity: 0.7;">(${b.totalUnits} ${b.type === 'bab' ? 'Bab' : 'Sayfa'})</span>
+                                ${memberDetails ? `<div style="font-size: 11px; color: #555; margin-top: 2px;">📖 ${memberDetails}</div>` : '<div style="font-size: 11px; color: #999; margin-top: 2px;">📖 Henüz kimse almadı</div>'}
                             </div>
-                            
-                            <div style="border-top: 1px solid var(--border-color); padding-top: 10px; margin-bottom: 12px;">
-                                <div style="font-weight: bold; font-size: 13px; margin-bottom: 8px;">📚 Kitaplarda Toplu Atama ve Silme Bölümü:</div>
-                                <div style="display: flex; flex-direction: column; gap: 8px; background: var(--card-bg); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);">
-                                    <div>
-                                        <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Eser Seçimi:</label>
-                                        <select id="admin-bulk-book-select" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 12px;">
-                                            ${appData.books.map(b => `<option value="${b.id}">${b.name} (${b.totalUnits} ${b.type === 'bab' ? 'Bab' : 'Sayfa'})</option>`).join('')}
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Grup / Kişi Seçimi (Hiyerarşik):</label>
-                                        <select id="admin-bulk-target-select" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 12px;">
-                                        </select>
-                                    </div>
-                                    <div style="display: flex; gap: 8px; margin-top: 4px;">
-                                        <button id="admin-bulk-assign-btn" style="flex: 1; padding: 8px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">📥 Toplu Atama Yap</button>
-                                        <button id="admin-bulk-delete-btn" style="flex: 1; padding: 8px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">🗑️ Toplu Sil / Boşalt</button>
-                                        <button id="admin-bulk-reset-btn" style="flex: 1; padding: 8px; background: #f39c12; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">🔄 Eseri Sıfırla</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
-                                <label style="font-weight: bold; font-size: 13px;">Grup:</label>
-                                <select id="admin-group-select" style="padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); flex: 1;">${groupsHtml}</select>
-                                <button id="admin-add-group" style="background: #27ae60; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">+ Ekle</button>
-                                <button id="admin-edit-group" style="background: #f39c12; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Düzenle</button>
-                                <button id="admin-delete-group" style="background: #e74c3c; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Sil</button>
-                            </div>
-                            <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; background: var(--card-bg); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);">
-                                <span style="font-size: 13px; font-weight: bold;">Grup Şifre Durumu: <span style="color: ${hasPassword ? '#27ae60' : '#e67e22'};">${hasPassword ? '🔒 Şifreli' : '🔓 Şifresiz'}</span></span>
-                                <button id="admin-set-password" style="background: #8e44ad; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">🔑 Şifre Belirle / Kaldır</button>
-                            </div>
-                            
-                            <div style="border-top: 1px solid var(--border-color); padding-top: 10px; margin-bottom: 12px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                    <span style="font-weight: bold; font-size: 13px;">📚 Eserler ve Sayfa/Birim Yönetimi:</span>
-                                    <button id="admin-add-book-btn" style="background: #27ae60; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">+ Yeni Eser Ekle</button>
-                                </div>
-                                <div style="max-height: 140px; overflow-y: auto; border: 1px solid var(--border-color); padding: 5px; border-radius: 4px; background: var(--card-bg);">
-                                    ${booksEditHtml}
-                                </div>
-                            </div>
-
-                            <div style="border-top: 1px solid var(--border-color); padding-top: 10px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                    <span style="font-weight: bold; font-size: 13px;">Gruptaki Üyeler:</span>
-                                    <button id="admin-add-member" style="background: #2980b9; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">+ Üye Ekle</button>
-                                </div>
-                                <div style="max-height: 120px; overflow-y: auto; border: 1px solid var(--border-color); padding: 5px; border-radius: 4px;">
-                                    ${appData.members.length > 0 ? membersHtml : '<div style="font-size: 12px; text-align: center; padding: 5px;">Kayıtlı üye yok.</div>'}
-                                </div>
+                            <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                                <button class="admin-edit-book" data-id="${b.id}" style="background: #f39c12; color: #fff; border: none; padding: 3px 8px; border-radius: 3px; font-size: 11px; cursor: pointer;">Düzenle</button>
+                                <button class="admin-remove-book" data-id="${b.id}" style="background: #e74c3c; color: #fff; border: none; padding: 3px 8px; border-radius: 3px; font-size: 11px; cursor: pointer;">Sil</button>
                             </div>
                         </div>
                     `;
-                }
+                }).join('');
 
-                bottomContainer.innerHTML = `
-                    ${adminPanelHtml}
+                let booksSectionHtml = `
+                    <div id="admin-books-section" style="background: rgba(46, 204, 113, 0.05); border: 1px solid #27ae60; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+                            <h3 style="color: #27ae60; font-size: 15px; margin: 0;">📚 Eser Yönetimi</h3>
+                            <button id="admin-add-book-btn" style="background: #27ae60; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">+ Yeni Eser Ekle</button>
+                        </div>
+                        <div style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); padding: 5px; border-radius: 4px; background: var(--card-bg);">
+                            ${booksEditHtml}
+                        </div>
+                        <div style="font-size: 11px; color: #7f8c8d; margin-top: 8px; font-style: italic;">
+                            💡 Her eserin yanında kimin kaç sayfa aldığı gösterilir.
+                        </div>
+                    </div>
+                `;
+
+                let bulkSectionHtml = `
+                    <div id="admin-bulk-section" style="background: rgba(155, 89, 182, 0.05); border: 1px solid #8e44ad; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                        <h3 style="color: #8e44ad; font-size: 15px; margin-bottom: 10px;">📊 Toplu İşlemler ve Analiz</h3>
+                        <div style="margin-bottom: 12px;">
+                            <button id="admin-open-simple-analysis" style="width: 100%; padding: 10px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">📊 Detaylı Analiz ve Rapor Paneli</button>
+                        </div>
+                        <div style="border-top: 1px solid var(--border-color); padding-top: 12px;">
+                            <div style="font-weight: bold; font-size: 13px; margin-bottom: 8px;">📚 Kitaplarda Toplu Atama ve Silme:</div>
+                            <div style="display: flex; flex-direction: column; gap: 8px; background: var(--card-bg); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);">
+                                <div>
+                                    <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Eser Seçimi:</label>
+                                    <select id="admin-bulk-book-select" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 12px;">
+                                        ${appData.books.map(b => `<option value="${b.id}">${b.name} (${b.totalUnits} ${b.type === 'bab' ? 'Bab' : 'Sayfa'})</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Hedef Grup / Kişi:</label>
+                                    <select id="admin-bulk-target-select" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 12px;">
+                                    </select>
+                                </div>
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                    <button id="admin-bulk-assign-btn" style="flex: 1; padding: 8px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; min-width: 100px;">📥 Atama Yap</button>
+                                    <button id="admin-bulk-delete-btn" style="flex: 1; padding: 8px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; min-width: 100px;">🗑️ Sil / Boşalt</button>
+                                    <button id="admin-bulk-reset-btn" style="flex: 1; padding: 8px; background: #f39c12; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; min-width: 100px;">🔄 Eseri Sıfırla</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                let messageSectionHtml = `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
                         <h3 style="font-size: 15px; margin: 0;">📢 Yöneticiye Mesaj Gönder</h3>
                         <button id="admin-toggle-btn-custom" style="padding: 6px 12px; background: ${isAdmin ? '#c0392b' : '#f39c12'}; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">${isAdmin ? '🔓 Yönetici Modu: AÇIK' : '🔐 Yönetici Modu: Kapalı'}</button>
@@ -1206,8 +978,26 @@
                     <button id="send-admin-msg-btn" style="background: #25D366; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">💬 WhatsApp ile Gönder</button>
                 `;
 
+                let adminPanelHtml = "";
                 if (isAdmin) {
-                    // Toplu Atama / Silme Hedef Seçeneklerini Doldurma
+                    adminPanelHtml = `
+                        <div id="admin-panel-section" style="background: rgba(212, 175, 55, 0.05); border: 1px solid var(--gold-primary); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                            <h3 style="color: var(--gold-dark); font-size: 16px; margin-bottom: 15px;">🛠️ Yönetici Kontrol Paneli</h3>
+                            ${groupSectionHtml}
+                            ${booksSectionHtml}
+                            ${bulkSectionHtml}
+                        </div>
+                    `;
+                }
+
+                bottomContainer.innerHTML = `${adminPanelHtml}${messageSectionHtml}`;
+
+                if (isAdmin) {
+                    const analysisBtn = document.getElementById("admin-open-simple-analysis");
+                    if (analysisBtn) {
+                        analysisBtn.addEventListener("click", () => { openSimpleAnalysisModal(); });
+                    }
+
                     let targetSelect = bottomContainer.querySelector("#admin-bulk-target-select");
                     if (targetSelect) {
                         let allGroupKeys = getAllGroupKeys();
@@ -1236,50 +1026,26 @@
                         targetSelect.innerHTML = optionsHtml;
                     }
 
-                    // Toplu Atama Butonu
                     const bulkAssignBtn = bottomContainer.querySelector("#admin-bulk-assign-btn");
                     if (bulkAssignBtn) {
                         bulkAssignBtn.addEventListener("click", () => {
                             let selectedBookId = bottomContainer.querySelector("#admin-bulk-book-select").value;
                             let selectedTarget = bottomContainer.querySelector("#admin-bulk-target-select").value;
-                            if (!selectedTarget) {
-                                alert("Lütfen atama yapılacak bir grup veya kişi seçin.");
-                                return;
-                            }
-
+                            if (!selectedTarget) { alert("Lütfen atama yapılacak bir grup veya kişi seçin."); return; }
                             let [type, gKey, mName] = selectedTarget.split(":");
                             let targetDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
-                            if (!targetDataRaw) {
-                                alert("Grup verisi bulunamadı.");
-                                return;
-                            }
+                            if (!targetDataRaw) { alert("Grup verisi bulunamadı."); return; }
                             let targetGroupData = JSON.parse(targetDataRaw);
-                            if (!targetGroupData.bookPages[selectedBookId]) {
-                                alert("Seçilen esere ait sayfa/birim verisi bulunamadı.");
-                                return;
-                            }
-
+                            if (!targetGroupData.bookPages[selectedBookId]) { alert("Seçilen esere ait sayfa/birim verisi bulunamadı."); return; }
                             if (type === "member") {
-                                targetGroupData.bookPages[selectedBookId].forEach(p => {
-                                    if (!p.owner) {
-                                        p.owner = mName;
-                                    }
-                                });
+                                targetGroupData.bookPages[selectedBookId].forEach(p => { if (!p.owner) { p.owner = mName; } });
                                 localStorage.setItem(`hatim_group_${gKey}`, JSON.stringify(targetGroupData));
                                 alert(`"${selectedBookId}" eserinin boş birimleri "${mName}" adlı üyeye atandı.`);
                             } else if (type === "group") {
                                 let members = targetGroupData.members;
-                                if (!members || members.length === 0) {
-                                    alert("Bu grupta kayıtlı üye bulunmuyor!");
-                                    return;
-                                }
+                                if (!members || members.length === 0) { alert("Bu grupta kayıtlı üye bulunmuyor!"); return; }
                                 let idx = 0;
-                                targetGroupData.bookPages[selectedBookId].forEach(p => {
-                                    if (!p.owner) {
-                                        p.owner = members[idx % members.length];
-                                        idx++;
-                                    }
-                                });
+                                targetGroupData.bookPages[selectedBookId].forEach(p => { if (!p.owner) { p.owner = members[idx % members.length]; idx++; } });
                                 localStorage.setItem(`hatim_group_${gKey}`, JSON.stringify(targetGroupData));
                                 alert(`"${selectedBookId}" eserinin boş birimleri "${gKey.toUpperCase()}" grubundaki üyeler arasında paylaştırıldı.`);
                             }
@@ -1287,35 +1053,21 @@
                         });
                     }
 
-                    // Toplu Silme Butonu
                     const bulkDeleteBtn = bottomContainer.querySelector("#admin-bulk-delete-btn");
                     if (bulkDeleteBtn) {
                         bulkDeleteBtn.addEventListener("click", () => {
                             let selectedBookId = bottomContainer.querySelector("#admin-bulk-book-select").value;
                             let selectedTarget = bottomContainer.querySelector("#admin-bulk-target-select").value;
-                            if (!selectedTarget) {
-                                alert("Lütfen işlem yapılacak grup veya kişiyi seçin.");
-                                return;
-                            }
-
+                            if (!selectedTarget) { alert("Lütfen işlem yapılacak grup veya kişiyi seçin."); return; }
                             let [type, gKey, mName] = selectedTarget.split(":");
                             let targetDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
                             if (!targetDataRaw) return;
                             let targetGroupData = JSON.parse(targetDataRaw);
-
                             if (confirm(`Seçilen eserdeki hisseleri silmek/boşaltmak istediğinize emin misiniz?`)) {
                                 if (type === "member") {
-                                    targetGroupData.bookPages[selectedBookId].forEach(p => {
-                                        if (p.owner === mName) {
-                                            p.owner = "";
-                                            p.isRead = false;
-                                        }
-                                    });
+                                    targetGroupData.bookPages[selectedBookId].forEach(p => { if (p.owner === mName) { p.owner = ""; p.isRead = false; } });
                                 } else if (type === "group") {
-                                    targetGroupData.bookPages[selectedBookId].forEach(p => {
-                                        p.owner = "";
-                                        p.isRead = false;
-                                    });
+                                    targetGroupData.bookPages[selectedBookId].forEach(p => { p.owner = ""; p.isRead = false; });
                                 }
                                 localStorage.setItem(`hatim_group_${gKey}`, JSON.stringify(targetGroupData));
                                 alert("Toplu silme/boşaltma işlemi başarıyla tamamlandı.");
@@ -1324,37 +1076,22 @@
                         });
                     }
 
-                    // Eseri Sıfırla Butonu
                     const bulkResetBtn = bottomContainer.querySelector("#admin-bulk-reset-btn");
                     if (bulkResetBtn) {
                         bulkResetBtn.addEventListener("click", () => {
                             let selectedBookId = bottomContainer.querySelector("#admin-bulk-book-select").value;
                             let selectedTarget = bottomContainer.querySelector("#admin-bulk-target-select").value;
-                            if (!selectedTarget) {
-                                alert("Lütfen işlem yapılacak grup veya kişiyi seçin.");
-                                return;
-                            }
-
+                            if (!selectedTarget) { alert("Lütfen işlem yapılacak grup veya kişiyi seçin."); return; }
                             let [type, gKey, mName] = selectedTarget.split(":");
                             let targetDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
                             if (!targetDataRaw) return;
                             let targetGroupData = JSON.parse(targetDataRaw);
-
                             if (confirm(`Seçilen eseri tamamen sıfırlamak istediğinize emin misiniz? (Tüm veriler silinecek)`)) {
                                 if (type === "member") {
-                                    targetGroupData.bookPages[selectedBookId].forEach(p => {
-                                        if (p.owner === mName) {
-                                            p.owner = "";
-                                            p.isRead = false;
-                                        }
-                                    });
+                                    targetGroupData.bookPages[selectedBookId].forEach(p => { if (p.owner === mName) { p.owner = ""; p.isRead = false; } });
                                 } else if (type === "group") {
-                                    targetGroupData.bookPages[selectedBookId].forEach(p => {
-                                        p.owner = "";
-                                        p.isRead = false;
-                                    });
+                                    targetGroupData.bookPages[selectedBookId].forEach(p => { p.owner = ""; p.isRead = false; });
                                 }
-                                // Hatim bilgilerini de sıfırla
                                 if (targetGroupData.bookHatims && targetGroupData.bookHatims[selectedBookId]) {
                                     targetGroupData.bookHatims[selectedBookId].hatimNo = 1;
                                     targetGroupData.bookHatims[selectedBookId].prayerDone = false;
@@ -1365,68 +1102,38 @@
                             }
                         });
                     }
-                }
-
-                document.getElementById("admin-toggle-btn-custom").addEventListener("click", () => triggerAdminToggle());
-
-                if (isAdmin) {
-                    const analysisBtn = document.getElementById("admin-open-simple-analysis");
-                    if (analysisBtn) {
-                        analysisBtn.addEventListener("click", () => {
-                            openSimpleAnalysisModal();
-                        });
-                    }
 
                     const addBookBtn = document.getElementById("admin-add-book-btn");
                     if (addBookBtn) {
                         addBookBtn.addEventListener("click", () => {
                             let bName = prompt("Eser adını girin:");
                             if (!bName || !bName.trim()) return;
-        
                             let bUnitsStr = prompt("Toplam sayfa/birim sayısını girin (Örn: 100):", "100");
                             let bUnits = parseInt(bUnitsStr, 10);
-                            if (isNaN(bUnits) || bUnits <= 0) {
-                                alert("Geçersiz birim sayısı!");
-                                return;
-                            }
-        
+                            if (isNaN(bUnits) || bUnits <= 0) { alert("Geçersiz birim sayısı!"); return; }
                             let bTypeInput = prompt("Birim türü nedir? ('sayfa' veya 'bab' yazın)", "sayfa");
                             let bType = (bTypeInput && bTypeInput.trim().toLowerCase() === "bab") ? "bab" : "page";
-        
                             let bPdf = prompt("PDF dosya yolunu veya linkini girin (Boş bırakabilirsiniz):", "") || "";
                             let bId = "book_" + Date.now();
-
-                            appData.books.push({
-                                id: bId,
-                                name: bName.trim(),
-                                totalUnits: bUnits,
-                                type: bType,
-                                defaultMode: bType === "bab" ? "on_bab" : "yirmi_sayfa",
-                                currentMode: bType === "bab" ? "on_bab" : "yirmi_sayfa",
-                                pdf: bPdf.trim()
-                            });
-
+                            appData.books.push({ id: bId, name: bName.trim(), totalUnits: bUnits, type: bType, defaultMode: bType === "bab" ? "on_bab" : "yirmi_sayfa", currentMode: bType === "bab" ? "on_bab" : "yirmi_sayfa", pdf: bPdf.trim() });
                             appData.bookPages[bId] = Array(bUnits).fill(null).map(() => ({ owner: "", isRead: false }));
                             appData.bookHatims[bId] = { hatimNo: 1, startDate: new Date().toLocaleDateString("tr-TR"), prayerDone: false };
                             appData.bookHistory[bId] = [];
-
                             saveGroupData();
                             loadGroupData();
                         });
                     }
-                    
+
                     document.querySelectorAll(".admin-edit-book").forEach(btn => {
                         btn.addEventListener("click", (e) => {
                             let bId = e.target.getAttribute("data-id");
                             let bookObj = appData.books.find(b => b.id === bId);
                             if (!bookObj) return;
-
                             let newName = prompt("Eserin yeni adı:", bookObj.name);
                             if (newName === null) return;
                             let newUnitsStr = prompt("Toplam birim/sayfa sayısı:", bookObj.totalUnits);
                             if (newUnitsStr === null) return;
                             let newUnits = parseInt(newUnitsStr, 10);
-
                             if (newName.trim()) bookObj.name = newName.trim();
                             if (!isNaN(newUnits) && newUnits > 0) {
                                 bookObj.totalUnits = newUnits;
@@ -1440,7 +1147,6 @@
                                     appData.bookPages[bId] = appData.bookPages[bId].slice(0, newUnits);
                                 }
                             }
-
                             saveGroupData();
                             loadGroupData();
                         });
@@ -1451,7 +1157,6 @@
                             let bId = e.target.getAttribute("data-id");
                             let bookObj = appData.books.find(b => b.id === bId);
                             if (!bookObj) return;
-
                             if (confirm(`"${bookObj.name}" eserini silmek istiyor musunuz?`)) {
                                 appData.books = appData.books.filter(b => b.id !== bId);
                                 delete appData.bookPages[bId];
@@ -1484,15 +1189,7 @@
                                 freshHatims[defBook.id] = { hatimNo: 1, startDate: todayStr, prayerDone: false };
                                 freshHistory[defBook.id] = [];
                             });
-                            appData = {
-                                members: [],
-                                password: groupPwd.trim(),
-                                books: freshBooks,
-                                bookPages: freshPages,
-                                bookHatims: freshHatims,
-                                bookHistory: freshHistory,
-                                readingLogs: []
-                            };
+                            appData = { members: [], password: groupPwd.trim(), books: freshBooks, bookPages: freshPages, bookHatims: freshHatims, bookHistory: freshHistory, readingLogs: [] };
                             saveGroupData();
                             await loadGroupData();
                         }
@@ -1520,23 +1217,16 @@
                         }
                     });
 
-                    const setPwdBtn = document.getElementById("admin-set-password");
-                    if (setPwdBtn) {
-                        setPwdBtn.addEventListener("click", () => {
-                            let currentPwd = appData.password || "";
-                            let newPwd = prompt("Gruba yeni şifre belirleyin (Kaldırmak için boş bırakın):", currentPwd);
-                            if (newPwd !== null) {
-                                appData.password = newPwd.trim();
-                                saveGroupData();
-                                if (appData.password) {
-                                    alert("Grup şifresi başarıyla tanımlandı.");
-                                } else {
-                                    alert("Grup şifresi kaldırıldı.");
-                                }
-                                loadGroupData();
-                            }
-                        });
-                    }
+                    document.getElementById("admin-set-password").addEventListener("click", () => {
+                        let currentPwd = appData.password || "";
+                        let newPwd = prompt("Gruba yeni şifre belirleyin (Kaldırmak için boş bırakın):", currentPwd);
+                        if (newPwd !== null) {
+                            appData.password = newPwd.trim();
+                            saveGroupData();
+                            if (appData.password) { alert("Grup şifresi başarıyla tanımlandı."); } else { alert("Grup şifresi kaldırıldı."); }
+                            loadGroupData();
+                        }
+                    });
 
                     document.getElementById("admin-add-member").addEventListener("click", async () => {
                         let mName = prompt("Eklenecek üye adı:");
@@ -1588,6 +1278,7 @@
                     });
                 }
 
+                document.getElementById("admin-toggle-btn-custom").addEventListener("click", () => triggerAdminToggle());
                 document.getElementById("send-admin-msg-btn").addEventListener("click", () => {
                     let text = document.getElementById("admin-msg-input").value.trim();
                     if (!text) return;
@@ -1622,13 +1313,58 @@
                 let firstOwner = subset[0].owner;
                 let firstIsRead = subset[0].isRead;
                 let allSame = subset.every(p => p.owner === firstOwner && p.isRead === firstIsRead && p.owner !== "");
-
                 if (allFree) return { owner: "", isRead: false, statusType: "free" };
                 else if (allSame) return { owner: firstOwner, isRead: firstIsRead, statusType: firstIsRead ? "read" : "taken" };
                 else {
                     let owners = [...new Set(subset.map(p => p.owner).filter(Boolean))];
                     return { owner: owners.join(", "), isRead: false, statusType: "mixed" };
                 }
+            }
+
+            function renderAnalysisSection() {
+                let analysisContainer = document.getElementById("analysis-section");
+                if (!analysisContainer) {
+                    analysisContainer = document.createElement("div");
+                    analysisContainer.id = "analysis-section";
+                    container.appendChild(analysisContainer);
+                } else {
+                    container.appendChild(analysisContainer);
+                }
+                analysisContainer.style.cssText = "margin: 20px 0; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg);";
+
+                let totalBooks = appData.books.length;
+                let totalTakenUnits = 0, totalReadUnits = 0, totalUnitsAll = 0;
+                appData.books.forEach(book => {
+                    let baseArray = appData.bookPages[book.id];
+                    totalUnitsAll += book.totalUnits;
+                    baseArray.forEach(p => {
+                        if (p.owner) totalTakenUnits++;
+                        if (p.isRead) totalReadUnits++;
+                    });
+                });
+                let percentTaken = totalUnitsAll > 0 ? Math.round((totalTakenUnits / totalUnitsAll) * 100) : 0;
+                let percentRead = totalUnitsAll > 0 ? Math.round((totalReadUnits / totalUnitsAll) * 100) : 0;
+
+                analysisContainer.innerHTML = `
+                    <h3 style="margin-bottom: 10px; font-size: 15px; display: flex; justify-content: space-between; align-items: center;">
+                        <span>📈 Genel Grup İlerleme Paneli</span>
+                        <span style="font-size: 11px; background: #27ae60; color: #fff; padding: 3px 8px; border-radius: 4px;">Grup: ${currentGroup.replace(/_/g, ' ').toUpperCase()}</span>
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-top: 10px;">
+                        <div style="padding: 10px; border-radius: 6px; border-left: 4px solid #3498db; border: 1px solid var(--border-color);">
+                            <div style="font-size: 11px; opacity: 0.8;">Toplam Eser</div>
+                            <div style="font-size: 17px; font-weight: bold;">${totalBooks} Adet</div>
+                        </div>
+                        <div style="padding: 10px; border-radius: 6px; border-left: 4px solid #f39c12; border: 1px solid var(--border-color);">
+                            <div style="font-size: 11px; opacity: 0.8;">Alınan Hisseler</div>
+                            <div style="font-size: 17px; font-weight: bold;">${totalTakenUnits} / ${totalUnitsAll} (%${percentTaken})</div>
+                        </div>
+                        <div style="padding: 10px; border-radius: 6px; border-left: 4px solid #27ae60; border: 1px solid var(--border-color);">
+                            <div style="font-size: 11px; opacity: 0.8;">Okunan Hisseler</div>
+                            <div style="font-size: 17px; font-weight: bold;">${totalReadUnits} / ${totalUnitsAll} (%${percentRead})</div>
+                        </div>
+                    </div>
+                `;
             }
 
             function renderBooks() {
@@ -1727,19 +1463,13 @@
                             </div>
                         </div>
                         <div class="book-body" style="display: ${isOpen ? 'block' : 'none'}; padding: 16px; border-top: 1px solid var(--border-color);">
-                            <div style="margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;">
-                                ${modeButtonsHtml}
-                            </div>
-                            <div style="max-height: 350px; overflow-y: auto; padding-right: 4px;">
-                                ${itemsHtml}
-                            </div>
+                            <div style="margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;">${modeButtonsHtml}</div>
+                            <div style="max-height: 350px; overflow-y: auto; padding-right: 4px;">${itemsHtml}</div>
                         </div>
                     `;
-
                     booksGrid.appendChild(card);
                 });
 
-                // Olay Dinleyicileri - PDF butonları için yeni sekme açma
                 document.querySelectorAll(".book-header").forEach(header => {
                     header.addEventListener("click", (e) => {
                         if (e.target.closest(".read-pdf-btn")) return;
@@ -1752,9 +1482,7 @@
                 document.querySelectorAll(".read-pdf-btn").forEach(btn => {
                     btn.addEventListener("click", (e) => {
                         e.stopPropagation();
-                        let bookId = btn.getAttribute("data-book-id");
-                        let bookName = btn.getAttribute("data-book-name");
-                        openPdfInNewTab(bookId, bookName);
+                        openPdfInNewTab(btn.getAttribute("data-book-id"), btn.getAttribute("data-book-name"));
                     });
                 });
 
@@ -1774,25 +1502,16 @@
 
                 document.querySelectorAll(".take-range-btn").forEach(btn => {
                     btn.addEventListener("click", (e) => {
-                        if (!loggedInMember) {
-                            alert("Lütfen önce isminizi seçin.");
-                            return;
-                        }
+                        if (!loggedInMember) { alert("Lütfen önce isminizi seçin."); return; }
                         let bId = btn.getAttribute("data-book-id");
                         let start = parseInt(btn.getAttribute("data-start"), 10);
                         let end = parseInt(btn.getAttribute("data-end"), 10);
                         let baseArray = appData.bookPages[bId];
-
-                        for (let i = start; i < end; i++) {
-                            baseArray[i].owner = loggedInMember;
-                            baseArray[i].isRead = false;
-                        }
-
+                        for (let i = start; i < end; i++) { baseArray[i].owner = loggedInMember; baseArray[i].isRead = false; }
                         if (!appData.readingLogs) appData.readingLogs = [];
                         let defModes = bookModesDefs[bId];
                         let modeObj = Object.values(defModes).find(m => m.getItems().some(item => item.start === start && item.end === end));
                         let rangeName = modeObj ? modeObj.getItems().find(item => item.start === start && item.end === end).name : `${start+1}-${end}`;
-
                         appData.readingLogs.push({
                             date: new Date().toLocaleDateString("tr-TR") + " " + new Date().toLocaleTimeString("tr-TR", {hour: '2-digit', minute:'2-digit'}),
                             timestamp: Date.now(),
@@ -1801,7 +1520,6 @@
                             range: rangeName,
                             count: end - start
                         });
-
                         saveGroupData();
                         renderBooks();
                         renderAnalysisSection();
@@ -1814,11 +1532,7 @@
                         let start = parseInt(btn.getAttribute("data-start"), 10);
                         let end = parseInt(btn.getAttribute("data-end"), 10);
                         let baseArray = appData.bookPages[bId];
-
-                        for (let i = start; i < end; i++) {
-                            baseArray[i].isRead = true;
-                        }
-
+                        for (let i = start; i < end; i++) { baseArray[i].isRead = true; }
                         saveGroupData();
                         renderBooks();
                         renderAnalysisSection();
@@ -1831,11 +1545,7 @@
                         let start = parseInt(btn.getAttribute("data-start"), 10);
                         let end = parseInt(btn.getAttribute("data-end"), 10);
                         let baseArray = appData.bookPages[bId];
-
-                        for (let i = start; i < end; i++) {
-                            baseArray[i].isRead = false;
-                        }
-
+                        for (let i = start; i < end; i++) { baseArray[i].isRead = false; }
                         saveGroupData();
                         renderBooks();
                         renderAnalysisSection();
@@ -1848,17 +1558,77 @@
                         let start = parseInt(btn.getAttribute("data-start"), 10);
                         let end = parseInt(btn.getAttribute("data-end"), 10);
                         let baseArray = appData.bookPages[bId];
-
-                        for (let i = start; i < end; i++) {
-                            baseArray[i].owner = "";
-                            baseArray[i].isRead = false;
-                        }
-
+                        for (let i = start; i < end; i++) { baseArray[i].owner = ""; baseArray[i].isRead = false; }
                         saveGroupData();
                         renderBooks();
                         renderAnalysisSection();
                     });
                 });
+            }
+
+            async function loadGroupData() {
+                const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
+                appData = savedData ? JSON.parse(savedData) : { members: currentGroup === "grup_1" ? [] : [], password: "" };
+
+                if (!appData.members) appData.members = [];
+                if (appData.password === undefined) appData.password = "";
+                if (!appData.readingLogs) appData.readingLogs = [];
+
+                const savedSession = localStorage.getItem(`hatim_session_${currentGroup}`);
+                loggedInMember = (savedSession && appData.members.includes(savedSession)) ? savedSession : "";
+
+                if (!appData.bookPages) appData.bookPages = {};
+                if (!appData.bookHatims) appData.bookHatims = {};
+                if (!appData.bookHistory) appData.bookHistory = {};
+
+                const todayStr = new Date().toLocaleDateString("tr-TR");
+                defaultBooksTemplate.forEach(defBook => {
+                    if (!appData.bookPages[defBook.id]) appData.bookPages[defBook.id] = Array(defBook.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
+                    if (!appData.bookHatims[defBook.id]) appData.bookHatims[defBook.id] = { hatimNo: 1, startDate: todayStr, prayerDone: false };
+                    if (!appData.bookHistory[defBook.id]) appData.bookHistory[defBook.id] = [];
+                });
+
+                if (!appData.books) {
+                    appData.books = JSON.parse(JSON.stringify(defaultBooksTemplate));
+                } else {
+                    defaultBooksTemplate.forEach(defBook => {
+                        let existing = appData.books.find(b => b.id === defBook.id);
+                        if (!existing) appData.books.push(JSON.parse(JSON.stringify(defBook)));
+                        else {
+                            if (!existing.currentMode) existing.currentMode = defBook.defaultMode;
+                            if (!existing.totalUnits) existing.totalUnits = defBook.totalUnits;
+                        }
+                    });
+                }
+
+                appData.books.forEach(b => {
+                    if (!appData.bookPages[b.id]) {
+                        appData.bookPages[b.id] = Array(b.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
+                    } else if (appData.bookPages[b.id].length !== b.totalUnits) {
+                        if (appData.bookPages[b.id].length < b.totalUnits) {
+                            while (appData.bookPages[b.id].length < b.totalUnits) {
+                                appData.bookPages[b.id].push({ owner: "", isRead: false });
+                            }
+                        } else {
+                            appData.bookPages[b.id] = appData.bookPages[b.id].slice(0, b.totalUnits);
+                        }
+                    }
+                    if (!appData.bookHatims[b.id]) appData.bookHatims[b.id] = { hatimNo: 1, startDate: todayStr, prayerDone: false };
+                    if (!appData.bookHistory[b.id]) appData.bookHistory[b.id] = [];
+                });
+
+                rebuildBookModesDefs();
+                saveGroupData();
+                await renderDailyInspiration();
+                renderBooks();
+                renderAnalysisSection();
+                renderAdminSectionAtBottom();
+                updateAutocompleteLists();
+                updateBulkShareVisibility();
+            }
+
+            function saveGroupData() {
+                localStorage.setItem(`hatim_group_${currentGroup}`, JSON.stringify(appData));
             }
 
             await loadGroupData();
