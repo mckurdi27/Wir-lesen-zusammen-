@@ -605,32 +605,50 @@
                     background: var(--card-bg);
                 `;
 
-                // "+ Yeni Grup" butonu kullanıcı panelinden kaldırıldı (Yalnızca Yönetici Panelinde bulunur).
                 controlsContainer.innerHTML = `
-                    <!-- 1. Bireysel / Şifreli bölüm (Bireysel-İsim-Şifre) -->
-                    <div style="display: flex; gap: 6px; align-items: center; margin-top: 10px; margin-bottom: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px; flex-wrap: wrap;">
-                        <span style="font-weight: bold; font-size: 12px; white-space: nowrap;">Bireysel-İsim-Şifre:</span>
-                        <input type="text" id="locked-group-name" placeholder="Grup Adı" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 80px;">
-                        <input type="password" id="locked-group-pwd" placeholder="Şifre" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 70px;">
-                        <button id="join-locked-group-btn" style="padding: 6px 10px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; white-space: nowrap;">Katıl</button>
-                    </div>
+    <!-- 1. Satır: İsim, Şifre, Tek/Grup (Dropmenü) -->
+    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px;">
+        <div style="display: flex; align-items: center; gap: 5px; flex: 1; min-width: 120px;">
+            <label style="font-weight: bold; font-size: 12px; white-space: nowrap;">İsim:</label>
+            <select id="user-member-select" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; width: 100%;">
+                ${membersOptions}
+            </select>
+        </div>
+        <div style="display: flex; align-items: center; gap: 5px; width: 115px;">
+            <label style="font-weight: bold; font-size: 12px; white-space: nowrap;">Şifre:</label>
+            <input type="password" id="member-pwd" placeholder="Şifre" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; width: 100%;">
+        </div>
+        <div style="display: flex; align-items: center; gap: 5px; flex: 1; min-width: 140px;">
+            <label style="font-weight: bold; font-size: 12px; white-space: nowrap;">Tek/Grup:</label>
+            <select id="user-group-select" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; width: 100%;">
+                ${groupsHtml}
+            </select>
+        </div>
+        <button id="user-add-member-btn" style="padding: 6px 10px; background: #2980b9; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; white-space: nowrap;">+ Üye Ekle</button>
+    </div>
+    
+    <!-- 2. Satır: Grup İsmi, Şifre, Katıl (Buton) -->
+    <div style="display: flex; gap: 8px; align-items: center; margin-top: 10px; margin-bottom: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 5px; flex: 1; min-width: 120px;">
+            <label style="font-weight: bold; font-size: 12px; white-space: nowrap;">Grup İsmi:</label>
+            <input type="text" id="locked-group-name" placeholder="Grup Adı" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; width: 100%;">
+        </div>
+        <div style="display: flex; align-items: center; gap: 5px; width: 115px;">
+            <label style="font-weight: bold; font-size: 12px; white-space: nowrap;">Şifre:</label>
+            <input type="password" id="locked-group-pwd" placeholder="Şifre" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; width: 100%;">
+        </div>
+        <button id="join-locked-group-btn" style="padding: 6px 14px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; white-space: nowrap;">Katıl</button>
+    </div>
 
-                    <!-- 2. Grup Seç / Grup-isim -->
-                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px;">
-                        <label style="font-weight: bold; font-size: 13px; min-width: 65px;">Grup-isim:</label>
-                        <select id="user-group-select" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 140px;">
-                            ${groupsHtml}
-                        <input type="password" id="locked-group-pwd" placeholder="Şifre" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 70px;">
-                    </div>
-                    
-                    <div style="font-size: 11px; color: #e67e22; font-style: italic; margin-top: 5px;">
-                        * Not: Hem bireysel hem de gruplardaki kişiler şifre girmeden sayfada değişiklik yapamayacaktır[span_1](start_span)[span_1](end_span).
-                    </div>
+    <div style="font-size: 11px; color: #e67e22; font-style: italic; margin-top: 5px;">
+        * Not: Hem bireysel hem de gruplardaki kişiler şifre girmeden sayfada değişiklik yapamayacaktır.
+    </div>
 
-                    <div id="bulk-share-area" style="display: ${loggedInMember ? 'block' : 'none'}; margin-top: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
-                        <button id="bulk-whatsapp-btn" style="width: 100%; padding: 8px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">💬 Tüm Seçtiklerimi WhatsApp'ta Paylaş</button>
-                    </div>
-                `;
+    <div id="bulk-share-area" style="display: ${loggedInMember ? 'block' : 'none'}; margin-top: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
+        <button id="bulk-whatsapp-btn" style="width: 100%; padding: 8px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">💬 Tüm Seçtiklerimi WhatsApp'ta Paylaş</button>
+    </div>
+`;
+
 
                 document.getElementById("user-group-select").addEventListener("change", async (e) => {
                     currentGroup = e.target.value;
