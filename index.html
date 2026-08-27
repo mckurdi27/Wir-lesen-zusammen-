@@ -247,12 +247,12 @@
             async function fetchHijriMonthData(ayKodu) {
                 if (monthlyInspirationCache[ayKodu]) return monthlyInspirationCache[ayKodu];
                 const fileMap = {
-                    "01": "json/01-muharrem.json", "02": "json/02-sefer.json", "03": "json/03-rebiulevvel.json",
-                    "04": "json/04-rebiulahir.json", "05": "json/05-cemaziyelevvel.json", "06": "json/06-cemaziyelahir.json",
+                    "01": "json/01-muharrem.json", "02": "json/02-sefer.json", "03": "json/03-rebiülevvel.json",
+                    "04": "json/04-rebiülahir.json", "05": "json/05-cemaziyelevvel.json", "06": "json/06-cemaziyelahir.json",
                     "07": "json/07-recep.json", "08": "json/08-saban.json", "09": "json/09-ramazan.json",
                     "10": "json/10-sevval.json", "11": "json/11-zilkade.json", "12": "json/12-zilhicce.json"
                 };
-                let filePath = fileMap[ayKodu] || "json/03-rebiulevvel.json";
+                let filePath = fileMap[ayKodu] || "json/03-rebiülevvel.json";
                 try {
                     const response = await fetch(filePath);
                     if (!response.ok) throw new Error('Dosya bulunamadı');
