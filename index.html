@@ -1,17 +1,13 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <!-- ================================================================= -->
-    <!-- HEAD BÖLÜMÜ VE META AYARLARI -->
-    <!-- ================================================================= -->
+    <!-- ================================================================= --> <!-- HEAD BÖLÜMÜ VE META AYARLARI --> <!-- ================================================================= -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ortak Hatim und Dua Takip Sistemi</title>
 </head>
 <body>
-    <!-- ================================================================= -->
-    <!-- ANA İÇERİK KAPSAYICISI -->
-    <!-- ================================================================= -->
+    <!-- ================================================================= -->  <!-- ANA İÇERİK KAPSAYICISI -->  <!-- ================================================================= -->
     <div class="container">
         <!-- En Üst Birleşik Ornate Başlık ve Görsel/Namaz Vakitleri Alanı -->
         <div id="main-title-ornate-section" style="margin-bottom: 20px; padding: 10px 15px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border: 2px solid #d4af37; border-top: 6px solid #8a6d3b; border-radius: 12px; box-shadow: 0 4px 15px rgba(138, 109, 59, 0.2);">
@@ -54,7 +50,7 @@
                         <div id="prayerTimesResult" style="font-size: 11px; color: #333; line-height: 1.3;">Vakitler yükleniyor...</div>
                     </div>
                 </div>
-
+                
                 <!-- Sağ Kart: Kâbe-i Muazzama Resmi -->
                 <div style="flex: 0 0 190px; text-align: center;">
                     <img src="img/Kabe.jpg" alt="Kâbe-i Muazzama" style="width: 100%; height: 157px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
@@ -121,9 +117,7 @@
         </script>
     </div>
 
-    <!-- ================================================================= -->
-    <!-- JAVASCRIPT UYGULAMA MANTIĞI -->
-    <!-- ================================================================= -->
+    <!-- ================================================================= -->  <!-- JAVASCRIPT UYGULAMA MANTIĞI -->   <!-- ================================================================= -->
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
             
@@ -606,79 +600,35 @@
                 `;
 
                 // "+ Yeni Grup" butonu kullanıcı panelinden kaldırıldı (Yalnızca Yönetici Panelinde bulunur).
-                controlsContainer.innerHTML 
-    <title>Giriş Paneli</title>
-    <style>
-        .header-panel {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          padding: 10px;
-          background: #f9f9f9;
-          border-radius: 8px;
-          box-sizing: border-box;
-          width: 100%;
-        }
+                controlsContainer.innerHTML = `
+                    <!-- 1. Grup Seç / Grup-isim -->
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px;">
+                        <label style="font-weight: bold; font-size: 13px; min-width: 65px;">Grup-isim:</label>
+                        <select id="user-group-select" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 140px;">
+                            ${groupsHtml}
+                        </select>
+                    </div>
+                    
+                    <!-- 2. Bireysel / Şifreli bölüm (Bireysel-İsim-Şifre) -->
+                    <div style="display: flex; gap: 6px; align-items: center; margin-top: 10px; margin-bottom: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px; flex-wrap: wrap;">
+                        <span style="font-weight: bold; font-size: 12px; white-space: nowrap;">Bireysel-İsim-Şifre:</span>
+                        <input type="text" id="locked-group-name" placeholder="Grup Adı" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 80px;">
+                        <input type="password" id="locked-group-pwd" placeholder="Şifre" style="padding: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 13px; flex: 1; min-width: 70px;">
+                        <button id="join-locked-group-btn" style="padding: 6px 10px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; white-space: nowrap;">Katıl</button>
+                    </div>
 
-        .panel-row {
-          display: flex;
-          gap: 8px;
-          width: 100%;
-        }
-
-        .panel-row input,
-        .panel-row select,
-        .panel-row button {
-          flex: 1;
-          padding: 8px 10px;
-          font-size: 14px;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-          box-sizing: border-box;
-        }
-
-        .panel-row button {
-          background-color: #007bff;
-          color: #fff;
-          cursor: pointer;
-          font-weight: 600;
-          border: none;
-        }
-
-        .panel-row button:hover {
-          background-color: #0056b3;
-        }
-
-        /* Mobil ekranlar için esnek düzen */
-        @media (max-width: 600px) {
-          .panel-row {
-            flex-direction: column;
-          }
-        }
-    </style>
-
-    <div class="header-panel">
-      <!-- 1. Satır: İsim, Şifre ve Tür Seçimi -->
-      <div class="panel-row">
-        <select id="memberSelect" aria-label="İsim Seçimi">
-          <option value="">İsim Seçin</option>
-        </select>
-        <input type="password" id="memberPassword" placeholder="Şifre" />
-        <select id="groupSelect" aria-label="Grup Türü">
-          <option value="individual">Bireysel</option>
-          <option value="group">Grup</option>
-        </select>
-      </div>
-
-      <!-- 2. Satır: Grup Bilgileri ve Katıl Butonu -->
-      <div class="panel-row">
-        <input type="text" id="newGroupName" placeholder="Grup İsmi" />
-        <input type="password" id="newGroupPassword" placeholder="Grup Şifresi" />
-        <button id="joinGroupBtn" type="button">Katıl</button>
-      </div>
-    </div>
-
-;
+                    <!-- 3. İsim-isim (Üye Seçimi ve Üye Ekle) -->
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
+                        <label style="font-weight: bold; font-size: 13px; min-width: 65px;">İsim-isim:</label>
+                        <select id="user-member-select" style="padding: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; font-size: 14px; flex: 1; min-width: 180px;">
+                            ${membersOptions}
+                        </select>
+                        <button id="user-add-member-btn" style="padding: 6px 10px; background: #2980b9; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">+ Üye Ekle</button>
+                    </div>
+                    
+                    <div style="font-size: 11px; color: #e67e22; font-style: italic; margin-top: 5px;">
+                        * Not: Hem bireysel hem de gruplardaki kişiler şifre girmeden sayfada değişiklik yapamayacaktır[span_1](start_span)[span_1](end_span).
+                    </div>
 
                     <div id="bulk-share-area" style="display: ${loggedInMember ? 'block' : 'none'}; margin-top: 10px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
                         <button id="bulk-whatsapp-btn" style="width: 100%; padding: 8px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">💬 Tüm Seçtiklerimi WhatsApp'ta Paylaş</button>
@@ -1923,37 +1873,6 @@
                     `;
 
                     booksGrid.appendChild(card);
-                });
-
-                // Olay Dinleyicileri (Event Listeners)
-                document.querySelectorAll(".book-header").forEach(header => {
-                    header.addEventListener("click", (e) => {
-                        if (e.target.closest(".read-pdf-btn")) return;
-                        let card = header.closest(".book-card");
-                        card.classList.toggle("open");
-                        renderBooks();
-                    });
-                });
-
-                document.querySelectorAll(".read-pdf-btn").forEach(btn => {
-                    btn.addEventListener("click", (e) => {
-                        e.stopPropagation();
-                        openPdfReaderModal(btn.getAttribute("data-book-id"), btn.getAttribute("data-book-name"));
-                    });
-                });
-
-                document.querySelectorAll(".mode-btn").forEach(btn => {
-                    btn.addEventListener("click", (e) => {
-                        e.stopPropagation();
-                        let bId = btn.getAttribute("data-book-id");
-                        let mKey = btn.getAttribute("data-mode");
-                        let bookObj = appData.books.find(b => b.id === bId);
-                        if (bookObj) {
-                            bookObj.currentMode = mKey;
-                            saveGroupData();
-                            renderBooks();
-                        }
-                    });
                 });
 
                 document.querySelectorAll(".take-range-btn").forEach(btn => {
