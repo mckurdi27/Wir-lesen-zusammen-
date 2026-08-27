@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -65,7 +66,7 @@
         </div>
 
         <!-- ================================================================= -->
-        <!-- SADE GİRİŞ PANELİ - 2 SATIR 3 SÜTUN (Autocomplete'li) -->
+        <!-- SADE GİRİŞ PANELİ - 2 SATIR 3 SÜTUN (DÜZELTİLMİŞ) -->
         <!-- ================================================================= -->
         <div id="simple-login-panel" style="margin-bottom: 20px; padding: 20px; background: var(--card-bg); border-radius: 12px; border: 2px solid var(--gold-primary); box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
             
@@ -93,21 +94,27 @@
 
             <!-- GRUP SEÇENEKLERİ (dinamik olarak gösterilir) -->
             <div id="login-group-section" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; align-items: center;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; align-items: center;">
                     <div style="position: relative; width: 100%;">
                         <input type="text" id="login-group-name" list="group-name-list" placeholder="Grup adını yazın" style="padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box;">
                         <datalist id="group-name-list"></datalist>
                     </div>
                     <input type="password" id="login-group-password" placeholder="Grup şifresi (isteğe bağlı)" style="padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box;">
-                    <button id="login-join-btn" style="padding: 10px 12px; background: #27ae60; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; width: 100%; box-sizing: border-box; transition: 0.3s;">➕ Katıl</button>
                 </div>
                 <div style="font-size: 11px; color: #7f8c8d; margin-top: 6px; text-align: center; font-style: italic;">
-                    💡 Yeni grup oluşturmak için grup adı yazıp Katıl'a basın. Şifreli gruplar listede görünmez.
+                    💡 Yeni grup oluşturmak için grup adı yazın. Şifreli gruplar listede görünmez.
                 </div>
             </div>
 
-            <!-- WhatsApp Paylaş Butonu (Eski panelden taşındı) -->
-            <div id="bulk-share-area" style="display: ${loggedInMember ? 'block' : 'none'}; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+            <!-- KATIL BUTONU - HER ZAMAN GÖRÜNÜR -->
+            <div style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                <div></div>
+                <button id="login-join-btn" style="padding: 12px 20px; background: #27ae60; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; box-sizing: border-box;">➕ Katıl</button>
+                <div></div>
+            </div>
+
+            <!-- WhatsApp Paylaş Butonu -->
+            <div id="bulk-share-area" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
                 <button id="bulk-whatsapp-btn" style="width: 100%; padding: 10px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">💬 Tüm Seçtiklerimi WhatsApp'ta Paylaş</button>
             </div>
 
@@ -542,7 +549,7 @@
             }
 
             // =================================================================
-            // SADE GİRİŞ PANELİ - JAVASCRIPT MANTIĞI (Autocomplete'li)
+            // GİRİŞ PANELİ - JAVASCRIPT MANTIĞI
             // =================================================================
 
             // Autocomplete listelerini güncelle
@@ -568,22 +575,11 @@
                     nameList.innerHTML = Array.from(allMembers).map(m => `<option value="${m}">`).join('');
                 }
 
-                // Grup datalist'ini güncelle (şifresiz gruplar)
+                // Grup datalist'ini güncelle (tüm gruplar)
                 const groupList = document.getElementById('group-name-list');
                 if (groupList) {
-                    const freeGroups = [];
-                    allGroups.forEach(gKey => {
-                        const data = localStorage.getItem(`hatim_group_${gKey}`);
-                        if (data) {
-                            try {
-                                const parsed = JSON.parse(data);
-                                if (!parsed.password || parsed.password.trim() === '') {
-                                    freeGroups.push(gKey);
-                                }
-                            } catch(e) {}
-                        }
-                    });
-                    groupList.innerHTML = freeGroups.map(g => `<option value="${g.replace(/_/g, ' ').toUpperCase()}">`).join('');
+                    const allGroupsList = getAllGroupKeys();
+                    groupList.innerHTML = allGroupsList.map(g => `<option value="${g.replace(/_/g, ' ').toUpperCase()}">`).join('');
                 }
             }
 
@@ -601,7 +597,7 @@
                 });
             }
             
-            // Katıl butonu
+            // Katıl butonu - HER ZAMAN ÇALIŞIR
             const joinBtn = document.getElementById('login-join-btn');
             if (joinBtn) {
                 joinBtn.addEventListener('click', function() {
@@ -617,6 +613,7 @@
                     }
                     
                     if (userType === 'bireysel') {
+                        // Bireysel giriş - mevcut gruba ekle
                         if (!appData.members.includes(userName)) {
                             appData.members.push(userName);
                         }
@@ -628,6 +625,7 @@
                         return;
                     }
                     
+                    // Grup seçeneği
                     if (!groupName) {
                         alert('❌ Lütfen grup adı girin!');
                         return;
@@ -639,12 +637,14 @@
                     if (existingData) {
                         try {
                             const parsed = JSON.parse(existingData);
+                            // Şifre kontrolü
                             if (parsed.password && parsed.password.trim() !== '') {
                                 if (groupPassword !== parsed.password) {
                                     alert('❌ Hatalı grup şifresi!');
                                     return;
                                 }
                             }
+                            // Üyeyi ekle
                             if (!parsed.members.includes(userName)) {
                                 parsed.members.push(userName);
                             }
@@ -658,6 +658,7 @@
                             alert('❌ Grup verisi okunamadı.');
                         }
                     } else {
+                        // Yeni grup oluştur
                         const todayStr = new Date().toLocaleDateString("tr-TR");
                         const freshBooks = JSON.parse(JSON.stringify(defaultBooksTemplate));
                         const freshPages = {};
@@ -689,6 +690,42 @@
                     }
                 });
             }
+
+            function updateBulkShareVisibility() {
+                const bulkArea = document.getElementById('bulk-share-area');
+                if (bulkArea) {
+                    bulkArea.style.display = loggedInMember ? 'block' : 'none';
+                }
+            }
+
+            // WhatsApp Paylaş Butonu
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.id === 'bulk-whatsapp-btn') {
+                    if (!loggedInMember) {
+                        alert("Lütfen önce isminizi seçin.");
+                        return;
+                    }
+                    let summary = [];
+                    appData.books.forEach(book => {
+                        let baseArray = appData.bookPages[book.id];
+                        let defModes = bookModesDefs[book.id];
+                        let primaryKey = book.type === "bab" ? "on_bab" : "yirmi_sayfa";
+                        if (!defModes[primaryKey]) primaryKey = Object.keys(defModes)[0];
+                        let taken = [];
+                        defModes[primaryKey].getItems().forEach(pi => {
+                            let st = getRangeStatus(baseArray, pi.start, pi.end);
+                            if (st.owner === loggedInMember) taken.push(pi.name);
+                        });
+                        if (taken.length > 0) summary.push(`• ${book.name}: *${taken.join(", ")}*`);
+                    });
+                    if (summary.length === 0) {
+                        alert("Üzerinizde hisse bulunmuyor.");
+                        return;
+                    }
+                    let msg = `*[${currentGroup.replace(/_/g, ' ').toUpperCase()}] ${loggedInMember} Hisseleri*\n\n` + summary.join("\n");
+                    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+                }
+            });
 
             // =================================================================
             // ZENGİN ANALİZ PANELİ
@@ -772,34 +809,6 @@
                     });
                     activeMemberDetails.sort((a, b) => b.read - a.read);
                 }
-
-                // Her grubun eser detayları
-                let groupBookDetails = {};
-                allGroupKeys.forEach(gKey => {
-                    let gDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
-                    if (!gDataRaw) return;
-                    let gData = JSON.parse(gDataRaw);
-                    let details = [];
-                    if (gData.books) {
-                        gData.books.forEach(b => {
-                            let taken = 0, read = 0;
-                            if (gData.bookPages && gData.bookPages[b.id]) {
-                                gData.bookPages[b.id].forEach(p => {
-                                    if (p.owner) taken++;
-                                    if (p.isRead) read++;
-                                });
-                            }
-                            details.push({
-                                name: b.name,
-                                total: b.totalUnits,
-                                taken: taken,
-                                read: read,
-                                takenPercent: b.totalUnits > 0 ? Math.round((taken / b.totalUnits) * 100) : 0
-                            });
-                        });
-                    }
-                    groupBookDetails[gKey] = details;
-                });
 
                 let modalOverlay = document.createElement("div");
                 modalOverlay.id = "simple-analysis-modal";
@@ -910,32 +919,79 @@
                             <!-- TAB 3: Üye Performansı -->
                             <div id="atab-3" class="a-tab-content" style="display: none;">
                                 <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">👥 Aktif Grup Üye Performansı</h3>
-                                <div style="margin-bottom: 12px;">
-                                    <label style="font-weight: bold; font-size: 13px;">Grup Seç:</label>
-                                    <select id="analysis-group-select" style="padding: 6px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg); color: var(--text-main); margin-left: 8px; font-size: 13px;">
-                                        ${groupStats.map(g => `
-                                            <option value="${g.name}" ${g.name === currentGroup ? 'selected' : ''}>${g.name.replace(/_/g, ' ').toUpperCase()}</option>
-                                        `).join('')}
-                                    </select>
-                                </div>
-                                <div id="analysis-member-list">
-                                    <!-- JavaScript ile doldurulacak -->
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                        <thead>
+                                            <tr style="background: rgba(212, 175, 55, 0.15);">
+                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">#</th>
+                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye Adı</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Aldığı Hisse</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okuduğu Hisse</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Tamamlama</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${activeMemberDetails.map((m, idx) => `
+                                                <tr style="${idx === 0 ? 'background: rgba(255, 215, 0, 0.1);' : ''}">
+                                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${idx + 1}</td>
+                                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: ${idx === 0 ? 'bold' : 'normal'};">
+                                                        ${idx === 0 ? '🥇 ' : ''}${m.name}
+                                                    </td>
+                                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${m.taken}</td>
+                                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${m.read}</td>
+                                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">
+                                                        <span style="background: ${m.readPercent >= 80 ? '#27ae60' : m.readPercent >= 50 ? '#f39c12' : '#e74c3c'}; color: white; padding: 2px 10px; border-radius: 10px; font-size: 11px;">
+                                                            %${m.readPercent}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
 
                             <!-- TAB 4: Eser Detayları -->
                             <div id="atab-4" class="a-tab-content" style="display: none;">
-                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📚 Grup Eser Detayları</h3>
-                                <div style="margin-bottom: 12px;">
-                                    <label style="font-weight: bold; font-size: 13px;">Grup Seç:</label>
-                                    <select id="analysis-book-group-select" style="padding: 6px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg); color: var(--text-main); margin-left: 8px; font-size: 13px;">
-                                        ${groupStats.map(g => `
-                                            <option value="${g.name}" ${g.name === currentGroup ? 'selected' : ''}>${g.name.replace(/_/g, ' ').toUpperCase()}</option>
-                                        `).join('')}
-                                    </select>
-                                </div>
-                                <div id="analysis-book-list">
-                                    <!-- JavaScript ile doldurulacak -->
+                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📚 Aktif Grup Eser Detayları</h3>
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                        <thead>
+                                            <tr style="background: rgba(212, 175, 55, 0.15);">
+                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser Adı</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Toplam Birim</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Alınan</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okunan</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">İlerleme</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${appData.books.map(b => {
+                                                let taken = 0, read = 0;
+                                                if (appData.bookPages && appData.bookPages[b.id]) {
+                                                    appData.bookPages[b.id].forEach(p => {
+                                                        if (p.owner) taken++;
+                                                        if (p.isRead) read++;
+                                                    });
+                                                }
+                                                let pct = b.totalUnits > 0 ? Math.round((taken / b.totalUnits) * 100) : 0;
+                                                return `
+                                                    <tr>
+                                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${b.name}</td>
+                                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${b.totalUnits}</td>
+                                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${taken}</td>
+                                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${read}</td>
+                                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">
+                                                            <div style="background: #e9ecef; border-radius: 10px; height: 8px; width: 80px; display: inline-block; overflow: hidden;">
+                                                                <div style="background: ${pct >= 80 ? '#27ae60' : pct >= 50 ? '#f39c12' : '#e74c3c'}; width: ${pct}%; height: 100%; border-radius: 10px;"></div>
+                                                            </div>
+                                                            <span style="font-size: 11px; margin-left: 4px;">%${pct}</span>
+                                                        </td>
+                                                    </tr>
+                                                `;
+                                            }).join('')}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
 
@@ -962,149 +1018,6 @@
                     });
                 });
 
-                // TAB 3: Üye Performansı
-                function renderMemberAnalysis(groupName) {
-                    const container = document.getElementById('analysis-member-list');
-                    const gDataRaw = localStorage.getItem(`hatim_group_${groupName}`);
-                    if (!gDataRaw) {
-                        container.innerHTML = '<p style="color: #777;">Grup verisi bulunamadı.</p>';
-                        return;
-                    }
-                    const gData = JSON.parse(gDataRaw);
-                    let members = gData.members || [];
-                    let memberStats = members.map(m => {
-                        let taken = 0, read = 0;
-                        Object.keys(gData.bookPages || {}).forEach(bId => {
-                            if (gData.bookPages[bId]) {
-                                gData.bookPages[bId].forEach(p => {
-                                    if (p.owner === m) {
-                                        taken++;
-                                        if (p.isRead) read++;
-                                    }
-                                });
-                            }
-                        });
-                        return { name: m, taken, read, readPercent: taken > 0 ? Math.round((read / taken) * 100) : 0 };
-                    });
-                    memberStats.sort((a, b) => b.read - a.read);
-
-                    if (memberStats.length === 0) {
-                        container.innerHTML = '<p style="color: #777;">Bu grupta kayıtlı üye yok.</p>';
-                        return;
-                    }
-
-                    container.innerHTML = `
-                        <div style="overflow-x: auto;">
-                            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                                <thead>
-                                    <tr style="background: rgba(212, 175, 55, 0.15);">
-                                        <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">#</th>
-                                        <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye Adı</th>
-                                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Aldığı Hisse</th>
-                                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okuduğu Hisse</th>
-                                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Tamamlama</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${memberStats.map((m, idx) => `
-                                        <tr style="${idx === 0 ? 'background: rgba(255, 215, 0, 0.1);' : ''}">
-                                            <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${idx + 1}</td>
-                                            <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: ${idx === 0 ? 'bold' : 'normal'};">
-                                                ${idx === 0 ? '🥇 ' : ''}${m.name}
-                                            </td>
-                                            <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${m.taken}</td>
-                                            <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${m.read}</td>
-                                            <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">
-                                                <span style="background: ${m.readPercent >= 80 ? '#27ae60' : m.readPercent >= 50 ? '#f39c12' : '#e74c3c'}; color: white; padding: 2px 10px; border-radius: 10px; font-size: 11px;">
-                                                    %${m.readPercent}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    `;
-                }
-
-                // TAB 4: Eser Detayları
-                function renderBookAnalysis(groupName) {
-                    const container = document.getElementById('analysis-book-list');
-                    const gDataRaw = localStorage.getItem(`hatim_group_${groupName}`);
-                    if (!gDataRaw) {
-                        container.innerHTML = '<p style="color: #777;">Grup verisi bulunamadı.</p>';
-                        return;
-                    }
-                    const gData = JSON.parse(gDataRaw);
-                    let books = gData.books || [];
-                    
-                    if (books.length === 0) {
-                        container.innerHTML = '<p style="color: #777;">Bu grupta kayıtlı eser yok.</p>';
-                        return;
-                    }
-
-                    container.innerHTML = `
-                        <div style="overflow-x: auto;">
-                            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                                <thead>
-                                    <tr style="background: rgba(212, 175, 55, 0.15);">
-                                        <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser Adı</th>
-                                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Toplam Birim</th>
-                                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Alınan</th>
-                                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okunan</th>
-                                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">İlerleme</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${books.map(b => {
-                                        let taken = 0, read = 0;
-                                        if (gData.bookPages && gData.bookPages[b.id]) {
-                                            gData.bookPages[b.id].forEach(p => {
-                                                if (p.owner) taken++;
-                                                if (p.isRead) read++;
-                                            });
-                                        }
-                                        let pct = b.totalUnits > 0 ? Math.round((taken / b.totalUnits) * 100) : 0;
-                                        return `
-                                            <tr>
-                                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${b.name}</td>
-                                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${b.totalUnits}</td>
-                                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${taken}</td>
-                                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${read}</td>
-                                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">
-                                                    <div style="background: #e9ecef; border-radius: 10px; height: 8px; width: 80px; display: inline-block; overflow: hidden;">
-                                                        <div style="background: ${pct >= 80 ? '#27ae60' : pct >= 50 ? '#f39c12' : '#e74c3c'}; width: ${pct}%; height: 100%; border-radius: 10px;"></div>
-                                                    </div>
-                                                    <span style="font-size: 11px; margin-left: 4px;">%${pct}</span>
-                                                </td>
-                                            </tr>
-                                        `;
-                                    }).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    `;
-                }
-
-                // Grup seçimi değişince TAB 3 ve TAB 4'ü güncelle
-                const groupSelect = modalOverlay.querySelector('#analysis-group-select');
-                if (groupSelect) {
-                    groupSelect.addEventListener('change', function() {
-                        renderMemberAnalysis(this.value);
-                    });
-                }
-
-                const bookGroupSelect = modalOverlay.querySelector('#analysis-book-group-select');
-                if (bookGroupSelect) {
-                    bookGroupSelect.addEventListener('change', function() {
-                        renderBookAnalysis(this.value);
-                    });
-                }
-
-                // İlk yükleme
-                renderMemberAnalysis(currentGroup);
-                renderBookAnalysis(currentGroup);
-
                 // Kapatma
                 modalOverlay.querySelector("#modal-simple-close-btn").addEventListener("click", () => modalOverlay.remove());
                 modalOverlay.querySelector("#modal-print-btn").addEventListener("click", () => window.print());
@@ -1116,30 +1029,10 @@
             async function loadGroupData() {
                 removeStuckPanel();
                 const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
-                appData = savedData ? JSON.parse(savedData) : { members: currentGroup === "grup_1" ? ["Ahmet", "Mehmet", "Ayşe"] : [], password: "" };
+                appData = savedData ? JSON.parse(savedData) : { members: currentGroup === "grup_1" ? [] : [], password: "" };
 
-                if (appData.password && !isAdmin) {
-                    let unlockedProtected = JSON.parse(localStorage.getItem("unlocked_protected_groups") || "[]");
-                    if (!unlockedProtected.includes(currentGroup)) {
-                        let enteredPwd = prompt(`"${currentGroup.replace(/_/g, ' ').toUpperCase()}" grubu şifrelidir. Lütfen şifreyi girin:`);
-                        if (enteredPwd === appData.password) {
-                            unlockedProtected.push(currentGroup);
-                            localStorage.setItem("unlocked_protected_groups", JSON.stringify(unlockedProtected));
-                        } else {
-                            alert("Hatalı veya boş şifre!");
-                            let allGroups = getAllGroupKeys();
-                            let fallback = allGroups.find(g => {
-                                let d = localStorage.getItem(`hatim_group_${g}`);
-                                if (!d) return true;
-                                let parsed = JSON.parse(d);
-                                return !parsed.password;
-                            }) || "grup_1";
-                            currentGroup = fallback;
-                            const savedDataFallback = localStorage.getItem(`hatim_group_${currentGroup}`);
-                            appData = savedDataFallback ? JSON.parse(savedDataFallback) : { members: currentGroup === "grup_1" ? ["Ahmet", "Mehmet", "Ayşe"] : [], password: "" };
-                        }
-                    }
-                }
+                // Şifre kontrolünü KALDIRIYORUZ - artık giriş panelinden yapılacak
+                // if (appData.password && !isAdmin) { ... }
 
                 if (!appData.members) appData.members = [];
                 if (appData.password === undefined) appData.password = "";
@@ -1201,42 +1094,6 @@
             function saveGroupData() {
                 localStorage.setItem(`hatim_group_${currentGroup}`, JSON.stringify(appData));
             }
-
-            function updateBulkShareVisibility() {
-                const bulkArea = document.getElementById('bulk-share-area');
-                if (bulkArea) {
-                    bulkArea.style.display = loggedInMember ? 'block' : 'none';
-                }
-            }
-
-            // WhatsApp Paylaş Butonu
-            document.addEventListener('click', function(e) {
-                if (e.target && e.target.id === 'bulk-whatsapp-btn') {
-                    if (!loggedInMember) {
-                        alert("Lütfen önce isminizi seçin.");
-                        return;
-                    }
-                    let summary = [];
-                    appData.books.forEach(book => {
-                        let baseArray = appData.bookPages[book.id];
-                        let defModes = bookModesDefs[book.id];
-                        let primaryKey = book.type === "bab" ? "on_bab" : "yirmi_sayfa";
-                        if (!defModes[primaryKey]) primaryKey = Object.keys(defModes)[0];
-                        let taken = [];
-                        defModes[primaryKey].getItems().forEach(pi => {
-                            let st = getRangeStatus(baseArray, pi.start, pi.end);
-                            if (st.owner === loggedInMember) taken.push(pi.name);
-                        });
-                        if (taken.length > 0) summary.push(`• ${book.name}: *${taken.join(", ")}*`);
-                    });
-                    if (summary.length === 0) {
-                        alert("Üzerinizde hisse bulunmuyor.");
-                        return;
-                    }
-                    let msg = `*[${currentGroup.replace(/_/g, ' ').toUpperCase()}] ${loggedInMember} Hisseleri*\n\n` + summary.join("\n");
-                    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
-                }
-            });
 
             function renderAnalysisSection() {
                 let analysisContainer = document.getElementById("analysis-section");
