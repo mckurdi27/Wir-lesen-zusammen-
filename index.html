@@ -1,13 +1,230 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Ortak Hatim ve Dua Takip Sistemi</title>
+    <style>
+        /* ============================================================
+           GENEL STİLLER
+           ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        :root {
+            --bg-primary: #fdfbf7;
+            --card-bg: #ffffff;
+            --gold-primary: #d4af37;
+            --gold-dark: #8a6d3b;
+            --text-main: #3e2723;
+            --border-color: #e3dcd2;
+            --color-taken: #e74c3c;
+            --color-read: #27ae60;
+            --color-free: #f39c12;
+            --touch-target: 48px;
+        }
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            font-family: 'Georgia', serif;
+            margin: 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        /* ============================================================
+           BUTON VE DOKUNMA HEDEFLERİ
+           ============================================================ */
+        button, .clickable {
+            min-height: var(--touch-target);
+            min-width: var(--touch-target);
+            padding: 12px 16px;
+            touch-action: manipulation;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        /* ============================================================
+           KİTAP KARTLARI
+           ============================================================ */
+        .book-card {
+            border: 2px solid var(--gold-primary);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            background: var(--card-bg);
+        }
+        .book-header {
+            border-bottom: 2px solid var(--gold-primary);
+            background: linear-gradient(to right, rgba(212,175,55,0.1), transparent);
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .book-body {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+        /* ============================================================
+           DURUM RENKLERİ
+           ============================================================ */
+        .status-free { background: rgba(243, 156, 18, 0.15) !important; border-left: 4px solid #f39c12; }
+        .status-taken { background: rgba(231, 76, 60, 0.12) !important; border-left: 4px solid #e74c3c; }
+        .status-read { background: rgba(39, 174, 96, 0.18) !important; border-left: 4px solid #27ae60; font-weight: bold; }
+        .status-mixed { background: rgba(52, 152, 219, 0.1) !important; border-left: 4px solid #3498db; }
+        /* ============================================================
+           MOBİL RESPONSIVE
+           ============================================================ */
+        @media (max-width: 640px) {
+            .container { padding: 0 5px; }
+            .row-3col { grid-template-columns: 1fr !important; gap: 8px !important; }
+            .book-body { padding: 10px; }
+            .book-header { flex-direction: column; align-items: stretch; text-align: center; }
+            .mode-btn, .take-range-btn, .read-range-btn, .release-range-btn, .unread-range-btn {
+                font-size: 13px !important;
+                padding: 10px 14px !important;
+                min-height: 44px;
+            }
+            #simple-login-panel { padding: 12px; }
+            #main-title-ornate-section img { height: 120px !important; }
+            #main-title-ornate-section > div { flex-direction: column; align-items: center; }
+            .admin-panel-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 480px) {
+            body { padding: 5px; font-size: 14px; }
+            button { font-size: 13px; padding: 10px 12px; min-height: 44px; }
+            .book-header h3 { font-size: 14px; }
+        }
+        /* ============================================================
+           KARANLIK MOD (Sistem temasına göre)
+           ============================================================ */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary: #0b1329;
+                --card-bg: #131b31;
+                --gold-primary: #f6e05e;
+                --gold-dark: #d4af37;
+                --text-main: #f1f5f9;
+                --border-color: #22304a;
+                --color-taken: #ff6b6b;
+                --color-read: #51cf66;
+                --color-free: #fcc419;
+            }
+            body { background-color: #0b1329 !important; color: #f1f5f9 !important; }
+        }
+        /* ============================================================
+           KULLANICI PANELİ
+           ============================================================ */
+        .user-active {
+            background: linear-gradient(135deg, rgba(39,174,96,0.1), rgba(39,174,96,0.05));
+            border: 2px solid #27ae60;
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .user-active .name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #27ae60;
+        }
+        .user-active .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        /* ============================================================
+           ANALİZ PANELİ
+           ============================================================ */
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .analysis-card {
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        .analysis-card .number {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+        /* ============================================================
+           YÖNETİCİ PANELİ
+           ============================================================ */
+        .admin-panel-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .admin-section {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        .admin-section h4 {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .admin-section.group-section { background: rgba(52,152,219,0.06); border: 1px solid #3498db; }
+        .admin-section.book-section { background: rgba(46,204,113,0.06); border: 1px solid #27ae60; }
+        .admin-section.bulk-section { background: rgba(155,89,182,0.06); border: 1px solid #8e44ad; }
+        /* ============================================================
+           TOAST MESAJLARI
+           ============================================================ */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2d2d2d;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 99999;
+            opacity: 0;
+            transition: opacity 0.3s;
+            max-width: 90%;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .toast.show {
+            opacity: 1;
+        }
+        .toast.success { background: #27ae60; }
+        .toast.error { background: #e74c3c; }
+        .toast.info { background: #2980b9; }
+    </style>
 </head>
 <body>
     <div class="container">
-        <!-- En Üst Başlık ve Görsel Alanı -->
+        <!-- ============================================================
+        ÜST BAŞLIK VE GÖRSEL ALANI
+        ============================================================ -->
         <div id="main-title-ornate-section" style="margin-bottom: 20px; padding: 10px 15px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border: 2px solid #d4af37; border-top: 6px solid #8a6d3b; border-radius: 12px; box-shadow: 0 4px 15px rgba(138, 109, 59, 0.2);">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
                 <div style="flex: 0 0 190px; text-align: center;">
@@ -21,8 +238,8 @@
                         Grubunuzu seçin, İsminizi belirleyin ve<br>manevi iklimde ortak hatim halkamıza katılın.
                     </div>
                     <div style="background: rgba(255,255,255,0.85); padding: 8px; border-radius: 6px; border: 1px solid #d4af37;">
-                        <div style="margin-bottom: 6px; display: flex; gap: 5px; justify-content: center; align-items: center;">
-                            <select id="citySelect" onchange="fetchPrayerTimes()" style="padding: 3px; border-radius: 4px; width: 65%; font-size: 11px;">
+                        <div style="margin-bottom: 6px; display: flex; gap: 5px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                            <select id="citySelect" onchange="fetchPrayerTimes()" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 12px; min-height: 40px;">
                                 <option value="Istanbul">İstanbul</option>
                                 <option value="Ankara">Ankara</option>
                                 <option value="Izmir">İzmir</option>
@@ -36,9 +253,9 @@
                                 <option value="Vienna">Viyana</option>
                                 <option value="New York">New York</option>
                             </select>
-                            <button onclick="fetchPrayerTimesByGPS()" title="GPS Konumumu Kullan" style="padding: 3px 6px; border-radius: 4px; background: #27ae60; color: white; border: none; cursor: pointer; font-size: 10px; font-weight: bold;">📍 GPS</button>
+                            <button onclick="fetchPrayerTimesByGPS()" title="GPS Konumumu Kullan" style="padding: 8px 12px; border-radius: 4px; background: #27ae60; color: white; border: none; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 40px;">📍 GPS</button>
                         </div>
-                        <div id="prayerTimesResult" style="font-size: 11px; color: #333; line-height: 1.3;">Vakitler yükleniyor...</div>
+                        <div id="prayerTimesResult" style="font-size: 11px; color: #333; line-height: 1.4;">Vakitler yükleniyor...</div>
                     </div>
                 </div>
                 <div style="flex: 0 0 190px; text-align: center;">
@@ -47,39 +264,64 @@
             </div>
         </div>
 
-        <!-- GİRİŞ PANELİ - 2 SATIR 3 SÜTUN -->
+        <!-- ============================================================
+        GİRİŞ PANELİ
+        ============================================================ -->
         <div id="simple-login-panel" style="margin-bottom: 20px; padding: 16px 20px; background: var(--card-bg); border-radius: 12px; border: 2px solid var(--gold-primary); box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
-            <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 12px; margin-bottom: 6px; font-weight: bold; font-size: 13px; color: var(--gold-dark);">
-                <div>👤 İsim</div>
-                <div>🔑 Şifre</div>
-                <div>📂 Tip</div>
+            
+            <!-- AKTİF KULLANICI GÖSTERİMİ -->
+            <div id="user-active-area" style="display: none;" class="user-active">
+                <div>
+                    <span style="font-size: 13px; opacity: 0.7;">👤 Aktif Kullanıcı:</span>
+                    <span id="active-user-name" class="name">-</span>
+                    <span id="active-user-group" style="font-size: 13px; opacity: 0.7; margin-left: 8px;"></span>
+                </div>
+                <button id="logout-btn" class="logout-btn">🚪 Çıkış Yap</button>
             </div>
-            <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 12px; align-items: center;">
-                <input type="text" id="login-user-name" list="user-name-list" placeholder="İsminizi yazın" style="padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box;">
-                <datalist id="user-name-list"></datalist>
-                <input type="password" id="login-user-password" placeholder="Şifrenizi yazın" style="padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box;">
-                <select id="login-user-type" style="padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box; cursor: pointer;">
-                    <option value="bireysel">🧑 Bireysel</option>
-                    <option value="grup">👥 Grup</option>
-                </select>
-            </div>
-            <div id="login-group-section" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border-color);">
-                <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 12px; align-items: center;">
-                    <div style="position: relative; width: 100%;">
-                        <input type="text" id="login-group-name" list="group-name-list" placeholder="Grup adını yazın" style="padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box;">
-                        <datalist id="group-name-list"></datalist>
+
+            <!-- GİRİŞ FORM ALANLARI -->
+            <div id="login-form-area">
+                <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 12px; margin-bottom: 6px; font-weight: bold; font-size: 13px; color: var(--gold-dark);" class="row-3col">
+                    <div>👤 İsim</div>
+                    <div>🔑 Şifre</div>
+                    <div>📂 Tip</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 12px; align-items: center;" class="row-3col">
+                    <input type="text" id="login-user-name" list="user-name-list" placeholder="İsminizi yazın" style="padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box; min-height: 48px;">
+                    <datalist id="user-name-list"></datalist>
+                    <input type="password" id="login-user-password" placeholder="Şifrenizi yazın" style="padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box; min-height: 48px;">
+                    <select id="login-user-type" style="padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box; cursor: pointer; min-height: 48px;">
+                        <option value="bireysel">🧑 Bireysel</option>
+                        <option value="grup">👥 Grup</option>
+                    </select>
+                </div>
+                <div id="login-group-section" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
+                    <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 12px; align-items: center;" class="row-3col">
+                        <div style="position: relative; width: 100%;">
+                            <input type="text" id="login-group-name" list="group-name-list" placeholder="Grup adını yazın" style="padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box; min-height: 48px;">
+                            <datalist id="group-name-list"></datalist>
+                        </div>
+                        <input type="password" id="login-group-password" placeholder="Grup şifresi" style="padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box; min-height: 48px;">
+                        <button id="login-join-btn" style="padding: 12px 14px; background: #27ae60; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; box-sizing: border-box; min-height: 48px; transition: 0.3s;">➕ Katıl</button>
                     </div>
-                    <input type="password" id="login-group-password" placeholder="Grup şifresi" style="padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box;">
-                    <button id="login-join-btn" style="padding: 10px 12px; background: #27ae60; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; width: 100%; box-sizing: border-box; transition: 0.3s;">➕ Katıl</button>
                 </div>
             </div>
+
+            <!-- WHATSAPP PAYLAŞ BUTONU -->
             <div id="bulk-share-area" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
-                <button id="bulk-whatsapp-btn" style="width: 100%; padding: 10px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">💬 Tüm Seçtiklerimi WhatsApp'ta Paylaş</button>
+                <button id="bulk-whatsapp-btn" style="width: 100%; padding: 14px; background: #25D366; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; min-height: 48px;">💬 Tüm Seçtiklerimi WhatsApp'ta Paylaş</button>
             </div>
+
         </div>
 
+        <!-- ============================================================
+        KİTAP LİSTESİ
+        ============================================================ -->
         <div id="books-grid"></div>
 
+        <!-- ============================================================
+        NAMAZ VAKİTLERİ SCRIPTİ
+        ============================================================ -->
         <script>
         async function fetchPrayerTimes() {
             const city = document.getElementById('citySelect').value;
@@ -125,8 +367,34 @@
         </script>
     </div>
 
+    <!-- ============================================================
+    TOAST MESAJ BİLEŞENİ
+    ============================================================ -->
+    <div id="toast" class="toast"></div>
+
+    <!-- ============================================================
+    ANA JAVASCRIPT
+    ============================================================ -->
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
+            // ============================================================
+            // TOAST FONKSİYONU
+            // ============================================================
+            function showToast(message, type = 'info', duration = 3000) {
+                const toast = document.getElementById('toast');
+                toast.textContent = message;
+                toast.className = 'toast ' + type;
+                setTimeout(() => {
+                    toast.classList.add('show');
+                }, 50);
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, duration);
+            }
+
+            // ============================================================
+            // DEĞİŞKENLER
+            // ============================================================
             let container = document.querySelector(".container");
             if (!container) {
                 container = document.createElement("div");
@@ -141,61 +409,6 @@
                 container.appendChild(booksGrid);
             }
 
-            function injectOrientalStyles() {
-                if (document.getElementById("oriental-motif-styles")) return;
-                const styleEl = document.createElement("style");
-                styleEl.id = "oriental-motif-styles";
-                styleEl.innerHTML = `
-                    :root {
-                        --bg-primary: #fdfbf7;
-                        --card-bg: #ffffff;
-                        --gold-primary: #d4af37;
-                        --gold-dark: #8a6d3b;
-                        --text-main: #3e2723;
-                        --border-color: #e3dcd2;
-                    }
-                    body {
-                        background-color: var(--bg-primary);
-                        color: var(--text-main);
-                        font-family: 'Georgia', serif;
-                        margin: 0;
-                        padding: 10px;
-                        font-size: 16px;
-                    }
-                    .container {
-                        max-width: 800px;
-                        margin: 0 auto;
-                    }
-                    .book-card {
-                        border: 2px solid var(--gold-primary) !important;
-                        border-radius: 12px !important;
-                        overflow: hidden;
-                        margin-bottom: 15px;
-                        background: var(--card-bg);
-                    }
-                    .book-header {
-                        border-bottom: 2px solid var(--gold-primary);
-                        background: linear-gradient(to right, rgba(212,175,55,0.1), transparent);
-                    }
-                    @media (prefers-color-scheme: dark) {
-                        :root {
-                            --bg-primary: #0b1329;
-                            --card-bg: #131b31;
-                            --gold-primary: #f6e05e;
-                            --gold-dark: #d4af37;
-                            --text-main: #f1f5f9;
-                            --border-color: #22304a;
-                        }
-                        body {
-                            background-color: #0b1329 !important;
-                            color: #f1f5f9 !important;
-                        }
-                    }
-                `;
-                document.head.appendChild(styleEl);
-            }
-            injectOrientalStyles();
-
             let currentGroup = "grup_1";
             let isAdmin = false;
             let appData = null;
@@ -203,7 +416,9 @@
             let monthlyInspirationCache = {};
             const ADMIN_PASSWORD = "1234";
 
-            // PDF Haritası
+            // ============================================================
+            // PDF HARİTASI
+            // ============================================================
             const bookPdfMap = {
                 "kuran": "pdf/Kuran-ı Kerim.pdf",
                 "cevsen": "pdf/Cevşen.pdf",
@@ -217,12 +432,14 @@
                 "dilekce_ar": "pdf/Bir Kırık Dilekçe Ar.pdf"
             };
 
-            // PDF'yi belirtilen sayfada aç
             function openPdfToPage(bookId, pageNumber) {
                 let pdfPath = bookPdfMap[bookId] || appData.books.find(b => b.id === bookId)?.pdf || "pdf/Kuran-ı Kerim.pdf";
                 window.open(`${pdfPath}#page=${pageNumber}`, '_blank');
             }
 
+            // ============================================================
+            // TARİH VE İLHAM FONKSİYONLARI
+            // ============================================================
             function bugunkuHicriTarihiAl() {
                 const ayAdlari = {
                     "01": "Muharrem", "02": "Sefer", "03": "Rebiülevvel", "04": "Rebiülahir",
@@ -335,29 +552,32 @@
                     background: var(--card-bg);
                 `;
                 inspirationContainer.innerHTML = `
-                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; width: 100%;">
-                       <div style="flex: 1; text-align: left;">
-                           <span style="font-size: 11px; padding: 4px 8px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(150,150,150,0.2); display: inline-block;">📅 ${inspirationData.miladiDateStr}</span>
+                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; width: 100%; flex-wrap: wrap;">
+                       <div style="flex: 1; text-align: left; min-width: 120px;">
+                           <span style="font-size: 12px; padding: 4px 10px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(150,150,150,0.2); display: inline-block;">📅 ${inspirationData.miladiDateStr}</span>
                        </div>
-                       <div style="flex: 1; text-align: center;">
-                           <span style="font-size: 11px; padding: 4px 8px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(150,150,150,0.2); display: inline-block;">⭐ Manevi ve Dil İlhamı Köşesi ⭐</span>
+                       <div style="flex: 1; text-align: center; min-width: 120px;">
+                           <span style="font-size: 12px; padding: 4px 10px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(150,150,150,0.2); display: inline-block;">⭐ Manevi İlham</span>
                        </div>
-                       <div style="flex: 1; text-align: right;">
-                           <span style="font-size: 11px; padding: 4px 8px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(150,150,150,0.2); display: inline-block;">🌙 ${inspirationData.fullDateStr}</span>
+                       <div style="flex: 1; text-align: right; min-width: 120px;">
+                           <span style="font-size: 12px; padding: 4px 10px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(150,150,150,0.2); display: inline-block;">🌙 ${inspirationData.fullDateStr}</span>
                        </div>
                    </div>
-                   <div style="font-size: 13px; line-height: 1.6;">
+                   <div style="font-size: 14px; line-height: 1.7;">
                        <p style="margin-bottom: 6px;">📖 <strong>Ayet:</strong> ${inspirationData.verse}</p>
                        <p style="margin-bottom: 6px;">📜 <strong>Hadis:</strong> ${inspirationData.hadish}</p>
                    </div>
                 `;
             }
 
+            // ============================================================
+            // MODE YÖNETİMİ
+            // ============================================================
             function createPageModes(totalPages) {
                 return {
-                    yirmi_sayfa: { name: "20 Sayfa", getItems: () => { let items = [], count = Math.ceil(totalPages / 20); for (let i = 0; i < count; i++) { let start = i * 20, end = Math.min((i + 1) * 20, totalPages); items.push({ id: i + 1, name: `${i + 1}. Cüz / Sayfa ${start + 1}-${end}`, start, end }); } return items; }},
-                    on_sayfa: { name: "10 Sayfa", getItems: () => { let items = [], count = Math.ceil(totalPages / 10); for (let i = 0; i < count; i++) { let start = i * 10, end = Math.min((i + 1) * 10, totalPages); items.push({ id: i + 1, name: `Sayfa ${start + 1}-${end}`, start, end }); } return items; }},
-                    bes_sayfa: { name: "5 Sayfa", getItems: () => { let items = [], count = Math.ceil(totalPages / 5); for (let i = 0; i < count; i++) { let start = i * 5, end = Math.min((i + 1) * 5, totalPages); items.push({ id: i + 1, name: `Sayfa ${start + 1}-${end}`, start, end }); } return items; }},
+                    yirmi_sayfa: { name: "20 Sayfa", getItems: () => { let items = [], count = Math.ceil(totalPages / 20); for (let i = 0; i < count; i++) { let start = i * 20, end = Math.min((i + 1) * 20, totalPages); items.push({ id: i + 1, name: `${i + 1}. Cüz / ${start+1}-${end}`, start, end }); } return items; }},
+                    on_sayfa: { name: "10 Sayfa", getItems: () => { let items = [], count = Math.ceil(totalPages / 10); for (let i = 0; i < count; i++) { let start = i * 10, end = Math.min((i + 1) * 10, totalPages); items.push({ id: i + 1, name: `${i + 1}. Bölüm / ${start+1}-${end}`, start, end }); } return items; }},
+                    bes_sayfa: { name: "5 Sayfa", getItems: () => { let items = [], count = Math.ceil(totalPages / 5); for (let i = 0; i < count; i++) { let start = i * 5, end = Math.min((i + 1) * 5, totalPages); items.push({ id: i + 1, name: `${i + 1}. Bölüm / ${start+1}-${end}`, start, end }); } return items; }},
                     bir_sayfa: { name: "1 Sayfa", getItems: () => { let items = []; for (let i = 0; i < totalPages; i++) items.push({ id: i + 1, name: `${i + 1}. Sayfa`, start: i, end: i + 1 }); return items; }}
                 };
             }
@@ -371,16 +591,16 @@
             }
 
             const defaultBooksTemplate = [
-                { id: "kuran", name: "1. Kur'ân-ı Kerîm", totalUnits: 604, type: "page", defaultMode: "yirmi_sayfa" },
-                { id: "cevsen", name: "2. Cevşen", totalUnits: 100, type: "bab", defaultMode: "on_bab" },
-                { id: "tevhidname", name: "3. Tevhidnâme", totalUnits: 20, type: "bab", defaultMode: "on_bab" },
-                { id: "celcelutiye", name: "4. Celcelûtiye", totalUnits: 30, type: "bab", defaultMode: "on_bab" },
-                { id: "buyuk_cevsen", name: "5. Büyük Cevşen", totalUnits: 250, type: "page", defaultMode: "yirmi_sayfa" },
-                { id: "ashabi_bedr", name: "6. Ashâb-ı Bedr ve Şühedâ-yı Uhud", totalUnits: 32, type: "page", defaultMode: "on_sayfa" },
-                { id: "dalail", name: "7. Delâilü'l-Hayrât", totalUnits: 160, type: "page", defaultMode: "yirmi_sayfa" },
-                { id: "dua_mecmuasi", name: "8. Dua Mecmuası Mealli", totalUnits: 200, type: "page", defaultMode: "yirmi_sayfa" },
-                { id: "dilekce_tr", name: "9. Bir Kırık Dilekçe (Türkçe)", totalUnits: 100, type: "page", defaultMode: "on_sayfa" },
-                { id: "dilekce_ar", name: "10. Bir Kırık Dilekçe (Arapça)", totalUnits: 100, type: "page", defaultMode: "on_sayfa" }
+                { id: "kuran", name: "📖 1. Kur'ân-ı Kerîm", totalUnits: 604, type: "page", defaultMode: "yirmi_sayfa" },
+                { id: "cevsen", name: "📖 2. Cevşen", totalUnits: 100, type: "bab", defaultMode: "on_bab" },
+                { id: "tevhidname", name: "📖 3. Tevhidnâme", totalUnits: 20, type: "bab", defaultMode: "on_bab" },
+                { id: "celcelutiye", name: "📖 4. Celcelûtiye", totalUnits: 30, type: "bab", defaultMode: "on_bab" },
+                { id: "buyuk_cevsen", name: "📖 5. Büyük Cevşen", totalUnits: 250, type: "page", defaultMode: "yirmi_sayfa" },
+                { id: "ashabi_bedr", name: "📖 6. Ashâb-ı Bedr", totalUnits: 32, type: "page", defaultMode: "on_sayfa" },
+                { id: "dalail", name: "📖 7. Delâilü'l-Hayrât", totalUnits: 160, type: "page", defaultMode: "yirmi_sayfa" },
+                { id: "dua_mecmuasi", name: "📖 8. Dua Mecmuası", totalUnits: 200, type: "page", defaultMode: "yirmi_sayfa" },
+                { id: "dilekce_tr", name: "📖 9. Bir Kırık Dilekçe (TR)", totalUnits: 100, type: "page", defaultMode: "on_sayfa" },
+                { id: "dilekce_ar", name: "📖 10. Bir Kırık Dilekçe (AR)", totalUnits: 100, type: "page", defaultMode: "on_sayfa" }
             ];
 
             const bookModesDefs = {};
@@ -396,6 +616,9 @@
                 }
             }
 
+            // ============================================================
+            // GRUP VE KULLANICI YÖNETİMİ
+            // ============================================================
             function getAllGroupKeys() {
                 let keys = [];
                 let unlockedProtected = JSON.parse(localStorage.getItem("unlocked_protected_groups") || "[]");
@@ -457,6 +680,41 @@
                 }
             }
 
+            // ============================================================
+            // GİRİŞ PANELİ İŞLEVLERİ
+            // ============================================================
+            function updateUserInterface() {
+                const loginArea = document.getElementById('login-form-area');
+                const userArea = document.getElementById('user-active-area');
+                const activeName = document.getElementById('active-user-name');
+                const activeGroup = document.getElementById('active-user-group');
+                const bulkArea = document.getElementById('bulk-share-area');
+
+                if (loggedInMember) {
+                    loginArea.style.display = 'none';
+                    userArea.style.display = 'flex';
+                    activeName.textContent = loggedInMember;
+                    activeGroup.textContent = `📍 ${currentGroup.replace(/_/g, ' ').toUpperCase()}`;
+                    bulkArea.style.display = 'block';
+                } else {
+                    loginArea.style.display = 'block';
+                    userArea.style.display = 'none';
+                    bulkArea.style.display = 'none';
+                }
+            }
+
+            // Çıkış Yap
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.id === 'logout-btn') {
+                    loggedInMember = "";
+                    localStorage.removeItem(`hatim_session_${currentGroup}`);
+                    updateUserInterface();
+                    renderBooks();
+                    showToast('🚪 Başarıyla çıkış yapıldı.', 'info');
+                }
+            });
+
+            // Tip değişince grup alanını göster/gizle
             const typeSelect = document.getElementById('login-user-type');
             const groupSection = document.getElementById('login-group-section');
             if (typeSelect) {
@@ -469,6 +727,7 @@
                 });
             }
 
+            // Katıl butonu
             const joinBtn = document.getElementById('login-join-btn');
             if (joinBtn) {
                 joinBtn.addEventListener('click', function() {
@@ -479,7 +738,7 @@
                     const groupPassword = document.getElementById('login-group-password').value.trim();
                     
                     if (!userName) {
-                        alert('❌ Lütfen isminizi girin!');
+                        showToast('❌ Lütfen isminizi girin!', 'error');
                         return;
                     }
                     
@@ -490,13 +749,14 @@
                         loggedInMember = userName;
                         localStorage.setItem(`hatim_session_${currentGroup}`, userName);
                         saveGroupData();
-                        alert(`✅ ${userName} bireysel olarak giriş yaptı!`);
+                        showToast(`✅ ${userName} bireysel olarak giriş yaptı!`, 'success');
+                        updateUserInterface();
                         loadGroupData();
                         return;
                     }
                     
                     if (!groupName) {
-                        alert('❌ Lütfen grup adı girin!');
+                        showToast('❌ Lütfen grup adı girin!', 'error');
                         return;
                     }
                     
@@ -508,7 +768,7 @@
                             const parsed = JSON.parse(existingData);
                             if (parsed.password && parsed.password.trim() !== '') {
                                 if (groupPassword !== parsed.password) {
-                                    alert('❌ Hatalı grup şifresi!');
+                                    showToast('❌ Hatalı grup şifresi!', 'error');
                                     return;
                                 }
                             }
@@ -519,10 +779,11 @@
                             currentGroup = groupKey;
                             loggedInMember = userName;
                             localStorage.setItem(`hatim_session_${groupKey}`, userName);
-                            alert(`✅ ${userName}, "${groupKey.replace(/_/g, ' ').toUpperCase()}" grubuna katıldı!`);
+                            showToast(`✅ ${userName}, "${groupKey.replace(/_/g, ' ').toUpperCase()}" grubuna katıldı!`, 'success');
+                            updateUserInterface();
                             loadGroupData();
                         } catch(e) {
-                            alert('❌ Grup verisi okunamadı.');
+                            showToast('❌ Grup verisi okunamadı.', 'error');
                         }
                     } else {
                         const todayStr = new Date().toLocaleDateString("tr-TR");
@@ -548,23 +809,18 @@
                         currentGroup = groupKey;
                         loggedInMember = userName;
                         localStorage.setItem(`hatim_session_${groupKey}`, userName);
-                        alert(`✅ "${groupKey.replace(/_/g, ' ').toUpperCase()}" grubu oluşturuldu ve ${userName} katıldı!`);
+                        showToast(`✅ "${groupKey.replace(/_/g, ' ').toUpperCase()}" grubu oluşturuldu!`, 'success');
+                        updateUserInterface();
                         loadGroupData();
                     }
                 });
             }
 
-            function updateBulkShareVisibility() {
-                const bulkArea = document.getElementById('bulk-share-area');
-                if (bulkArea) {
-                    bulkArea.style.display = loggedInMember ? 'block' : 'none';
-                }
-            }
-
+            // WhatsApp Paylaş
             document.addEventListener('click', function(e) {
                 if (e.target && e.target.id === 'bulk-whatsapp-btn') {
                     if (!loggedInMember) {
-                        alert("Lütfen önce isminizi seçin.");
+                        showToast('Lütfen önce isminizi seçin.', 'error');
                         return;
                     }
                     let summary = [];
@@ -581,7 +837,7 @@
                         if (taken.length > 0) summary.push(`• ${book.name}: *${taken.join(", ")}*`);
                     });
                     if (summary.length === 0) {
-                        alert("Üzerinizde hisse bulunmuyor.");
+                        showToast('Üzerinizde hisse bulunmuyor.', 'info');
                         return;
                     }
                     let msg = `*[${currentGroup.replace(/_/g, ' ').toUpperCase()}] ${loggedInMember} Hisseleri*\n\n` + summary.join("\n");
@@ -590,10 +846,10 @@
             });
 
             // ============================================================
-            // ANALİZ PANELİ
+            // ANALİZ PANELİ (Detaylı)
             // ============================================================
-            function openSimpleAnalysisModal() {
-                let existingModal = document.getElementById("simple-analysis-modal");
+            function openDetailedAnalysisModal() {
+                let existingModal = document.getElementById("detailed-analysis-modal");
                 if (existingModal) existingModal.remove();
 
                 let allGroupKeys = getAllGroupKeys();
@@ -603,6 +859,7 @@
                 let totalTaken = 0;
                 let totalRead = 0;
 
+                // Tüm grupları topla
                 allGroupKeys.forEach(gKey => {
                     let gDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
                     if (!gDataRaw) return;
@@ -637,16 +894,32 @@
 
                 groupStats.sort((a, b) => b.takenPercent - a.takenPercent);
 
-                let activeGroupStats = groupStats.find(g => g.name === currentGroup);
+                // Aktif grup detayları
                 let activeMemberDetails = [];
+                let activeBookDetails = [];
+                let readingLogs = [];
+
                 if (appData && appData.members) {
                     appData.members.forEach(m => {
                         let mTaken = 0;
                         let mRead = 0;
+                        let mLogs = [];
                         Object.keys(appData.bookPages).forEach(bId => {
                             if (appData.bookPages[bId]) {
-                                appData.bookPages[bId].forEach(p => {
-                                    if (p.owner === m) { mTaken++; if (p.isRead) mRead++; }
+                                appData.bookPages[bId].forEach((p, idx) => {
+                                    if (p.owner === m) {
+                                        mTaken++;
+                                        if (p.isRead) mRead++;
+                                        // Okuma logları
+                                        if (p.isRead) {
+                                            let bookName = appData.books.find(b => b.id === bId)?.name || bId;
+                                            mLogs.push({
+                                                book: bookName,
+                                                unit: idx + 1,
+                                                date: p.readDate || 'Tarih yok'
+                                            });
+                                        }
+                                    }
                                 });
                             }
                         });
@@ -654,85 +927,132 @@
                             name: m,
                             taken: mTaken,
                             read: mRead,
-                            readPercent: mTaken > 0 ? Math.round((mRead / mTaken) * 100) : 0
+                            readPercent: mTaken > 0 ? Math.round((mRead / mTaken) * 100) : 0,
+                            logs: mLogs
                         });
                     });
                     activeMemberDetails.sort((a, b) => b.readPercent - a.readPercent);
+
+                    // Eser detayları
+                    appData.books.forEach(b => {
+                        let taken = 0, read = 0;
+                        let unitDetails = [];
+                        if (appData.bookPages && appData.bookPages[b.id]) {
+                            appData.bookPages[b.id].forEach((p, idx) => {
+                                if (p.owner) {
+                                    taken++;
+                                    unitDetails.push({
+                                        unit: idx + 1,
+                                        owner: p.owner,
+                                        isRead: p.isRead,
+                                        readDate: p.readDate || 'Okunmadı'
+                                    });
+                                }
+                                if (p.isRead) read++;
+                            });
+                        }
+                        let pct = b.totalUnits > 0 ? Math.round((taken / b.totalUnits) * 100) : 0;
+                        activeBookDetails.push({
+                            name: b.name,
+                            total: b.totalUnits,
+                            taken: taken,
+                            read: read,
+                            percent: pct,
+                            units: unitDetails
+                        });
+                    });
+                    activeBookDetails.sort((a, b) => b.percent - a.percent);
+
+                    // Okuma günlüğü
+                    if (appData.readingLogs) {
+                        readingLogs = [...appData.readingLogs];
+                        readingLogs.sort((a, b) => b.timestamp - a.timestamp);
+                    }
                 }
 
                 let modalOverlay = document.createElement("div");
-                modalOverlay.id = "simple-analysis-modal";
+                modalOverlay.id = "detailed-analysis-modal";
                 modalOverlay.style.cssText = `
                     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                    background: rgba(0, 0, 0, 0.6); z-index: 99999;
+                    background: rgba(0, 0, 0, 0.7); z-index: 999999;
                     display: flex; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;
+                    overflow-y: auto;
                 `;
 
                 modalOverlay.innerHTML = `
-                    <div style="background: var(--card-bg); color: var(--text-main); width: 100%; max-width: 950px; max-height: 90vh; border-radius: 12px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.3);">
-                        <div style="padding: 15px 20px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border-bottom: 2px solid var(--gold-primary); display: flex; justify-content: space-between; align-items: center; color: #3e2723; flex-wrap: wrap; gap: 8px;">
+                    <div style="background: var(--card-bg); color: var(--text-main); width: 100%; max-width: 1000px; max-height: 95vh; border-radius: 16px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.4);">
+                        <!-- Başlık -->
+                        <div style="padding: 16px 20px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border-bottom: 2px solid var(--gold-primary); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
                             <div>
-                                <h2 style="margin: 0; font-size: 18px; color: #8a6d3b;">📊 Detaylı Analiz Paneli</h2>
-                                <div style="font-size: 11px; opacity: 0.8; margin-top: 3px;">Aktif Grup: ${currentGroup.replace(/_/g, ' ').toUpperCase()}</div>
+                                <h2 style="margin: 0; font-size: 20px; color: #8a6d3b;">📊 Detaylı Analiz Paneli</h2>
+                                <div style="font-size: 12px; opacity: 0.8;">Aktif Grup: ${currentGroup.replace(/_/g, ' ').toUpperCase()}</div>
                             </div>
-                            <div style="display: flex; gap: 8px;">
-                                <button id="modal-print-btn" style="background: #2980b9; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;">🖨️ Yazdır</button>
-                                <button id="modal-simple-close-btn" style="background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;">✕ Kapat</button>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button id="modal-print-btn" style="background: #2980b9; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px;">🖨️ Yazdır</button>
+                                <button id="modal-close-btn" style="background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px;">✕ Kapat</button>
                             </div>
                         </div>
+
+                        <!-- Sekmeler -->
                         <div style="display: flex; gap: 4px; padding: 10px 15px 0 15px; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border-color); overflow-x: auto;">
-                            <button class="a-tab-btn active" data-target="atab-1" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">📊 Genel Özet</button>
-                            <button class="a-tab-btn" data-target="atab-2" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">🏆 Grup Sıralama</button>
-                            <button class="a-tab-btn" data-target="atab-3" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">👥 Üye Sıralama</button>
-                            <button class="a-tab-btn" data-target="atab-4" style="padding: 8px 14px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px;">📚 Eser Detayları</button>
+                            <button class="d-tab-btn active" data-target="dtabs-1" style="padding: 10px 16px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; white-space: nowrap;">📊 Genel Özet</button>
+                            <button class="d-tab-btn" data-target="dtabs-2" style="padding: 10px 16px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; white-space: nowrap;">🏆 Grup Sıralama</button>
+                            <button class="d-tab-btn" data-target="dtabs-3" style="padding: 10px 16px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; white-space: nowrap;">👥 Üye Analizi</button>
+                            <button class="d-tab-btn" data-target="dtabs-4" style="padding: 10px 16px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; white-space: nowrap;">📚 Eser Detay</button>
+                            <button class="d-tab-btn" data-target="dtabs-5" style="padding: 10px 16px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; white-space: nowrap;">📜 Okuma Günlüğü</button>
                         </div>
+
+                        <!-- İçerik -->
                         <div style="padding: 20px; overflow-y: auto; flex: 1; font-size: 14px;">
-                            <div id="atab-1" class="a-tab-content">
-                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📈 Sistem Genel Özeti</h3>
-                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px;">
-                                    <div style="padding: 15px; background: rgba(52, 152, 219, 0.1); border-radius: 8px; border-left: 4px solid #3498db; text-align: center;">
-                                        <div style="font-size: 11px; opacity: 0.7;">Toplam Grup</div>
-                                        <div style="font-size: 22px; font-weight: bold;">${allGroupKeys.length}</div>
+                            <!-- TAB 1: Genel Özet -->
+                            <div id="dtabs-1" class="d-tab-content">
+                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 10px;">📈 Sistem Genel Özeti</h3>
+                                <div class="analysis-grid">
+                                    <div class="analysis-card" style="border-left: 4px solid #3498db;">
+                                        <div style="font-size: 12px; opacity: 0.7;">Toplam Grup</div>
+                                        <div class="number">${allGroupKeys.length}</div>
                                     </div>
-                                    <div style="padding: 15px; background: rgba(46, 204, 113, 0.1); border-radius: 8px; border-left: 4px solid #27ae60; text-align: center;">
-                                        <div style="font-size: 11px; opacity: 0.7;">Toplam Üye</div>
-                                        <div style="font-size: 22px; font-weight: bold;">${totalMembers}</div>
+                                    <div class="analysis-card" style="border-left: 4px solid #27ae60;">
+                                        <div style="font-size: 12px; opacity: 0.7;">Toplam Üye</div>
+                                        <div class="number">${totalMembers}</div>
                                     </div>
-                                    <div style="padding: 15px; background: rgba(241, 196, 15, 0.1); border-radius: 8px; border-left: 4px solid #f39c12; text-align: center;">
-                                        <div style="font-size: 11px; opacity: 0.7;">Toplam Alınan</div>
-                                        <div style="font-size: 22px; font-weight: bold;">${totalTaken}</div>
+                                    <div class="analysis-card" style="border-left: 4px solid #f39c12;">
+                                        <div style="font-size: 12px; opacity: 0.7;">Toplam Alınan</div>
+                                        <div class="number">${totalTaken}</div>
                                     </div>
-                                    <div style="padding: 15px; background: rgba(155, 89, 182, 0.1); border-radius: 8px; border-left: 4px solid #8e44ad; text-align: center;">
-                                        <div style="font-size: 11px; opacity: 0.7;">Toplam Okunan</div>
-                                        <div style="font-size: 22px; font-weight: bold;">${totalRead}</div>
+                                    <div class="analysis-card" style="border-left: 4px solid #8e44ad;">
+                                        <div style="font-size: 12px; opacity: 0.7;">Toplam Okunan</div>
+                                        <div class="number">${totalRead}</div>
                                     </div>
                                 </div>
-                                ${activeGroupStats ? `
-                                <div style="padding: 15px; background: rgba(212, 175, 55, 0.08); border-radius: 8px; border: 1px solid var(--gold-primary);">
-                                    <h3 style="margin-top: 0; font-size: 15px; color: var(--gold-dark);">📌 Aktif Grup: ${currentGroup.replace(/_/g, ' ').toUpperCase()}</h3>
+
+                                <!-- Aktif Grup Özeti -->
+                                <div style="margin-top: 16px; padding: 16px; background: rgba(212, 175, 55, 0.08); border-radius: 8px; border: 1px solid var(--gold-primary);">
+                                    <h4 style="margin: 0 0 8px 0; color: var(--gold-dark);">📌 Aktif Grup: ${currentGroup.replace(/_/g, ' ').toUpperCase()}</h4>
                                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px;">
-                                        <div><span style="opacity:0.7;">Üye:</span> <strong>${activeGroupStats.members}</strong></div>
-                                        <div><span style="opacity:0.7;">Alınan:</span> <strong>${activeGroupStats.taken} / ${activeGroupStats.books} (%${activeGroupStats.takenPercent})</strong></div>
-                                        <div><span style="opacity:0.7;">Okunan:</span> <strong>${activeGroupStats.read} / ${activeGroupStats.books} (%${activeGroupStats.readPercent})</strong></div>
+                                        <div><span style="opacity:0.7;">Üye:</span> <strong>${appData.members ? appData.members.length : 0}</strong></div>
+                                        <div><span style="opacity:0.7;">Toplam Eser:</span> <strong>${appData.books ? appData.books.length : 0}</strong></div>
+                                        <div><span style="opacity:0.7;">Tamamlanan Hatim:</span> <strong>${appData.books ? appData.books.filter(b => {
+                                            let h = appData.bookHatims?.[b.id];
+                                            return h?.prayerDone === true;
+                                        }).length : 0}</strong></div>
                                     </div>
-                                    <div style="margin-top: 8px; background: #e9ecef; border-radius: 10px; height: 8px; overflow: hidden;">
-                                        <div style="background: linear-gradient(to right, #f39c12, #27ae60); width: ${activeGroupStats.takenPercent}%; height: 100%; border-radius: 10px; transition: 0.5s;"></div>
-                                    </div>
-                                    <div style="font-size: 11px; opacity: 0.7; margin-top: 3px; text-align: right;">${activeGroupStats.takenPercent}% ilerleme</div>
                                 </div>
-                                ` : ''}
                             </div>
-                            <div id="atab-2" class="a-tab-content" style="display: none;">
-                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">🏆 Grup Sıralama (En İyiden En Kötüye)</h3>
+
+                            <!-- TAB 2: Grup Sıralama -->
+                            <div id="dtabs-2" class="d-tab-content" style="display: none;">
+                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 10px;">🏆 Grup Sıralaması</h3>
                                 <div style="overflow-x: auto;">
-                                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                                         <thead>
                                             <tr style="background: rgba(212, 175, 55, 0.15);">
                                                 <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">#</th>
-                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Grup Adı</th>
+                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Grup</th>
                                                 <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Üye</th>
-                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">İlerleme</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Alınan</th>
                                                 <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okunan</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">İlerleme</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -741,30 +1061,31 @@
                                                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${idx + 1}</td>
                                                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${idx === 0 ? '🥇 ' : idx === 1 ? '🥈 ' : idx === 2 ? '🥉 ' : ''}${g.name.replace(/_/g, ' ').toUpperCase()}</td>
                                                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${g.members}</td>
+                                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${g.taken}</td>
+                                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${g.read}</td>
                                                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">
-                                                        <div style="display: flex; align-items: center; gap: 8px; justify-content: center;">
-                                                            <div style="background: #e9ecef; border-radius: 10px; height: 8px; width: 80px; overflow: hidden;">
-                                                                <div style="background: ${g.takenPercent >= 80 ? '#27ae60' : g.takenPercent >= 50 ? '#f39c12' : '#e74c3c'}; width: ${g.takenPercent}%; height: 100%; border-radius: 10px;"></div>
-                                                            </div>
-                                                            <span style="font-weight: bold; font-size: 13px;">%${g.takenPercent}</span>
+                                                        <div style="background: #e9ecef; border-radius: 10px; height: 8px; width: 100px; display: inline-block; overflow: hidden;">
+                                                            <div style="background: ${g.takenPercent >= 80 ? '#27ae60' : g.takenPercent >= 50 ? '#f39c12' : '#e74c3c'}; width: ${g.takenPercent}%; height: 100%; border-radius: 10px;"></div>
                                                         </div>
+                                                        <span style="font-size: 12px; margin-left: 6px; font-weight: bold;">%${g.takenPercent}</span>
                                                     </td>
-                                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; font-size: 12px;">${g.read} / ${g.taken}</td>
                                                 </tr>
                                             `).join('')}
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
-                            <div id="atab-3" class="a-tab-content" style="display: none;">
-                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">👥 Aktif Grup Üye Sıralaması</h3>
+
+                            <!-- TAB 3: Üye Analizi -->
+                            <div id="dtabs-3" class="d-tab-content" style="display: none;">
+                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 10px;">👥 Aktif Grup Üye Analizi</h3>
                                 ${activeMemberDetails.length > 0 ? `
                                 <div style="overflow-x: auto;">
                                     <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                                         <thead>
                                             <tr style="background: rgba(212, 175, 55, 0.15);">
                                                 <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">#</th>
-                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye Adı</th>
+                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye</th>
                                                 <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Aldığı</th>
                                                 <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okuduğu</th>
                                                 <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Tamamlama</th>
@@ -780,7 +1101,7 @@
                                                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${m.taken}</td>
                                                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${m.read}</td>
                                                     <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">
-                                                        <span style="background: ${m.readPercent >= 80 ? '#27ae60' : m.readPercent >= 50 ? '#f39c12' : '#e74c3c'}; color: white; padding: 3px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">%${m.readPercent}</span>
+                                                        <span style="background: ${m.readPercent >= 80 ? '#27ae60' : m.readPercent >= 50 ? '#f39c12' : '#e74c3c'}; color: white; padding: 4px 14px; border-radius: 12px; font-size: 13px; font-weight: bold;">%${m.readPercent}</span>
                                                     </td>
                                                 </tr>
                                             `).join('')}
@@ -789,57 +1110,85 @@
                                 </div>
                                 ` : '<p style="color: #777; text-align: center; padding: 20px;">Bu grupta kayıtlı üye yok.</p>'}
                             </div>
-                            <div id="atab-4" class="a-tab-content" style="display: none;">
-                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 8px;">📚 Aktif Grup Eser Detayları</h3>
+
+                            <!-- TAB 4: Eser Detayları -->
+                            <div id="dtabs-4" class="d-tab-content" style="display: none;">
+                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 10px;">📚 Aktif Grup Eser Detayları</h3>
                                 <div style="overflow-x: auto;">
                                     <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                                         <thead>
                                             <tr style="background: rgba(212, 175, 55, 0.15);">
-                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser Adı</th>
+                                                <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser</th>
                                                 <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Toplam</th>
                                                 <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Alınan</th>
                                                 <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okunan</th>
                                                 <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">İlerleme</th>
+                                                <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Durum</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            ${appData.books.map(b => {
-                                                let taken = 0, read = 0;
-                                                if (appData.bookPages && appData.bookPages[b.id]) {
-                                                    appData.bookPages[b.id].forEach(p => {
-                                                        if (p.owner) taken++;
-                                                        if (p.isRead) read++;
-                                                    });
-                                                }
-                                                let pct = b.totalUnits > 0 ? Math.round((taken / b.totalUnits) * 100) : 0;
-                                                return `
-                                                    <tr>
-                                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${b.name}</td>
-                                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${b.totalUnits}</td>
-                                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${taken}</td>
-                                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${read}</td>
-                                                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">
-                                                            <div style="display: flex; align-items: center; gap: 6px; justify-content: center;">
-                                                                <div style="background: #e9ecef; border-radius: 10px; height: 6px; width: 60px; overflow: hidden;">
-                                                                    <div style="background: ${pct >= 80 ? '#27ae60' : pct >= 50 ? '#f39c12' : '#e74c3c'}; width: ${pct}%; height: 100%; border-radius: 10px;"></div>
-                                                                </div>
-                                                                <span style="font-size: 11px;">%${pct}</span>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                `;
-                                            }).join('')}
+                                            ${activeBookDetails.map(b => `
+                                                <tr>
+                                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${b.name}</td>
+                                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${b.total}</td>
+                                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${b.taken}</td>
+                                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${b.read}</td>
+                                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">
+                                                        <div style="background: #e9ecef; border-radius: 10px; height: 8px; width: 80px; display: inline-block; overflow: hidden;">
+                                                            <div style="background: ${b.percent >= 80 ? '#27ae60' : b.percent >= 50 ? '#f39c12' : '#e74c3c'}; width: ${b.percent}%; height: 100%; border-radius: 10px;"></div>
+                                                        </div>
+                                                        <span style="font-size: 11px; margin-left: 4px;">%${b.percent}</span>
+                                                    </td>
+                                                    <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">
+                                                        ${b.percent >= 100 ? '<span style="color: #27ae60; font-weight: bold;">✅ Tamamlandı</span>' : '<span style="color: #f39c12;">🔄 Devam Ediyor</span>'}
+                                                    </td>
+                                                </tr>
+                                            `).join('')}
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
+
+                            <!-- TAB 5: Okuma Günlüğü -->
+                            <div id="dtabs-5" class="d-tab-content" style="display: none;">
+                                <h3 style="margin-top: 0; color: var(--gold-dark); border-left: 4px solid var(--gold-primary); padding-left: 10px;">📜 Okuma Günlüğü</h3>
+                                ${readingLogs.length > 0 ? `
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                                        <thead>
+                                            <tr style="background: rgba(212, 175, 55, 0.15);">
+                                                <th style="padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Tarih</th>
+                                                <th style="padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye</th>
+                                                <th style="padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser</th>
+                                                <th style="padding: 8px 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Miktar</th>
+                                                <th style="padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Aralık</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${readingLogs.slice(0, 50).map(log => `
+                                                <tr>
+                                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-size: 11px; opacity: 0.8;">${log.date}</td>
+                                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${log.member}</td>
+                                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color);">${log.bookName}</td>
+                                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">${log.count} birim</td>
+                                                    <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-size: 11px;">${log.range}</td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                    ${readingLogs.length > 50 ? `<p style="text-align: center; color: #777; font-size: 12px; margin-top: 8px;">... ve ${readingLogs.length - 50} kayıt daha</p>` : ''}
+                                </div>
+                                ` : '<p style="color: #777; text-align: center; padding: 20px;">Henüz okuma kaydı bulunmuyor.</p>'}
+                            </div>
                         </div>
                     </div>
                 `;
+
                 document.body.appendChild(modalOverlay);
 
-                const tabBtns = modalOverlay.querySelectorAll(".a-tab-btn");
-                const tabContents = modalOverlay.querySelectorAll(".a-tab-content");
+                // Tab değiştirme
+                const tabBtns = modalOverlay.querySelectorAll(".d-tab-btn");
+                const tabContents = modalOverlay.querySelectorAll(".d-tab-content");
                 tabBtns.forEach(btn => {
                     btn.addEventListener("click", (e) => {
                         tabBtns.forEach(b => { b.style.background = "var(--card-bg)"; b.style.color = "var(--text-main)"; });
@@ -849,7 +1198,9 @@
                         document.getElementById(e.currentTarget.getAttribute("data-target")).style.display = "block";
                     });
                 });
-                modalOverlay.querySelector("#modal-simple-close-btn").addEventListener("click", () => modalOverlay.remove());
+
+                // Kapatma
+                modalOverlay.querySelector("#modal-close-btn").addEventListener("click", () => modalOverlay.remove());
                 modalOverlay.querySelector("#modal-print-btn").addEventListener("click", () => window.print());
                 modalOverlay.addEventListener("click", (e) => {
                     if (e.target === modalOverlay) modalOverlay.remove();
@@ -857,7 +1208,7 @@
             }
 
             // ============================================================
-            // getRangeStatus FONKSİYONU
+            // getRangeStatus
             // ============================================================
             function getRangeStatus(baseArray, start, end) {
                 let subset = baseArray.slice(start, end);
@@ -874,7 +1225,7 @@
             }
 
             // ============================================================
-            // renderBooks FONKSİYONU (PDF butonlu)
+            // renderBooks - PDF butonlu, renkli durumlar
             // ============================================================
             function renderBooks() {
                 const openBookIds = Array.from(document.querySelectorAll(".book-card.open")).map(el => el.getAttribute("data-book-id"));
@@ -902,97 +1253,91 @@
                     let modeButtonsHtml = modeKeys.map(mk => {
                         let mObj = defModes[mk];
                         let isActive = mk === book.currentMode;
-                        return `<button class="mode-btn ${isActive ? 'active' : ''}" data-book-id="${book.id}" data-mode="${mk}" style="padding: 6px 12px; font-size: 12px; border-radius: 4px; border: 1px solid var(--border-color); background: ${isActive ? 'var(--gold-primary)' : 'var(--card-bg)'}; color: ${isActive ? '#fff' : 'var(--text-main)'}; cursor: pointer; font-weight: bold;">${mObj.name}</button>`;
+                        return `<button class="mode-btn ${isActive ? 'active' : ''}" data-book-id="${book.id}" data-mode="${mk}" style="padding: 10px 16px; font-size: 13px; border-radius: 6px; border: 1px solid var(--border-color); background: ${isActive ? 'var(--gold-primary)' : 'var(--card-bg)'}; color: ${isActive ? '#fff' : 'var(--text-main)'}; cursor: pointer; font-weight: bold; min-height: 44px; touch-action: manipulation;">${mObj.name}</button>`;
                     }).join('');
 
                     let itemsHtml = items.map(pi => {
                         let st = getRangeStatus(baseArray, pi.start, pi.end);
-                        let bgStyle = "background: var(--card-bg); color: var(--text-main);";
-                        let statusText = "Boş";
+                        let statusClass = "status-free";
+                        let statusText = "🟡 Boş";
 
-                        if (st.statusType === "free") {
-                            bgStyle = "background: rgba(46, 204, 113, 0.08); color: var(--text-main);";
-                            statusText = "Boş";
-                        } else if (st.statusType === "taken") {
-                            bgStyle = "background: rgba(241, 196, 15, 0.15); color: var(--text-main);";
-                            statusText = `${st.owner} (Alındı)`;
+                        if (st.statusType === "taken") {
+                            statusClass = "status-taken";
+                            statusText = `🔴 ${st.owner} (Alındı)`;
                         } else if (st.statusType === "read") {
-                            bgStyle = "background: rgba(39, 174, 96, 0.2); color: var(--text-main); font-weight: bold;";
-                            statusText = `${st.owner} (✓ Okundu)`;
+                            statusClass = "status-read";
+                            statusText = `🟢 ${st.owner} (✓ Okundu)`;
                         } else if (st.statusType === "mixed") {
-                            bgStyle = "background: rgba(52, 152, 219, 0.1); color: var(--text-main);";
-                            statusText = `Karma: ${st.owner}`;
+                            statusClass = "status-mixed";
+                            statusText = `🔵 Karma: ${st.owner}`;
                         }
 
                         let isOwner = loggedInMember && st.owner.includes(loggedInMember);
                         let actionButtons = "";
 
                         // PDF butonu - her zaman göster
-                        let pdfBtn = `<button class="pdf-page-btn" data-book-id="${book.id}" data-page="${pi.start + 1}" style="padding: 4px 10px; background: #8e44ad; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">📄 PDF</button>`;
+                        let pdfBtn = `<button class="pdf-page-btn" data-book-id="${book.id}" data-page="${pi.start + 1}" style="padding: 8px 14px; background: #8e44ad; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px; touch-action: manipulation;">📄 PDF</button>`;
 
                         if (loggedInMember) {
                             if (st.statusType === "free") {
                                 actionButtons = `
-                                    <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+                                    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
                                         ${pdfBtn}
-                                        <button class="take-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 8px 14px; background: #27ae60; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">Hisse Al</button>
+                                        <button class="take-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 10px 18px; background: #f39c12; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px; touch-action: manipulation;">Hisse Al</button>
                                     </div>
                                 `;
                             } else if (isOwner) {
                                 if (st.statusType === "taken") {
                                     actionButtons = `
-                                        <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+                                        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
                                             ${pdfBtn}
-                                            <button class="read-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 8px 12px; background: #2980b9; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">Okundu</button>
-                                            <button class="release-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 8px 12px; background: #e74c3c; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">Vazgeç</button>
+                                            <button class="read-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 10px 18px; background: #27ae60; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px; touch-action: manipulation;">✅ Okundu</button>
+                                            <button class="release-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 10px 18px; background: #e74c3c; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px; touch-action: manipulation;">❌ Vazgeç</button>
                                         </div>
                                     `;
                                 } else if (st.statusType === "read") {
                                     actionButtons = `
-                                        <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+                                        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
                                             ${pdfBtn}
-                                            <button class="unread-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 8px 12px; background: #e67e22; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">Okunmadı</button>
-                                            <button class="release-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 8px 12px; background: #e74c3c; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">Vazgeç</button>
+                                            <button class="unread-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 10px 18px; background: #e67e22; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px; touch-action: manipulation;">↩️ Okunmadı</button>
+                                            <button class="release-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 10px 18px; background: #e74c3c; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px; touch-action: manipulation;">❌ Vazgeç</button>
                                         </div>
                                     `;
                                 }
                             } else {
-                                // Başkasının hissesi - sadece PDF butonu
-                                actionButtons = `<div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">${pdfBtn}</div>`;
+                                actionButtons = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">${pdfBtn}</div>`;
                             }
                         } else {
-                            // Giriş yapmamış - sadece PDF butonu
-                            actionButtons = `<div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">${pdfBtn}</div>`;
+                            actionButtons = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">${pdfBtn}</div>`;
                         }
 
                         return `
-                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; margin-bottom: 6px; border-radius: 6px; border: 1px solid var(--border-color); ${bgStyle} flex-wrap: wrap; gap: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; margin-bottom: 6px; border-radius: 8px; border: 1px solid var(--border-color); ${statusClass} flex-wrap: wrap; gap: 10px;">
                                 <div>
-                                    <div style="font-weight: bold; font-size: 14px;">${pi.name}</div>
-                                    <div style="font-size: 12px; opacity: 0.85; margin-top: 2px;">Durum: ${statusText}</div>
+                                    <div style="font-weight: bold; font-size: 15px;">${pi.name}</div>
+                                    <div style="font-size: 13px; opacity: 0.85; margin-top: 2px;">${statusText}</div>
                                 </div>
                                 <div>${actionButtons}</div>
                             </div>
                         `;
                     }).join('');
 
-                    // Kitap başlığında PDF butonu
-                    let headerPdfBtn = `<button class="pdf-book-btn" data-book-id="${book.id}" style="background: #8e44ad; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold;">📄 PDF</button>`;
+                    let headerPdfBtn = `<button class="pdf-book-btn" data-book-id="${book.id}" style="padding: 8px 16px; background: #8e44ad; color: #fff; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: bold; min-height: 44px; touch-action: manipulation;">📄 PDF</button>`;
 
                     card.innerHTML = `
-                        <div class="book-header" style="padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; flex-wrap: wrap; gap: 10px;">
+                        <div class="book-header">
                             <div>
-                                <h3 style="margin: 0; font-size: 16px; color: var(--gold-dark);">${book.name}</h3>
-                                <div style="font-size: 11px; opacity: 0.8; margin-top: 3px;">Hatim No: ${hatimInfo.hatimNo} | İlerleme: %${percent} (${takenCount}/${book.totalUnits})</div>
+                                <h3 style="margin: 0; font-size: 17px; color: var(--gold-dark);">${book.name}</h3>
+                                <div style="font-size: 12px; opacity: 0.8; margin-top: 3px;">🔁 Hatim No: ${hatimInfo.hatimNo} | 📊 İlerleme: %${percent} (${takenCount}/${book.totalUnits})</div>
                             </div>
-                            <div style="display: flex; gap: 8px; align-items: center;">
+                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                                 ${headerPdfBtn}
-                                <span style="font-size: 12px; font-weight: bold; color: var(--gold-dark);">${isOpen ? '▲ Gizle' : '▼ Göster'}</span>
+                                <span style="font-size: 14px; font-weight: bold; color: var(--gold-dark); cursor: pointer;">${isOpen ? '▲ Gizle' : '▼ Göster'}</span>
                             </div>
                         </div>
-                        <div class="book-body" style="display: ${isOpen ? 'block' : 'none'}; padding: 16px; border-top: 1px solid var(--border-color);">
-                            <div style="margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;">${modeButtonsHtml}</div>
-                            <div style="max-height: 350px; overflow-y: auto; padding-right: 4px;">${itemsHtml}</div>
+                        <div class="book-body" style="display: ${isOpen ? 'block' : 'none'};">
+                            <div style="margin-bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">${modeButtonsHtml}</div>
+                            <div style="max-height: 400px; overflow-y: auto; padding-right: 4px;">${itemsHtml}</div>
                         </div>
                     `;
 
@@ -1002,18 +1347,15 @@
                 // ============================================================
                 // OLAY DİNLEYİCİLERİ
                 // ============================================================
-
-                // Kitap başlığına tıklayınca aç/kapa
                 document.querySelectorAll(".book-header").forEach(header => {
                     header.addEventListener("click", (e) => {
-                        if (e.target.closest(".pdf-book-btn") || e.target.closest(".pdf-page-btn")) return;
+                        if (e.target.closest(".pdf-book-btn") || e.target.closest(".pdf-page-btn") || e.target.closest("button")) return;
                         let card = header.closest(".book-card");
                         card.classList.toggle("open");
                         renderBooks();
                     });
                 });
 
-                // Kitap başlığındaki PDF butonu - kitabın ilk sayfasını açar
                 document.querySelectorAll(".pdf-book-btn").forEach(btn => {
                     btn.addEventListener("click", (e) => {
                         e.stopPropagation();
@@ -1022,7 +1364,6 @@
                     });
                 });
 
-                // Her bölümdeki PDF butonu - ilgili sayfaya atlar
                 document.querySelectorAll(".pdf-page-btn").forEach(btn => {
                     btn.addEventListener("click", (e) => {
                         e.stopPropagation();
@@ -1032,7 +1373,6 @@
                     });
                 });
 
-                // Mod butonları
                 document.querySelectorAll(".mode-btn").forEach(btn => {
                     btn.addEventListener("click", (e) => {
                         e.stopPropagation();
@@ -1047,10 +1387,9 @@
                     });
                 });
 
-                // Hisse Al
                 document.querySelectorAll(".take-range-btn").forEach(btn => {
                     btn.addEventListener("click", (e) => {
-                        if (!loggedInMember) { alert("Lütfen önce isminizi seçin."); return; }
+                        if (!loggedInMember) { showToast('Lütfen önce isminizi seçin.', 'error'); return; }
                         let bId = btn.getAttribute("data-book-id");
                         let start = parseInt(btn.getAttribute("data-start"), 10);
                         let end = parseInt(btn.getAttribute("data-end"), 10);
@@ -1071,48 +1410,60 @@
                         saveGroupData();
                         renderBooks();
                         renderAnalysisSection();
+                        showToast(`✅ ${rangeName} hissesi alındı!`, 'success');
                     });
                 });
 
-                // Okundu
                 document.querySelectorAll(".read-range-btn").forEach(btn => {
                     btn.addEventListener("click", (e) => {
                         let bId = btn.getAttribute("data-book-id");
                         let start = parseInt(btn.getAttribute("data-start"), 10);
                         let end = parseInt(btn.getAttribute("data-end"), 10);
                         let baseArray = appData.bookPages[bId];
-                        for (let i = start; i < end; i++) { baseArray[i].isRead = true; }
+                        let now = new Date().toLocaleDateString("tr-TR");
+                        for (let i = start; i < end; i++) { 
+                            baseArray[i].isRead = true;
+                            baseArray[i].readDate = now;
+                        }
                         saveGroupData();
                         renderBooks();
                         renderAnalysisSection();
+                        showToast(`✅ Bölüm okundu olarak işaretlendi!`, 'success');
                     });
                 });
 
-                // Okunmadı
                 document.querySelectorAll(".unread-range-btn").forEach(btn => {
                     btn.addEventListener("click", (e) => {
                         let bId = btn.getAttribute("data-book-id");
                         let start = parseInt(btn.getAttribute("data-start"), 10);
                         let end = parseInt(btn.getAttribute("data-end"), 10);
                         let baseArray = appData.bookPages[bId];
-                        for (let i = start; i < end; i++) { baseArray[i].isRead = false; }
+                        for (let i = start; i < end; i++) { 
+                            baseArray[i].isRead = false;
+                            baseArray[i].readDate = undefined;
+                        }
                         saveGroupData();
                         renderBooks();
                         renderAnalysisSection();
+                        showToast(`↩️ Bölüm okunmadı olarak işaretlendi.`, 'info');
                     });
                 });
 
-                // Vazgeç
                 document.querySelectorAll(".release-range-btn").forEach(btn => {
                     btn.addEventListener("click", (e) => {
                         let bId = btn.getAttribute("data-book-id");
                         let start = parseInt(btn.getAttribute("data-start"), 10);
                         let end = parseInt(btn.getAttribute("data-end"), 10);
                         let baseArray = appData.bookPages[bId];
-                        for (let i = start; i < end; i++) { baseArray[i].owner = ""; baseArray[i].isRead = false; }
+                        for (let i = start; i < end; i++) { 
+                            baseArray[i].owner = ""; 
+                            baseArray[i].isRead = false;
+                            baseArray[i].readDate = undefined;
+                        }
                         saveGroupData();
                         renderBooks();
                         renderAnalysisSection();
+                        showToast(`❌ Hisseden vazgeçildi.`, 'error');
                     });
                 });
             }
@@ -1129,41 +1480,41 @@
                 } else {
                     container.appendChild(bottomContainer);
                 }
-                bottomContainer.style.cssText = "margin: 20px 0; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg);";
+                bottomContainer.style.cssText = "margin: 20px 0; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--card-bg);";
 
                 let allGroups = getAllGroupKeys();
                 let groupsHtml = allGroups.map(g => `<option value="${g}" ${g === currentGroup ? "selected" : ""}>${g.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
 
                 let membersHtml = appData.members.map(m => `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; margin-bottom: 4px; border-radius: 4px; font-size: 13px; border: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; font-size: 14px; border: 1px solid var(--border-color);">
                         <span>• ${m}</span>
-                        <div style="display: flex; gap: 4px;">
-                            <button class="admin-edit-member" data-name="${m}" style="background: #f39c12; color: #fff; border: none; padding: 3px 6px; border-radius: 3px; font-size: 11px; cursor: pointer;">Düzelt</button>
-                            <button class="admin-remove-member" data-name="${m}" style="background: #e74c3c; color: #fff; border: none; padding: 3px 6px; border-radius: 3px; font-size: 11px; cursor: pointer;">Çıkart</button>
+                        <div style="display: flex; gap: 6px;">
+                            <button class="admin-edit-member" data-name="${m}" style="background: #f39c12; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; min-height: 40px;">Düzelt</button>
+                            <button class="admin-remove-member" data-name="${m}" style="background: #e74c3c; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; min-height: 40px;">Çıkart</button>
                         </div>
                     </div>
                 `).join('');
 
                 let groupSectionHtml = `
-                    <div id="admin-group-section" style="background: rgba(52, 152, 219, 0.05); border: 1px solid #3498db; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
-                        <h3 style="color: #2980b9; font-size: 15px; margin-bottom: 10px;">👥 Grup ve Üye Yönetimi</h3>
-                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
+                    <div class="admin-section group-section">
+                        <h4 style="color: #2980b9;">👥 Grup ve Üye Yönetimi</h4>
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
                             <label style="font-weight: bold; font-size: 13px;">Grup:</label>
-                            <select id="admin-group-select" style="padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); flex: 1; min-width: 150px;">${groupsHtml}</select>
-                            <button id="admin-add-group" style="background: #27ae60; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">+ Ekle</button>
-                            <button id="admin-edit-group" style="background: #f39c12; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Düzenle</button>
-                            <button id="admin-delete-group" style="background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Sil</button>
-                            <button id="admin-set-password" style="background: #8e44ad; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">🔑 Şifre</button>
+                            <select id="admin-group-select" style="padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); flex: 1; min-width: 120px; min-height: 44px;">${groupsHtml}</select>
+                            <button id="admin-add-group" style="background: #27ae60; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 44px;">+ Ekle</button>
+                            <button id="admin-edit-group" style="background: #f39c12; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 44px;">Düzenle</button>
+                            <button id="admin-delete-group" style="background: #e74c3c; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 44px;">Sil</button>
+                            <button id="admin-set-password" style="background: #8e44ad; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 44px;">🔑 Şifre</button>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
                             <span style="font-weight: bold; font-size: 13px;">Gruptaki Üyeler:</span>
-                            <button id="admin-add-member" style="background: #2980b9; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">+ Üye Ekle</button>
+                            <button id="admin-add-member" style="background: #2980b9; color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 40px;">+ Üye Ekle</button>
                         </div>
-                        <div style="max-height: 150px; overflow-y: auto; border: 1px solid var(--border-color); padding: 5px; border-radius: 4px; background: var(--card-bg);">
-                            ${appData.members.length > 0 ? membersHtml : '<div style="font-size: 12px; text-align: center; padding: 10px; color: #777;">Kayıtlı üye yok.</div>'}
+                        <div style="max-height: 180px; overflow-y: auto; border: 1px solid var(--border-color); padding: 6px; border-radius: 6px; background: var(--card-bg);">
+                            ${appData.members.length > 0 ? membersHtml : '<div style="font-size: 13px; text-align: center; padding: 12px; color: #777;">Kayıtlı üye yok.</div>'}
                         </div>
-                        <div style="font-size: 11px; color: #7f8c8d; margin-top: 8px; font-style: italic;">
-                            💡 Grup şifre durumu: <span style="font-weight: bold; color: ${appData.password ? '#27ae60' : '#e67e22'};">${appData.password ? '🔒 Şifreli' : '🔓 Şifresiz'}</span>
+                        <div style="font-size: 12px; color: #7f8c8d; margin-top: 8px;">
+                            💡 Şifre durumu: <span style="font-weight: bold; color: ${appData.password ? '#27ae60' : '#e67e22'};">${appData.password ? '🔒 Şifreli' : '🔓 Şifresiz'}</span>
                         </div>
                     </div>
                 `;
@@ -1179,61 +1530,59 @@
                         });
                     }
                     let memberList = Object.keys(memberPages);
-                    let memberDetails = memberList.map(m => `${m}: ${memberPages[m]} sayfa`).join(', ');
+                    let memberDetails = memberList.map(m => `${m}: ${memberPages[m]} birim`).join(', ');
                     return `
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; margin-bottom: 4px; border-radius: 4px; font-size: 13px; border: 1px solid var(--border-color); flex-wrap: wrap; gap: 4px;">
-                            <div style="flex: 1; min-width: 150px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; font-size: 13px; border: 1px solid var(--border-color); flex-wrap: wrap; gap: 6px;">
+                            <div style="flex: 1; min-width: 140px;">
                                 <strong>${b.name}</strong> 
                                 <span style="font-size: 11px; opacity: 0.7;">(${b.totalUnits} ${b.type === 'bab' ? 'Bab' : 'Sayfa'})</span>
                                 ${memberDetails ? `<div style="font-size: 11px; color: #555; margin-top: 2px;">📖 ${memberDetails}</div>` : '<div style="font-size: 11px; color: #999; margin-top: 2px;">📖 Henüz kimse almadı</div>'}
                             </div>
                             <div style="display: flex; gap: 4px; flex-wrap: wrap;">
-                                <button class="admin-edit-book" data-id="${b.id}" style="background: #f39c12; color: #fff; border: none; padding: 3px 8px; border-radius: 3px; font-size: 11px; cursor: pointer;">Düzenle</button>
-                                <button class="admin-remove-book" data-id="${b.id}" style="background: #e74c3c; color: #fff; border: none; padding: 3px 8px; border-radius: 3px; font-size: 11px; cursor: pointer;">Sil</button>
+                                <button class="admin-edit-book" data-id="${b.id}" style="background: #f39c12; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; min-height: 40px;">Düzenle</button>
+                                <button class="admin-remove-book" data-id="${b.id}" style="background: #e74c3c; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; min-height: 40px;">Sil</button>
                             </div>
                         </div>
                     `;
                 }).join('');
 
                 let booksSectionHtml = `
-                    <div id="admin-books-section" style="background: rgba(46, 204, 113, 0.05); border: 1px solid #27ae60; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                    <div class="admin-section book-section">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
-                            <h3 style="color: #27ae60; font-size: 15px; margin: 0;">📚 Eser Yönetimi</h3>
-                            <button id="admin-add-book-btn" style="background: #27ae60; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">+ Yeni Eser Ekle</button>
+                            <h4 style="color: #27ae60; margin: 0;">📚 Eser Yönetimi</h4>
+                            <button id="admin-add-book-btn" style="background: #27ae60; color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 40px;">+ Yeni Eser Ekle</button>
                         </div>
-                        <div style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); padding: 5px; border-radius: 4px; background: var(--card-bg);">
+                        <div style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); padding: 6px; border-radius: 6px; background: var(--card-bg);">
                             ${booksEditHtml}
                         </div>
-                        <div style="font-size: 11px; color: #7f8c8d; margin-top: 8px; font-style: italic;">
-                            💡 Her eserin yanında kimin kaç sayfa aldığı gösterilir.
-                        </div>
+                        <div style="font-size: 12px; color: #7f8c8d; margin-top: 8px;">💡 Her eserin yanında kimin kaç birim aldığı gösterilir.</div>
                     </div>
                 `;
 
                 let bulkSectionHtml = `
-                    <div id="admin-bulk-section" style="background: rgba(155, 89, 182, 0.05); border: 1px solid #8e44ad; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
-                        <h3 style="color: #8e44ad; font-size: 15px; margin-bottom: 10px;">📊 Toplu İşlemler ve Analiz</h3>
+                    <div class="admin-section bulk-section">
+                        <h4 style="color: #8e44ad;">📊 Toplu İşlemler ve Analiz</h4>
                         <div style="margin-bottom: 12px;">
-                            <button id="admin-open-simple-analysis" style="width: 100%; padding: 10px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">📊 Detaylı Analiz ve Rapor Paneli</button>
+                            <button id="admin-open-detailed-analysis" style="width: 100%; padding: 14px; background: #8e44ad; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; min-height: 48px;">📊 Detaylı Analiz Paneli</button>
                         </div>
                         <div style="border-top: 1px solid var(--border-color); padding-top: 12px;">
-                            <div style="font-weight: bold; font-size: 13px; margin-bottom: 8px;">📚 Kitaplarda Toplu Atama ve Silme:</div>
-                            <div style="display: flex; flex-direction: column; gap: 8px; background: var(--card-bg); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);">
+                            <div style="font-weight: bold; font-size: 13px; margin-bottom: 8px;">📚 Toplu Atama ve Silme:</div>
+                            <div style="display: flex; flex-direction: column; gap: 8px; background: var(--card-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
                                 <div>
-                                    <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Eser Seçimi:</label>
-                                    <select id="admin-bulk-book-select" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 12px;">
-                                        ${appData.books.map(b => `<option value="${b.id}">${b.name} (${b.totalUnits} ${b.type === 'bab' ? 'Bab' : 'Sayfa'})</option>`).join('')}
+                                    <label style="font-size: 12px; font-weight: bold;">Eser Seçimi:</label>
+                                    <select id="admin-bulk-book-select" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px; min-height: 44px;">
+                                        ${appData.books.map(b => `<option value="${b.id}">${b.name} (${b.totalUnits})</option>`).join('')}
                                     </select>
                                 </div>
                                 <div>
-                                    <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Hedef Grup / Kişi:</label>
-                                    <select id="admin-bulk-target-select" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 12px;">
+                                    <label style="font-size: 12px; font-weight: bold;">Hedef:</label>
+                                    <select id="admin-bulk-target-select" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px; min-height: 44px;">
                                     </select>
                                 </div>
                                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                    <button id="admin-bulk-assign-btn" style="flex: 1; padding: 8px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; min-width: 100px;">📥 Atama Yap</button>
-                                    <button id="admin-bulk-delete-btn" style="flex: 1; padding: 8px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; min-width: 100px;">🗑️ Sil / Boşalt</button>
-                                    <button id="admin-bulk-reset-btn" style="flex: 1; padding: 8px; background: #f39c12; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; min-width: 100px;">🔄 Eseri Sıfırla</button>
+                                    <button id="admin-bulk-assign-btn" style="flex: 1; padding: 10px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; min-width: 80px;">📥 Atama</button>
+                                    <button id="admin-bulk-delete-btn" style="flex: 1; padding: 10px; background: #e74c3c; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; min-width: 80px;">🗑️ Sil</button>
+                                    <button id="admin-bulk-reset-btn" style="flex: 1; padding: 10px; background: #f39c12; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; min-width: 80px;">🔄 Sıfırla</button>
                                 </div>
                             </div>
                         </div>
@@ -1242,20 +1591,22 @@
 
                 let messageSectionHtml = `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
-                        <h3 style="font-size: 15px; margin: 0;">📢 Yöneticiye Mesaj Gönder</h3>
-                        <button id="admin-toggle-btn-custom" style="padding: 6px 12px; background: ${isAdmin ? '#c0392b' : '#f39c12'}; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">${isAdmin ? '🔓 Yönetici Modu: AÇIK' : '🔐 Yönetici Modu: Kapalı'}</button>
+                        <h3 style="font-size: 15px; margin: 0;">📢 Yöneticiye Mesaj</h3>
+                        <button id="admin-toggle-btn-custom" style="padding: 10px 16px; background: ${isAdmin ? '#c0392b' : '#f39c12'}; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">${isAdmin ? '🔓 Mod: AÇIK' : '🔐 Mod: Kapalı'}</button>
                     </div>
-                    <textarea id="admin-msg-input" placeholder="Mesajınızı buraya yazın..." style="width: 100%; height: 60px; padding: 10px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 4px; margin-bottom: 10px;"></textarea>
-                    <button id="send-admin-msg-btn" style="background: #25D366; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">💬 WhatsApp ile Gönder</button>
+                    <textarea id="admin-msg-input" placeholder="Mesajınızı yazın..." style="width: 100%; height: 60px; padding: 12px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; margin-bottom: 10px; font-size: 14px;"></textarea>
+                    <button id="send-admin-msg-btn" style="width: 100%; padding: 14px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 15px; min-height: 48px;">💬 WhatsApp ile Gönder</button>
                 `;
 
                 let adminPanelHtml = "";
                 if (isAdmin) {
                     adminPanelHtml = `
-                        <div id="admin-panel-section" style="background: rgba(212, 175, 55, 0.05); border: 1px solid var(--gold-primary); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
-                            <h3 style="color: var(--gold-dark); font-size: 16px; margin-bottom: 15px;">🛠️ Yönetici Kontrol Paneli</h3>
-                            ${groupSectionHtml}
-                            ${booksSectionHtml}
+                        <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid var(--gold-primary); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+                            <h3 style="color: var(--gold-dark); font-size: 17px; margin-bottom: 15px;">🛠️ Yönetici Kontrol Paneli</h3>
+                            <div class="admin-panel-grid">
+                                ${groupSectionHtml}
+                                ${booksSectionHtml}
+                            </div>
                             ${bulkSectionHtml}
                         </div>
                     `;
@@ -1264,31 +1615,34 @@
                 bottomContainer.innerHTML = `${adminPanelHtml}${messageSectionHtml}`;
 
                 if (isAdmin) {
-                    const analysisBtn = document.getElementById("admin-open-simple-analysis");
+                    // ============================================================
+                    // ADMIN OLAY DİNLEYİCİLERİ
+                    // ============================================================
+                    const analysisBtn = document.getElementById("admin-open-detailed-analysis");
                     if (analysisBtn) {
-                        analysisBtn.addEventListener("click", () => { openSimpleAnalysisModal(); });
+                        analysisBtn.addEventListener("click", () => { openDetailedAnalysisModal(); });
                     }
 
                     let targetSelect = bottomContainer.querySelector("#admin-bulk-target-select");
                     if (targetSelect) {
                         let allGroupKeys = getAllGroupKeys();
-                        let optionsHtml = '<option value="">-- Grup veya Kişi Seçin --</option>';
+                        let optionsHtml = '<option value="">-- Seçin --</option>';
                         allGroupKeys.forEach(gKey => {
                             let dRaw = localStorage.getItem(`hatim_group_${gKey}`);
-                            let gNameFormatted = gKey.replace(/_/g, ' ').toUpperCase();
+                            let gName = gKey.replace(/_/g, ' ').toUpperCase();
                             if (dRaw) {
                                 try {
                                     let parsed = JSON.parse(dRaw);
                                     if (parsed.members && parsed.members.length > 0) {
-                                        optionsHtml += `<optgroup label="📁 ${gNameFormatted} Grubu">`;
-                                        optionsHtml += `<option value="group:${gKey}">[Grup Tamamı] ${gNameFormatted}</option>`;
+                                        optionsHtml += `<optgroup label="📁 ${gName}">`;
+                                        optionsHtml += `<option value="group:${gKey}">[Grup Tamamı] ${gName}</option>`;
                                         parsed.members.forEach(m => {
-                                            optionsHtml += `<option value="member:${gKey}:${m}">👤 ${m} (${gNameFormatted})</option>`;
+                                            optionsHtml += `<option value="member:${gKey}:${m}">👤 ${m}</option>`;
                                         });
                                         optionsHtml += `</optgroup>`;
                                     } else {
-                                        optionsHtml += `<optgroup label="📁 ${gNameFormatted} Grubu (Üye Yok)">`;
-                                        optionsHtml += `<option value="group:${gKey}">[Grup Tamamı] ${gNameFormatted}</option>`;
+                                        optionsHtml += `<optgroup label="📁 ${gName}">`;
+                                        optionsHtml += `<option value="group:${gKey}">[Grup Tamamı] ${gName}</option>`;
                                         optionsHtml += `</optgroup>`;
                                     }
                                 } catch(e){}
@@ -1297,252 +1651,266 @@
                         targetSelect.innerHTML = optionsHtml;
                     }
 
+                    // Toplu Atama
                     const bulkAssignBtn = bottomContainer.querySelector("#admin-bulk-assign-btn");
                     if (bulkAssignBtn) {
                         bulkAssignBtn.addEventListener("click", () => {
-                            let selectedBookId = bottomContainer.querySelector("#admin-bulk-book-select").value;
-                            let selectedTarget = bottomContainer.querySelector("#admin-bulk-target-select").value;
-                            if (!selectedTarget) { alert("Lütfen atama yapılacak bir grup veya kişi seçin."); return; }
-                            let [type, gKey, mName] = selectedTarget.split(":");
-                            let targetDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
-                            if (!targetDataRaw) { alert("Grup verisi bulunamadı."); return; }
-                            let targetGroupData = JSON.parse(targetDataRaw);
-                            if (!targetGroupData.bookPages[selectedBookId]) { alert("Seçilen esere ait sayfa/birim verisi bulunamadı."); return; }
+                            let bookId = bottomContainer.querySelector("#admin-bulk-book-select").value;
+                            let target = bottomContainer.querySelector("#admin-bulk-target-select").value;
+                            if (!target) { showToast('Lütfen hedef seçin.', 'error'); return; }
+                            let [type, gKey, mName] = target.split(":");
+                            let data = localStorage.getItem(`hatim_group_${gKey}`);
+                            if (!data) { showToast('Grup bulunamadı.', 'error'); return; }
+                            let gData = JSON.parse(data);
+                            if (!gData.bookPages[bookId]) { showToast('Eser bulunamadı.', 'error'); return; }
+
                             if (type === "member") {
-                                targetGroupData.bookPages[selectedBookId].forEach(p => { if (!p.owner) { p.owner = mName; } });
-                                localStorage.setItem(`hatim_group_${gKey}`, JSON.stringify(targetGroupData));
-                                alert(`"${selectedBookId}" eserinin boş birimleri "${mName}" adlı üyeye atandı.`);
+                                gData.bookPages[bookId].forEach(p => { if (!p.owner) p.owner = mName; });
                             } else if (type === "group") {
-                                let members = targetGroupData.members;
-                                if (!members || members.length === 0) { alert("Bu grupta kayıtlı üye bulunmuyor!"); return; }
+                                let members = gData.members;
+                                if (!members || members.length === 0) { showToast('Grupta üye yok!', 'error'); return; }
                                 let idx = 0;
-                                targetGroupData.bookPages[selectedBookId].forEach(p => { if (!p.owner) { p.owner = members[idx % members.length]; idx++; } });
-                                localStorage.setItem(`hatim_group_${gKey}`, JSON.stringify(targetGroupData));
-                                alert(`"${selectedBookId}" eserinin boş birimleri "${gKey.toUpperCase()}" grubundaki üyeler arasında paylaştırıldı.`);
+                                gData.bookPages[bookId].forEach(p => { if (!p.owner) { p.owner = members[idx % members.length]; idx++; } });
                             }
+                            localStorage.setItem(`hatim_group_${gKey}`, JSON.stringify(gData));
+                            showToast('✅ Toplu atama tamamlandı!', 'success');
                             loadGroupData();
                         });
                     }
 
+                    // Toplu Silme
                     const bulkDeleteBtn = bottomContainer.querySelector("#admin-bulk-delete-btn");
                     if (bulkDeleteBtn) {
                         bulkDeleteBtn.addEventListener("click", () => {
-                            let selectedBookId = bottomContainer.querySelector("#admin-bulk-book-select").value;
-                            let selectedTarget = bottomContainer.querySelector("#admin-bulk-target-select").value;
-                            if (!selectedTarget) { alert("Lütfen işlem yapılacak grup veya kişiyi seçin."); return; }
-                            let [type, gKey, mName] = selectedTarget.split(":");
-                            let targetDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
-                            if (!targetDataRaw) return;
-                            let targetGroupData = JSON.parse(targetDataRaw);
-                            if (confirm(`Seçilen eserdeki hisseleri silmek/boşaltmak istediğinize emin misiniz?`)) {
+                            let bookId = bottomContainer.querySelector("#admin-bulk-book-select").value;
+                            let target = bottomContainer.querySelector("#admin-bulk-target-select").value;
+                            if (!target) { showToast('Lütfen hedef seçin.', 'error'); return; }
+                            let [type, gKey, mName] = target.split(":");
+                            let data = localStorage.getItem(`hatim_group_${gKey}`);
+                            if (!data) return;
+                            let gData = JSON.parse(data);
+                            if (confirm('Seçilen eserdeki hisseleri silmek istediğinize emin misiniz?')) {
                                 if (type === "member") {
-                                    targetGroupData.bookPages[selectedBookId].forEach(p => { if (p.owner === mName) { p.owner = ""; p.isRead = false; } });
+                                    gData.bookPages[bookId].forEach(p => { if (p.owner === mName) { p.owner = ""; p.isRead = false; } });
                                 } else if (type === "group") {
-                                    targetGroupData.bookPages[selectedBookId].forEach(p => { p.owner = ""; p.isRead = false; });
+                                    gData.bookPages[bookId].forEach(p => { p.owner = ""; p.isRead = false; });
                                 }
-                                localStorage.setItem(`hatim_group_${gKey}`, JSON.stringify(targetGroupData));
-                                alert("Toplu silme/boşaltma işlemi başarıyla tamamlandı.");
+                                localStorage.setItem(`hatim_group_${gKey}`, JSON.stringify(gData));
+                                showToast('🗑️ Silme işlemi tamamlandı.', 'info');
                                 loadGroupData();
                             }
                         });
                     }
 
+                    // Eseri Sıfırla
                     const bulkResetBtn = bottomContainer.querySelector("#admin-bulk-reset-btn");
                     if (bulkResetBtn) {
                         bulkResetBtn.addEventListener("click", () => {
-                            let selectedBookId = bottomContainer.querySelector("#admin-bulk-book-select").value;
-                            let selectedTarget = bottomContainer.querySelector("#admin-bulk-target-select").value;
-                            if (!selectedTarget) { alert("Lütfen işlem yapılacak grup veya kişiyi seçin."); return; }
-                            let [type, gKey, mName] = selectedTarget.split(":");
-                            let targetDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
-                            if (!targetDataRaw) return;
-                            let targetGroupData = JSON.parse(targetDataRaw);
-                            if (confirm(`Seçilen eseri tamamen sıfırlamak istediğinize emin misiniz? (Tüm veriler silinecek)`)) {
+                            let bookId = bottomContainer.querySelector("#admin-bulk-book-select").value;
+                            let target = bottomContainer.querySelector("#admin-bulk-target-select").value;
+                            if (!target) { showToast('Lütfen hedef seçin.', 'error'); return; }
+                            let [type, gKey, mName] = target.split(":");
+                            let data = localStorage.getItem(`hatim_group_${gKey}`);
+                            if (!data) return;
+                            let gData = JSON.parse(data);
+                            if (confirm('Seçilen eseri tamamen sıfırlamak istediğinize emin misiniz?')) {
                                 if (type === "member") {
-                                    targetGroupData.bookPages[selectedBookId].forEach(p => { if (p.owner === mName) { p.owner = ""; p.isRead = false; } });
+                                    gData.bookPages[bookId].forEach(p => { if (p.owner === mName) { p.owner = ""; p.isRead = false; } });
                                 } else if (type === "group") {
-                                    targetGroupData.bookPages[selectedBookId].forEach(p => { p.owner = ""; p.isRead = false; });
+                                    gData.bookPages[bookId].forEach(p => { p.owner = ""; p.isRead = false; });
                                 }
-                                if (targetGroupData.bookHatims && targetGroupData.bookHatims[selectedBookId]) {
-                                    targetGroupData.bookHatims[selectedBookId].hatimNo = 1;
-                                    targetGroupData.bookHatims[selectedBookId].prayerDone = false;
+                                if (gData.bookHatims && gData.bookHatims[bookId]) {
+                                    gData.bookHatims[bookId].hatimNo = 1;
+                                    gData.bookHatims[bookId].prayerDone = false;
                                 }
-                                localStorage.setItem(`hatim_group_${gKey}`, JSON.stringify(targetGroupData));
-                                alert(`"${selectedBookId}" eseri başarıyla sıfırlandı.`);
+                                localStorage.setItem(`hatim_group_${gKey}`, JSON.stringify(gData));
+                                showToast('🔄 Eser sıfırlandı.', 'info');
                                 loadGroupData();
                             }
                         });
                     }
 
-                    const addBookBtn = document.getElementById("admin-add-book-btn");
-                    if (addBookBtn) {
-                        addBookBtn.addEventListener("click", () => {
-                            let bName = prompt("Eser adını girin:");
-                            if (!bName || !bName.trim()) return;
-                            let bUnitsStr = prompt("Toplam sayfa/birim sayısını girin (Örn: 100):", "100");
-                            let bUnits = parseInt(bUnitsStr, 10);
-                            if (isNaN(bUnits) || bUnits <= 0) { alert("Geçersiz birim sayısı!"); return; }
-                            let bTypeInput = prompt("Birim türü nedir? ('sayfa' veya 'bab' yazın)", "sayfa");
-                            let bType = (bTypeInput && bTypeInput.trim().toLowerCase() === "bab") ? "bab" : "page";
-                            let bPdf = prompt("PDF dosya yolunu veya linkini girin (Boş bırakabilirsiniz):", "") || "";
-                            let bId = "book_" + Date.now();
-                            appData.books.push({ id: bId, name: bName.trim(), totalUnits: bUnits, type: bType, defaultMode: bType === "bab" ? "on_bab" : "yirmi_sayfa", currentMode: bType === "bab" ? "on_bab" : "yirmi_sayfa", pdf: bPdf.trim() });
-                            appData.bookPages[bId] = Array(bUnits).fill(null).map(() => ({ owner: "", isRead: false }));
-                            appData.bookHatims[bId] = { hatimNo: 1, startDate: new Date().toLocaleDateString("tr-TR"), prayerDone: false };
-                            appData.bookHistory[bId] = [];
-                            saveGroupData();
-                            loadGroupData();
-                        });
-                    }
+                    // Yeni Eser Ekle
+                    document.getElementById("admin-add-book-btn").addEventListener("click", () => {
+                        let bName = prompt("Eser adı:");
+                        if (!bName?.trim()) return;
+                        let units = parseInt(prompt("Toplam birim sayısı:", "100"));
+                        if (isNaN(units) || units <= 0) { showToast('Geçersiz sayı!', 'error'); return; }
+                        let type = prompt("Birim türü (sayfa/bab):", "sayfa");
+                        let bType = type?.toLowerCase() === "bab" ? "bab" : "page";
+                        let pdf = prompt("PDF yolu (boş bırakabilirsiniz):", "") || "";
+                        let id = "book_" + Date.now();
+                        appData.books.push({ id, name: bName.trim(), totalUnits: units, type: bType, defaultMode: bType === "bab" ? "on_bab" : "yirmi_sayfa", currentMode: bType === "bab" ? "on_bab" : "yirmi_sayfa", pdf });
+                        appData.bookPages[id] = Array(units).fill(null).map(() => ({ owner: "", isRead: false }));
+                        appData.bookHatims[id] = { hatimNo: 1, startDate: new Date().toLocaleDateString("tr-TR"), prayerDone: false };
+                        appData.bookHistory[id] = [];
+                        saveGroupData();
+                        loadGroupData();
+                        showToast('✅ Yeni eser eklendi!', 'success');
+                    });
 
+                    // Eser Düzenle
                     document.querySelectorAll(".admin-edit-book").forEach(btn => {
-                        btn.addEventListener("click", (e) => {
-                            let bId = e.target.getAttribute("data-id");
-                            let bookObj = appData.books.find(b => b.id === bId);
-                            if (!bookObj) return;
-                            let newName = prompt("Eserin yeni adı:", bookObj.name);
+                        btn.addEventListener("click", () => {
+                            let id = btn.getAttribute("data-id");
+                            let book = appData.books.find(b => b.id === id);
+                            if (!book) return;
+                            let newName = prompt("Yeni ad:", book.name);
                             if (newName === null) return;
-                            let newUnitsStr = prompt("Toplam birim/sayfa sayısı:", bookObj.totalUnits);
-                            if (newUnitsStr === null) return;
-                            let newUnits = parseInt(newUnitsStr, 10);
-                            if (newName.trim()) bookObj.name = newName.trim();
+                            let newUnits = parseInt(prompt("Yeni birim sayısı:", book.totalUnits));
                             if (!isNaN(newUnits) && newUnits > 0) {
-                                bookObj.totalUnits = newUnits;
-                                if (!appData.bookPages[bId]) {
-                                    appData.bookPages[bId] = Array(newUnits).fill(null).map(() => ({ owner: "", isRead: false }));
-                                } else if (appData.bookPages[bId].length < newUnits) {
-                                    while (appData.bookPages[bId].length < newUnits) {
-                                        appData.bookPages[bId].push({ owner: "", isRead: false });
+                                book.name = newName.trim();
+                                book.totalUnits = newUnits;
+                                if (!appData.bookPages[id]) {
+                                    appData.bookPages[id] = Array(newUnits).fill(null).map(() => ({ owner: "", isRead: false }));
+                                } else if (appData.bookPages[id].length < newUnits) {
+                                    while (appData.bookPages[id].length < newUnits) {
+                                        appData.bookPages[id].push({ owner: "", isRead: false });
                                     }
                                 } else {
-                                    appData.bookPages[bId] = appData.bookPages[bId].slice(0, newUnits);
+                                    appData.bookPages[id] = appData.bookPages[id].slice(0, newUnits);
                                 }
-                            }
-                            saveGroupData();
-                            loadGroupData();
-                        });
-                    });
-
-                    document.querySelectorAll(".admin-remove-book").forEach(btn => {
-                        btn.addEventListener("click", (e) => {
-                            let bId = e.target.getAttribute("data-id");
-                            let bookObj = appData.books.find(b => b.id === bId);
-                            if (!bookObj) return;
-                            if (confirm(`"${bookObj.name}" eserini silmek istiyor musunuz?`)) {
-                                appData.books = appData.books.filter(b => b.id !== bId);
-                                delete appData.bookPages[bId];
-                                delete appData.bookHatims[bId];
-                                delete appData.bookHistory[bId];
                                 saveGroupData();
                                 loadGroupData();
+                                showToast('✅ Eser güncellendi!', 'success');
                             }
                         });
                     });
 
+                    // Eser Sil
+                    document.querySelectorAll(".admin-remove-book").forEach(btn => {
+                        btn.addEventListener("click", () => {
+                            let id = btn.getAttribute("data-id");
+                            let book = appData.books.find(b => b.id === id);
+                            if (!book) return;
+                            if (confirm(`"${book.name}" silinsin mi?`)) {
+                                appData.books = appData.books.filter(b => b.id !== id);
+                                delete appData.bookPages[id];
+                                delete appData.bookHatims[id];
+                                delete appData.bookHistory[id];
+                                saveGroupData();
+                                loadGroupData();
+                                showToast('🗑️ Eser silindi.', 'info');
+                            }
+                        });
+                    });
+
+                    // Grup İşlemleri
                     document.getElementById("admin-group-select").addEventListener("change", async (e) => {
                         currentGroup = e.target.value;
                         await loadGroupData();
                     });
 
                     document.getElementById("admin-add-group").addEventListener("click", async () => {
-                        let newG = prompt("Yeni grup adı:");
-                        if (newG && newG.trim()) {
-                            let groupKey = newG.trim().toLowerCase().replace(/\s+/g, '_');
-                            let groupPwd = prompt("Bu gruba şifre koymak ister misiniz?:") || "";
-                            currentGroup = groupKey;
-                            const todayStr = new Date().toLocaleDateString("tr-TR");
-                            let freshBooks = JSON.parse(JSON.stringify(defaultBooksTemplate));
-                            let freshPages = {};
-                            let freshHatims = {};
-                            let freshHistory = {};
-                            freshBooks.forEach(defBook => {
-                                freshPages[defBook.id] = Array(defBook.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
-                                freshHatims[defBook.id] = { hatimNo: 1, startDate: todayStr, prayerDone: false };
-                                freshHistory[defBook.id] = [];
+                        let name = prompt("Yeni grup adı:");
+                        if (name?.trim()) {
+                            let key = name.trim().toLowerCase().replace(/\s+/g, '_');
+                            let pwd = prompt("Grup şifresi (boş bırakabilirsiniz):") || "";
+                            currentGroup = key;
+                            const today = new Date().toLocaleDateString("tr-TR");
+                            let books = JSON.parse(JSON.stringify(defaultBooksTemplate));
+                            let pages = {}, hatims = {}, history = {};
+                            books.forEach(b => {
+                                pages[b.id] = Array(b.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
+                                hatims[b.id] = { hatimNo: 1, startDate: today, prayerDone: false };
+                                history[b.id] = [];
                             });
-                            appData = { members: [], password: groupPwd.trim(), books: freshBooks, bookPages: freshPages, bookHatims: freshHatims, bookHistory: freshHistory, readingLogs: [] };
+                            appData = { members: [], password: pwd.trim(), books, bookPages: pages, bookHatims: hatims, bookHistory: history, readingLogs: [] };
                             saveGroupData();
                             await loadGroupData();
+                            showToast('✅ Yeni grup oluşturuldu!', 'success');
                         }
                     });
 
                     document.getElementById("admin-edit-group").addEventListener("click", async () => {
-                        let newName = prompt("Grubun yeni adı:", currentGroup.replace(/_/g, ' '));
-                        if (newName && newName.trim()) {
-                            let newKey = newName.trim().toLowerCase().replace(/\s+/g, '_');
-                            if (newKey !== currentGroup) {
-                                localStorage.setItem(`hatim_group_${newKey}`, JSON.stringify(appData));
+                        let name = prompt("Yeni grup adı:", currentGroup.replace(/_/g, ' '));
+                        if (name?.trim()) {
+                            let key = name.trim().toLowerCase().replace(/\s+/g, '_');
+                            if (key !== currentGroup) {
+                                localStorage.setItem(`hatim_group_${key}`, JSON.stringify(appData));
                                 localStorage.removeItem(`hatim_group_${currentGroup}`);
-                                currentGroup = newKey;
+                                currentGroup = key;
                                 await loadGroupData();
+                                showToast('✅ Grup adı güncellendi!', 'success');
                             }
                         }
                     });
 
                     document.getElementById("admin-delete-group").addEventListener("click", async () => {
-                        if (confirm(`"${currentGroup}" grubunu silmek istiyor musunuz?`)) {
+                        if (confirm(`"${currentGroup}" grubu silinsin mi?`)) {
                             localStorage.removeItem(`hatim_group_${currentGroup}`);
                             let keys = getAllGroupKeys();
-                            currentGroup = keys[0];
+                            currentGroup = keys[0] || "grup_1";
                             await loadGroupData();
+                            showToast('🗑️ Grup silindi.', 'info');
                         }
                     });
 
                     document.getElementById("admin-set-password").addEventListener("click", () => {
-                        let currentPwd = appData.password || "";
-                        let newPwd = prompt("Gruba yeni şifre belirleyin (Kaldırmak için boş bırakın):", currentPwd);
-                        if (newPwd !== null) {
-                            appData.password = newPwd.trim();
+                        let pwd = prompt("Yeni şifre (boş bırakırsanız kaldırılır):", appData.password || "");
+                        if (pwd !== null) {
+                            appData.password = pwd.trim();
                             saveGroupData();
-                            if (appData.password) { alert("Grup şifresi başarıyla tanımlandı."); } else { alert("Grup şifresi kaldırıldı."); }
                             loadGroupData();
+                            showToast(appData.password ? '🔒 Şifre tanımlandı!' : '🔓 Şifre kaldırıldı!', 'info');
                         }
                     });
 
+                    // Üye İşlemleri
                     document.getElementById("admin-add-member").addEventListener("click", async () => {
-                        let mName = prompt("Eklenecek üye adı:");
-                        if (mName && mName.trim()) {
-                            let clean = mName.trim();
+                        let name = prompt("Eklenecek üye adı:");
+                        if (name?.trim()) {
+                            let clean = name.trim();
                             if (!appData.members.includes(clean)) {
                                 appData.members.push(clean);
                                 saveGroupData();
                                 await loadGroupData();
+                                showToast(`✅ ${clean} eklendi!`, 'success');
+                            } else {
+                                showToast('Bu üye zaten var.', 'error');
                             }
                         }
                     });
 
                     document.querySelectorAll(".admin-remove-member").forEach(btn => {
                         btn.addEventListener("click", async (e) => {
-                            let nameToRemove = e.target.getAttribute("data-name");
-                            if (confirm(`"${nameToRemove}" adlı üyeyi çıkartmak istiyor musunuz?`)) {
-                                appData.members = appData.members.filter(m => m !== nameToRemove);
+                            let name = e.target.getAttribute("data-name");
+                            if (confirm(`"${name}" çıkartılsın mı?`)) {
+                                appData.members = appData.members.filter(m => m !== name);
+                                Object.keys(appData.bookPages).forEach(bId => {
+                                    appData.bookPages[bId].forEach(p => {
+                                        if (p.owner === name) { p.owner = ""; p.isRead = false; }
+                                    });
+                                });
                                 saveGroupData();
                                 await loadGroupData();
+                                showToast(`❌ ${name} çıkartıldı.`, 'info');
                             }
                         });
                     });
 
                     document.querySelectorAll(".admin-edit-member").forEach(btn => {
                         btn.addEventListener("click", async (e) => {
-                            let oldName = e.target.getAttribute("data-name");
-                            let editedName = prompt("Yeni ad:", oldName);
-                            if (editedName && editedName.trim() && editedName.trim() !== oldName) {
-                                let cleanNew = editedName.trim();
-                                let idx = appData.members.indexOf(oldName);
+                            let old = e.target.getAttribute("data-name");
+                            let newName = prompt("Yeni ad:", old);
+                            if (newName?.trim() && newName.trim() !== old) {
+                                let clean = newName.trim();
+                                let idx = appData.members.indexOf(old);
                                 if (idx !== -1) {
-                                    appData.members[idx] = cleanNew;
+                                    appData.members[idx] = clean;
                                     Object.keys(appData.bookPages).forEach(bId => {
                                         appData.bookPages[bId].forEach(p => {
-                                            if (p.owner === oldName) p.owner = cleanNew;
+                                            if (p.owner === old) p.owner = clean;
                                         });
                                     });
                                     if (appData.readingLogs) {
                                         appData.readingLogs.forEach(l => {
-                                            if (l.member === oldName) l.member = cleanNew;
+                                            if (l.member === old) l.member = clean;
                                         });
                                     }
                                     saveGroupData();
                                     await loadGroupData();
+                                    showToast(`✅ ${old} → ${clean}`, 'success');
                                 }
                             }
                         });
@@ -1552,7 +1920,7 @@
                 document.getElementById("admin-toggle-btn-custom").addEventListener("click", () => triggerAdminToggle());
                 document.getElementById("send-admin-msg-btn").addEventListener("click", () => {
                     let text = document.getElementById("admin-msg-input").value.trim();
-                    if (!text) return;
+                    if (!text) { showToast('Mesaj yazın!', 'error'); return; }
                     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
                 });
             }
@@ -1566,10 +1934,8 @@
                     analysisContainer = document.createElement("div");
                     analysisContainer.id = "analysis-section";
                     container.appendChild(analysisContainer);
-                } else {
-                    container.appendChild(analysisContainer);
                 }
-                analysisContainer.style.cssText = "margin: 20px 0; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg);";
+                analysisContainer.style.cssText = "margin: 20px 0; padding: 16px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--card-bg);";
 
                 let totalBooks = appData.books.length;
                 let totalTakenUnits = 0, totalReadUnits = 0, totalUnitsAll = 0;
@@ -1585,22 +1951,24 @@
                 let percentRead = totalUnitsAll > 0 ? Math.round((totalReadUnits / totalUnitsAll) * 100) : 0;
 
                 analysisContainer.innerHTML = `
-                    <h3 style="margin-bottom: 10px; font-size: 15px; display: flex; justify-content: space-between; align-items: center;">
-                        <span>📈 Genel Grup İlerleme Paneli</span>
-                        <span style="font-size: 11px; background: #27ae60; color: #fff; padding: 3px 8px; border-radius: 4px;">Grup: ${currentGroup.replace(/_/g, ' ').toUpperCase()}</span>
+                    <h3 style="margin-bottom: 10px; font-size: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <span>📈 Grup İlerleme</span>
+                        <span style="font-size: 12px; background: #27ae60; color: #fff; padding: 4px 12px; border-radius: 20px;">${currentGroup.replace(/_/g, ' ').toUpperCase()}</span>
                     </h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-top: 10px;">
-                        <div style="padding: 10px; border-radius: 6px; border-left: 4px solid #3498db; border: 1px solid var(--border-color);">
-                            <div style="font-size: 11px; opacity: 0.8;">Toplam Eser</div>
-                            <div style="font-size: 17px; font-weight: bold;">${totalBooks} Adet</div>
+                    <div class="analysis-grid">
+                        <div class="analysis-card" style="border-left: 4px solid #3498db;">
+                            <div style="font-size: 12px; opacity: 0.7;">Toplam Eser</div>
+                            <div class="number">${totalBooks}</div>
                         </div>
-                        <div style="padding: 10px; border-radius: 6px; border-left: 4px solid #f39c12; border: 1px solid var(--border-color);">
-                            <div style="font-size: 11px; opacity: 0.8;">Alınan Hisseler</div>
-                            <div style="font-size: 17px; font-weight: bold;">${totalTakenUnits} / ${totalUnitsAll} (%${percentTaken})</div>
+                        <div class="analysis-card" style="border-left: 4px solid #f39c12;">
+                            <div style="font-size: 12px; opacity: 0.7;">Alınan</div>
+                            <div class="number">${totalTakenUnits} / ${totalUnitsAll}</div>
+                            <div style="font-size: 13px; color: #f39c12;">%${percentTaken}</div>
                         </div>
-                        <div style="padding: 10px; border-radius: 6px; border-left: 4px solid #27ae60; border: 1px solid var(--border-color);">
-                            <div style="font-size: 11px; opacity: 0.8;">Okunan Hisseler</div>
-                            <div style="font-size: 17px; font-weight: bold;">${totalReadUnits} / ${totalUnitsAll} (%${percentRead})</div>
+                        <div class="analysis-card" style="border-left: 4px solid #27ae60;">
+                            <div style="font-size: 12px; opacity: 0.7;">Okunan</div>
+                            <div class="number">${totalReadUnits} / ${totalUnitsAll}</div>
+                            <div style="font-size: 13px; color: #27ae60;">%${percentRead}</div>
                         </div>
                     </div>
                 `;
@@ -1610,11 +1978,11 @@
                 if (isAdmin) {
                     isAdmin = false;
                 } else {
-                    const enteredPassword = prompt("Yönetici şifresi:");
-                    if (enteredPassword === ADMIN_PASSWORD) {
+                    const pwd = prompt("Yönetici şifresi:");
+                    if (pwd === ADMIN_PASSWORD) {
                         isAdmin = true;
-                    } else if (enteredPassword !== null) {
-                        alert("Hatalı şifre!");
+                    } else if (pwd !== null) {
+                        showToast('❌ Hatalı şifre!', 'error');
                         return;
                     } else {
                         return;
@@ -1625,6 +1993,7 @@
                 renderAnalysisSection();
                 renderAdminSectionAtBottom();
                 updateAutocompleteLists();
+                showToast(isAdmin ? '🔓 Yönetici modu açıldı!' : '🔐 Yönetici modu kapandı.', 'info');
             }
 
             async function loadGroupData() {
@@ -1685,7 +2054,7 @@
                 renderAnalysisSection();
                 renderAdminSectionAtBottom();
                 updateAutocompleteLists();
-                updateBulkShareVisibility();
+                updateUserInterface();
             }
 
             function saveGroupData() {
