@@ -213,10 +213,10 @@
         <!-- BÖLÜM 4 - ÜST BAŞLIK VE GÖRSEL ALANI -->
         <div id="main-title-ornate-section" style="margin-bottom: 20px; padding: 10px 15px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border: 2px solid #d4af37; border-top: 6px solid #8a6d3b; border-radius: 12px; box-shadow: 0 4px 15px rgba(138, 109, 59, 0.2);">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
-                <div style="flex: 0 0 155px; text-align: center;">
-                    <img src="img/Nebevi.jpg" alt="" style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
+                <div style="flex: 0 0 190px; text-align: center;">
+                    <img src="img/Nebevi.jpg" alt="" style="width: 100%; height: 190px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
                 </div>
-                <div style="flex: 1; min-width: 155px; text-align: center;">
+                <div style="flex: 1; min-width: 200px; text-align: center;">
                     <div style="font-size: 18px; font-weight: bold; margin-bottom: 4px; color: #3e2723;">
                         <span>Ortak Hatim<br>ve<br>Dualarda Buluşuyoruz</span>
                     </div>
@@ -244,36 +244,39 @@
                         <div id="prayerTimesResult" style="font-size: 10px; color: #333; line-height: 1.3;">Vakitler yükleniyor...</div>
                     </div>
                 </div>
-                <div style="flex: 0 0 155px; text-align: center;">
-                    <img src="img/Kabe.jpg" alt="" style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
+                <div style="flex: 0 0 190px; text-align: center;">
+                    <img src="img/Kabe.jpg" alt="" style="width: 100%; height: 190px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
                 </div>
             </div>
         </div>
 
-        <!-- PDF OKUYUCU MODAL -->
-        <div id="pdf-reader-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999999; justify-content: center; align-items: center; padding: 10px; box-sizing: border-box;">
-            <div style="background: var(--card-bg); width: 100%; max-width: 900px; height: 95vh; border-radius: 12px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.4); position: relative;">
-                <!-- Başlık -->
-                <div style="padding: 10px 16px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border-bottom: 2px solid var(--gold-primary); display: flex; justify-content: space-between; align-items: center; color: #3e2723; flex-wrap: wrap; gap: 8px;">
-                    <div style="font-weight: bold; font-size: 15px;">
+        <!-- PDF OKUYUCU MODAL - TAM EKRAN -->
+        <div id="pdf-reader-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; z-index: 999999; justify-content: center; align-items: center; padding: 0; box-sizing: border-box;">
+            <div style="background: #2d2d2d; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.4);">
+                <!-- Başlık - Minimal -->
+                <div style="padding: 8px 16px; background: #1a1a1a; border-bottom: 1px solid #444; display: flex; justify-content: space-between; align-items: center; color: #fff; flex-wrap: wrap; gap: 6px; min-height: 44px;">
+                    <div style="font-weight: bold; font-size: 14px; color: #ddd;">
                         <span id="pdf-modal-title">📄 PDF Okuyucu</span>
                         <span id="pdf-modal-page-info" style="font-size: 12px; opacity: 0.7; margin-left: 8px;"></span>
                     </div>
-                    <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-                        <button id="pdf-prev-btn" style="background: #3498db; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 36px;">◀ Önceki</button>
-                        <span style="font-size: 12px;">Sayfa</span>
-                        <input type="number" id="pdf-page-input" min="1" value="1" style="width: 50px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; text-align: center;">
-                        <span style="font-size: 12px;">/ <span id="pdf-total-pages">1</span></span>
-                        <button id="pdf-next-btn" style="background: #3498db; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 36px;">Sonraki ▶</button>
-                        <button id="pdf-close-btn" style="background: #e74c3c; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 36px;">✕ Kapat</button>
+                    <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                        <button id="pdf-prev-btn" style="background: #444; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px;">◀</button>
+                        <span style="font-size: 12px; color: #aaa;">Sayfa</span>
+                        <input type="number" id="pdf-page-input" min="1" value="1" style="width: 45px; padding: 3px; border: 1px solid #555; border-radius: 4px; font-size: 12px; text-align: center; background: #333; color: #fff;">
+                        <span style="font-size: 12px; color: #aaa;">/ <span id="pdf-total-pages">1</span></span>
+                        <button id="pdf-next-btn" style="background: #444; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px;">▶</button>
+                        <button id="pdf-zoom-in" style="background: #444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px;">🔍+</button>
+                        <button id="pdf-zoom-out" style="background: #444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px;">🔍-</button>
+                        <button id="pdf-fit-btn" style="background: #2980b9; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px;">⬚ Sığdır</button>
+                        <button id="pdf-close-btn" style="background: #e74c3c; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px;">✕</button>
                     </div>
                 </div>
-                <!-- Canvas -->
-                <div style="flex: 1; width: 100%; background: #525659; display: flex; justify-content: center; align-items: center; overflow: auto; padding: 10px;">
-                    <canvas id="pdf-canvas" style="max-width: 100%; max-height: 100%; box-shadow: 0 2px 10px rgba(0,0,0,0.3);"></canvas>
+                <!-- Canvas - Tam Ekran -->
+                <div id="pdf-canvas-container" style="flex: 1; width: 100%; background: #1a1a1a; display: flex; justify-content: center; align-items: center; overflow: auto; padding: 10px; position: relative;">
+                    <canvas id="pdf-canvas" style="max-width: 100%; max-height: 100%; box-shadow: 0 2px 10px rgba(0,0,0,0.3); background: #fff;"></canvas>
                 </div>
                 <!-- Yükleniyor -->
-                <div id="pdf-loading" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 18px; background: rgba(0,0,0,0.6); padding: 20px 30px; border-radius: 8px;">
+                <div id="pdf-loading" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 18px; background: rgba(0,0,0,0.8); padding: 20px 30px; border-radius: 8px; z-index: 10;">
                     ⏳ Yükleniyor...
                 </div>
             </div>
@@ -578,6 +581,7 @@
                     let targetPage = pageNumber || 1;
                     if (targetPage > pdfTotalPages) targetPage = pdfTotalPages;
                     if (targetPage < 1) targetPage = 1;
+                    if (!targetPage || targetPage === 0) targetPage = 1;
                     
                     pdfCurrentPage = targetPage;
                     pageInput.value = targetPage;
@@ -623,6 +627,9 @@
                 const prevBtn = document.getElementById('pdf-prev-btn');
                 const nextBtn = document.getElementById('pdf-next-btn');
                 const pageInput = document.getElementById('pdf-page-input');
+                const zoomInBtn = document.getElementById('pdf-zoom-in');
+                const zoomOutBtn = document.getElementById('pdf-zoom-out');
+                const fitBtn = document.getElementById('pdf-fit-btn');
                 
                 closeBtn.addEventListener('click', function() {
                     modal.style.display = 'none';
@@ -663,15 +670,58 @@
                     }
                 });
                 
-                document.getElementById('pdf-canvas').addEventListener('wheel', function(e) {
-                    e.preventDefault();
-                    if (e.deltaY < 0) {
-                        pdfScale = Math.min(pdfScale + 0.1, 3);
-                    } else {
-                        pdfScale = Math.max(pdfScale - 0.1, 0.5);
+                zoomInBtn.addEventListener('click', function() {
+                    if (pdfDoc) {
+                        pdfScale = Math.min(pdfScale + 0.2, 3);
+                        renderPdfPage(pdfCurrentPage);
                     }
-                    if (pdfDoc) renderPdfPage(pdfCurrentPage);
+                });
+                
+                zoomOutBtn.addEventListener('click', function() {
+                    if (pdfDoc) {
+                        pdfScale = Math.max(pdfScale - 0.2, 0.3);
+                        renderPdfPage(pdfCurrentPage);
+                    }
+                });
+                
+                fitBtn.addEventListener('click', function() {
+                    if (pdfDoc) {
+                        const container = document.getElementById('pdf-canvas-container');
+                        const canvas = document.getElementById('pdf-canvas');
+                        const containerWidth = container.clientWidth - 20;
+                        const containerHeight = container.clientHeight - 20;
+                        
+                        pdfDoc.getPage(pdfCurrentPage).then(function(page) {
+                            const viewport = page.getViewport({ scale: 1 });
+                            const pageWidth = viewport.width;
+                            const pageHeight = viewport.height;
+                            const scaleX = containerWidth / pageWidth;
+                            const scaleY = containerHeight / pageHeight;
+                            pdfScale = Math.min(scaleX, scaleY);
+                            if (pdfScale < 0.3) pdfScale = 0.3;
+                            if (pdfScale > 2) pdfScale = 2;
+                            renderPdfPage(pdfCurrentPage);
+                        });
+                    }
+                });
+                
+                document.getElementById('pdf-canvas-container').addEventListener('wheel', function(e) {
+                    e.preventDefault();
+                    if (pdfDoc) {
+                        if (e.deltaY < 0) {
+                            pdfScale = Math.min(pdfScale + 0.2, 3);
+                        } else {
+                            pdfScale = Math.max(pdfScale - 0.2, 0.3);
+                        }
+                        renderPdfPage(pdfCurrentPage);
+                    }
                 }, { passive: false });
+                
+                window.addEventListener('resize', function() {
+                    if (pdfDoc) {
+                        renderPdfPage(pdfCurrentPage);
+                    }
+                });
             }
 
             // TARİH VE İLHAM FONKSİYONLARI
