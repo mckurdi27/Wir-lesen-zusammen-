@@ -75,6 +75,10 @@
         @media (max-width: 640px) {
             .container { padding: 0 5px; }
             .row-3col { grid-template-columns: 1fr !important; gap: 8px !important; }
+            .login-grid, .login-grid-2, .login-grid-2x3 { grid-template-columns: 1fr !important; gap: 10px !important; }
+            .login-panel { padding: 14px; }
+            .login-submit-row { justify-content: stretch; }
+            .login-join-btn { width: 100%; }
             .book-body { padding: 10px; }
             .book-header { flex-direction: column; align-items: stretch; text-align: center; }
             .mode-btn, .take-range-btn, .read-range-btn, .release-range-btn, .unread-range-btn {
@@ -107,7 +111,108 @@
             body { background-color: #0b1329 !important; color: #f1f5f9 !important; }
         }
 
-        .user-active {
+        
+        .login-panel {
+            margin-bottom: 20px;
+            padding: 20px 22px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 2px solid var(--gold-primary);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        .login-panel-header {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        .login-panel-title {
+            font-size: 17px;
+            font-weight: bold;
+            color: var(--gold-dark);
+        }
+        .login-panel-sub {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        .login-user-icon { font-size: 26px; }
+        .login-user-label { font-size: 13px; opacity: 0.7; }
+        .login-user-group { font-size: 13px; opacity: 0.7; margin-left: 8px; }
+        .login-form-area { display: flex; flex-direction: column; }
+        .login-grid {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1fr;
+            gap: 12px;
+        }
+        .login-grid-2 { grid-template-columns: 1fr 1fr; }
+        .login-grid-2x3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            align-items: end;
+        }
+        .login-field-btn { align-self: stretch; }
+        .login-field-btn .login-join-btn { width: 100%; height: 48px; }
+        .login-field { display: flex; flex-direction: column; gap: 5px; }
+        .login-label {
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--gold-dark);
+        }
+        .login-input {
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--card-bg);
+            color: var(--text-main);
+            width: 100%;
+            box-sizing: border-box;
+            min-height: 48px;
+        }
+        .login-select { cursor: pointer; }
+        
+        .login-submit-row {
+            margin-top: 14px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .login-join-btn {
+            padding: 12px 26px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            min-height: 48px;
+            transition: 0.3s;
+        }
+        .login-join-btn:hover { background: #1e8f4e; }
+        .bulk-share-area {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px dashed var(--border-color);
+        }
+        .bulk-whatsapp-btn {
+            width: 100%;
+            padding: 14px;
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            min-height: 48px;
+        }
+        .bulk-whatsapp-btn:hover { background: #1db958; }
+
+
+.user-active {
             background: linear-gradient(135deg, rgba(39,174,96,0.1), rgba(39,174,96,0.05));
             border: 2px solid #27ae60;
             border-radius: 8px;
@@ -283,53 +388,58 @@
         </div>
 
         <!-- BÖLÜM 5 - GİRİŞ PANELİ -->
-        <div id="simple-login-panel" style="margin-bottom: 20px; padding: 16px 20px; background: var(--card-bg); border-radius: 12px; border: 2px solid var(--gold-primary); box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+        <div id="simple-login-panel" class="login-panel">
             <div id="user-active-area" style="display: none;" class="user-active">
-                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                    <span id="user-icon" style="font-size: 24px;">👤</span>
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span id="user-icon" class="login-user-icon">&#128100;</span>
                     <div>
-                        <span style="font-size: 13px; opacity: 0.7;">Aktif Kullanıcı:</span>
+                        <span class="login-user-label">Aktif Kullanıcı:</span>
                         <span id="active-user-name" class="name">-</span>
-                        <span id="active-user-group" style="font-size: 13px; opacity: 0.7; margin-left: 8px;"></span>
+                        <span id="active-user-group" class="login-user-group"></span>
                     </div>
                 </div>
-                <button id="logout-btn" class="logout-btn">🚪 Çıkış Yap</button>
+                <button id="logout-btn" class="logout-btn">&#128682; Çıkış Yap</button>
             </div>
-            <div id="login-form-area">
-                <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 12px; margin-bottom: 6px; font-weight: bold; font-size: 13px; color: var(--gold-dark);" class="row-3col">
-                    <div>👤 İsim</div>
-                    <div>🔑 Şifre</div>
-                    <div>📂 Tip</div>
-                </div>
-                <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 12px; align-items: center;" class="row-3col">
-                    <input type="text" id="login-user-name" list="user-name-list" placeholder="İsminizi yazın" style="padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box; min-height: 48px;">
-                    <datalist id="user-name-list"></datalist>
-                    <input type="password" id="login-user-password" placeholder="Şifrenizi yazın" style="padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box; min-height: 48px;">
-                    <select id="login-user-type" style="padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box; cursor: pointer; min-height: 48px;">
-                        <option value="bireysel">🧑 Bireysel</option>
-                        <option value="grup">👥 Grup</option>
-                    </select>
-                </div>
-                <div id="login-group-section" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
-                    <div style="display: grid; grid-template-columns: 2fr 2fr; gap: 12px; align-items: center;" class="row-3col">
-                        <div style="position: relative; width: 100%;">
-                            <input type="text" id="login-group-name" list="group-name-list" placeholder="Grup adını yazın" style="padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box; min-height: 48px;">
-                            <datalist id="group-name-list"></datalist>
-                        </div>
-                        <input type="password" id="login-group-password" placeholder="Grup şifresi" style="padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box; min-height: 48px;">
+
+            <div id="login-form-area" class="login-form-area">
+                <div class="login-grid login-grid-2x3">
+                    <div class="login-field">
+                        <label for="login-user-name" class="login-label">&#128100; İsim</label>
+                        <input type="text" id="login-user-name" list="user-name-list" placeholder="İsminizi yazın" class="login-input">
+                        <datalist id="user-name-list"></datalist>
+                    </div>
+                    <div class="login-field">
+                        <label for="login-user-password" class="login-label">&#128274; Şifre</label>
+                        <input type="password" id="login-user-password" placeholder="Şifrenizi yazın" class="login-input">
+                    </div>
+                    <div class="login-field login-field-type">
+                        <label for="login-user-type" class="login-label">&#128100; Tip</label>
+                        <select id="login-user-type" class="login-input login-select">
+                            <option value="bireysel">&#128100; Tek</option>
+                            <option value="grup">&#128101; Grup</option>
+                        </select>
+                    </div>
+                    <div class="login-field">
+                        <label for="login-group-name" class="login-label">&#128101; Grup İsim</label>
+                        <input type="text" id="login-group-name" list="group-name-list" placeholder="Grup adını yazın" class="login-input">
+                        <datalist id="group-name-list"></datalist>
+                    </div>
+                    <div class="login-field">
+                        <label for="login-group-password" class="login-label">&#128274; Grup Şifre</label>
+                        <input type="password" id="login-group-password" placeholder="Grup şifresi" class="login-input">
+                    </div>
+                    <div class="login-field login-field-btn">
+                        <button id="login-join-btn" class="login-join-btn">&#10133; Katıl</button>
                     </div>
                 </div>
-                <div style="margin-top: 12px; display: grid; grid-template-columns: 2fr 1fr; gap: 12px; align-items: center;">
-                    <div></div>
-                    <button id="login-join-btn" style="padding: 12px 14px; background: #27ae60; color: white; border: 1px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; box-sizing: border-box; min-height: 48px; transition: 0.3s;">➕ Katıl</button>
-                </div>
             </div>
-            <div id="bulk-share-area" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
-                <button id="bulk-whatsapp-btn" style="width: 100%; padding: 14px; background: #25D366; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; min-height: 48px;">💬 Tüm Seçtiklerimi WhatsApp'ta Paylaş</button>
+
+            <div id="bulk-share-area" class="bulk-share-area" style="display: none;">
+                <button id="bulk-whatsapp-btn" class="bulk-whatsapp-btn">&#128172; Tüm Seçtiklerimi WhatsApp'ta Paylaş</button>
             </div>
         </div>
 
-        <!-- BÖLÜM 6 - KİTAP LİSTESİ -->
+<!-- BÖLÜM 6 - KİTAP LİSTESİ -->
         <div id="books-grid"></div>
 
         <!-- BÖLÜM 7 - NAMAZ VAKİTLERİ -->
@@ -410,6 +520,7 @@
             let isAdmin = false;
             let appData = null;
             let loggedInMember = "";
+            let loggedInMemberType = "";
             let monthlyInspirationCache = {};
             const ADMIN_PASSWORD = "1234";
 
@@ -1050,8 +1161,7 @@
                     const groupName = currentGroup.replace(/_/g, ' ').toUpperCase();
                     activeGroup.textContent = `📍 ${groupName}`;
                     
-                    const isGroup = appData.members && appData.members.length > 1;
-                    if (isGroup) {
+                    if (loggedInMemberType === 'grup') {
                         userIcon.textContent = '👥';
                         userIcon.title = 'Grup Üyesi';
                     } else {
@@ -1078,13 +1188,11 @@
             });
 
             const typeSelect = document.getElementById('login-user-type');
-            const groupSection = document.getElementById('login-group-section');
             if (typeSelect) {
                 typeSelect.addEventListener('change', function() {
+                    // 2x3 ızgarada tüm alanlar her zaman görünür; gizleme gerekmez.
                     if (this.value === 'grup') {
-                        groupSection.style.display = 'block';
-                    } else {
-                        groupSection.style.display = 'none';
+                        document.getElementById('login-group-name').focus();
                     }
                 });
             }
@@ -1108,7 +1216,9 @@
                             appData.members.push(userName);
                         }
                         loggedInMember = userName;
+                        loggedInMemberType = "bireysel";
                         localStorage.setItem(`hatim_session_${currentGroup}`, userName);
+                        localStorage.setItem(`hatim_session_type_${currentGroup}`, "bireysel");
                         saveGroupData();
                         showToast(`✅ ${userName} bireysel olarak giriş yaptı!`, 'success');
                         updateUserInterface();
@@ -1139,7 +1249,9 @@
                             localStorage.setItem(`hatim_group_${groupKey}`, JSON.stringify(parsed));
                             currentGroup = groupKey;
                             loggedInMember = userName;
+                            loggedInMemberType = "grup";
                             localStorage.setItem(`hatim_session_${groupKey}`, userName);
+                            localStorage.setItem(`hatim_session_type_${groupKey}`, "grup");
                             showToast(`✅ ${userName}, "${groupKey.replace(/_/g, ' ').toUpperCase()}" grubuna katıldı!`, 'success');
                             updateUserInterface();
                             loadGroupData();
@@ -1169,7 +1281,9 @@
                         localStorage.setItem(`hatim_group_${groupKey}`, JSON.stringify(newGroupData));
                         currentGroup = groupKey;
                         loggedInMember = userName;
+                        loggedInMemberType = "grup";
                         localStorage.setItem(`hatim_session_${groupKey}`, userName);
+                        localStorage.setItem(`hatim_session_type_${groupKey}`, "grup");
                         showToast(`✅ "${groupKey.replace(/_/g, ' ').toUpperCase()}" grubu oluşturuldu!`, 'success');
                         updateUserInterface();
                         loadGroupData();
@@ -2590,6 +2704,7 @@
 
                 const savedSession = localStorage.getItem(`hatim_session_${currentGroup}`);
                 loggedInMember = (savedSession && appData.members.includes(savedSession)) ? savedSession : "";
+                loggedInMemberType = localStorage.getItem(`hatim_session_type_${currentGroup}`) || "";
 
                 if (!appData.bookPages) appData.bookPages = {};
                 if (!appData.bookHatims) appData.bookHatims = {};
