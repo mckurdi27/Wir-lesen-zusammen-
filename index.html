@@ -248,7 +248,7 @@
             </div>
         </div>
 
-        <!-- BÖLÜM 5 - GİRİŞ PANELİ -->
+        <!-- BÖLÜM 5 - GİRİŞ PANELİ (DÜZELTİLDİ - KATIL BUTONU HER ZAMAN GÖRÜNÜR) -->
         <div id="simple-login-panel" style="margin-bottom: 20px; padding: 16px 20px; background: var(--card-bg); border-radius: 12px; border: 2px solid var(--gold-primary); box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
             <div id="user-active-area" style="display: none;" class="user-active">
                 <div>
@@ -273,15 +273,20 @@
                         <option value="grup">👥 Grup</option>
                     </select>
                 </div>
+                <!-- GRUP ALANI -->
                 <div id="login-group-section" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
-                    <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 12px; align-items: center;" class="row-3col">
+                    <div style="display: grid; grid-template-columns: 2fr 2fr; gap: 12px; align-items: center;" class="row-3col">
                         <div style="position: relative; width: 100%;">
                             <input type="text" id="login-group-name" list="group-name-list" placeholder="Grup adını yazın" style="padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box; min-height: 48px;">
                             <datalist id="group-name-list"></datalist>
                         </div>
                         <input type="password" id="login-group-password" placeholder="Grup şifresi" style="padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box; min-height: 48px;">
-                        <button id="login-join-btn" style="padding: 12px 14px; background: #27ae60; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; box-sizing: border-box; min-height: 48px; transition: 0.3s;">➕ Katıl</button>
                     </div>
+                </div>
+                <!-- KATIL BUTONU - HER ZAMAN GÖRÜNÜR (grup alanının dışında) -->
+                <div style="margin-top: 12px; display: grid; grid-template-columns: 2fr 1fr; gap: 12px; align-items: center;">
+                    <div></div>
+                    <button id="login-join-btn" style="padding: 12px 14px; background: #27ae60; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; box-sizing: border-box; min-height: 48px; transition: 0.3s;">➕ Katıl</button>
                 </div>
             </div>
             <div id="bulk-share-area" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
@@ -388,17 +393,13 @@
             };
 
             // BÖLÜM-SAYFA EŞLEŞTİRME TABLOSU - 30 BÖLÜMLÜ - MANUEL AYAR
-            // NOT: Tüm kitaplar 30 bölümlüdür. Her bölüm varsayılan olarak
-            // sırasıyla 1, 2, 3, 4 ... 30. sayfaya gider.
-            // İstediğin bölümün sayfa numarasını aşağıda "pages" içinde değiştirebilirsin!
-            // Örnek: 0: 1,    // 1. Bölüm → sayfa 1 (değiştirmek istersen 0: 5 yap)
             const bookSectionPages = {
                 "kuran": {
                     type: "manual",
                     pages: {
-                        0: 1, 1: 22, 2: 42, 3: 62, 4: 82, 5: 102, 6: 122, 7: 142, 8: 162, 9: 182,
-                        10: 202, 11: 222, 12: 242, 13: 262, 14: 282, 15: 302, 16: 322, 17: 342, 18: 362, 19: 382,
-                        20: 402, 21: 422, 22: 442, 23: 462, 24: 482, 25: 502, 26: 522, 27: 542, 28: 562, 29: 582
+                        0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10,
+                        10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20,
+                        20: 21, 21: 22, 22: 23, 23: 24, 24: 25, 25: 26, 26: 27, 27: 28, 28: 29, 29: 30
                     },
                     getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
                 },
@@ -491,7 +492,7 @@
                 window.open(`${pdfPath}#page=${startPage}`, '_blank');
             }
 
-            // TARİH VE İLHAM FONKSİYONLARI
+            // TARİH VE İLHAM FONKSİYONLARI (DÜZELTİLDİ - JSON YOLLARI DOĞRU)
             function bugunkuHicriTarihiAl() {
                 const ayAdlari = {
                     "01": "Muharrem", "02": "Sefer", "03": "Rebiülevvel", "04": "Rebiülahir",
@@ -622,35 +623,106 @@
                 `;
             }
 
-            // MODE YÖNETİMİ
+            // ============================================================
+            // MODE YÖNETİMİ (DÜZELTİLDİ - SADECE SAYI GÖSTERİR)
+            // ============================================================
             function createPageModes(totalPages) {
                 return {
-                    on_sayfa: { name: "10 Bölüm", getItems: () => { let items = [], count = Math.ceil(totalPages / 10); for (let i = 0; i < count; i++) { let start = i * 10, end = Math.min((i + 1) * 10, totalPages); items.push({ id: i + 1, name: `${start+1}-${end}. Bölüm`, start, end }); } return items; }},
-                    bes_sayfa: { name: "5 Bölüm", getItems: () => { let items = [], count = Math.ceil(totalPages / 5); for (let i = 0; i < count; i++) { let start = i * 5, end = Math.min((i + 1) * 5, totalPages); items.push({ id: i + 1, name: `${start+1}-${end}. Bölüm`, start, end }); } return items; }},
-                    bir_sayfa: { name: "1 Bölüm", getItems: () => { let items = []; for (let i = 0; i < totalPages; i++) items.push({ id: i + 1, name: `${i + 1}. Bölüm`, start: i, end: i + 1 }); return items; }}
+                    yirmi_sayfa: { 
+                        name: "20", 
+                        getItems: () => { 
+                            let items = [], count = Math.ceil(totalPages / 20); 
+                            for (let i = 0; i < count; i++) { 
+                                let start = i * 20, end = Math.min((i + 1) * 20, totalPages); 
+                                items.push({ id: i + 1, name: `${i + 1}. Cüz / ${start+1}-${end}`, start, end }); 
+                            } 
+                            return items; 
+                        }
+                    },
+                    on_sayfa: { 
+                        name: "10", 
+                        getItems: () => { 
+                            let items = [], count = Math.ceil(totalPages / 10); 
+                            for (let i = 0; i < count; i++) { 
+                                let start = i * 10, end = Math.min((i + 1) * 10, totalPages); 
+                                items.push({ id: i + 1, name: `${start+1}-${end}`, start, end }); 
+                            } 
+                            return items; 
+                        }
+                    },
+                    bes_sayfa: { 
+                        name: "5", 
+                        getItems: () => { 
+                            let items = [], count = Math.ceil(totalPages / 5); 
+                            for (let i = 0; i < count; i++) { 
+                                let start = i * 5, end = Math.min((i + 1) * 5, totalPages); 
+                                items.push({ id: i + 1, name: `${start+1}-${end}`, start, end }); 
+                            } 
+                            return items; 
+                        }
+                    },
+                    bir_sayfa: { 
+                        name: "1", 
+                        getItems: () => { 
+                            let items = []; 
+                            for (let i = 0; i < totalPages; i++) 
+                                items.push({ id: i + 1, name: `${i + 1}`, start: i, end: i + 1 }); 
+                            return items; 
+                        }
+                    }
                 };
             }
 
             function createBabModes(totalBabs) {
                 return {
-                    on_bab: { name: "10 Bab", getItems: () => { let items = [], count = Math.ceil(totalBabs / 10); for (let i = 0; i < count; i++) { let start = i * 10, end = Math.min((i + 1) * 10, totalBabs); items.push({ id: i + 1, name: `${start + 1}-${end}. Bablar`, start, end }); } return items; }},
-                    bes_bab: { name: "5 Bab", getItems: () => { let items = [], count = Math.ceil(totalBabs / 5); for (let i = 0; i < count; i++) { let start = i * 5, end = Math.min((i + 1) * 5, totalBabs); items.push({ id: i + 1, name: `${start + 1}-${end}. Bablar`, start, end }); } return items; }},
-                    bab: { name: "1 Bab", getItems: () => { let items = []; for (let i = 0; i < totalBabs; i++) items.push({ id: i + 1, name: `${i + 1}. Bab`, start: i, end: i + 1 }); return items; }}
+                    on_bab: { 
+                        name: "10", 
+                        getItems: () => { 
+                            let items = [], count = Math.ceil(totalBabs / 10); 
+                            for (let i = 0; i < count; i++) { 
+                                let start = i * 10, end = Math.min((i + 1) * 10, totalBabs); 
+                                items.push({ id: i + 1, name: `${start + 1}-${end}`, start, end }); 
+                            } 
+                            return items; 
+                        }
+                    },
+                    bes_bab: { 
+                        name: "5", 
+                        getItems: () => { 
+                            let items = [], count = Math.ceil(totalBabs / 5); 
+                            for (let i = 0; i < count; i++) { 
+                                let start = i * 5, end = Math.min((i + 1) * 5, totalBabs); 
+                                items.push({ id: i + 1, name: `${start + 1}-${end}`, start, end }); 
+                            } 
+                            return items; 
+                        }
+                    },
+                    bab: { 
+                        name: "1", 
+                        getItems: () => { 
+                            let items = []; 
+                            for (let i = 0; i < totalBabs; i++) 
+                                items.push({ id: i + 1, name: `${i + 1}`, start: i, end: i + 1 }); 
+                            return items; 
+                        }
+                    }
                 };
             }
 
-            // TÜM KİTAPLAR 30 BÖLÜMLÜ
+            // ============================================================
+            // DEFAULT BOOKS TEMPLATE (ESKİ DEĞERLER - DÜZELTİLDİ)
+            // ============================================================
             const defaultBooksTemplate = [
-                { id: "kuran", name: "📖 1. Kur'ân-ı Kerîm", totalUnits: 30, type: "page", defaultMode: "on_sayfa" },
-                { id: "cevsen", name: "📖 2. Cevşen", totalUnits: 30, type: "bab", defaultMode: "on_bab" },
-                { id: "tevhidname", name: "📖 3. Tevhidnâme Mealli", totalUnits: 30, type: "bab", defaultMode: "on_bab" },
+                { id: "kuran", name: "📖 1. Kur'ân-ı Kerîm", totalUnits: 604, type: "page", defaultMode: "yirmi_sayfa" },
+                { id: "cevsen", name: "📖 2. Cevşen", totalUnits: 100, type: "bab", defaultMode: "on_bab" },
+                { id: "tevhidname", name: "📖 3. Tevhidnâme Mealli", totalUnits: 20, type: "bab", defaultMode: "on_bab" },
                 { id: "celcelutiye", name: "📖 4. Celcelûtiye", totalUnits: 30, type: "bab", defaultMode: "on_bab" },
-                { id: "buyuk_cevsen", name: "📖 5. Büyük Cevşen", totalUnits: 30, type: "page", defaultMode: "on_sayfa" },
-                { id: "ashabi_bedr", name: "📖 6. Ashâb-ı Bedr", totalUnits: 30, type: "page", defaultMode: "on_sayfa" },
-                { id: "dalail", name: "📖 7. Delâilü'l-Hayrât", totalUnits: 30, type: "page", defaultMode: "on_sayfa" },
-                { id: "dua_mecmuasi", name: "📖 8. Dua Mecmuası", totalUnits: 30, type: "page", defaultMode: "on_sayfa" },
-                { id: "dilekce_tr", name: "📖 9. Bir Kırık Dilekçe (TR)", totalUnits: 30, type: "page", defaultMode: "on_sayfa" },
-                { id: "dilekce_ar", name: "📖 10. Bir Kırık Dilekçe (AR)", totalUnits: 30, type: "page", defaultMode: "on_sayfa" }
+                { id: "buyuk_cevsen", name: "📖 5. Büyük Cevşen", totalUnits: 250, type: "page", defaultMode: "yirmi_sayfa" },
+                { id: "ashabi_bedr", name: "📖 6. Ashâb-ı Bedr", totalUnits: 32, type: "page", defaultMode: "on_sayfa" },
+                { id: "dalail", name: "📖 7. Delâilü'l-Hayrât", totalUnits: 160, type: "page", defaultMode: "yirmi_sayfa" },
+                { id: "dua_mecmuasi", name: "📖 8. Dua Mecmuası", totalUnits: 200, type: "page", defaultMode: "yirmi_sayfa" },
+                { id: "dilekce_tr", name: "📖 9. Bir Kırık Dilekçe (TR)", totalUnits: 100, type: "page", defaultMode: "on_sayfa" },
+                { id: "dilekce_ar", name: "📖 10. Bir Kırık Dilekçe (AR)", totalUnits: 100, type: "page", defaultMode: "on_sayfa" }
             ];
 
             const bookModesDefs = {};
@@ -785,6 +857,7 @@
                 });
             }
 
+            // KATIL BUTONU - HER ZAMAN ÇALIŞIR
             const joinBtn = document.getElementById('login-join-btn');
             if (joinBtn) {
                 joinBtn.addEventListener('click', function() {
@@ -883,7 +956,7 @@
                     appData.books.forEach(book => {
                         let baseArray = appData.bookPages[book.id];
                         let defModes = bookModesDefs[book.id];
-                        let primaryKey = book.type === "bab" ? "on_bab" : "on_sayfa";
+                        let primaryKey = book.type === "bab" ? "on_bab" : "yirmi_sayfa";
                         if (!defModes[primaryKey]) primaryKey = Object.keys(defModes)[0];
                         let taken = [];
                         defModes[primaryKey].getItems().forEach(pi => {
@@ -1499,7 +1572,7 @@
 
                 appData.books.forEach((book) => {
                     let baseArray = appData.bookPages[book.id];
-                    let defModes = bookModesDefs[book.id] || createPageModes(book.totalUnits || 30);
+                    let defModes = bookModesDefs[book.id] || createPageModes(book.totalUnits || 100);
                     let modeKeys = Object.keys(defModes);
                     if (!modeKeys.includes(book.currentMode)) book.currentMode = modeKeys[0];
                     let items = defModes[book.currentMode].getItems();
@@ -1867,7 +1940,7 @@
                 let messageSectionHtml = `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
                         <h3 style="font-size: 15px; margin: 0;">📢 Yöneticiye Mesaj</h3>
-                        <button id="admin-toggle-btn-custom" style="padding: 10px 16px; background: ${isAdmin ? '#c0392b' : '#f39c12'}; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">${isAdmin ? '🔓 Mod: AÇIK' : '🔐 Mod: Kapalí'}</button>
+                        <button id="admin-toggle-btn-custom" style="padding: 10px 16px; background: ${isAdmin ? '#c0392b' : '#f39c12'}; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">${isAdmin ? '🔓 Mod: AÇIK' : '🔐 Mod: Kapalı'}</button>
                     </div>
                     <textarea id="admin-msg-input" placeholder="Mesajınızı yazın..." style="width: 100%; height: 60px; padding: 12px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; margin-bottom: 10px; font-size: 14px;"></textarea>
                     <button id="send-admin-msg-btn" style="width: 100%; padding: 14px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 15px; min-height: 48px;">💬 WhatsApp ile Gönder</button>
@@ -2002,17 +2075,17 @@
                     document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         let bName = prompt("Eser adı:");
                         if (!bName?.trim()) return;
-                        let units = parseInt(prompt("Toplam birim sayısı:", "30"));
+                        let units = parseInt(prompt("Toplam birim sayısı:", "100"));
                         if (isNaN(units) || units <= 0) { showToast('Geçersiz sayı!', 'error'); return; }
                         let type = prompt("Birim türü (sayfa/bab):", "sayfa");
                         let bType = type?.toLowerCase() === "bab" ? "bab" : "page";
                         let pdf = prompt("PDF yolu (boş bırakabilirsiniz):", "") || "";
                         let id = "book_" + Date.now();
-                        appData.books.push({ id, name: bName.trim(), totalUnits: units, type: bType, defaultMode: bType === "bab" ? "on_bab" : "on_sayfa", currentMode: bType === "bab" ? "on_bab" : "on_sayfa", pdf });
+                        appData.books.push({ id, name: bName.trim(), totalUnits: units, type: bType, defaultMode: bType === "bab" ? "on_bab" : "yirmi_sayfa", currentMode: bType === "bab" ? "on_bab" : "yirmi_sayfa", pdf });
                         appData.bookPages[id] = Array(units).fill(null).map(() => ({ owner: "", isRead: false }));
                         appData.bookHatims[id] = { hatimNo: 1, startDate: new Date().toLocaleDateString("tr-TR"), prayerDone: false };
                         appData.bookHistory[id] = [];
-                        // bookSectionPages'e yeni kitap ekle
+                        // bookSectionPages'e yeni kitap ekle (sayfa numaralarını otomatik oluştur)
                         bookSectionPages[id] = {
                             type: "manual",
                             pages: {},
