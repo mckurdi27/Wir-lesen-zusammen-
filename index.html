@@ -212,11 +212,11 @@
     <div class="container">
         <!-- BÖLÜM 4 - ÜST BAŞLIK VE GÖRSEL ALANI -->
         <div id="main-title-ornate-section" style="margin-bottom: 20px; padding: 10px 15px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border: 2px solid #d4af37; border-top: 6px solid #8a6d3b; border-radius: 12px; box-shadow: 0 4px 15px rgba(138, 109, 59, 0.2);">
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;">
                 <div style="flex: 0 0 148px; text-align: center;">
                     <img src="img/Nebevi.jpg" alt="" style="width: 100%; height: 220px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
                 </div>
-                <div style="flex: 1; min-width: 200px; text-align: center;">
+                <div style="flex: 0 1 auto; min-width: 220px; text-align: center;">
                     <div style="font-size: 19px; font-weight: bold; margin-bottom: 4px; color: #3e2723;">
                         <span>Ortak Hatim<br>ve<br>Dualarda Buluşuyoruz<br></span>
                     </div>
@@ -587,7 +587,19 @@
                     pageInput.value = targetPage;
                     pageInfo.textContent = `(${targetPage} / ${pdfTotalPages})`;
                     
-                    renderPdfPage(targetPage);
+                    // Açılışta sayfayı kapsayıcıya otomatik sığdır (tam ekran)
+                    const container = document.getElementById('pdf-canvas-container');
+                    const cw = container.clientWidth - 20;
+                    const ch = container.clientHeight - 20;
+                    pdfDoc.getPage(targetPage).then(function(page) {
+                        const vp = page.getViewport({ scale: 1 });
+                        const sx = cw / vp.width;
+                        const sy = ch / vp.height;
+                        pdfScale = Math.min(sx, sy);
+                        if (pdfScale < 0.3) pdfScale = 0.3;
+                        if (pdfScale > 2) pdfScale = 2;
+                        renderPdfPage(targetPage);
+                    });
                     loading.style.display = 'none';
                 }).catch(function(error) {
                     loading.style.display = 'none';
