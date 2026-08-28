@@ -272,7 +272,7 @@
                     </div>
                 </div>
                 <!-- Canvas - Tam Ekran -->
-                <div id="pdf-canvas-container" style="flex: 1; width: 100%; background: #1a1a1a; display: flex; justify-content: center; align-items: center; overflow: auto; padding: 10px; position: relative;">
+                <div id="pdf-canvas-container" style="flex: 1; width: 100%; background: #ffffff; display: flex; justify-content: center; align-items: center; overflow: hidden; padding: 0; position: relative; touch-action: pan-y;">
                     <canvas id="pdf-canvas" style="max-width: 100%; max-height: 100%; box-shadow: 0 2px 10px rgba(0,0,0,0.3); background: #fff;"></canvas>
                 </div>
                 <!-- Yükleniyor -->
@@ -506,15 +506,15 @@
                     
                     // Açılışta sayfayı kapsayıcıya otomatik sığdır (tam ekran)
                     const container = document.getElementById('pdf-canvas-container');
-                    const cw = container.clientWidth - 20;
-                    const ch = container.clientHeight - 20;
+                    const cw = container.clientWidth;
+                    const ch = container.clientHeight;
                     pdfDoc.getPage(targetPage).then(function(page) {
                         const vp = page.getViewport({ scale: 1 });
                         const sx = cw / vp.width;
                         const sy = ch / vp.height;
                         pdfScale = Math.min(sx, sy);
-                        if (pdfScale < 0.3) pdfScale = 0.3;
-                        if (pdfScale > 2) pdfScale = 2;
+                        if (pdfScale < 0.2) pdfScale = 0.2;
+                        if (pdfScale > 3) pdfScale = 3;
                         renderPdfPage(targetPage);
                     });
                     loading.style.display = 'none';
@@ -584,6 +584,52 @@
                         pdfCurrentPage++;
                         renderPdfPage(pdfCurrentPage);
                     }
+                });
+                
+                // Dokunarak sağa/sola kaydırma ile sayfa geçişi
+                let touchStartX = null, touchStartY = null;
+                const swipeContainer = document.getElementById('pdf-canvas-container');
+                swipeContainer.addEventListener('touchstart', function(e) {
+                    if (e.touches.length === 1) {
+                        touchStartX = e.touches[0].clientX;
+                        touchStartY = e.touches[0].clientY;
+                    }
+                }, { passive: true });
+                swipeContainer.addEventListener('touchmove', function(e) {
+                    if (e.touches.length === 1 && touchStartX !== null) {
+                        const dx = Math.abs(e.touches[0].clientX - touchStartX);
+                        const dy = Math.abs(e.touches[0].clientY - touchStartY);
+                        if (dx > dy && dx > 8) { e.preventDefault(); }
+                    }
+                }, { passive: false });
+                swipeContainer.addEventListener('touchend', function(e) {
+                    if (touchStartX === null) return;
+                    const dx = e.changedTouches[0].clientX - touchStartX;
+                    const dy = e.changedTouches[0].clientY - touchStartY;
+                    touchStartX = null; touchStartY = null;
+                    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return;
+                    if (dx < 0 && pdfDoc && pdfCurrentPage < pdfTotalPages) {
+                        pdfCurrentPage++;
+                        renderPdfPage(pdfCurrentPage);
+                    } else if (dx > 0 && pdfDoc && pdfCurrentPage > 1) {
+                        pdfCurrentPage--;
+                        renderPdfPage(pdfCurrentPage);
+                    }
+                }, { passive: true });
+
+                // Pencere yeniden boyutlanınca sayfayı yeniden sığdır
+                window.addEventListener('resize', function() {
+                    if (!pdfDoc || modal.style.display !== 'flex') return;
+                    const c = document.getElementById('pdf-canvas-container');
+                    const cw2 = c.clientWidth, ch2 = c.clientHeight;
+                    pdfDoc.getPage(pdfCurrentPage).then(function(pg) {
+                        const vp2 = pg.getViewport({ scale: 1 });
+                        const sx2 = cw2 / vp2.width, sy2 = ch2 / vp2.height;
+                        pdfScale = Math.min(sx2, sy2);
+                        if (pdfScale < 0.2) pdfScale = 0.2;
+                        if (pdfScale > 3) pdfScale = 3;
+                        renderPdfPage(pdfCurrentPage);
+                    });
                 });
                 
                 pageInput.addEventListener('keypress', function(e) {
