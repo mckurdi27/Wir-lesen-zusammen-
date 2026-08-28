@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Ortak Hatim ve Dua Takip Sistemi</title>
+    <!-- PDF.js Kütüphanesi -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -248,6 +250,35 @@
             </div>
         </div>
 
+        <!-- PDF OKUYUCU MODAL -->
+        <div id="pdf-reader-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999999; justify-content: center; align-items: center; padding: 10px; box-sizing: border-box;">
+            <div style="background: var(--card-bg); width: 100%; max-width: 900px; height: 95vh; border-radius: 12px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.4); position: relative;">
+                <!-- Başlık -->
+                <div style="padding: 10px 16px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border-bottom: 2px solid var(--gold-primary); display: flex; justify-content: space-between; align-items: center; color: #3e2723; flex-wrap: wrap; gap: 8px;">
+                    <div style="font-weight: bold; font-size: 15px;">
+                        <span id="pdf-modal-title">📄 PDF Okuyucu</span>
+                        <span id="pdf-modal-page-info" style="font-size: 12px; opacity: 0.7; margin-left: 8px;"></span>
+                    </div>
+                    <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                        <button id="pdf-prev-btn" style="background: #3498db; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 36px;">◀ Önceki</button>
+                        <span style="font-size: 12px;">Sayfa</span>
+                        <input type="number" id="pdf-page-input" min="1" value="1" style="width: 50px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; text-align: center;">
+                        <span style="font-size: 12px;">/ <span id="pdf-total-pages">1</span></span>
+                        <button id="pdf-next-btn" style="background: #3498db; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 36px;">Sonraki ▶</button>
+                        <button id="pdf-close-btn" style="background: #e74c3c; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 36px;">✕ Kapat</button>
+                    </div>
+                </div>
+                <!-- Canvas -->
+                <div style="flex: 1; width: 100%; background: #525659; display: flex; justify-content: center; align-items: center; overflow: auto; padding: 10px;">
+                    <canvas id="pdf-canvas" style="max-width: 100%; max-height: 100%; box-shadow: 0 2px 10px rgba(0,0,0,0.3);"></canvas>
+                </div>
+                <!-- Yükleniyor -->
+                <div id="pdf-loading" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 18px; background: rgba(0,0,0,0.6); padding: 20px 30px; border-radius: 8px;">
+                    ⏳ Yükleniyor...
+                </div>
+            </div>
+        </div>
+
         <!-- BÖLÜM 5 - GİRİŞ PANELİ -->
         <div id="simple-login-panel" style="margin-bottom: 20px; padding: 16px 20px; background: var(--card-bg); border-radius: 12px; border: 2px solid var(--gold-primary); box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
             <div id="user-active-area" style="display: none;" class="user-active">
@@ -393,9 +424,8 @@
                 "dilekce_ar": "pdf/Bir Kırık Dilekçe Ar.pdf"
             };
 
-            // BÖLÜM-SAYFA EŞLEŞTİRME TABLOSU (DÜZELTİLDİ)
+            // BÖLÜM-SAYFA EŞLEŞTİRME TABLOSU
             const bookSectionPages = {
-                // 1. KUR'ÂN-I KERÎM - 604 Sayfa, 30 Cüz
                 "kuran": {
                     type: "manual",
                     pages: {
@@ -410,7 +440,6 @@
                         return this.pages[unitIndex] || (unitIndex * 20 + 1);
                     }
                 },
-                // 2. CEVŞEN - 100 Bab
                 "cevsen": {
                     type: "manual",
                     pages: {
@@ -436,7 +465,6 @@
                         return this.pages[unitIndex] || (unitIndex * 2 + 3);
                     }
                 },
-                // 3. TEVHİDNÂME MEALLİ - 20 Bab
                 "tevhidname": {
                     type: "manual",
                     pages: {
@@ -449,7 +477,6 @@
                         return this.pages[unitIndex] || (unitIndex * 2 + 1);
                     }
                 },
-                // 4. CELCELÛTİYE - 30 Bab
                 "celcelutiye": {
                     type: "manual",
                     pages: {
@@ -463,7 +490,6 @@
                         return this.pages[unitIndex] || (unitIndex * 3 + 1);
                     }
                 },
-                // 5. BÜYÜK CEVŞEN - 250 Sayfa
                 "buyuk_cevsen": {
                     type: "range",
                     startPage: 1,
@@ -472,7 +498,6 @@
                         return (unitIndex * this.pageSize) + this.startPage;
                     }
                 },
-                // 6. ASHÂB-I BEDR - 32 Sayfa
                 "ashabi_bedr": {
                     type: "range",
                     startPage: 1,
@@ -481,7 +506,6 @@
                         return (unitIndex * this.pageSize) + this.startPage;
                     }
                 },
-                // 7. DELÂİLÜ'L-HAYRÂT - 160 Sayfa
                 "dalail": {
                     type: "range",
                     startPage: 1,
@@ -490,7 +514,6 @@
                         return (unitIndex * this.pageSize) + this.startPage;
                     }
                 },
-                // 8. DUA MECMUASI - 200 Sayfa
                 "dua_mecmuasi": {
                     type: "range",
                     startPage: 1,
@@ -499,7 +522,6 @@
                         return (unitIndex * this.pageSize) + this.startPage;
                     }
                 },
-                // 9. BİR KIRIK DİLEKÇE (TÜRKÇE) - 100 Sayfa
                 "dilekce_tr": {
                     type: "range",
                     startPage: 1,
@@ -508,7 +530,6 @@
                         return (unitIndex * this.pageSize) + this.startPage;
                     }
                 },
-                // 10. BİR KIRIK DİLEKÇE (ARAPÇA) - 100 Sayfa
                 "dilekce_ar": {
                     type: "range",
                     startPage: 1,
@@ -520,23 +541,140 @@
             };
 
             // ============================================================
-            // PDF AÇMA FONKSİYONU (DÜZELTİLDİ)
+            // PDF.JS OKUYUCU FONKSİYONLARI
             // ============================================================
-            function openPdfToPage(bookId, pageNumber) {
+            let pdfDoc = null;
+            let pdfCurrentPage = 1;
+            let pdfTotalPages = 1;
+            let pdfScale = 1.5;
+
+            function openPdfReader(bookId, pageNumber) {
+                const modal = document.getElementById('pdf-reader-modal');
+                const canvas = document.getElementById('pdf-canvas');
+                const ctx = canvas.getContext('2d');
+                const loading = document.getElementById('pdf-loading');
+                const title = document.getElementById('pdf-modal-title');
+                const pageInput = document.getElementById('pdf-page-input');
+                const totalPagesSpan = document.getElementById('pdf-total-pages');
+                const pageInfo = document.getElementById('pdf-modal-page-info');
+                
+                modal.style.display = 'flex';
+                loading.style.display = 'block';
+                
+                const bookName = appData.books.find(b => b.id === bookId)?.name || bookId;
+                title.textContent = `📄 ${bookName}`;
+                
                 let pdfPath = bookPdfMap[bookId] || appData.books.find(b => b.id === bookId)?.pdf || "pdf/Kuran-ı Kerim.pdf";
-                let startPage = pageNumber || 1;
                 
-                // PDF dosyasını sayfa numarası ile aç
-                // #page= sayfa numarasını belirtir (PDF görüntüleyici destekliyorsa)
-                let url = `${pdfPath}#page=${startPage}`;
+                const pdfjsLib = window.pdfjsLib;
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
                 
-                console.log(`📄 PDF açılıyor: ${bookId} - sayfa ${startPage}`);
-                console.log(`🔗 URL: ${url}`);
-                
-                window.open(url, '_blank');
+                pdfjsLib.getDocument(pdfPath).promise.then(function(pdf) {
+                    pdfDoc = pdf;
+                    pdfTotalPages = pdf.numPages;
+                    totalPagesSpan.textContent = pdfTotalPages;
+                    pageInput.max = pdfTotalPages;
+                    
+                    let targetPage = pageNumber || 1;
+                    if (targetPage > pdfTotalPages) targetPage = pdfTotalPages;
+                    if (targetPage < 1) targetPage = 1;
+                    
+                    pdfCurrentPage = targetPage;
+                    pageInput.value = targetPage;
+                    pageInfo.textContent = `(${targetPage} / ${pdfTotalPages})`;
+                    
+                    renderPdfPage(targetPage);
+                    loading.style.display = 'none';
+                }).catch(function(error) {
+                    loading.style.display = 'none';
+                    alert('❌ PDF yüklenemedi! Lütfen dosya yolunu kontrol edin.\n\nHata: ' + error.message);
+                    console.error('PDF yükleme hatası:', error);
+                    modal.style.display = 'none';
+                });
             }
 
-            // TARİH VE İLHAM FONKSİYONLARI (DÜZELTİLDİ - Ü HARFLİ JSON)
+            function renderPdfPage(pageNum) {
+                if (!pdfDoc) return;
+                
+                const canvas = document.getElementById('pdf-canvas');
+                const ctx = canvas.getContext('2d');
+                const pageInfo = document.getElementById('pdf-modal-page-info');
+                const pageInput = document.getElementById('pdf-page-input');
+                
+                pdfDoc.getPage(pageNum).then(function(page) {
+                    const viewport = page.getViewport({ scale: pdfScale });
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    
+                    const renderContext = {
+                        canvasContext: ctx,
+                        viewport: viewport
+                    };
+                    
+                    page.render(renderContext);
+                    pageInfo.textContent = `(${pageNum} / ${pdfTotalPages})`;
+                    pageInput.value = pageNum;
+                });
+            }
+
+            function initPdfReaderEvents() {
+                const modal = document.getElementById('pdf-reader-modal');
+                const closeBtn = document.getElementById('pdf-close-btn');
+                const prevBtn = document.getElementById('pdf-prev-btn');
+                const nextBtn = document.getElementById('pdf-next-btn');
+                const pageInput = document.getElementById('pdf-page-input');
+                
+                closeBtn.addEventListener('click', function() {
+                    modal.style.display = 'none';
+                    pdfDoc = null;
+                });
+                
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        modal.style.display = 'none';
+                        pdfDoc = null;
+                    }
+                });
+                
+                prevBtn.addEventListener('click', function() {
+                    if (pdfDoc && pdfCurrentPage > 1) {
+                        pdfCurrentPage--;
+                        renderPdfPage(pdfCurrentPage);
+                    }
+                });
+                
+                nextBtn.addEventListener('click', function() {
+                    if (pdfDoc && pdfCurrentPage < pdfTotalPages) {
+                        pdfCurrentPage++;
+                        renderPdfPage(pdfCurrentPage);
+                    }
+                });
+                
+                pageInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        let page = parseInt(this.value);
+                        if (pdfDoc && page >= 1 && page <= pdfTotalPages) {
+                            pdfCurrentPage = page;
+                            renderPdfPage(page);
+                        } else {
+                            alert('Geçersiz sayfa numarası! (1-' + pdfTotalPages + ')');
+                            this.value = pdfCurrentPage;
+                        }
+                    }
+                });
+                
+                document.getElementById('pdf-canvas').addEventListener('wheel', function(e) {
+                    e.preventDefault();
+                    if (e.deltaY < 0) {
+                        pdfScale = Math.min(pdfScale + 0.1, 3);
+                    } else {
+                        pdfScale = Math.max(pdfScale - 0.1, 0.5);
+                    }
+                    if (pdfDoc) renderPdfPage(pdfCurrentPage);
+                }, { passive: false });
+            }
+
+            // TARİH VE İLHAM FONKSİYONLARI
             function bugunkuHicriTarihiAl() {
                 const ayAdlari = {
                     "01": "Muharrem", "02": "Sefer", "03": "Rebiülevvel", "04": "Rebiülahir",
@@ -1041,6 +1179,11 @@
                     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
                 }
             });
+
+            // ============================================================
+            // PDF.JS OKUYUCU - OLAY DİNLEYİCİLERİNİ BAŞLAT
+            // ============================================================
+            initPdfReaderEvents();
 
             // ANALİZ PANELİ
             function openDetailedAnalysisModal() {
@@ -1766,24 +1909,13 @@
                     });
                 });
 
-                document.querySelectorAll(".pdf-book-btn").forEach(btn => {
-                    btn.addEventListener("click", (e) => {
-                        e.stopPropagation();
-                        let bookId = btn.getAttribute("data-book-id");
-                        let page = 1;
-                        if (bookSectionPages[bookId] && bookSectionPages[bookId].getPage) {
-                            page = bookSectionPages[bookId].getPage(0);
-                        }
-                        openPdfToPage(bookId, page);
-                    });
-                });
-
-                document.querySelectorAll(".pdf-page-btn").forEach(btn => {
+                // PDF BUTONLARI - PDF.JS OKUYUCUYU AÇAR
+                document.querySelectorAll(".pdf-book-btn, .pdf-page-btn").forEach(btn => {
                     btn.addEventListener("click", function(e) {
                         e.stopPropagation();
                         let bookId = this.getAttribute("data-book-id");
-                        let page = parseInt(this.getAttribute("data-page"), 10);
-                        openPdfToPage(bookId, page);
+                        let page = parseInt(this.getAttribute("data-page")) || 1;
+                        openPdfReader(bookId, page);
                     });
                 });
 
