@@ -519,13 +519,24 @@
                 }
             };
 
+            // ============================================================
+            // PDF AÇMA FONKSİYONU (DÜZELTİLDİ)
+            // ============================================================
             function openPdfToPage(bookId, pageNumber) {
                 let pdfPath = bookPdfMap[bookId] || appData.books.find(b => b.id === bookId)?.pdf || "pdf/Kuran-ı Kerim.pdf";
                 let startPage = pageNumber || 1;
-                window.open(`${pdfPath}#page=${startPage}`, '_blank');
+                
+                // PDF dosyasını sayfa numarası ile aç
+                // #page= sayfa numarasını belirtir (PDF görüntüleyici destekliyorsa)
+                let url = `${pdfPath}#page=${startPage}`;
+                
+                console.log(`📄 PDF açılıyor: ${bookId} - sayfa ${startPage}`);
+                console.log(`🔗 URL: ${url}`);
+                
+                window.open(url, '_blank');
             }
 
-            // TARİH VE İLHAM FONKSİYONLARI
+            // TARİH VE İLHAM FONKSİYONLARI (DÜZELTİLDİ - Ü HARFLİ JSON)
             function bugunkuHicriTarihiAl() {
                 const ayAdlari = {
                     "01": "Muharrem", "02": "Sefer", "03": "Rebiülevvel", "04": "Rebiülahir",
@@ -567,13 +578,15 @@
                 };
                 let filePath = fileMap[ayKodu] || "json/03-rebiülevvel.json";
                 try {
+                    console.log('📂 JSON yükleniyor:', filePath);
                     const response = await fetch(filePath);
-                    if (!response.ok) throw new Error('Dosya bulunamadı');
+                    if (!response.ok) throw new Error(`HTTP hatası: ${response.status}`);
                     const data = await response.json();
                     monthlyInspirationCache[ayKodu] = data;
+                    console.log('✅ JSON yüklendi:', ayKodu);
                     return data;
                 } catch (e) {
-                    console.error('JSON yüklenemedi:', e);
+                    console.error('❌ JSON yüklenemedi:', e);
                     return null;
                 }
             }
@@ -806,9 +819,7 @@
                 return keys;
             }
 
-            // ============================================================
             // AUTCOMPLETE LİSTELERİ (İKONLU)
-            // ============================================================
             function updateAutocompleteLists() {
                 const allMembers = new Map();
                 const allGroups = getAllGroupKeys();
@@ -822,7 +833,6 @@
                                 const isGroup = parsed.members.length > 1;
                                 parsed.members.forEach(m => {
                                     if (allMembers.has(m)) {
-                                        // Zaten varsa ve grup ise ikonu güncelle
                                         if (isGroup) {
                                             allMembers.set(m, '👥');
                                         }
@@ -2483,3 +2493,4 @@
     </script>
 </body>
 </html>
+```
