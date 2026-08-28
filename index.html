@@ -1,17 +1,10 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <!-- ============================================================
-    BÖLÜM 1 - HEAD VE META AYARLARI
-    ============================================================ -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Ortak Hatim ve Dua Takip Sistemi</title>
-    <!-- ============================================================
-    BÖLÜM 2 - CSS STİLLER
-    ============================================================ -->
     <style>
-        /* BÖLÜM 2.1 - Genel Stiller */
         * {
             margin: 0;
             padding: 0;
@@ -50,7 +43,6 @@
             border-radius: 8px;
             font-size: 14px;
         }
-        /* BÖLÜM 2.2 - Kitap Kartları */
         .book-card {
             border: 2px solid var(--gold-primary);
             border-radius: 12px;
@@ -73,12 +65,11 @@
             padding: 16px;
             border-top: 1px solid var(--border-color);
         }
-        /* BÖLÜM 2.3 - Durum Renkleri */
         .status-free { background: rgba(243, 156, 18, 0.15) !important; border-left: 4px solid #f39c12; }
         .status-taken { background: rgba(231, 76, 60, 0.12) !important; border-left: 4px solid #e74c3c; }
         .status-read { background: rgba(39, 174, 96, 0.18) !important; border-left: 4px solid #27ae60; font-weight: bold; }
         .status-mixed { background: rgba(52, 152, 219, 0.1) !important; border-left: 4px solid #3498db; }
-        /* BÖLÜM 2.4 - Mobil Uyum */
+
         @media (max-width: 640px) {
             .container { padding: 0 5px; }
             .row-3col { grid-template-columns: 1fr !important; gap: 8px !important; }
@@ -99,7 +90,6 @@
             button { font-size: 13px; padding: 10px 12px; min-height: 44px; }
             .book-header h3 { font-size: 14px; }
         }
-        /* BÖLÜM 2.5 - Karanlık Mod */
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg-primary: #0b1329;
@@ -114,7 +104,7 @@
             }
             body { background-color: #0b1329 !important; color: #f1f5f9 !important; }
         }
-        /* BÖLÜM 2.6 - Kullanıcı Aktif Alanı */
+
         .user-active {
             background: linear-gradient(135deg, rgba(39,174,96,0.1), rgba(39,174,96,0.05));
             border: 2px solid #27ae60;
@@ -142,7 +132,7 @@
             font-weight: bold;
             font-size: 13px;
         }
-        /* BÖLÜM 2.7 - Analiz Kartları */
+
         .analysis-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -160,7 +150,7 @@
             font-weight: bold;
             margin-top: 4px;
         }
-        /* BÖLÜM 2.8 - Admin Paneli */
+
         .admin-panel-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -181,7 +171,7 @@
         @media (max-width: 640px) {
             .admin-panel-grid { grid-template-columns: 1fr !important; }
         }
-        /* BÖLÜM 2.9 - Toast Mesajları */
+
         .toast {
             position: fixed;
             bottom: 20px;
@@ -203,7 +193,7 @@
         .toast.success { background: #27ae60; }
         .toast.error { background: #e74c3c; }
         .toast.info { background: #2980b9; }
-        /* BÖLÜM 2.10 - Analiz Modal */
+        
         .d-tab-btn.active {
             background: var(--gold-primary) !important;
             color: #fff !important;
@@ -217,21 +207,13 @@
     </style>
 </head>
 <body>
-    <!-- ============================================================
-    BÖLÜM 3 - BODY / CONTAINER
-    ============================================================ -->
     <div class="container">
-        <!-- ============================================================
-        BÖLÜM 4 - ÜST BAŞLIK VE GÖRSEL ALANI (DÜZELTİLMİŞ)
-        ============================================================ -->
+        <!-- BÖLÜM 4 - ÜST BAŞLIK VE GÖRSEL ALANI -->
         <div id="main-title-ornate-section" style="margin-bottom: 20px; padding: 10px 15px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border: 2px solid #d4af37; border-top: 6px solid #8a6d3b; border-radius: 12px; box-shadow: 0 4px 15px rgba(138, 109, 59, 0.2);">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
-                <!-- Sol: Mescid-i Nebevi -->
                 <div style="flex: 0 0 190px; text-align: center;">
                     <img src="img/Nebevi.jpg" alt="" style="width: 100%; height: 190px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
                 </div>
-                
-                <!-- Orta: Başlık ve Namaz Vakitleri -->
                 <div style="flex: 1; min-width: 200px; text-align: center;">
                     <div style="font-size: 18px; font-weight: bold; margin-bottom: 4px; color: #3e2723;">
                         <span>Ortak Hatim<br>ve<br>Dualarda Buluşuyoruz</span>
@@ -239,8 +221,6 @@
                     <div style="font-size: 12px; opacity: 0.85; font-style: italic; margin-bottom: 8px; max-width: 260px; margin-left: auto; margin-right: auto; line-height: 1.4;">
                         Grubunuzu seçin, İsminizi belirleyin ve<br>manevi iklimde ortak hatim halkamıza katılın.
                     </div>
-                    
-                    <!-- NAMAZ VAKİTLERİ - SADECE BİR TANE -->
                     <div style="background: rgba(255,255,255,0.85); padding: 4px 6px; border-radius: 6px; border: 1px solid #d4af37;">
                         <div style="margin-bottom: 4px; display: flex; gap: 4px; justify-content: center; align-items: center; flex-wrap: wrap;">
                             <select id="citySelect" onchange="fetchPrayerTimes()" style="padding: 4px 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 11px; min-height: 32px;">
@@ -262,20 +242,14 @@
                         <div id="prayerTimesResult" style="font-size: 10px; color: #333; line-height: 1.3;">Vakitler yükleniyor...</div>
                     </div>
                 </div>
-                
-                <!-- Sağ: Kabe -->
                 <div style="flex: 0 0 190px; text-align: center;">
                     <img src="img/Kabe.jpg" alt="" style="width: 100%; height: 190px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
                 </div>
             </div>
         </div>
 
-        <!-- ============================================================
-        BÖLÜM 5 - GİRİŞ PANELİ
-        ============================================================ -->
+        <!-- BÖLÜM 5 - GİRİŞ PANELİ -->
         <div id="simple-login-panel" style="margin-bottom: 20px; padding: 16px 20px; background: var(--card-bg); border-radius: 12px; border: 2px solid var(--gold-primary); box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
-            
-            <!-- BÖLÜM 5.1 - Aktif Kullanıcı -->
             <div id="user-active-area" style="display: none;" class="user-active">
                 <div>
                     <span style="font-size: 13px; opacity: 0.7;">👤 Aktif Kullanıcı:</span>
@@ -284,8 +258,6 @@
                 </div>
                 <button id="logout-btn" class="logout-btn">🚪 Çıkış Yap</button>
             </div>
-
-            <!-- BÖLÜM 5.2 - Giriş Formu -->
             <div id="login-form-area">
                 <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 12px; margin-bottom: 6px; font-weight: bold; font-size: 13px; color: var(--gold-dark);" class="row-3col">
                     <div>👤 İsim</div>
@@ -312,22 +284,15 @@
                     </div>
                 </div>
             </div>
-
-            <!-- BÖLÜM 5.3 - WhatsApp Paylaş -->
             <div id="bulk-share-area" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
                 <button id="bulk-whatsapp-btn" style="width: 100%; padding: 14px; background: #25D366; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; min-height: 48px;">💬 Tüm Seçtiklerimi WhatsApp'ta Paylaş</button>
             </div>
-
         </div>
 
-        <!-- ============================================================
-        BÖLÜM 6 - KİTAP LİSTESİ
-        ============================================================ -->
+        <!-- BÖLÜM 6 - KİTAP LİSTESİ -->
         <div id="books-grid"></div>
 
-        <!-- ============================================================
-        BÖLÜM 7 - NAMAZ VAKİTLERİ (SCRIPT)
-        ============================================================ -->
+        <!-- BÖLÜM 7 - NAMAZ VAKİTLERİ -->
         <script>
         async function fetchPrayerTimes() {
             const city = document.getElementById('citySelect').value;
@@ -373,19 +338,11 @@
         </script>
     </div>
 
-    <!-- ============================================================
-    BÖLÜM 8 - TOAST MESAJ
-    ============================================================ -->
     <div id="toast" class="toast"></div>
 
-    <!-- ============================================================
-    BÖLÜM 9 - ANA JAVASCRIPT
-    ============================================================ -->
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
-            // ============================================================
-            // BÖLÜM 9.1 - TOAST FONKSİYONU
-            // ============================================================
+            // TOAST FONKSİYONU
             function showToast(message, type = 'info', duration = 3000) {
                 const toast = document.getElementById('toast');
                 toast.textContent = message;
@@ -394,9 +351,7 @@
                 setTimeout(() => { toast.classList.remove('show'); }, duration);
             }
 
-            // ============================================================
-            // BÖLÜM 9.2 - DEĞİŞKENLER
-            // ============================================================
+            // DEĞİŞKENLER
             let container = document.querySelector(".container");
             if (!container) {
                 container = document.createElement("div");
@@ -418,9 +373,7 @@
             let monthlyInspirationCache = {};
             const ADMIN_PASSWORD = "1234";
 
-            // ============================================================
-            // BÖLÜM 9.3 - PDF HARİTASI VE SAYFA AYARLARI
-            // ============================================================
+            // PDF HARİTASI
             const bookPdfMap = {
                 "kuran": "pdf/Kuran-ı Kerim.pdf",
                 "cevsen": "pdf/Cevşen.pdf",
@@ -434,80 +387,101 @@
                 "dilekce_ar": "pdf/Bir Kırık Dilekçe Ar.pdf"
             };
 
-            // Bölüm-Sayfa Eşleştirme Tablosu
+            // BÖLÜM-SAYFA EŞLEŞTİRME TABLOSU - 30 BÖLÜMLÜ - MANUEL AYAR
+            // NOT: Tüm kitaplar 30 bölümlüdür. Her bölüm varsayılan olarak
+            // sırasıyla 1, 2, 3, 4 ... 30. sayfaya gider.
+            // İstediğin bölümün sayfa numarasını aşağıda "pages" içinde değiştirebilirsin!
+            // Örnek: 0: 1,    // 1. Bölüm → sayfa 1 (değiştirmek istersen 0: 5 yap)
             const bookSectionPages = {
                 "kuran": {
-                    type: "range",
-                    startPage: 1,
-                    pageSize: 20,
-                    getPage: function(unitIndex) {
-                        return (unitIndex * this.pageSize) + this.startPage;
-                    }
+                    type: "manual",
+                    pages: {
+                        0: 1, 1: 22, 2: 42, 3: 62, 4: 82, 5: 102, 6: 122, 7: 142, 8: 162, 9: 182,
+                        10: 202, 11: 222, 12: 242, 13: 262, 14: 282, 15: 302, 16: 322, 17: 342, 18: 362, 19: 382,
+                        20: 402, 21: 422, 22: 442, 23: 462, 24: 482, 25: 502, 26: 522, 27: 542, 28: 562, 29: 582
+                    },
+                    getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
                 },
                 "cevsen": {
                     type: "manual",
-                    pages: { 0: 3, 1: 5, 2: 7, 3: 9 },
-                    getPage: function(unitIndex) {
-                        return this.pages[unitIndex] || (unitIndex * 2 + 3);
-                    }
+                    pages: {
+                        0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10,
+                        10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20,
+                        20: 21, 21: 22, 22: 23, 23: 24, 24: 25, 25: 26, 26: 27, 27: 28, 28: 29, 29: 30
+                    },
+                    getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
                 },
                 "tevhidname": {
                     type: "manual",
-                    pages: { 0: 1, 1: 3, 2: 5 },
-                    getPage: function(unitIndex) {
-                        return this.pages[unitIndex] || (unitIndex + 1);
-                    }
+                    pages: {
+                        0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10,
+                        10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20,
+                        20: 21, 21: 22, 22: 23, 23: 24, 24: 25, 25: 26, 26: 27, 27: 28, 28: 29, 29: 30
+                    },
+                    getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
                 },
                 "celcelutiye": {
                     type: "manual",
-                    pages: { 0: 1, 1: 4, 2: 7 },
-                    getPage: function(unitIndex) {
-                        return this.pages[unitIndex] || (unitIndex * 3 + 1);
-                    }
+                    pages: {
+                        0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10,
+                        10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20,
+                        20: 21, 21: 22, 22: 23, 23: 24, 24: 25, 25: 26, 26: 27, 27: 28, 28: 29, 29: 30
+                    },
+                    getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
                 },
                 "buyuk_cevsen": {
-                    type: "range",
-                    startPage: 1,
-                    pageSize: 10,
-                    getPage: function(unitIndex) {
-                        return (unitIndex * this.pageSize) + this.startPage;
-                    }
+                    type: "manual",
+                    pages: {
+                        0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10,
+                        10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20,
+                        20: 21, 21: 22, 22: 23, 23: 24, 24: 25, 25: 26, 26: 27, 27: 28, 28: 29, 29: 30
+                    },
+                    getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
                 },
                 "ashabi_bedr": {
                     type: "manual",
-                    pages: { 0: 1, 1: 2, 2: 3 },
-                    getPage: function(unitIndex) {
-                        return this.pages[unitIndex] || (unitIndex + 1);
-                    }
+                    pages: {
+                        0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10,
+                        10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20,
+                        20: 21, 21: 22, 22: 23, 23: 24, 24: 25, 25: 26, 26: 27, 27: 28, 28: 29, 29: 30
+                    },
+                    getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
                 },
                 "dalail": {
-                    type: "range",
-                    startPage: 1,
-                    pageSize: 5,
-                    getPage: function(unitIndex) {
-                        return (unitIndex * this.pageSize) + this.startPage;
-                    }
+                    type: "manual",
+                    pages: {
+                        0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10,
+                        10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20,
+                        20: 21, 21: 22, 22: 23, 23: 24, 24: 25, 25: 26, 26: 27, 27: 28, 28: 29, 29: 30
+                    },
+                    getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
                 },
                 "dua_mecmuasi": {
                     type: "manual",
-                    pages: { 0: 1, 1: 4, 2: 8 },
-                    getPage: function(unitIndex) {
-                        return this.pages[unitIndex] || (unitIndex * 4 + 1);
-                    }
+                    pages: {
+                        0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10,
+                        10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20,
+                        20: 21, 21: 22, 22: 23, 23: 24, 24: 25, 25: 26, 26: 27, 27: 28, 28: 29, 29: 30
+                    },
+                    getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
                 },
                 "dilekce_tr": {
                     type: "manual",
-                    pages: { 0: 1, 1: 2, 2: 3 },
-                    getPage: function(unitIndex) {
-                        return this.pages[unitIndex] || (unitIndex + 1);
-                    }
+                    pages: {
+                        0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10,
+                        10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20,
+                        20: 21, 21: 22, 22: 23, 23: 24, 24: 25, 25: 26, 26: 27, 27: 28, 28: 29, 29: 30
+                    },
+                    getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
                 },
                 "dilekce_ar": {
                     type: "manual",
-                    pages: { 0: 1, 1: 2, 2: 3 },
-                    getPage: function(unitIndex) {
-                        return this.pages[unitIndex] || (unitIndex + 1);
-                    }
+                    pages: {
+                        0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10,
+                        10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20,
+                        20: 21, 21: 22, 22: 23, 23: 24, 24: 25, 25: 26, 26: 27, 27: 28, 28: 29, 29: 30
+                    },
+                    getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
                 }
             };
 
@@ -517,9 +491,7 @@
                 window.open(`${pdfPath}#page=${startPage}`, '_blank');
             }
 
-            // ============================================================
-            // BÖLÜM 9.4 - TARİH VE İLHAM FONKSİYONLARI (DÜZELTİLMİŞ)
-            // ============================================================
+            // TARİH VE İLHAM FONKSİYONLARI
             function bugunkuHicriTarihiAl() {
                 const ayAdlari = {
                     "01": "Muharrem", "02": "Sefer", "03": "Rebiülevvel", "04": "Rebiülahir",
@@ -543,10 +515,8 @@
                 }
             }
 
-            // DÜZELTİLMİŞ: JSON dosyaları doğru isimlerle
             async function fetchHijriMonthData(ayKodu) {
                 if (monthlyInspirationCache[ayKodu]) return monthlyInspirationCache[ayKodu];
-                
                 const fileMap = {
                     "01": "json/01-muharrem.json",
                     "02": "json/02-sefer.json",
@@ -652,15 +622,12 @@
                 `;
             }
 
-            // ============================================================
-            // BÖLÜM 9.5 - MODE YÖNETİMİ
-            // ============================================================
+            // MODE YÖNETİMİ
             function createPageModes(totalPages) {
                 return {
-                    yirmi_sayfa: { name: "20 Sayfa", getItems: () => { let items = [], count = Math.ceil(totalPages / 20); for (let i = 0; i < count; i++) { let start = i * 20, end = Math.min((i + 1) * 20, totalPages); items.push({ id: i + 1, name: `${i + 1}. Cüz / ${start+1}-${end}`, start, end }); } return items; }},
-                    on_sayfa: { name: "10 Sayfa", getItems: () => { let items = [], count = Math.ceil(totalPages / 10); for (let i = 0; i < count; i++) { let start = i * 10, end = Math.min((i + 1) * 10, totalPages); items.push({ id: i + 1, name: `${i + 1}. Bölüm / ${start+1}-${end}`, start, end }); } return items; }},
-                    bes_sayfa: { name: "5 Sayfa", getItems: () => { let items = [], count = Math.ceil(totalPages / 5); for (let i = 0; i < count; i++) { let start = i * 5, end = Math.min((i + 1) * 5, totalPages); items.push({ id: i + 1, name: `${i + 1}. Bölüm / ${start+1}-${end}`, start, end }); } return items; }},
-                    bir_sayfa: { name: "1 Sayfa", getItems: () => { let items = []; for (let i = 0; i < totalPages; i++) items.push({ id: i + 1, name: `${i + 1}. Sayfa`, start: i, end: i + 1 }); return items; }}
+                    on_sayfa: { name: "10 Bölüm", getItems: () => { let items = [], count = Math.ceil(totalPages / 10); for (let i = 0; i < count; i++) { let start = i * 10, end = Math.min((i + 1) * 10, totalPages); items.push({ id: i + 1, name: `${start+1}-${end}. Bölüm`, start, end }); } return items; }},
+                    bes_sayfa: { name: "5 Bölüm", getItems: () => { let items = [], count = Math.ceil(totalPages / 5); for (let i = 0; i < count; i++) { let start = i * 5, end = Math.min((i + 1) * 5, totalPages); items.push({ id: i + 1, name: `${start+1}-${end}. Bölüm`, start, end }); } return items; }},
+                    bir_sayfa: { name: "1 Bölüm", getItems: () => { let items = []; for (let i = 0; i < totalPages; i++) items.push({ id: i + 1, name: `${i + 1}. Bölüm`, start: i, end: i + 1 }); return items; }}
                 };
             }
 
@@ -672,17 +639,18 @@
                 };
             }
 
+            // TÜM KİTAPLAR 30 BÖLÜMLÜ
             const defaultBooksTemplate = [
-                { id: "kuran", name: "📖 1. Kur'ân-ı Kerîm", totalUnits: 604, type: "page", defaultMode: "yirmi_sayfa" },
-                { id: "cevsen", name: "📖 2. Cevşen", totalUnits: 100, type: "bab", defaultMode: "on_bab" },
-                { id: "tevhidname", name: "📖 3. Tevhidnâme", totalUnits: 20, type: "bab", defaultMode: "on_bab" },
+                { id: "kuran", name: "📖 1. Kur'ân-ı Kerîm", totalUnits: 30, type: "page", defaultMode: "on_sayfa" },
+                { id: "cevsen", name: "📖 2. Cevşen", totalUnits: 30, type: "bab", defaultMode: "on_bab" },
+                { id: "tevhidname", name: "📖 3. Tevhidnâme Mealli", totalUnits: 30, type: "bab", defaultMode: "on_bab" },
                 { id: "celcelutiye", name: "📖 4. Celcelûtiye", totalUnits: 30, type: "bab", defaultMode: "on_bab" },
-                { id: "buyuk_cevsen", name: "📖 5. Büyük Cevşen", totalUnits: 250, type: "page", defaultMode: "yirmi_sayfa" },
-                { id: "ashabi_bedr", name: "📖 6. Ashâb-ı Bedr", totalUnits: 32, type: "page", defaultMode: "on_sayfa" },
-                { id: "dalail", name: "📖 7. Delâilü'l-Hayrât", totalUnits: 160, type: "page", defaultMode: "yirmi_sayfa" },
-                { id: "dua_mecmuasi", name: "📖 8. Dua Mecmuası", totalUnits: 200, type: "page", defaultMode: "yirmi_sayfa" },
-                { id: "dilekce_tr", name: "📖 9. Bir Kırık Dilekçe (TR)", totalUnits: 100, type: "page", defaultMode: "on_sayfa" },
-                { id: "dilekce_ar", name: "📖 10. Bir Kırık Dilekçe (AR)", totalUnits: 100, type: "page", defaultMode: "on_sayfa" }
+                { id: "buyuk_cevsen", name: "📖 5. Büyük Cevşen", totalUnits: 30, type: "page", defaultMode: "on_sayfa" },
+                { id: "ashabi_bedr", name: "📖 6. Ashâb-ı Bedr", totalUnits: 30, type: "page", defaultMode: "on_sayfa" },
+                { id: "dalail", name: "📖 7. Delâilü'l-Hayrât", totalUnits: 30, type: "page", defaultMode: "on_sayfa" },
+                { id: "dua_mecmuasi", name: "📖 8. Dua Mecmuası", totalUnits: 30, type: "page", defaultMode: "on_sayfa" },
+                { id: "dilekce_tr", name: "📖 9. Bir Kırık Dilekçe (TR)", totalUnits: 30, type: "page", defaultMode: "on_sayfa" },
+                { id: "dilekce_ar", name: "📖 10. Bir Kırık Dilekçe (AR)", totalUnits: 30, type: "page", defaultMode: "on_sayfa" }
             ];
 
             const bookModesDefs = {};
@@ -698,13 +666,10 @@
                 }
             }
 
-            // ============================================================
-            // BÖLÜM 9.6 - GRUP VE KULLANICI YÖNETİMİ
-            // ============================================================
+            // GRUP VE KULLANICI YÖNETİMİ
             function getAllGroupKeys() {
                 let keys = [];
                 let unlockedProtected = JSON.parse(localStorage.getItem("unlocked_protected_groups") || "[]");
-                
                 for (let i = 0; i < localStorage.length; i++) {
                     let key = localStorage.key(i);
                     if (key && key.startsWith("hatim_group_")) {
@@ -777,9 +742,7 @@
                 }
             }
 
-            // ============================================================
-            // BÖLÜM 9.7 - GİRİŞ PANELİ İŞLEVLERİ
-            // ============================================================
+            // GİRİŞ PANELİ İŞLEVLERİ
             function updateUserInterface() {
                 const loginArea = document.getElementById('login-form-area');
                 const userArea = document.getElementById('user-active-area');
@@ -920,7 +883,7 @@
                     appData.books.forEach(book => {
                         let baseArray = appData.bookPages[book.id];
                         let defModes = bookModesDefs[book.id];
-                        let primaryKey = book.type === "bab" ? "on_bab" : "yirmi_sayfa";
+                        let primaryKey = book.type === "bab" ? "on_bab" : "on_sayfa";
                         if (!defModes[primaryKey]) primaryKey = Object.keys(defModes)[0];
                         let taken = [];
                         defModes[primaryKey].getItems().forEach(pi => {
@@ -938,14 +901,11 @@
                 }
             });
 
-            // ============================================================
-            // BÖLÜM 9.8 - ANALİZ PANELİ
-            // ============================================================
+            // ANALİZ PANELİ
             function openDetailedAnalysisModal() {
                 let existingModal = document.getElementById("detailed-analysis-modal");
                 if (existingModal) existingModal.remove();
 
-                // Tüm grupları ve verileri topla
                 let allGroupKeys = getAllGroupKeysForAdmin ? getAllGroupKeysForAdmin() : getAllGroupKeys();
                 let groupStats = [];
                 let allMembers = [];
@@ -982,7 +942,6 @@
                         data: gData
                     });
                     
-                    // Tüm üyeleri topla
                     memberNames.forEach(m => {
                         if (!allMembers.find(a => a.name === m)) {
                             allMembers.push({ name: m, groups: [gKey] });
@@ -1007,7 +966,6 @@
                     overflow-y: auto;
                 `;
 
-                // Grup Seçim HTML'i
                 function getGroupSelectHtml(selected = 'all') {
                     let html = `<option value="all">📁 Tüm Gruplar</option>`;
                     groupStats.forEach(g => {
@@ -1016,7 +974,6 @@
                     return html;
                 }
 
-                // Üye Seçim HTML'i
                 function getMemberSelectHtml(groupName = 'all', selected = 'all') {
                     let members = [];
                     if (groupName === 'all') {
@@ -1034,7 +991,6 @@
                     return html;
                 }
 
-                // Üye Detay Verileri Toplama
                 function getMemberDetailData(memberName, groupName = null) {
                     let result = {
                         name: memberName,
@@ -1112,7 +1068,6 @@
                     return result;
                 }
 
-                // SEKME İÇERİKLERİNİ RENDER ET
                 function renderTab1(groupName = 'all', memberName = 'all') {
                     const container = document.getElementById('dtabs-1-content');
                     let html = '';
@@ -1412,10 +1367,8 @@
                     container.innerHTML = html;
                 }
 
-                // ANA MODAL HTML
                 modalOverlay.innerHTML = `
                     <div style="background: var(--card-bg); color: var(--text-main); width: 100%; max-width: 1100px; max-height: 95vh; border-radius: 16px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.4);">
-                        <!-- BAŞLIK -->
                         <div style="padding: 16px 20px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border-bottom: 2px solid var(--gold-primary); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
                             <div>
                                 <h2 style="margin: 0; font-size: 20px; color: #8a6d3b;">📊 Detaylı Analiz Paneli</h2>
@@ -1426,8 +1379,6 @@
                                 <button id="modal-close-btn" style="background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px;">✕ Kapat</button>
                             </div>
                         </div>
-
-                        <!-- GRUP VE ÜYE SEÇİMİ -->
                         <div style="padding: 12px 20px; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border-color); display: flex; gap: 12px; flex-wrap: wrap;">
                             <div style="flex: 1; min-width: 150px;">
                                 <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">📁 Grup Seç:</label>
@@ -1442,8 +1393,6 @@
                                 </select>
                             </div>
                         </div>
-
-                        <!-- SEKMELER -->
                         <div style="display: flex; gap: 4px; padding: 10px 15px 0 15px; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border-color); overflow-x: auto;">
                             <button class="d-tab-btn active" data-target="dtabs-1" style="padding: 10px 16px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; white-space: nowrap;">📊 Genel Özet</button>
                             <button class="d-tab-btn" data-target="dtabs-2" style="padding: 10px 16px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; white-space: nowrap;">🏆 Grup Sıralama</button>
@@ -1451,8 +1400,6 @@
                             <button class="d-tab-btn" data-target="dtabs-4" style="padding: 10px 16px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; white-space: nowrap;">📚 Eser Detay</button>
                             <button class="d-tab-btn" data-target="dtabs-5" style="padding: 10px 16px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; white-space: nowrap;">📜 Okuma Günlüğü</button>
                         </div>
-
-                        <!-- İÇERİK -->
                         <div style="padding: 20px; overflow-y: auto; flex: 1; font-size: 14px;">
                             <div id="dtabs-1" class="d-tab-content"><div id="dtabs-1-content"></div></div>
                             <div id="dtabs-2" class="d-tab-content" style="display: none;"><div id="dtabs-2-content"></div></div>
@@ -1465,15 +1412,9 @@
 
                 document.body.appendChild(modalOverlay);
 
-                // OLAY DİNLEYİCİLERİ
-                let currentGroupName = 'all';
-                let currentMemberName = 'all';
-
                 function updateAllTabs() {
                     const group = document.getElementById('analysis-group-select').value;
                     const member = document.getElementById('analysis-member-select').value;
-                    currentGroupName = group;
-                    currentMemberName = member;
                     
                     const activeTab = document.querySelector('.d-tab-btn.active');
                     if (activeTab) {
@@ -1523,7 +1464,6 @@
                     });
                 });
 
-                // İlk yükleme
                 renderTab1('all', 'all');
                 renderTab2('all');
                 renderTab3('all', 'all');
@@ -1537,9 +1477,7 @@
                 });
             }
 
-            // ============================================================
-            // BÖLÜM 9.9 - getRangeStatus
-            // ============================================================
+            // getRangeStatus
             function getRangeStatus(baseArray, start, end) {
                 let subset = baseArray.slice(start, end);
                 let allFree = subset.every(p => !p.owner);
@@ -1554,16 +1492,14 @@
                 }
             }
 
-            // ============================================================
-            // BÖLÜM 9.10 - renderBooks
-            // ============================================================
+            // renderBooks
             function renderBooks() {
                 const openBookIds = Array.from(document.querySelectorAll(".book-card.open")).map(el => el.getAttribute("data-book-id"));
                 booksGrid.innerHTML = "";
 
                 appData.books.forEach((book) => {
                     let baseArray = appData.bookPages[book.id];
-                    let defModes = bookModesDefs[book.id] || createPageModes(book.totalUnits || 100);
+                    let defModes = bookModesDefs[book.id] || createPageModes(book.totalUnits || 30);
                     let modeKeys = Object.keys(defModes);
                     if (!modeKeys.includes(book.currentMode)) book.currentMode = modeKeys[0];
                     let items = defModes[book.currentMode].getItems();
@@ -1609,7 +1545,7 @@
                         if (bookSectionPages[book.id] && bookSectionPages[book.id].getPage) {
                             pageNumber = bookSectionPages[book.id].getPage(index);
                         } else {
-                            pageNumber = pi.start + 1;
+                            pageNumber = index + 1;
                         }
 
                         let pdfBtn = `<button class="pdf-page-btn" data-book-id="${book.id}" data-page="${pageNumber}" style="padding: 8px 14px; background: #8e44ad; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px; touch-action: manipulation;">📄 PDF ${pageNumber}</button>`;
@@ -1680,7 +1616,6 @@
                     booksGrid.appendChild(card);
                 });
 
-                // OLAY DİNLEYİCİLERİ
                 document.querySelectorAll(".book-header").forEach(header => {
                     header.addEventListener("click", (e) => {
                         if (e.target.closest(".pdf-book-btn") || e.target.closest(".pdf-page-btn") || e.target.closest("button")) return;
@@ -1810,9 +1745,7 @@
                 });
             }
 
-            // ============================================================
-            // BÖLÜM 9.11 - ADMIN PANELİ
-            // ============================================================
+            // ADMIN PANELİ
             function renderAdminSectionAtBottom() {
                 let bottomContainer = document.getElementById("admin-bottom-section");
                 if (!bottomContainer) {
@@ -1934,7 +1867,7 @@
                 let messageSectionHtml = `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
                         <h3 style="font-size: 15px; margin: 0;">📢 Yöneticiye Mesaj</h3>
-                        <button id="admin-toggle-btn-custom" style="padding: 10px 16px; background: ${isAdmin ? '#c0392b' : '#f39c12'}; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">${isAdmin ? '🔓 Mod: AÇIK' : '🔐 Mod: Kapalı'}</button>
+                        <button id="admin-toggle-btn-custom" style="padding: 10px 16px; background: ${isAdmin ? '#c0392b' : '#f39c12'}; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">${isAdmin ? '🔓 Mod: AÇIK' : '🔐 Mod: Kapalí'}</button>
                     </div>
                     <textarea id="admin-msg-input" placeholder="Mesajınızı yazın..." style="width: 100%; height: 60px; padding: 12px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; margin-bottom: 10px; font-size: 14px;"></textarea>
                     <button id="send-admin-msg-btn" style="width: 100%; padding: 14px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 15px; min-height: 48px;">💬 WhatsApp ile Gönder</button>
@@ -1957,13 +1890,11 @@
                 bottomContainer.innerHTML = `${adminPanelHtml}${messageSectionHtml}`;
 
                 if (isAdmin) {
-                    // ANALİZ BUTONU
                     const analysisBtn = document.getElementById("admin-open-detailed-analysis");
                     if (analysisBtn) {
                         analysisBtn.addEventListener("click", () => { openDetailedAnalysisModal(); });
                     }
 
-                    // TOPLU ATAMA HEDEF SEÇİMİ
                     let targetSelect = bottomContainer.querySelector("#admin-bulk-target-select");
                     if (targetSelect) {
                         let allGroupKeys = getAllGroupKeysForAdmin();
@@ -1992,7 +1923,6 @@
                         targetSelect.innerHTML = optionsHtml;
                     }
 
-                    // TOPLU ATAMA
                     const bulkAssignBtn = bottomContainer.querySelector("#admin-bulk-assign-btn");
                     if (bulkAssignBtn) {
                         bulkAssignBtn.addEventListener("click", () => {
@@ -2019,7 +1949,6 @@
                         });
                     }
 
-                    // TOPLU SİLME
                     const bulkDeleteBtn = bottomContainer.querySelector("#admin-bulk-delete-btn");
                     if (bulkDeleteBtn) {
                         bulkDeleteBtn.addEventListener("click", () => {
@@ -2043,7 +1972,6 @@
                         });
                     }
 
-                    // ESERİ SIFIRLA
                     const bulkResetBtn = bottomContainer.querySelector("#admin-bulk-reset-btn");
                     if (bulkResetBtn) {
                         bulkResetBtn.addEventListener("click", () => {
@@ -2071,26 +1999,35 @@
                         });
                     }
 
-                    // YENİ ESER EKLE
                     document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         let bName = prompt("Eser adı:");
                         if (!bName?.trim()) return;
-                        let units = parseInt(prompt("Toplam birim sayısı:", "100"));
+                        let units = parseInt(prompt("Toplam birim sayısı:", "30"));
                         if (isNaN(units) || units <= 0) { showToast('Geçersiz sayı!', 'error'); return; }
                         let type = prompt("Birim türü (sayfa/bab):", "sayfa");
                         let bType = type?.toLowerCase() === "bab" ? "bab" : "page";
                         let pdf = prompt("PDF yolu (boş bırakabilirsiniz):", "") || "";
                         let id = "book_" + Date.now();
-                        appData.books.push({ id, name: bName.trim(), totalUnits: units, type: bType, defaultMode: bType === "bab" ? "on_bab" : "yirmi_sayfa", currentMode: bType === "bab" ? "on_bab" : "yirmi_sayfa", pdf });
+                        appData.books.push({ id, name: bName.trim(), totalUnits: units, type: bType, defaultMode: bType === "bab" ? "on_bab" : "on_sayfa", currentMode: bType === "bab" ? "on_bab" : "on_sayfa", pdf });
                         appData.bookPages[id] = Array(units).fill(null).map(() => ({ owner: "", isRead: false }));
                         appData.bookHatims[id] = { hatimNo: 1, startDate: new Date().toLocaleDateString("tr-TR"), prayerDone: false };
                         appData.bookHistory[id] = [];
+                        // bookSectionPages'e yeni kitap ekle
+                        bookSectionPages[id] = {
+                            type: "manual",
+                            pages: {},
+                            getPage: function(unitIndex) {
+                                return this.pages[unitIndex] || (unitIndex + 1);
+                            }
+                        };
+                        for (let i = 0; i < units; i++) {
+                            bookSectionPages[id].pages[i] = i + 1;
+                        }
                         saveGroupData();
                         loadGroupData();
                         showToast('✅ Yeni eser eklendi!', 'success');
                     });
 
-                    // ESER DÜZENLE
                     document.querySelectorAll(".admin-edit-book").forEach(btn => {
                         btn.addEventListener("click", () => {
                             let id = btn.getAttribute("data-id");
@@ -2111,6 +2048,21 @@
                                 } else {
                                     appData.bookPages[id] = appData.bookPages[id].slice(0, newUnits);
                                 }
+                                // bookSectionPages'i güncelle
+                                if (!bookSectionPages[id]) {
+                                    bookSectionPages[id] = {
+                                        type: "manual",
+                                        pages: {},
+                                        getPage: function(unitIndex) {
+                                            return this.pages[unitIndex] || (unitIndex + 1);
+                                        }
+                                    };
+                                }
+                                for (let i = 0; i < newUnits; i++) {
+                                    if (!bookSectionPages[id].pages[i]) {
+                                        bookSectionPages[id].pages[i] = i + 1;
+                                    }
+                                }
                                 saveGroupData();
                                 loadGroupData();
                                 showToast('✅ Eser güncellendi!', 'success');
@@ -2118,7 +2070,6 @@
                         });
                     });
 
-                    // ESER SİL
                     document.querySelectorAll(".admin-remove-book").forEach(btn => {
                         btn.addEventListener("click", () => {
                             let id = btn.getAttribute("data-id");
@@ -2129,6 +2080,7 @@
                                 delete appData.bookPages[id];
                                 delete appData.bookHatims[id];
                                 delete appData.bookHistory[id];
+                                delete bookSectionPages[id];
                                 saveGroupData();
                                 loadGroupData();
                                 showToast('🗑️ Eser silindi.', 'info');
@@ -2136,7 +2088,6 @@
                         });
                     });
 
-                    // GRUP İŞLEMLERİ
                     document.getElementById("admin-group-select").addEventListener("change", async (e) => {
                         currentGroup = e.target.value;
                         await loadGroupData();
@@ -2197,7 +2148,6 @@
                         }
                     });
 
-                    // ÜYE İŞLEMLERİ
                     document.getElementById("admin-add-member").addEventListener("click", async () => {
                         let name = prompt("Eklenecek üye adı:");
                         if (name?.trim()) {
@@ -2266,9 +2216,6 @@
                 });
             }
 
-            // ============================================================
-            // BÖLÜM 9.12 - DİĞER FONKSİYONLAR
-            // ============================================================
             function renderAnalysisSection() {
                 let analysisContainer = document.getElementById("analysis-section");
                 if (!analysisContainer) {
@@ -2337,9 +2284,6 @@
                 showToast(isAdmin ? '🔓 Yönetici modu açıldı!' : '🔐 Yönetici modu kapandı.', 'info');
             }
 
-            // ============================================================
-            // BÖLÜM 9.13 - loadGroupData
-            // ============================================================
             async function loadGroupData() {
                 const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
                 appData = savedData ? JSON.parse(savedData) : { members: currentGroup === "grup_1" ? [] : [], password: "" };
@@ -2401,16 +2345,10 @@
                 updateUserInterface();
             }
 
-            // ============================================================
-            // BÖLÜM 9.14 - saveGroupData
-            // ============================================================
             function saveGroupData() {
                 localStorage.setItem(`hatim_group_${currentGroup}`, JSON.stringify(appData));
             }
 
-            // ============================================================
-            // BÖLÜM 9.15 - BAŞLAT
-            // ============================================================
             await loadGroupData();
         });
     </script>
