@@ -248,13 +248,16 @@
             </div>
         </div>
 
-        <!-- BÖLÜM 5 - GİRİŞ PANELİ (DÜZELTİLDİ - KATIL BUTONU HER ZAMAN GÖRÜNÜR) -->
+        <!-- BÖLÜM 5 - GİRİŞ PANELİ -->
         <div id="simple-login-panel" style="margin-bottom: 20px; padding: 16px 20px; background: var(--card-bg); border-radius: 12px; border: 2px solid var(--gold-primary); box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
             <div id="user-active-area" style="display: none;" class="user-active">
-                <div>
-                    <span style="font-size: 13px; opacity: 0.7;">👤 Aktif Kullanıcı:</span>
-                    <span id="active-user-name" class="name">-</span>
-                    <span id="active-user-group" style="font-size: 13px; opacity: 0.7; margin-left: 8px;"></span>
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <span id="user-icon" style="font-size: 24px;">👤</span>
+                    <div>
+                        <span style="font-size: 13px; opacity: 0.7;">Aktif Kullanıcı:</span>
+                        <span id="active-user-name" class="name">-</span>
+                        <span id="active-user-group" style="font-size: 13px; opacity: 0.7; margin-left: 8px;"></span>
+                    </div>
                 </div>
                 <button id="logout-btn" class="logout-btn">🚪 Çıkış Yap</button>
             </div>
@@ -273,7 +276,6 @@
                         <option value="grup">👥 Grup</option>
                     </select>
                 </div>
-                <!-- GRUP ALANI -->
                 <div id="login-group-section" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
                     <div style="display: grid; grid-template-columns: 2fr 2fr; gap: 12px; align-items: center;" class="row-3col">
                         <div style="position: relative; width: 100%;">
@@ -283,7 +285,6 @@
                         <input type="password" id="login-group-password" placeholder="Grup şifresi" style="padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; background: var(--card-bg); color: var(--text-main); width: 100%; box-sizing: border-box; min-height: 48px;">
                     </div>
                 </div>
-                <!-- KATIL BUTONU - HER ZAMAN GÖRÜNÜR (grup alanının dışında) -->
                 <div style="margin-top: 12px; display: grid; grid-template-columns: 2fr 1fr; gap: 12px; align-items: center;">
                     <div></div>
                     <button id="login-join-btn" style="padding: 12px 14px; background: #27ae60; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; box-sizing: border-box; min-height: 48px; transition: 0.3s;">➕ Katıl</button>
@@ -392,97 +393,129 @@
                 "dilekce_ar": "pdf/Bir Kırık Dilekçe Ar.pdf"
             };
 
-            // BÖLÜM-SAYFA EŞLEŞTİRME TABLOSU - 30 BÖLÜMLÜ - MANUEL AYAR
+            // BÖLÜM-SAYFA EŞLEŞTİRME TABLOSU (DÜZELTİLDİ)
             const bookSectionPages = {
+                // 1. KUR'ÂN-I KERÎM - 604 Sayfa, 30 Cüz
                 "kuran": {
                     type: "manual",
                     pages: {
-                        0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10,
-                        10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20,
-                        20: 21, 21: 22, 22: 23, 23: 24, 24: 25, 25: 26, 26: 27, 27: 28, 28: 29, 29: 30
+                        0: 1, 1: 21, 2: 41, 3: 61, 4: 81, 5: 101,
+                        6: 121, 7: 141, 8: 161, 9: 181, 10: 201,
+                        11: 221, 12: 241, 13: 261, 14: 281, 15: 301,
+                        16: 321, 17: 341, 18: 361, 19: 381, 20: 401,
+                        21: 421, 22: 441, 23: 461, 24: 481, 25: 501,
+                        26: 521, 27: 541, 28: 561, 29: 581
                     },
-                    getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
+                    getPage: function(unitIndex) {
+                        return this.pages[unitIndex] || (unitIndex * 20 + 1);
+                    }
                 },
+                // 2. CEVŞEN - 100 Bab
                 "cevsen": {
                     type: "manual",
                     pages: {
-                        0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10,
-                        10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20,
-                        20: 21, 21: 22, 22: 23, 23: 24, 24: 25, 25: 26, 26: 27, 27: 28, 28: 29, 29: 30
+                        0: 3, 1: 5, 2: 7, 3: 9, 4: 11, 5: 13,
+                        6: 15, 7: 17, 8: 19, 9: 21, 10: 23, 11: 25,
+                        12: 27, 13: 29, 14: 31, 15: 33, 16: 35, 17: 37,
+                        18: 39, 19: 41, 20: 43, 21: 45, 22: 47, 23: 49,
+                        24: 51, 25: 53, 26: 55, 27: 57, 28: 59, 29: 61,
+                        30: 63, 31: 65, 32: 67, 33: 69, 34: 71, 35: 73,
+                        36: 75, 37: 77, 38: 79, 39: 81, 40: 83, 41: 85,
+                        42: 87, 43: 89, 44: 91, 45: 93, 46: 95, 47: 97,
+                        48: 99, 49: 101, 50: 103, 51: 105, 52: 107, 53: 109,
+                        54: 111, 55: 113, 56: 115, 57: 117, 58: 119, 59: 121,
+                        60: 123, 61: 125, 62: 127, 63: 129, 64: 131, 65: 133,
+                        66: 135, 67: 137, 68: 139, 69: 141, 70: 143, 71: 145,
+                        72: 147, 73: 149, 74: 151, 75: 153, 76: 155, 77: 157,
+                        78: 159, 79: 161, 80: 163, 81: 165, 82: 167, 83: 169,
+                        84: 171, 85: 173, 86: 175, 87: 177, 88: 179, 89: 181,
+                        90: 183, 91: 185, 92: 187, 93: 189, 94: 191, 95: 193,
+                        96: 195, 97: 197, 98: 199, 99: 201
                     },
-                    getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
+                    getPage: function(unitIndex) {
+                        return this.pages[unitIndex] || (unitIndex * 2 + 3);
+                    }
                 },
+                // 3. TEVHİDNÂME MEALLİ - 20 Bab
                 "tevhidname": {
                     type: "manual",
                     pages: {
-                        0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10,
-                        10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20,
-                        20: 21, 21: 22, 22: 23, 23: 24, 24: 25, 25: 26, 26: 27, 27: 28, 28: 29, 29: 30
+                        0: 1, 1: 3, 2: 5, 3: 7, 4: 9, 5: 11,
+                        6: 13, 7: 15, 8: 17, 9: 19, 10: 21, 11: 23,
+                        12: 25, 13: 27, 14: 29, 15: 31, 16: 33, 17: 35,
+                        18: 37, 19: 39
                     },
-                    getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
+                    getPage: function(unitIndex) {
+                        return this.pages[unitIndex] || (unitIndex * 2 + 1);
+                    }
                 },
+                // 4. CELCELÛTİYE - 30 Bab
                 "celcelutiye": {
                     type: "manual",
                     pages: {
-                        0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10,
-                        10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20,
-                        20: 21, 21: 22, 22: 23, 23: 24, 24: 25, 25: 26, 26: 27, 27: 28, 28: 29, 29: 30
+                        0: 1, 1: 4, 2: 7, 3: 10, 4: 13, 5: 16,
+                        6: 19, 7: 22, 8: 25, 9: 28, 10: 31, 11: 34,
+                        12: 37, 13: 40, 14: 43, 15: 46, 16: 49, 17: 52,
+                        18: 55, 19: 58, 20: 61, 21: 64, 22: 67, 23: 70,
+                        24: 73, 25: 76, 26: 79, 27: 82, 28: 85, 29: 88
                     },
-                    getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
+                    getPage: function(unitIndex) {
+                        return this.pages[unitIndex] || (unitIndex * 3 + 1);
+                    }
                 },
+                // 5. BÜYÜK CEVŞEN - 250 Sayfa
                 "buyuk_cevsen": {
-                    type: "manual",
-                    pages: {
-                        0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10,
-                        10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20,
-                        20: 21, 21: 22, 22: 23, 23: 24, 24: 25, 25: 26, 26: 27, 27: 28, 28: 29, 29: 30
-                    },
-                    getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
+                    type: "range",
+                    startPage: 1,
+                    pageSize: 8,
+                    getPage: function(unitIndex) {
+                        return (unitIndex * this.pageSize) + this.startPage;
+                    }
                 },
+                // 6. ASHÂB-I BEDR - 32 Sayfa
                 "ashabi_bedr": {
-                    type: "manual",
-                    pages: {
-                        0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10,
-                        10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20,
-                        20: 21, 21: 22, 22: 23, 23: 24, 24: 25, 25: 26, 26: 27, 27: 28, 28: 29, 29: 30
-                    },
-                    getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
+                    type: "range",
+                    startPage: 1,
+                    pageSize: 1,
+                    getPage: function(unitIndex) {
+                        return (unitIndex * this.pageSize) + this.startPage;
+                    }
                 },
+                // 7. DELÂİLÜ'L-HAYRÂT - 160 Sayfa
                 "dalail": {
-                    type: "manual",
-                    pages: {
-                        0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10,
-                        10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20,
-                        20: 21, 21: 22, 22: 23, 23: 24, 24: 25, 25: 26, 26: 27, 27: 28, 28: 29, 29: 30
-                    },
-                    getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
+                    type: "range",
+                    startPage: 1,
+                    pageSize: 5,
+                    getPage: function(unitIndex) {
+                        return (unitIndex * this.pageSize) + this.startPage;
+                    }
                 },
+                // 8. DUA MECMUASI - 200 Sayfa
                 "dua_mecmuasi": {
-                    type: "manual",
-                    pages: {
-                        0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10,
-                        10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20,
-                        20: 21, 21: 22, 22: 23, 23: 24, 24: 25, 25: 26, 26: 27, 27: 28, 28: 29, 29: 30
-                    },
-                    getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
+                    type: "range",
+                    startPage: 1,
+                    pageSize: 6,
+                    getPage: function(unitIndex) {
+                        return (unitIndex * this.pageSize) + this.startPage;
+                    }
                 },
+                // 9. BİR KIRIK DİLEKÇE (TÜRKÇE) - 100 Sayfa
                 "dilekce_tr": {
-                    type: "manual",
-                    pages: {
-                        0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10,
-                        10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20,
-                        20: 21, 21: 22, 22: 23, 23: 24, 24: 25, 25: 26, 26: 27, 27: 28, 28: 29, 29: 30
-                    },
-                    getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
+                    type: "range",
+                    startPage: 1,
+                    pageSize: 3,
+                    getPage: function(unitIndex) {
+                        return (unitIndex * this.pageSize) + this.startPage;
+                    }
                 },
+                // 10. BİR KIRIK DİLEKÇE (ARAPÇA) - 100 Sayfa
                 "dilekce_ar": {
-                    type: "manual",
-                    pages: {
-                        0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10,
-                        10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20,
-                        20: 21, 21: 22, 22: 23, 23: 24, 24: 25, 25: 26, 26: 27, 27: 28, 28: 29, 29: 30
-                    },
-                    getPage: function(unitIndex) { return this.pages[unitIndex] || (unitIndex + 1); }
+                    type: "range",
+                    startPage: 1,
+                    pageSize: 3,
+                    getPage: function(unitIndex) {
+                        return (unitIndex * this.pageSize) + this.startPage;
+                    }
                 }
             };
 
@@ -492,7 +525,7 @@
                 window.open(`${pdfPath}#page=${startPage}`, '_blank');
             }
 
-            // TARİH VE İLHAM FONKSİYONLARI (DÜZELTİLDİ - JSON YOLLARI DOĞRU)
+            // TARİH VE İLHAM FONKSİYONLARI
             function bugunkuHicriTarihiAl() {
                 const ayAdlari = {
                     "01": "Muharrem", "02": "Sefer", "03": "Rebiülevvel", "04": "Rebiülahir",
@@ -623,9 +656,7 @@
                 `;
             }
 
-            // ============================================================
-            // MODE YÖNETİMİ (DÜZELTİLDİ - SADECE SAYI GÖSTERİR)
-            // ============================================================
+            // MODE YÖNETİMİ
             function createPageModes(totalPages) {
                 return {
                     yirmi_sayfa: { 
@@ -709,9 +740,6 @@
                 };
             }
 
-            // ============================================================
-            // DEFAULT BOOKS TEMPLATE (ESKİ DEĞERLER - DÜZELTİLDİ)
-            // ============================================================
             const defaultBooksTemplate = [
                 { id: "kuran", name: "📖 1. Kur'ân-ı Kerîm", totalUnits: 604, type: "page", defaultMode: "yirmi_sayfa" },
                 { id: "cevsen", name: "📖 2. Cevşen", totalUnits: 100, type: "bab", defaultMode: "on_bab" },
@@ -778,24 +806,42 @@
                 return keys;
             }
 
+            // ============================================================
+            // AUTCOMPLETE LİSTELERİ (İKONLU)
+            // ============================================================
             function updateAutocompleteLists() {
-                const allMembers = new Set();
+                const allMembers = new Map();
                 const allGroups = getAllGroupKeys();
+                
                 allGroups.forEach(gKey => {
                     const data = localStorage.getItem(`hatim_group_${gKey}`);
                     if (data) {
                         try {
                             const parsed = JSON.parse(data);
                             if (parsed.members) {
-                                parsed.members.forEach(m => allMembers.add(m));
+                                const isGroup = parsed.members.length > 1;
+                                parsed.members.forEach(m => {
+                                    if (allMembers.has(m)) {
+                                        // Zaten varsa ve grup ise ikonu güncelle
+                                        if (isGroup) {
+                                            allMembers.set(m, '👥');
+                                        }
+                                    } else {
+                                        allMembers.set(m, isGroup ? '👥' : '👤');
+                                    }
+                                });
                             }
                         } catch(e) {}
                     }
                 });
+                
                 const nameList = document.getElementById('user-name-list');
                 if (nameList) {
-                    nameList.innerHTML = Array.from(allMembers).map(m => `<option value="${m}">`).join('');
+                    nameList.innerHTML = Array.from(allMembers.entries()).map(([name, icon]) => 
+                        `<option value="${name}">${icon} ${name}</option>`
+                    ).join('');
                 }
+                
                 const groupList = document.getElementById('group-name-list');
                 if (groupList) {
                     const freeGroups = [];
@@ -810,7 +856,7 @@
                             } catch(e) {}
                         }
                     });
-                    groupList.innerHTML = freeGroups.map(g => `<option value="${g}">`).join('');
+                    groupList.innerHTML = freeGroups.map(g => `<option value="${g}">📁 ${g}</option>`).join('');
                 }
             }
 
@@ -820,13 +866,26 @@
                 const userArea = document.getElementById('user-active-area');
                 const activeName = document.getElementById('active-user-name');
                 const activeGroup = document.getElementById('active-user-group');
+                const userIcon = document.getElementById('user-icon');
                 const bulkArea = document.getElementById('bulk-share-area');
 
                 if (loggedInMember) {
                     loginArea.style.display = 'none';
                     userArea.style.display = 'flex';
                     activeName.textContent = loggedInMember;
-                    activeGroup.textContent = `📍 ${currentGroup.replace(/_/g, ' ').toUpperCase()}`;
+                    
+                    const groupName = currentGroup.replace(/_/g, ' ').toUpperCase();
+                    activeGroup.textContent = `📍 ${groupName}`;
+                    
+                    const isGroup = appData.members && appData.members.length > 1;
+                    if (isGroup) {
+                        userIcon.textContent = '👥';
+                        userIcon.title = 'Grup Üyesi';
+                    } else {
+                        userIcon.textContent = '👤';
+                        userIcon.title = 'Bireysel Kullanıcı';
+                    }
+                    
                     bulkArea.style.display = 'block';
                 } else {
                     loginArea.style.display = 'block';
@@ -857,7 +916,6 @@
                 });
             }
 
-            // KATIL BUTONU - HER ZAMAN ÇALIŞIR
             const joinBtn = document.getElementById('login-join-btn');
             if (joinBtn) {
                 joinBtn.addEventListener('click', function() {
@@ -1711,10 +1769,10 @@
                 });
 
                 document.querySelectorAll(".pdf-page-btn").forEach(btn => {
-                    btn.addEventListener("click", (e) => {
+                    btn.addEventListener("click", function(e) {
                         e.stopPropagation();
-                        let bookId = btn.getAttribute("data-book-id");
-                        let page = parseInt(btn.getAttribute("data-page"), 10);
+                        let bookId = this.getAttribute("data-book-id");
+                        let page = parseInt(this.getAttribute("data-page"), 10);
                         openPdfToPage(bookId, page);
                     });
                 });
@@ -2085,7 +2143,6 @@
                         appData.bookPages[id] = Array(units).fill(null).map(() => ({ owner: "", isRead: false }));
                         appData.bookHatims[id] = { hatimNo: 1, startDate: new Date().toLocaleDateString("tr-TR"), prayerDone: false };
                         appData.bookHistory[id] = [];
-                        // bookSectionPages'e yeni kitap ekle (sayfa numaralarını otomatik oluştur)
                         bookSectionPages[id] = {
                             type: "manual",
                             pages: {},
@@ -2121,7 +2178,6 @@
                                 } else {
                                     appData.bookPages[id] = appData.bookPages[id].slice(0, newUnits);
                                 }
-                                // bookSectionPages'i güncelle
                                 if (!bookSectionPages[id]) {
                                     bookSectionPages[id] = {
                                         type: "manual",
