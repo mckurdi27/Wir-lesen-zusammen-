@@ -233,53 +233,53 @@
     BÖLÜM 3 - BODY / CONTAINER
     ============================================================ -->
         <!-- ============================================================
-BÖLÜM 4 - ÜST BAŞLIK VE GÖRSEL ALANI
-============================================================ -->
-<div id="main-title-ornate-section" style="margin-bottom: 20px; padding: 10px 15px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border: 2px solid #d4af37; border-top: 6px solid #8a6d3b; border-radius: 12px; box-shadow: 0 4px 15px rgba(138, 109, 59, 0.2);">
-    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
-        <!-- Sol: Mescid-i Nebevi -->
-        <div style="flex: 0 0 190px; text-align: center;">
-            <img src="img/Nebevi.jpg" alt="" style="width: 100%; height: 190px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
-        </div>
+		BÖLÜM 4 - ÜST BAŞLIK VE GÖRSEL ALANI
+		============================================================ -->
+		<div id="main-title-ornate-section" style="margin-bottom: 20px; padding: 10px 15px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border: 2px solid #d4af37; border-top: 6px solid #8a6d3b; border-radius: 12px; box-shadow: 0 4px 15px rgba(138, 109, 59, 0.2);">
+		    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+		        <!-- Sol: Mescid-i Nebevi -->
+		        <div style="flex: 0 0 190px; text-align: center;">
+		            <img src="img/Nebevi.jpg" alt="" style="width: 100%; height: 190px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
+		        </div>
         
-        <!-- Orta: Başlık ve Namaz Vakitleri -->
-        <div style="flex: 1; min-width: 200px; text-align: center;">
-            <div style="font-size: 18px; font-weight: bold; margin-bottom: 4px; color: #3e2723;">
-                <span>Ortak Hatim<br>ve<br>Dualarda Buluşuyoruz</span>
-            </div>
-            <div style="font-size: 12px; opacity: 0.85; font-style: italic; margin-bottom: 8px; max-width: 260px; margin-left: auto; margin-right: auto; line-height: 1.4;">
-                Grubunuzu seçin, İsminizi belirleyin ve<br>manevi iklimde ortak hatim halkamıza katılın.
-            </div>
+		       <!-- Orta: Başlık ve Namaz Vakitleri -->
+		        <div style="flex: 1; min-width: 200px; text-align: center;">
+		            <div style="font-size: 18px; font-weight: bold; margin-bottom: 4px; color: #3e2723;">
+		              <span>Ortak Hatim<br>ve<br>Dualarda Buluşuyoruz</span>
+		           </div>
+		         <div style="font-size: 12px; opacity: 0.85; font-style: italic; margin-bottom: 8px; max-width: 260px; margin-left: auto; margin-right: auto; line-height: 1.4;">
+		              Grubunuzu seçin, İsminizi belirleyin ve<br>manevi iklimde ortak hatim halkamıza katılın.
+		          </div>
             
-            <!-- NAMAZ VAKİTLERİ - SADECE BİR TANE -->
-            <div style="background: rgba(255,255,255,0.85); padding: 4px 6px; border-radius: 6px; border: 1px solid #d4af37;">
-                <div style="margin-bottom: 4px; display: flex; gap: 4px; justify-content: center; align-items: center; flex-wrap: wrap;">
-                    <select id="citySelect" onchange="fetchPrayerTimes()" style="padding: 4px 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 11px; min-height: 32px;">
-                        <option value="Istanbul">İstanbul</option>
-                        <option value="Ankara">Ankara</option>
-                        <option value="Izmir">İzmir</option>
-                        <option value="Berlin">Berlin</option>
-                        <option value="Frankfurt">Frankfurt</option>
-                        <option value="Makkah">Mekke</option>
-                        <option value="Madinah">Medine</option>
-                        <option value="London">Londra</option>
-                        <option value="Paris">Paris</option>
-                        <option value="Amsterdam">Amsterdam</option>
-                        <option value="Vienna">Viyana</option>
-                        <option value="New York">New York</option>
-                    </select>
-                    <button onclick="fetchPrayerTimesByGPS()" style="padding: 4px 8px; border-radius: 4px; background: #27ae60; color: white; border: none; cursor: pointer; font-size: 10px; font-weight: bold; min-height: 32px;">📍 GPS</button>
-                </div>
-                <div id="prayerTimesResult" style="font-size: 10px; color: #333; line-height: 1.3;">Vakitler yükleniyor...</div>
-            </div>
-        </div>
+		           <!-- NAMAZ VAKİTLERİ - SADECE BİR TANE -->
+		           <div style="background: rgba(255,255,255,0.85); padding: 4px 6px; border-radius: 6px; border: 1px solid #d4af37;">
+		                <div style="margin-bottom: 4px; display: flex; gap: 4px; justify-content: center; align-items: center; flex-wrap: wrap;">
+		                    <select id="citySelect" onchange="fetchPrayerTimes()" style="padding: 4px 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 11px; min-height: 32px;">
+    		                   <option value="Istanbul">İstanbul</option>
+                    		   <option value="Ankara">Ankara</option>
+                    		   <option value="Izmir">İzmir</option>
+                               <option value="Berlin">Berlin</option>
+    		                   <option value="Frankfurt">Frankfurt</option>
+            		           <option value="Makkah">Mekke</option>
+    						   <option value="Madinah">Medine</option>
+                               <option value="London">Londra</option>
+    		                   <option value="Paris">Paris</option>
+    		                   <option value="Amsterdam">Amsterdam</option>
+		                       <option value="Vienna">Viyana</option>
+    		                   <option value="New York">New York</option>
+		                  </select>
+		                   <button onclick="fetchPrayerTimesByGPS()" style="padding: 4px 8px; border-radius: 4px; background: #27ae60; color: white; border: none; cursor: pointer; font-size: 10px; font-weight: bold; min-height: 32px;">📍 GPS</button>
+		                </div>
+		                <div id="prayerTimesResult" style="font-size: 10px; color: #333; line-height: 1.3;">Vakitler yükleniyor...</div>
+		            </div>
+		        </div>
         
-        <!-- Sağ: Kabe -->
-        <div style="flex: 0 0 190px; text-align: center;">
-            <img src="img/Kabe.jpg" alt="" style="width: 100%; height: 190px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
-        </div>
-    </div>
-</div>
+		        <!-- Sağ: Kabe -->
+		        <div style="flex: 0 0 190px; text-align: center;">
+		           <img src="img/Kabe.jpg" alt="" style="width: 100%; height: 190px; object-fit: cover; border-radius: 4px; border: 1px solid #d4af37; display: block;">
+		       </div>
+		   </div>
+		</div>
         <!-- ============================================================
         BÖLÜM 5 - GİRİŞ PANELİ
         ============================================================ -->
