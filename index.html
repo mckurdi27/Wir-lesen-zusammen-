@@ -1,13 +1,29 @@
+    <!-- ============================================================
+     Bölüm İçerik
+     1 Head ve Meta Ayarları
+     2 CSS Stiller (2.1-2.10)
+     3 Body / Container
+     4 Üst Başlık ve Görsel Alanı
+     5 Giriş Paneli (5.1-5.3)
+     6 Kitap Listesi
+     7 Namaz Vakitleri
+     8 Toast Mesaj
+     9 Ana JavaScript (9.1-9.15)
+    ============================================================ -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+    <!-- ============================================================
+    BÖLÜM 1 - HEAD VE META AYARLARI
+    ============================================================ -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Ortak Hatim ve Dua Takip Sistemi</title>
+    <!-- ============================================================
+    BÖLÜM 2 - CSS STİLLER
+    ============================================================ -->
     <style>
-        /* ============================================================
-           GENEL STİLLER
-           ============================================================ */
+        /* BÖLÜM 2.1 - Genel Stiller */
         * {
             margin: 0;
             padding: 0;
@@ -46,6 +62,7 @@
             border-radius: 8px;
             font-size: 14px;
         }
+        /* BÖLÜM 2.2 - Kitap Kartları */
         .book-card {
             border: 2px solid var(--gold-primary);
             border-radius: 12px;
@@ -68,11 +85,12 @@
             padding: 16px;
             border-top: 1px solid var(--border-color);
         }
+        /* BÖLÜM 2.3 - Durum Renkleri */
         .status-free { background: rgba(243, 156, 18, 0.15) !important; border-left: 4px solid #f39c12; }
         .status-taken { background: rgba(231, 76, 60, 0.12) !important; border-left: 4px solid #e74c3c; }
         .status-read { background: rgba(39, 174, 96, 0.18) !important; border-left: 4px solid #27ae60; font-weight: bold; }
         .status-mixed { background: rgba(52, 152, 219, 0.1) !important; border-left: 4px solid #3498db; }
-
+        /* BÖLÜM 2.4 - Mobil Uyum */
         @media (max-width: 640px) {
             .container { padding: 0 5px; }
             .row-3col { grid-template-columns: 1fr !important; gap: 8px !important; }
@@ -93,6 +111,7 @@
             button { font-size: 13px; padding: 10px 12px; min-height: 44px; }
             .book-header h3 { font-size: 14px; }
         }
+        /* BÖLÜM 2.5 - Karanlık Mod */
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg-primary: #0b1329;
@@ -107,7 +126,7 @@
             }
             body { background-color: #0b1329 !important; color: #f1f5f9 !important; }
         }
-
+        /* BÖLÜM 2.6 - Kullanıcı Aktif Alanı */
         .user-active {
             background: linear-gradient(135deg, rgba(39,174,96,0.1), rgba(39,174,96,0.05));
             border: 2px solid #27ae60;
@@ -135,7 +154,7 @@
             font-weight: bold;
             font-size: 13px;
         }
-
+        /* BÖLÜM 2.7 - Analiz Kartları */
         .analysis-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -153,7 +172,7 @@
             font-weight: bold;
             margin-top: 4px;
         }
-
+        /* BÖLÜM 2.8 - Admin Paneli */
         .admin-panel-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -174,7 +193,7 @@
         @media (max-width: 640px) {
             .admin-panel-grid { grid-template-columns: 1fr !important; }
         }
-
+        /* BÖLÜM 2.9 - Toast Mesajları */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -196,8 +215,7 @@
         .toast.success { background: #27ae60; }
         .toast.error { background: #e74c3c; }
         .toast.info { background: #2980b9; }
-        
-        /* Analiz Modal stilleri */
+        /* BÖLÜM 2.10 - Analiz Modal */
         .d-tab-btn.active {
             background: var(--gold-primary) !important;
             color: #fff !important;
@@ -211,8 +229,13 @@
     </style>
 </head>
 <body>
+    <!-- ============================================================
+    BÖLÜM 3 - BODY / CONTAINER
+    ============================================================ -->
     <div class="container">
-        <!-- ÜST BAŞLIK VE GÖRSEL ALANI -->
+        <!-- ============================================================
+        BÖLÜM 4 - ÜST BAŞLIK VE GÖRSEL ALANI
+        ============================================================ -->
         <div id="main-title-ornate-section" style="margin-bottom: 20px; padding: 10px 15px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border: 2px solid #d4af37; border-top: 6px solid #8a6d3b; border-radius: 12px; box-shadow: 0 4px 15px rgba(138, 109, 59, 0.2);">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
                 <div style="flex: 0 0 190px; text-align: center;">
@@ -252,9 +275,12 @@
             </div>
         </div>
 
-        <!-- GİRİŞ PANELİ -->
+        <!-- ============================================================
+        BÖLÜM 5 - GİRİŞ PANELİ
+        ============================================================ -->
         <div id="simple-login-panel" style="margin-bottom: 20px; padding: 16px 20px; background: var(--card-bg); border-radius: 12px; border: 2px solid var(--gold-primary); box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
             
+            <!-- BÖLÜM 5.1 - Aktif Kullanıcı -->
             <div id="user-active-area" style="display: none;" class="user-active">
                 <div>
                     <span style="font-size: 13px; opacity: 0.7;">👤 Aktif Kullanıcı:</span>
@@ -264,6 +290,7 @@
                 <button id="logout-btn" class="logout-btn">🚪 Çıkış Yap</button>
             </div>
 
+            <!-- BÖLÜM 5.2 - Giriş Formu -->
             <div id="login-form-area">
                 <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 12px; margin-bottom: 6px; font-weight: bold; font-size: 13px; color: var(--gold-dark);" class="row-3col">
                     <div>👤 İsim</div>
@@ -291,16 +318,21 @@
                 </div>
             </div>
 
+            <!-- BÖLÜM 5.3 - WhatsApp Paylaş -->
             <div id="bulk-share-area" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
                 <button id="bulk-whatsapp-btn" style="width: 100%; padding: 14px; background: #25D366; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; min-height: 48px;">💬 Tüm Seçtiklerimi WhatsApp'ta Paylaş</button>
             </div>
 
         </div>
 
-        <!-- KİTAP LİSTESİ -->
+        <!-- ============================================================
+        BÖLÜM 6 - KİTAP LİSTESİ
+        ============================================================ -->
         <div id="books-grid"></div>
 
-        <!-- NAMAZ VAKİTLERİ -->
+        <!-- ============================================================
+        BÖLÜM 7 - NAMAZ VAKİTLERİ
+        ============================================================ -->
         <script>
         async function fetchPrayerTimes() {
             const city = document.getElementById('citySelect').value;
@@ -346,12 +378,18 @@
         </script>
     </div>
 
+    <!-- ============================================================
+    BÖLÜM 8 - TOAST MESAJ
+    ============================================================ -->
     <div id="toast" class="toast"></div>
 
+    <!-- ============================================================
+    BÖLÜM 9 - ANA JAVASCRIPT
+    ============================================================ -->
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
             // ============================================================
-            // TOAST FONKSİYONU
+            // BÖLÜM 9.1 - TOAST FONKSİYONU
             // ============================================================
             function showToast(message, type = 'info', duration = 3000) {
                 const toast = document.getElementById('toast');
@@ -362,7 +400,7 @@
             }
 
             // ============================================================
-            // DEĞİŞKENLER
+            // BÖLÜM 9.2 - DEĞİŞKENLER
             // ============================================================
             let container = document.querySelector(".container");
             if (!container) {
@@ -386,7 +424,7 @@
             const ADMIN_PASSWORD = "1234";
 
             // ============================================================
-            // PDF HARİTASI VE SAYFA AYARLARI
+            // BÖLÜM 9.3 - PDF HARİTASI VE SAYFA AYARLARI
             // ============================================================
             const bookPdfMap = {
                 "kuran": "pdf/Kuran-ı Kerim.pdf",
@@ -401,7 +439,7 @@
                 "dilekce_ar": "pdf/Bir Kırık Dilekçe Ar.pdf"
             };
 
-            // Bölüm-Sayfa Eşleştirme Tablosu (ELLE DÜZENLE!)
+            // Bölüm-Sayfa Eşleştirme Tablosu
             const bookSectionPages = {
                 "kuran": {
                     type: "range",
@@ -485,7 +523,7 @@
             }
 
             // ============================================================
-            // TARİH VE İLHAM FONKSİYONLARI
+            // BÖLÜM 9.4 - TARİH VE İLHAM FONKSİYONLARI
             // ============================================================
             function bugunkuHicriTarihiAl() {
                 const ayAdlari = {
@@ -618,7 +656,7 @@
             }
 
             // ============================================================
-            // MODE YÖNETİMİ
+            // BÖLÜM 9.5 - MODE YÖNETİMİ
             // ============================================================
             function createPageModes(totalPages) {
                 return {
@@ -664,7 +702,7 @@
             }
 
             // ============================================================
-            // GRUP VE KULLANICI YÖNETİMİ
+            // BÖLÜM 9.6 - GRUP VE KULLANICI YÖNETİMİ
             // ============================================================
             function getAllGroupKeys() {
                 let keys = [];
@@ -743,7 +781,7 @@
             }
 
             // ============================================================
-            // GİRİŞ PANELİ İŞLEVLERİ
+            // BÖLÜM 9.7 - GİRİŞ PANELİ İŞLEVLERİ
             // ============================================================
             function updateUserInterface() {
                 const loginArea = document.getElementById('login-form-area');
@@ -904,14 +942,14 @@
             });
 
             // ============================================================
-            // ANALİZ PANELİ (YENİ - TÜM SEKMELER)
+            // BÖLÜM 9.8 - ANALİZ PANELİ (openDetailedAnalysisModal)
             // ============================================================
             function openDetailedAnalysisModal() {
                 let existingModal = document.getElementById("detailed-analysis-modal");
                 if (existingModal) existingModal.remove();
 
                 // Tüm grupları ve verileri topla
-                let allGroupKeys = getAllGroupKeysForAdmin();
+                let allGroupKeys = getAllGroupKeysForAdmin ? getAllGroupKeysForAdmin() : getAllGroupKeys();
                 let groupStats = [];
                 let allMembers = [];
 
@@ -972,9 +1010,7 @@
                     overflow-y: auto;
                 `;
 
-                // ============================================================
-                // GRUP VE ÜYE SEÇİMİ İÇİN HTML
-                // ============================================================
+                // Grup Seçim HTML'i
                 function getGroupSelectHtml(selected = 'all') {
                     let html = `<option value="all">📁 Tüm Gruplar</option>`;
                     groupStats.forEach(g => {
@@ -983,6 +1019,7 @@
                     return html;
                 }
 
+                // Üye Seçim HTML'i
                 function getMemberSelectHtml(groupName = 'all', selected = 'all') {
                     let members = [];
                     if (groupName === 'all') {
@@ -1000,9 +1037,7 @@
                     return html;
                 }
 
-                // ============================================================
-                // BİR ÜYENİN DETAYLI VERİLERİNİ TOPLA
-                // ============================================================
+                // Üye Detay Verileri Toplama
                 function getMemberDetailData(memberName, groupName = null) {
                     let result = {
                         name: memberName,
@@ -1080,15 +1115,12 @@
                     return result;
                 }
 
-                // ============================================================
                 // SEKME İÇERİKLERİNİ RENDER ET
-                // ============================================================
                 function renderTab1(groupName = 'all', memberName = 'all') {
                     const container = document.getElementById('dtabs-1-content');
                     let html = '';
                     
                     if (groupName === 'all') {
-                        // Tüm grupları göster
                         groupStats.forEach(g => {
                             let memberDisplay = g.memberNames.join(', ');
                             html += `
@@ -1107,7 +1139,6 @@
                             `;
                         });
                     } else {
-                        // Belirli bir grubu göster
                         let g = groupStats.find(gs => gs.name === groupName);
                         if (g) {
                             let memberDisplay = memberName === 'all' ? g.memberNames.join(', ') : memberName;
@@ -1176,7 +1207,6 @@
                     const container = document.getElementById('dtabs-3-content');
                     
                     if (memberName === 'all') {
-                        // Tüm üyeleri göster
                         let allMemberStats = [];
                         allMembers.forEach(m => {
                             let data = getMemberDetailData(m.name, groupName === 'all' ? null : groupName);
@@ -1233,7 +1263,6 @@
                         return;
                     }
                     
-                    // Tek bir üyenin detayını göster
                     let data = getMemberDetailData(memberName, groupName === 'all' ? null : groupName);
                     
                     if (data.books.length === 0) {
@@ -1386,9 +1415,7 @@
                     container.innerHTML = html;
                 }
 
-                // ============================================================
                 // ANA MODAL HTML
-                // ============================================================
                 modalOverlay.innerHTML = `
                     <div style="background: var(--card-bg); color: var(--text-main); width: 100%; max-width: 1100px; max-height: 95vh; border-radius: 16px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.4);">
                         <!-- BAŞLIK -->
@@ -1441,9 +1468,7 @@
 
                 document.body.appendChild(modalOverlay);
 
-                // ============================================================
                 // OLAY DİNLEYİCİLERİ
-                // ============================================================
                 let currentGroupName = 'all';
                 let currentMemberName = 'all';
 
@@ -1516,7 +1541,7 @@
             }
 
             // ============================================================
-            // getRangeStatus
+            // BÖLÜM 9.9 - getRangeStatus
             // ============================================================
             function getRangeStatus(baseArray, start, end) {
                 let subset = baseArray.slice(start, end);
@@ -1533,7 +1558,7 @@
             }
 
             // ============================================================
-            // renderBooks
+            // BÖLÜM 9.10 - renderBooks
             // ============================================================
             function renderBooks() {
                 const openBookIds = Array.from(document.querySelectorAll(".book-card.open")).map(el => el.getAttribute("data-book-id"));
@@ -1789,7 +1814,7 @@
             }
 
             // ============================================================
-            // ADMIN PANELİ
+            // BÖLÜM 9.11 - ADMIN PANELİ
             // ============================================================
             function renderAdminSectionAtBottom() {
                 let bottomContainer = document.getElementById("admin-bottom-section");
@@ -2245,7 +2270,7 @@
             }
 
             // ============================================================
-            // DİĞER FONKSİYONLAR
+            // BÖLÜM 9.12 - DİĞER FONKSİYONLAR
             // ============================================================
             function renderAnalysisSection() {
                 let analysisContainer = document.getElementById("analysis-section");
@@ -2315,6 +2340,9 @@
                 showToast(isAdmin ? '🔓 Yönetici modu açıldı!' : '🔐 Yönetici modu kapandı.', 'info');
             }
 
+            // ============================================================
+            // BÖLÜM 9.13 - loadGroupData
+            // ============================================================
             async function loadGroupData() {
                 const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
                 appData = savedData ? JSON.parse(savedData) : { members: currentGroup === "grup_1" ? [] : [], password: "" };
@@ -2376,12 +2404,18 @@
                 updateUserInterface();
             }
 
+            // ============================================================
+            // BÖLÜM 9.14 - saveGroupData
+            // ============================================================
             function saveGroupData() {
                 localStorage.setItem(`hatim_group_${currentGroup}`, JSON.stringify(appData));
             }
 
+            // ============================================================
+            // BÖLÜM 9.15 - BAŞLAT
+            // ============================================================
             await loadGroupData();
         });
     </script>
 </body>
-</html>
+    </html>
