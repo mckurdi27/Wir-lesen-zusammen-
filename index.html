@@ -1774,6 +1774,37 @@
                         }
                     }
                     
+                    
+                    // Bireysel uyeler de Genel Ozete eklensin
+                    try {
+                        let _bp = getBireyselPool();
+                        (_bp.members || []).forEach(bm => {
+                            let bData = null;
+                            try { bData = JSON.parse(localStorage.getItem('hatim_group_' + bm.toLowerCase()) || 'null'); } catch(e){}
+                            let bBooks = 0, bTaken = 0, bRead = 0;
+                            if (bData && bData.books && bData.bookPages) {
+                                bData.books.forEach(b => {
+                                    bBooks += b.totalUnits;
+                                    if (bData.bookPages[b.id]) bData.bookPages[b.id].forEach(pp => { if (pp.owner) bTaken++; if (pp.isRead) bRead++; });
+                                });
+                            }
+                            let bPct = bBooks > 0 ? Math.round((bTaken / bBooks) * 100) : 0;
+                            html += `
+                                <div style="padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(39,174,96,0.06);">
+                                    <div style="font-weight: bold; font-size: 16px; color: #27ae60;">👤 ${bm}</div>
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 4px; margin-top: 4px; font-size: 14px;">
+                                        <div>👤 Bireysel</div>
+                                        <div>📚 Alinan: ${bTaken} / ${bBooks}</div>
+                                        <div>📖 Okunan: ${bRead} / ${bBooks}</div>
+                                        <div>📊 Ilerleme: %${bPct}</div>
+                                    </div>
+                                    <div style="margin-top: 6px; background: #e9ecef; border-radius: 10px; height: 6px; overflow: hidden;">
+                                        <div style="background: ${bPct >= 80 ? '#27ae60' : bPct >= 50 ? '#f39c12' : '#e74c3c'}; width: ${bPct}%; height: 100%;"></div>
+                                    </div>
+                                </div>`;
+                        });
+                    } catch(err) {}
+
                     container.innerHTML = html;
                 }
 
