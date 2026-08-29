@@ -438,11 +438,11 @@
 
         <!-- BİREYSEL TAKİP PANELİ -->
         <div id="bireysel-takip-panel" style="display: none; margin-bottom: 20px; padding: 16px 20px; background: var(--card-bg); border-radius: 12px; border: 2px solid var(--gold-primary); box-shadow: 0 4px 15px rgba(138,109,59,0.2);">
-            <h3 style="margin: 0 0 12px; color: #8a6d3b; font-size: 18px;">👤 Bireysel Takip</h3>
+            <h3 style="margin: 0 0 12px; color: #8a6d3b; font-size: 18px;">👤 Üye Takip</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; margin-bottom: 14px; flex-wrap: wrap;">
                 <div>
                     <label style="font-weight:bold; font-size:13px; display:block; margin-bottom:4px;">Üye Adı</label>
-                    <input type="text" id="bt-member-name" readonly style="width:100%; padding:10px 12px; border-radius:6px; border:1px solid var(--border-color); background:#f4f4f4; font-size:14px; min-height:44px;">
+                    <input type="text" id="bt-member-name" style="width:100%; padding:10px 12px; border-radius:6px; border:1px solid var(--border-color); background:var(--card-bg); font-size:14px; min-height:44px;">
                 </div>
                 <div>
                     <label style="font-weight:bold; font-size:13px; display:block; margin-bottom:4px;">Şifre</label>
@@ -451,6 +451,7 @@
                         <button id="bt-password-toggle" type="button" style="background:#bdc3c7; color:#fff; border:none; border-radius:6px; padding:0 12px; cursor:pointer; font-size:14px; min-height:44px;">👁</button>
                     </div>
                 </div>
+                <button id="bt-change-name" style="background:#2980b9; color:#fff; border:none; border-radius:8px; padding:10px 16px; cursor:pointer; font-weight:bold; font-size:14px; min-height:48px;">Ad Değiştir</button>
                 <button id="bt-change-password" style="background:#27ae60; color:#fff; border:none; border-radius:8px; padding:10px 16px; cursor:pointer; font-weight:bold; font-size:14px; min-height:48px;">Şifre Değiştir</button>
             </div>
             <div id="bt-member-books" style="overflow-x:auto;"></div>
@@ -1177,13 +1178,19 @@
             function renderBireyselTakipPanel() {
                     const panel = document.getElementById('bireysel-takip-panel');
                     if (!panel) return;
-                    if (!loggedInMember || loggedInMemberType === 'grup') { panel.style.display='none'; return; }
+                    if (!loggedInMember) { panel.style.display='none'; return; }
                     panel.style.display = 'block';
                     const nameEl = document.getElementById('bt-member-name');
                     const pwdEl = document.getElementById('bt-member-password');
                     if (nameEl) nameEl.value = loggedInMember;
                     let _bp = getBireyselPool();
-                    if (pwdEl) pwdEl.value = (_bp.passwords && _bp.passwords[loggedInMember]) ? _bp.passwords[loggedInMember] : '';
+                    let _pwdVal = '';
+                    if (loggedInMemberType === 'grup') {
+                        try { if (appData && appData.passwords) _pwdVal = appData.passwords[loggedInMember] || ''; } catch(e){}
+                    } else {
+                        _pwdVal = (_bp.passwords && _bp.passwords[loggedInMember]) ? _bp.passwords[loggedInMember] : '';
+                    }
+                    if (pwdEl) pwdEl.value = _pwdVal;
                     const booksEl = document.getElementById('bt-member-books');
                     if (!booksEl) return;
                     let data;
@@ -1204,6 +1211,7 @@
                             <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${b.read}</td>
                             <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">%${pct}</td>
                             <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${durum}</td>
+                            <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">—</td>
                         </tr>`;
                     }).join('');
                     booksEl.innerHTML = `
@@ -1219,20 +1227,58 @@
                                 <th style="padding:8px;">Okunan</th>
                                 <th style="padding:8px;">İlerleme</th>
                                 <th style="padding:8px;">Durum</th>
+                                <th style="padding:8px;">Düzenle</th>
                             </tr></thead>
                             <tbody>${rows}</tbody>
                         </table>`;
                 }
 
                 document.addEventListener('click', function(e) {
+                    if (e.target && e.target.id === 'bt-change-name') {
+                        const nameEl = document.getElementById('bt-member-name');
+                        const newName = (nameEl ? nameEl.value : '').trim();
+                        if (!newName) { showToast('⚠️ Üye adı boş olamaz!', 'error'); return; }
+                        if (newName === loggedInMember) { showToast('ℹ️ Ad aynı, değişiklik yok.', 'info'); return; }
+                        const oldName = loggedInMember;
+                        // rename in group passwords or bireysel pool
+                        if (loggedInMemberType === 'grup' && appData) {
+                            if (appData.passwords && appData.passwords[oldName]) { appData.passwords[newName] = appData.passwords[oldName]; delete appData.passwords[oldName]; }
+                            // rename in members list
+                            if (appData.members) { let ix = appData.members.indexOf(oldName); if (ix !== -1) appData.members[ix] = newName; }
+                            saveGroupData();
+                        } else {
+                            let _bp = getBireyselPool();
+                            if (_bp.passwords && _bp.passwords[oldName]) { _bp.passwords[newName] = _bp.passwords[oldName]; delete _bp.passwords[oldName]; }
+                            let mx = _bp.members.indexOf(oldName); if (mx !== -1) _bp.members[mx] = newName;
+                            saveBireyselPool(_bp);
+                            // rename the member's own data key if bireysel
+                            let oldKey = 'hatim_group_' + oldName.toLowerCase();
+                            let newKey = 'hatim_group_' + newName.toLowerCase();
+                            try { let d = JSON.parse(localStorage.getItem(oldKey) || 'null'); if (d) { localStorage.setItem(newKey, JSON.stringify(d)); localStorage.removeItem(oldKey); } } catch(e){}
+                        }
+                        loggedInMember = newName;
+                        localStorage.setItem('hatim_bireysel_session', newName);
+                        localStorage.setItem(`hatim_session_${currentGroup}`, newName);
+                        showToast('✅ Üye adı "' + newName + '" olarak güncellendi.', 'success');
+                        updateUserInterface();
+                        renderBireyselTakipPanel();
+                    }
                     if (e.target && e.target.id === 'bt-change-password') {
                         const pwdEl = document.getElementById('bt-member-password');
                         const val = (pwdEl ? pwdEl.value : '').trim();
                         if (!val) { showToast('⚠️ Şifre boş olamaz!', 'error'); return; }
-                        let _bp = getBireyselPool();
-                        if (!_bp.passwords) _bp.passwords = {};
-                        _bp.passwords[loggedInMember] = val;
-                        saveBireyselPool(_bp);
+                        if (loggedInMemberType === 'grup') {
+                            if (appData) {
+                                if (!appData.passwords) appData.passwords = {};
+                                appData.passwords[loggedInMember] = val;
+                                saveGroupData();
+                            }
+                        } else {
+                            let _bp = getBireyselPool();
+                            if (!_bp.passwords) _bp.passwords = {};
+                            _bp.passwords[loggedInMember] = val;
+                            saveBireyselPool(_bp);
+                        }
                         showToast('✅ Şifreniz güncellendi.', 'success');
                     }
                     if (e.target && e.target.id === 'bt-password-toggle') {
