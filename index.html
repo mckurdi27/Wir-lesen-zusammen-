@@ -1221,6 +1221,8 @@
                     if (userType === 'bireysel') {
                         let _bp = getBireyselPool();
                         if (!_bp.members.includes(userName)) { _bp.members.push(userName); _bp.memberTypes[userName] = "bireysel"; }
+                        if (!_bp.passwords) _bp.passwords = {};
+                        if (userPassword) _bp.passwords[userName] = userPassword;
                         saveBireyselPool(_bp);
                         if (!appData.members.includes(userName)) {
                             appData.members.push(userName);
@@ -1261,6 +1263,8 @@
                                 if (!parsed.memberTypes) parsed.memberTypes = {};
                                 parsed.memberTypes[userName] = "grup";
                             }
+                            if (!parsed.passwords) parsed.passwords = {};
+                            if (userPassword) parsed.passwords[userName] = userPassword;
                             localStorage.setItem(`hatim_group_${groupKey}`, JSON.stringify(parsed));
                             currentGroup = groupKey;
                             loggedInMember = userName;
@@ -1288,6 +1292,7 @@
                         const newGroupData = {
                             members: [userName],
                             memberTypes: { [userName]: 'grup' },
+                            passwords: userPassword ? { [userName]: userPassword } : {},
                             password: groupPassword || "",
                             books: freshBooks,
                             bookPages: freshPages,
@@ -2260,8 +2265,7 @@
                 bottomContainer.style.cssText = "margin: 20px 0; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--card-bg);";
 
                 let allGroups = getAllGroupKeysForAdmin();
-                let savedAdminGroup = localStorage.getItem('hatim_admin_group') || '';
-                let groupsHtml = `<option value="">👤 BİREYSEL</option>` + allGroups.map(g => `<option value="${g}" ${g === savedAdminGroup ? 'selected' : ''}>${g.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
+                let groupsHtml = `<option value="" selected>👤 BİREYSEL</option>` + allGroups.map(g => `<option value="${g}">${g.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
 
                 let groupMembers = appData.members.filter(m => !(appData.memberTypes && appData.memberTypes[m] === 'bireysel'));
                 let _bireyselPool = getBireyselPool();
@@ -2359,7 +2363,10 @@
                     try {
                         let d = JSON.parse(raw);
                         let gPw = d.password || '(şifresiz)';
-                        let gMembers = (d.members || []).map(mm => mm + (d.memberTypes && d.memberTypes[mm] === 'bireysel' ? ' (👤)' : '')).join(', ') || '-';
+                        let gMembers = (d.members || []).map(mm => {
+                            let mpw = (d.passwords && d.passwords[mm]) ? d.passwords[mm] : '';
+                            return mm + (mpw ? ` (🔑 ${mpw})` : '');
+                        }).join(', ') || '-';
                         return `<div style="padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px; background: var(--card-bg);">
                             <div style="font-weight: bold; color: #2980b9;">👥 ${gName}</div>
                             <div style="font-size: 12px; margin-top: 4px;">🔑 Grup Şifresi: <span style="font-weight:bold; color:#8e44ad;">${gPw}</span></div>
@@ -2367,7 +2374,7 @@
                         </div>`;
                     } catch(e) { return ''; }
                 }).join('');
-                let infoBireyselHtml = (_infoPool.members || []).map(mm => `<div style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 6px; font-size: 13px; background: var(--card-bg);">👤 ${mm}</div>`).join('') || '<div style="font-size: 13px; color:#777;">Bireysel üye yok.</div>';
+                let infoBireyselHtml = (_infoPool.members || []).map(mm => `<div style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 6px; font-size: 13px; background: var(--card-bg);">👤 ${mm}${(_infoPool.passwords && _infoPool.passwords[mm]) ? ` (🔑 ${_infoPool.passwords[mm]})` : ''}</div>`).join('') || '<div style="font-size: 13px; color:#777;">Bireysel üye yok.</div>';
                 let infoSectionHtml = `
                     <div class="admin-section info-section">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
@@ -2644,7 +2651,6 @@
                     });
 
                     document.getElementById("admin-group-select").addEventListener("change", async (e) => {
-                        if (e.target.value) localStorage.setItem('hatim_admin_group', e.target.value);
                         currentGroup = e.target.value;
                         await loadGroupData();
                     });
@@ -2862,6 +2868,7 @@
                 let p = JSON.parse(localStorage.getItem('hatim_bireysel_pool') || 'null');
                 if (!p || !p.members) p = { members: [], memberTypes: {} };
                 if (!p.memberTypes) p.memberTypes = {};
+                if (!p.passwords) p.passwords = {};
                 return p;
             }
             function saveBireyselPool(p) { localStorage.setItem('hatim_bireysel_pool', JSON.stringify(p)); }
