@@ -3115,9 +3115,13 @@ function infoSortTable(col) {
                         let pick = `<div style="margin-top:8px; padding:8px; border:1px solid var(--border-color); border-radius:6px; background:rgba(142,68,173,0.05);">
                             <div style="font-size:12px; font-weight:bold; margin-bottom:6px;">📖 ${bookName} — ${freeIdx.length} boş hisse: hangi üyeye atansın? (tek tek)</div>
                             <div style="display:flex; flex-wrap:wrap; gap:6px;">`;
+                        pick += `<div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                            <label style="font-size:12px; font-weight:bold;">Adet:</label>
+                            <input type="number" id="bulk-pick-count" value="1" min="1" max="${freeIdx.length}" style="width:80px; padding:8px; border-radius:6px; border:1px solid var(--border-color); font-size:14px; min-height:44px;">
+                        </div>`;
                         cands.forEach(m => { pick += `<button class="bulk-pick-member" data-member="${m}" style="background:#27ae60; color:#fff; border:none; border-radius:6px; cursor:pointer; padding:8px 12px; font-size:12px; min-height:44px;">${m}</button>`; });
                         pick += `</div>
-                            <div style="font-size:11px; color:#777; margin-top:6px;">Her tıklamada 1 hisse atanır; istenen kadar tıklayın.</div>
+                            <div style="font-size:11px; color:#777; margin-top:6px;">Üye adına tıklayın: belirtilen adet kadar hisse o üyeye atanır.</div>
                         </div>`;
                         // remove old pickers
                         panel.querySelectorAll('.bulk-pick-wrap').forEach(x => x.remove());
@@ -3128,12 +3132,14 @@ function infoSortTable(col) {
                         wrap.querySelectorAll('.bulk-pick-member').forEach(btn => {
                             btn.addEventListener('click', () => {
                                 let m = btn.getAttribute('data-member');
+                                let countEl = document.getElementById('bulk-pick-count');
+                                let count = countEl ? Math.max(1, parseInt(countEl.value) || 1) : 1;
                                 let pages2 = g3.bookPages[bObj.id];
-                                let assigned = false;
-                                for (let i = 0; i < pages2.length; i++) {
-                                    if (!pages2[i].owner) { pages2[i].owner = m; pages2[i].isRead = false; assigned = true; break; }
+                                let assigned = 0;
+                                for (let i = 0; i < pages2.length && assigned < count; i++) {
+                                    if (!pages2[i].owner) { pages2[i].owner = m; pages2[i].isRead = false; assigned++; }
                                 }
-                                if (assigned) { bulkSave(data); showToast('✅ 1 hisse ' + m + ' üyesine atandı.', 'success'); loadGroupData(); }
+                                if (assigned > 0) { bulkSave(data); showToast('✅ ' + assigned + ' hisse ' + m + ' üyesine atandı.', 'success'); loadGroupData(); }
                                 else { showToast('Boş hisse kalmadı.', 'info'); }
                             });
                         });
