@@ -6,6 +6,7 @@
     <title>Ortak Hatim ve Dua Takip Sistemi</title>
     <!-- PDF.js Kütüphanesi -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -516,7 +517,7 @@
             let appData = null;
             let loggedInMember = "";
             let loggedInMemberType = "";
-            let analysisSortKey = "name"; let analysisSortDir = "az";
+            let analysisSortKey = "name"; let analysisSortDir = "az"; let activeAnalysisTab = "dtabs-1";
             let analysisBooks = []; // empty = all
             let monthlyInspirationCache = {};
             const ADMIN_PASSWORD = "1234";
@@ -1927,6 +1928,7 @@
                                 <div style="font-size: 12px; opacity: 0.8;">Aktif Grup: ${currentGroup.replace(/_/g, ' ').toUpperCase()}</div>
                             </div>
                             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button id="modal-excel-btn" style="background: #27ae60; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px;">📊 Excel</button>
                                 <button id="modal-print-btn" style="background: #2980b9; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px;">🖨️ Yazdır</button>
                                 <button id="modal-close-btn" style="background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px;">✕ Kapat</button>
                             </div>
@@ -1977,13 +1979,64 @@
 
                 document.body.appendChild(modalOverlay);
 
+                
+                function exportAnalysisToExcel() {
+                    try {
+                        if (typeof XLSX === 'undefined') { alert('Excel kütüphanesi yüklenemedi. İnternet bağlantınızı kontrol edin.'); return; }
+                        let groupKeys = (typeof getAllGroupKeysForAdmin === 'function') ? getAllGroupKeysForAdmin() : (typeof getAllGroupKeys === 'function' ? getAllGroupKeys() : []);
+                        if (!groupKeys.length && typeof allGroupKeys !== 'undefined') groupKeys = allGroupKeys;
+                        let groups = [];
+                        groupKeys.forEach(gKey => {
+                            const raw = localStorage.getItem(`hatim_group_${gKey}`);
+                            if (!raw) return;
+                            try {
+                                const g = JSON.parse(raw);
+                                const members = (g.memberTypes) ? (g.members||[]).filter(m => (g.memberTypes[m]||"grup")==="grup") : (g.members||[]);
+                                let taken=0, read=0, units=0;
+                                if (g.books && g.bookPages) { g.books.forEach(b => { units += (b.totalUnits||0); if (g.bookPages[b.id]) g.bookPages[b.id].forEach(p => { if (p.owner) taken++; if (p.isRead) read++; }); }); }
+                                groups.push({ name: gKey, members: members.length, units: units, taken: taken, read: read, percent: units>0 ? Math.round((read/units)*100) : 0, passwords: g.passwords||{} });
+                            } catch(e){}
+                        });
+                        let bireysel = { members: [], passwords: {} };
+                        try { const p = JSON.parse(localStorage.getItem('hatim_bireysel_pool')||'null'); if (p) { bireysel.members = p.members||[]; bireysel.passwords = p.passwords||{}; } } catch(e){}
+                        let members = [];
+                        groups.forEach(gg => gg.name && (gg.members)).length;
+                        groups.forEach(gKey => {
+                            const raw = localStorage.getItem(`hatim_group_${gKey.name}`);
+                            if (!raw) return;
+                            const g = JSON.parse(raw);
+                            (g.members||[]).forEach(m => {
+                                const isGrup = !(g.memberTypes && (g.memberTypes[m]||"grup")==="bireysel");
+                                let d = (typeof getMemberDetailData==='function') ? getMemberDetailData(m, null, 'all') : {totalTaken:0,totalRead:0};
+                                if (!members.find(x=>x.name===m)) members.push({ name:m, type: isGrup?'grup':'bireysel', taken:d.totalTaken, read:d.totalRead, percent:d.totalTaken>0?Math.round((d.totalRead/d.totalTaken)*100):0 });
+                            });
+                        });
+                        bireysel.members.forEach(m => { if (!members.find(x=>x.name===m)) { let d=(typeof getMemberDetailData==='function')?getMemberDetailData(m,null,'all'):{totalTaken:0,totalRead:0}; members.push({ name:m, type:'bireysel', taken:d.totalTaken, read:d.totalRead, percent:d.totalTaken>0?Math.round((d.totalRead/d.totalTaken)*100):0 }); } });
+                        members.sort((a,b)=>a.name.localeCompare(b.name,'tr'));
+                        const wb = XLSX.utils.book_new();
+                        let ozet = [[ 'Grup', 'Üye Sayısı', 'Toplam Birim', 'Alınan', 'Okunan', 'Tamamlama %' ]];
+                        groups.forEach(g=>ozet.push([g.name, g.members, g.units, g.taken, g.read, g.percent]));
+                        ozet.push(['👤 BİREYSEL', bireysel.members.length, '', '', '', '']);
+                        let wsOzet = XLSX.utils.aoa_to_sheet(ozet);
+                        XLSX.utils.book_append_sheet(wb, wsOzet, 'Özet');
+                        let veri = [[ 'Üye', 'Tip', 'Aldığı', 'Okuduğu', 'Tamamlama %' ]];
+                        members.forEach(m=>veri.push([m.name, m.type==='grup'?'Grup':'Bireysel', m.taken, m.read, m.percent]));
+                        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(veri), 'Veri');
+                        let sifre = [[ 'Grup', 'Şifre' ]];
+                        groups.forEach(g=>{ if(g.passwords) Object.keys(g.passwords).forEach(p=>sifre.push([g.name, p])); });
+                        sifre.push([]); sifre.push(['👤 Bireysel Şifreleri']);
+                        if (bireysel.passwords) Object.keys(bireysel.passwords).forEach(p=>sifre.push([p, bireysel.passwords[p]]));
+                        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sifre), 'Şifreler');
+                        XLSX.writeFile(wb, 'Hatim_Analiz.xlsx');
+                    } catch(err) { alert('Excel oluşturulamadı: ' + err.message); }
+                }
+                
                 function updateAllTabs() {
                     const group = document.getElementById('analysis-group-select').value;
                     const member = document.getElementById('analysis-member-select').value;
                     
-                    const activeTab = document.querySelector('.d-tab-btn.active');
-                    if (activeTab) {
-                        const target = activeTab.getAttribute('data-target');
+                    const target = activeAnalysisTab;
+                    if (target) {
                         switch(target) {
                             case 'dtabs-1': renderTab1(group, member); break;
                             case 'dtabs-2': renderTab2(group); break;
@@ -2031,6 +2084,7 @@
                         e.currentTarget.style.background = "var(--gold-primary)";
                         e.currentTarget.style.color = "#fff";
                         const target = e.currentTarget.getAttribute("data-target");
+                        activeAnalysisTab = target;
                         document.getElementById(target).style.display = "block";
                         
                         const group = document.getElementById('analysis-group-select').value;
@@ -2052,6 +2106,9 @@
                 renderTab5('all', 'all');
 
                 modalOverlay.querySelector("#modal-close-btn").addEventListener("click", () => modalOverlay.remove());
+                                modalOverlay.querySelector("#modal-excel-btn").addEventListener("click", function() {
+                    exportAnalysisToExcel();
+                });
                 modalOverlay.querySelector("#modal-print-btn").addEventListener("click", () => window.print());
                 modalOverlay.addEventListener("click", (e) => {
                     if (e.target === modalOverlay) modalOverlay.remove();
