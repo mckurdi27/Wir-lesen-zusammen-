@@ -2113,20 +2113,22 @@
                     });
                 });
 
-                renderTab1('all', 'all');
-                renderTab2('all');
-                renderTab3('all', 'all');
-                renderTab4('all', 'all');
-                renderTab5('all', 'all');
-
+                // Buton dinleyicileri önce bağlanır (render hatası onları etkilemesin)
                 modalOverlay.querySelector("#modal-close-btn").addEventListener("click", () => modalOverlay.remove());
-                                modalOverlay.querySelector("#modal-excel-btn").addEventListener("click", function() {
-                    exportAnalysisToExcel();
+                modalOverlay.querySelector("#modal-excel-btn").addEventListener("click", function() {
+                    try { exportAnalysisToExcel(); } catch(err) { alert('Excel oluşturulamadı: ' + err.message); }
                 });
                 modalOverlay.querySelector("#modal-print-btn").addEventListener("click", () => window.print());
                 modalOverlay.addEventListener("click", (e) => {
                     if (e.target === modalOverlay) modalOverlay.remove();
                 });
+
+                // Render'lar korumalı çalışır
+                try { renderTab1('all', 'all'); } catch(e) {}
+                try { renderTab2('all'); } catch(e) {}
+                try { renderTab3('all', 'all'); } catch(e) {}
+                try { renderTab4('all', 'all'); } catch(e) {}
+                try { renderTab5('all', 'all'); } catch(e) {}
             }
 
             // getRangeStatus
