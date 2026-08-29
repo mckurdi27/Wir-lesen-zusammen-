@@ -1336,6 +1336,7 @@
                         saveBireyselPool(_bp);
                         loggedInMember = userName;
                         loggedInMemberType = "bireysel";
+                        currentGroup = userName.toLowerCase();
                         localStorage.setItem('hatim_member_type_' + userName, "bireysel");
                         localStorage.setItem(`hatim_session_${currentGroup}`, userName);
                         localStorage.setItem(`hatim_session_type_${currentGroup}`, "bireysel");
