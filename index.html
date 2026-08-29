@@ -1219,6 +1219,10 @@
                         showToast('❌ Lütfen isminizi girin!', 'error');
                         return;
                     }
+                    if (!userPassword) {
+                        showToast('❌ Lütfen şifrenizi belirleyin!', 'error');
+                        return;
+                    }
                     
                     if (userType === 'bireysel') {
                         let _bp = getBireyselPool();
@@ -2409,7 +2413,7 @@
                         </div>`;
                     } catch(e) { return ''; }
                 }).join('');
-                let infoBireyselHtml = (_infoPool.members || []).map(mm => `<div style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 6px; font-size: 13px; background: var(--card-bg);">👤 ${mm}${(_infoPool.passwords && _infoPool.passwords[mm]) ? ` (🔑 ${_infoPool.passwords[mm]})` : ''}</div>`).join('') || '<div style="font-size: 13px; color:#777;">Bireysel üye yok.</div>';
+                let infoBireyselHtml = (_infoPool.members || []).map(mm => `<div style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 6px; font-size: 13px; background: var(--card-bg); display:flex; justify-content:space-between; align-items:center;">👤 ${mm}${(_infoPool.passwords && _infoPool.passwords[mm]) ? ` (🔑 ${_infoPool.passwords[mm]})` : ''} <button class="admin-remove-bireysel" data-name="${mm}" style="background:#e74c3c;color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:12px;cursor:pointer;min-height:28px;">🗑 Sil</button></div>`).join('') || '<div style="font-size: 13px; color:#777;">Bireysel üye yok.</div>';
                 let infoSectionHtml = `
                     <div class="admin-section info-section">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
@@ -2752,10 +2756,14 @@
                             let sel = document.getElementById("admin-group-select");
                             let selVal = sel ? sel.value : "";
                             if (selVal === "") {
+                                let pw = prompt("Bireysel üye şifresi:");
+                                if (!pw || !pw.trim()) { showToast('❌ Şifre gerekli!', 'error'); return; }
                                 let pool = getBireyselPool();
                                 if (!pool.members.includes(clean)) {
                                     pool.members.push(clean);
                                     pool.memberTypes[clean] = "bireysel";
+                                    if (!pool.passwords) pool.passwords = {};
+                                    pool.passwords[clean] = pw.trim();
                                     saveBireyselPool(pool);
                                     showToast(`✅ ${clean} bireysel üye olarak eklendi!`, 'success');
                                 } else { showToast('Bu üye zaten var.', 'error'); }
@@ -2765,10 +2773,14 @@
                             }
                             currentGroup = selVal;
                             await loadGroupData();
+                            let gpw = prompt("Grup üyesi şifresi:");
+                            if (!gpw || !gpw.trim()) { showToast('❌ Şifre gerekli!', 'error'); return; }
                             if (!appData.members.includes(clean)) {
                                 appData.members.push(clean);
                                 if (!appData.memberTypes) appData.memberTypes = {};
                                 appData.memberTypes[clean] = "grup";
+                                if (!appData.passwords) appData.passwords = {};
+                                appData.passwords[clean] = gpw.trim();
                                 saveGroupData();
                                 await loadGroupData();
                                 showToast(`✅ ${clean} eklendi!`, 'success');
@@ -2791,6 +2803,24 @@
                                 saveGroupData();
                                 await loadGroupData();
                                 showToast(`❌ ${name} çıkartıldı.`, 'info');
+                            }
+                        });
+                    });
+
+                    document.querySelectorAll(".admin-remove-bireysel").forEach(btn => {
+                        btn.addEventListener("click", async (e) => {
+                            let name = e.target.getAttribute("data-name");
+                            if (confirm(`"${name}" bireysel üye silinsin mi?`)) {
+                                let pool = getBireyselPool();
+                                pool.members = pool.members.filter(m => m !== name);
+                                if (pool.memberTypes) delete pool.memberTypes[name];
+                                if (pool.passwords) delete pool.passwords[name];
+                                saveBireyselPool(pool);
+                                // ayrıca bu üyenin grup anahtarını (okuma verisi) temizle
+                                let bKey = "hatim_group_" + name.toLowerCase();
+                                if (localStorage.getItem(bKey)) localStorage.removeItem(bKey);
+                                await loadGroupData();
+                                showToast(`❌ ${name} bireysel üye silindi.`, 'info');
                             }
                         });
                     });
