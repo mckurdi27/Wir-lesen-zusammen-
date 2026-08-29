@@ -517,6 +517,8 @@
             let loggedInMember = "";
             let loggedInMemberType = "";
             let analysisTab = "grup";
+            let analysisSortDir = "az";
+            let analysisBooks = []; // empty = all
             let monthlyInspirationCache = {};
             const ADMIN_PASSWORD = "1234";
 
@@ -1431,6 +1433,22 @@
                     return html;
                 }
 
+                function getBookSelectHtml(selected = 'all') {
+                    let bookNames = [];
+                    allGroupKeys.forEach(gk => {
+                        let raw = localStorage.getItem(`hatim_group_${gk}`);
+                        if (!raw) return;
+                        try {
+                            let g = JSON.parse(raw);
+                            (g.books || []).forEach(b => { if (!bookNames.includes(b.name)) bookNames.push(b.name); });
+                        } catch(e){}
+                    });
+                    bookNames.sort((a,b)=>a.localeCompare(b,'tr'));
+                    let h = `<option value="all">📚 Tüm Kitaplar</option>`;
+                    bookNames.forEach(b => { h += `<option value="${b}" ${b===selected?'selected':''}>${b}</option>`; });
+                    return h;
+                }
+
                 function getMemberSelectHtml(groupName = 'all', selected = 'all') {
                     let members = [];
                     if (groupName === 'all') {
@@ -1443,12 +1461,12 @@
                     }
                     let html = `<option value="all">👥 Tüm Üyeler</option>`;
                     members.forEach(m => {
-                        html += `<option value="${m.name}" ${m.name === selected ? 'selected' : ''}>👤 ${m.name}</option>`;
+                        html += `<option value="${m.name}" ${m.name === selected ? 'selected' : ''}>${m.type === 'bireysel' ? '👤' : '👥'} ${m.name}${m.groups && m.groups.length ? ' (' + m.groups.map(g => g.replace(/_/g,' ').toUpperCase()).join(', ') + ')' : ''}</option>`;
                     });
                     return html;
                 }
 
-                function getMemberDetailData(memberName, groupName = null) {
+                function getMemberDetailData(memberName, groupName = null, bookFilter = 'all') {
                     let result = {
                         name: memberName,
                         groups: [],
@@ -1471,7 +1489,7 @@
                             result.groups.push(gKey);
                             
                             if (parsed.books && parsed.bookPages) {
-                                parsed.books.forEach(b => {
+                                parsed.books.filter(b => bookFilter === 'all' || b.name === bookFilter).forEach(b => {
                                     let taken = 0, read = 0;
                                     let unitDetails = [];
                                     if (parsed.bookPages[b.id]) {
@@ -1574,7 +1592,7 @@
                 function renderTab2(groupName = 'all') {
                     const container = document.getElementById('dtabs-2-content');
                     let stats = [...groupStats];
-                    stats.sort((a, b) => b.takenPercent - a.takenPercent);
+                    stats.sort((a, b) => analysisSortDir === 'az' ? a.name.localeCompare(b.name, 'tr') : b.name.localeCompare(a.name, 'tr'));
                     
                     let html = `
                         <div style="overflow-x: auto;">
@@ -1618,7 +1636,7 @@
                     if (memberName === 'all') {
                         let allMemberStats = [];
                         allMembers.forEach(m => {
-                            let data = getMemberDetailData(m.name, groupName === 'all' ? null : groupName);
+                            let data = getMemberDetailData(m.name, groupName === 'all' ? null : groupName, analysisBooks.length ? analysisBooks : 'all');
                             allMemberStats.push({
                                 name: m.name,
                                 type: m.type || 'grup',
@@ -1628,7 +1646,7 @@
                                 percent: data.totalTaken > 0 ? Math.round((data.totalRead / data.totalTaken) * 100) : 0
                             });
                         });
-                        allMemberStats.sort((a, b) => b.percent - a.percent);
+                        allMemberStats.sort((a, b) => analysisSortDir === 'az' ? a.name.localeCompare(b.name, 'tr') : b.name.localeCompare(a.name, 'tr'));
                         
                         if (allMemberStats.length === 0) {
                             container.innerHTML = '<div style="text-align: center; color: #777; padding: 20px;">Bu grupta kayıtlı üye yok.</div>';
@@ -1654,7 +1672,7 @@
                                             <tr style="${idx === 0 ? 'background: rgba(255, 215, 0, 0.1);' : ''}">
                                                 <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${idx + 1}</td>
                                                 <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: ${idx === 0 ? 'bold' : 'normal'};">
-                                                    ${idx === 0 ? '🥇 ' : idx === 1 ? '🥈 ' : idx === 2 ? '🥉 ' : ''}${m.name}
+                                                    ${idx === 0 ? '🥇 ' : idx === 1 ? '🥈 ' : idx === 2 ? '🥉 ' : ''}${m.type === 'bireysel' ? '👤' : '👥'} ${m.name}${m.groups.length ? ' <span style="opacity:.6;font-size:11px;">(' + m.groups.map(g => g.replace(/_/g,' ').toUpperCase()).join(', ') + ')</span>' : ''}
                                                 </td>
                                                 <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; font-size: 12px;">${m.type === 'bireysel' ? '\ud83d\udc64 Bireysel' : '\ud83d\udc65 Grup'}</td>
                                                 <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; font-size: 11px;">
@@ -1675,7 +1693,7 @@
                         return;
                     }
                     
-                    let data = getMemberDetailData(memberName, groupName === 'all' ? null : groupName);
+                    let data = getMemberDetailData(memberName, groupName === 'all' ? null : groupName, analysisBooks.length ? analysisBooks : 'all');
                     
                     if (data.books.length === 0) {
                         container.innerHTML = `<div style="text-align: center; color: #777; padding: 20px;">${memberName} adlı üyenin hiç hissesi bulunmuyor.</div>`;
@@ -1700,7 +1718,6 @@
                         ${(() => {
                         const mt = allMembers.find(a => a.name === memberName);
                         const isBireysel = mt && mt.type === 'bireysel';
-                        if (!isBireysel) return '';
                         const logs = data.readingLogs || [];
                         const activeDays = new Set(logs.map(l => l.date)).size;
                         let groupAvg = null;
@@ -1719,7 +1736,7 @@
                         <div style="margin-bottom: 12px; padding: 14px; border-radius: 10px; border: 2px solid var(--gold-primary); background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(212,175,55,0.02));">
                             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
                                 <span style="font-weight: bold; color: var(--gold-dark); font-size: 14px;">\ud83d\udc64 Ki\u015fisel Analiz Kart\u0131</span>
-                                <span style="font-size: 11px; background: #27ae60; color: #fff; padding: 3px 10px; border-radius: 12px;">Bireysel Takip</span>
+                                <span style="font-size: 11px; background: #27ae60; color: #fff; padding: 3px 10px; border-radius: 12px;">${isBireysel ? 'Bireysel Takip' : 'Grup Uyesi'}</span>
                             </div>
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 12px;">
                                 <div style="text-align: center; padding: 10px; background: #fff; border-radius: 8px; border: 1px solid var(--border-color);">
@@ -1810,7 +1827,7 @@
 
                 function renderTab4(groupName = 'all', memberName = 'all') {
                     const container = document.getElementById('dtabs-4-content');
-                    let data = getMemberDetailData(memberName, groupName === 'all' ? null : groupName);
+                    let data = getMemberDetailData(memberName, groupName === 'all' ? null : groupName, analysisBooks.length ? analysisBooks : 'all');
                     
                     if (data.books.length === 0) {
                         container.innerHTML = `<div style="text-align: center; color: #777; padding: 20px;">${memberName === 'all' ? 'Bu grupta' : memberName} adlı üyenin hiç hissesi bulunmuyor.</div>`;
@@ -1857,7 +1874,7 @@
 
                 function renderTab5(groupName = 'all', memberName = 'all') {
                     const container = document.getElementById('dtabs-5-content');
-                    let data = getMemberDetailData(memberName, groupName === 'all' ? null : groupName);
+                    let data = getMemberDetailData(memberName, groupName === 'all' ? null : groupName, analysisBooks.length ? analysisBooks : 'all');
                     
                     if (data.readingLogs.length === 0) {
                         container.innerHTML = `<div style="text-align: center; color: #777; padding: 20px;">Henüz okuma kaydı bulunmuyor.</div>`;
@@ -1919,6 +1936,17 @@
                                     ${getMemberSelectHtml()}
                                 </select>
                             </div>
+                            <div style="flex: 1; min-width: 150px;">
+                                <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">📚 Kitap Seç:</label>
+                                <select id="analysis-book-select" style="width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 14px; min-height: 44px;">
+                                    <option value="all">📚 Tüm Kitaplar</option>
+                                    ${getBookSelectHtml()}
+                                </select>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:8px; padding: 0 20px 8px 20px;">
+                            <button id="analysis-sort-az" style="flex:1; padding:7px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:bold; border:1px solid var(--border-color); background:${analysisSortDir==='az'?'var(--gold-primary)':'var(--card-bg)'}; color:${analysisSortDir==='az'?'#fff':'inherit'};">A-Z</button>
+                            <button id="analysis-sort-za" style="flex:1; padding:7px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:bold; border:1px solid var(--border-color); background:${analysisSortDir==='za'?'var(--gold-primary)':'var(--card-bg)'}; color:${analysisSortDir==='za'?'#fff':'inherit'};">Z-A</button>
                         </div>
                         <div style="display: flex; gap: 4px; padding: 10px 15px 0 15px; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border-color); overflow-x: auto;">
                             <button class="d-tab-btn active" data-target="dtabs-1" style="padding: 10px 16px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; white-space: nowrap;">📊 Genel Özet</button>
@@ -1966,6 +1994,14 @@
                 document.getElementById('analysis-member-select').addEventListener('change', function() {
                     updateAllTabs();
                 });
+
+                document.getElementById('analysis-book-select').addEventListener('change', function() {
+                    const v = this.value;
+                    analysisBooks = (v === 'all') ? [] : [v];
+                    updateAllTabs();
+                });
+                modalOverlay.querySelector('#analysis-sort-az').addEventListener('click', function() { analysisSortDir='az'; updateAllTabs(); });
+                modalOverlay.querySelector('#analysis-sort-za').addEventListener('click', function() { analysisSortDir='za'; updateAllTabs(); });
 
                 const tabBtns = modalOverlay.querySelectorAll(".d-tab-btn");
                 const tabContents = modalOverlay.querySelectorAll(".d-tab-content");
