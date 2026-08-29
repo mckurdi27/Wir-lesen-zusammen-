@@ -1498,13 +1498,8 @@
                     });
                     
                     allGMembers.forEach(m => {
-                        if (!allMembers.find(a => a.name === m)) {
+                        if (!allMembers.find(a => a.name === m && a.groups[0] === gKey)) {
                             allMembers.push({ name: m, groups: [gKey], type: (gData.memberTypes && gData.memberTypes[m]) ? gData.memberTypes[m] : "grup" });
-                        } else {
-                            let existing = allMembers.find(a => a.name === m);
-                            if (!existing.groups.includes(gKey)) {
-                                existing.groups.push(gKey);
-                            }
                         }
                     });
                 });
@@ -1517,8 +1512,26 @@
                     }
                 });
 
-                groupStats.sort((a, b) => a.name.localeCompare(b.name));
-                allMembers.sort((a, b) => a.name.localeCompare(b.name));
+                allGroupKeys.forEach(gKeyP => {
+                    let gDataP = localStorage.getItem(`hatim_group_${gKeyP}`);
+                    if (!gDataP) return;
+                    let gP = JSON.parse(gDataP);
+                    (gP.passiveMembers || []).forEach(pm => {
+                        if (!allMembers.find(a => a.name === pm && a.groups[0] === gKeyP)) {
+                            allMembers.push({ name: pm, groups: [gKeyP], type: 'pasif' });
+                        }
+                    });
+                });
+
+                groupStats.sort((a, b) => a.name.localeCompare(b.name, 'tr'));
+                allMembers.sort((a, b) => {
+                    const ag = a.groups[0] === 'bireysel' ? 1 : 0;
+                    const bg = b.groups[0] === 'bireysel' ? 1 : 0;
+                    if (ag !== bg) return ag - bg;
+                    const ac = a.groups[0] === 'bireysel' ? a.name : a.name + '|' + a.groups[0];
+                    const bc = b.groups[0] === 'bireysel' ? b.name : b.name + '|' + b.groups[0];
+                    return ac.localeCompare(bc, 'tr');
+                });
 
                 let modalOverlay = document.createElement("div");
                 modalOverlay.id = "detailed-analysis-modal";
@@ -1565,7 +1578,7 @@
                     }
                     let html = `<option value="all">👥 Tüm Üyeler</option>`;
                     members.forEach(m => {
-                        html += `<option value="${m.name}" ${m.name === selected ? 'selected' : ''}>${m.type === 'bireysel' ? '👤' : '👥'} ${m.name}${m.groups && m.groups.length ? ' (' + m.groups.map(g => g.replace(/_/g,' ').toUpperCase()).join(', ') + ')' : ''}</option>`;
+                        html += `<option value="${m.name}" ${m.name === selected ? 'selected' : ''}>${m.type === 'bireysel' ? '👤' : m.type === 'pasif' ? '⭐' : '👥'} ${m.name}${m.type === 'pasif' ? ' <span style="background:#bdc3c7;color:#fff;padding:1px 6px;border-radius:4px;font-size:10px;">PASİF</span>' : ''}${m.groups && m.groups.length ? ' (' + m.groups.map(g => g.replace(/_/g,' ').toUpperCase()).join(', ') + ')' : ''}</option>`;
                     });
                     return html;
                 }
@@ -2518,7 +2531,7 @@
                 }
                 let _bireyselPoolMembers = _bireyselPool.members || [];
                 let _bireyselMembersHtml = _bireyselPoolMembers.map(m => `<div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; border-bottom: 1px solid var(--border-color);">👤 ${m}${(_bireyselPool.passwords && _bireyselPool.passwords[m]) ? ` (🔑 ${_bireyselPool.passwords[m]})` : ''}<button class="admin-remove-bireysel" data-name="${m}" style="background:#e74c3c;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer;min-height:34px;">Sil</button></div>`).join('') || '';
-                let groupMembers = appData.members.filter(m => !(appData.memberTypes && appData.memberTypes[m] === 'bireysel'));
+                let groupMembers = appData.members.filter(m => !(appData.memberTypes && (appData.memberTypes[m] === 'bireysel' || appData.memberTypes[m] === 'pasif')));
                                 let membersHtml = groupMembers.map(m => `
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; font-size: 14px; border: 1px solid var(--border-color);">
                         <span>• ${m}</span>
@@ -3039,7 +3052,17 @@
                     });
 
                     document.getElementById("admin-add-member").addEventListener("click", async () => {
-                        let name = prompt("Eklenecek üye adı:");
+                        let sel0 = document.getElementById("admin-group-select");
+                        let selVal0 = sel0 ? sel0.value : "";
+                        let base = (selVal0 && selVal0 !== "") ? ` (${selVal0.replace(/_/g,' ').toUpperCase()})` : '';
+                        let suggested = "";
+                        if (selVal0 && selVal0 !== "") {
+                            let _gd0 = localStorage.getItem('hatim_group_' + selVal0);
+                            let _members0 = _gd0 ? (JSON.parse(_gd0).members || []) : [];
+                            let _idx = _members0.length + 1;
+                            suggested = _members0.length > 0 ? ` (önerilen: ${_idx}. üye)` : '';
+                        }
+                        let name = prompt("Eklenecek üye adı:" + suggested);
                         if (name?.trim()) {
                             let clean = name.trim();
                             let sel = document.getElementById("admin-group-select");
@@ -3068,6 +3091,7 @@
                                 appData.members.push(clean);
                                 if (!appData.memberTypes) appData.memberTypes = {};
                                 appData.memberTypes[clean] = "grup";
+                                if (appData.passiveMembers) { appData.passiveMembers = appData.passiveMembers.filter(p => p !== clean); }
                                 if (!appData.passwords) appData.passwords = {};
                                 appData.passwords[clean] = gpw.trim();
                                 saveGroupData();
@@ -3099,15 +3123,29 @@
                         btn.addEventListener("click", async (e) => {
                             let name = e.target.getAttribute("data-name");
                             if (confirm(`"${name}" çıkartılsın mı?`)) {
-                                appData.members = appData.members.filter(m => m !== name);
-                                Object.keys(appData.bookPages).forEach(bId => {
-                                    appData.bookPages[bId].forEach(p => {
-                                        if (p.owner === name) { p.owner = ""; p.isRead = false; }
+                                let _mdet = null;
+                                try { _mdet = getMemberDetailData(name, currentGroup, 'all'); } catch(e){}
+                                let hasCompleted = _mdet && _mdet.books && _mdet.books.some(b => b.completed);
+                                if (hasCompleted) {
+                                    if (!appData.passiveMembers) appData.passiveMembers = [];
+                                    if (!appData.passiveMembers.includes(name)) appData.passiveMembers.push(name);
+                                    if (!appData.memberTypes) appData.memberTypes = {};
+                                    appData.memberTypes[name] = 'pasif';
+                                    appData.members = appData.members.filter(m => m !== name);
+                                    saveGroupData();
+                                    await loadGroupData();
+                                    showToast(`ℹ️ ${name} pasif üye yapıldı (tamamlanmış eserleri korundu).`, 'info');
+                                } else {
+                                    appData.members = appData.members.filter(m => m !== name);
+                                    Object.keys(appData.bookPages).forEach(bId => {
+                                        appData.bookPages[bId].forEach(p => {
+                                            if (p.owner === name) { p.owner = ""; p.isRead = false; }
+                                        });
                                     });
-                                });
-                                saveGroupData();
-                                await loadGroupData();
-                                showToast(`❌ ${name} çıkartıldı.`, 'info');
+                                    saveGroupData();
+                                    await loadGroupData();
+                                    showToast(`❌ ${name} çıkartıldı.`, 'info');
+                                }
                             }
                         });
                     });
