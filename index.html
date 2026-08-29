@@ -3052,9 +3052,18 @@ function infoSortTable(col) {
                                 <th style="padding:6px; text-align:left; border:1px solid var(--border-color);">Eser</th>
                                 <th style="padding:6px; text-align:left; border:1px solid var(--border-color);">Birimler</th>
                                 <th style="padding:6px; text-align:left; border:1px solid var(--border-color);">Okunan</th>
+                                <th style="padding:6px; text-align:left; border:1px solid var(--border-color);">Alınmayan</th>
                             </tr></thead><tbody>`;
                             rows.forEach(r => {
-                                h += `<tr><td style="padding:6px; border:1px solid var(--border-color); font-weight:bold;">${r.name}</td><td style="padding:6px; border:1px solid var(--border-color);">${r.units.length}/${r.total}</td><td style="padding:6px; border:1px solid var(--border-color); color:#27ae60;">${r.read} okundu</td></tr>`;
+                                let free = r.total - r.units.length;
+                                h += `<tr>
+                                    <td style="padding:6px; border:1px solid var(--border-color); font-weight:bold;">${r.name}</td>
+                                    <td style="padding:6px; border:1px solid var(--border-color);">${r.units.length}/${r.total}</td>
+                                    <td style="padding:6px; border:1px solid var(--border-color); color:#27ae60;">${r.read} okundu</td>
+                                    <td style="padding:6px; border:1px solid var(--border-color); text-align:center;">
+                                        ${free > 0 ? `<button class="bulk-free-btn" data-book="${r.name}" style="background:#8e44ad; color:#fff; border:none; border-radius:6px; cursor:pointer; padding:6px 10px; font-size:12px; min-height:40px;">${free} alınmadı ▾</button>` : '—'}
+                                    </td>
+                                </tr>`;
                             });
                             h += `</tbody></table></div>`;
                             h += `<div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">`;
@@ -3086,6 +3095,49 @@ function infoSortTable(col) {
                             });
                         });
                     }
+                    panel.addEventListener('click', function(e) {
+                        if (!e.target.classList.contains('bulk-free-btn')) return;
+                        let bookName = e.target.getAttribute('data-book');
+                        let g3 = data.gData;
+                        // find the book's id by name
+                        let bObj = (g3.books || appData.books || []).find(x => x.name === bookName);
+                        if (!bObj || !g3.bookPages[bObj.id]) return;
+                        let pages = g3.bookPages[bObj.id];
+                        let freeIdx = [];
+                        pages.forEach((p, i) => { if (!p.owner) freeIdx.push(i); });
+                        if (!freeIdx.length) { showToast('Boş hisse kalmadı.', 'info'); return; }
+                        // member candidates
+                        let cands = [];
+                        if (data.type === 'group') { cands = g3.members || []; }
+                        else if (data.type === 'bireysel') { cands = [data.mName]; }
+                        else if (data.type === 'member') { cands = [data.mName]; }
+                        if (!cands.length) { showToast('Atanacak üye yok.', 'error'); return; }
+                        let pick = `<div style="margin-top:8px; padding:8px; border:1px solid var(--border-color); border-radius:6px; background:rgba(142,68,173,0.05);">
+                            <div style="font-size:12px; font-weight:bold; margin-bottom:6px;">📖 ${bookName} — ${freeIdx.length} boş hisse: hangi üyeye atansın? (tek tek)</div>
+                            <div style="display:flex; flex-wrap:wrap; gap:6px;">`;
+                        cands.forEach(m => { pick += `<button class="bulk-pick-member" data-member="${m}" style="background:#27ae60; color:#fff; border:none; border-radius:6px; cursor:pointer; padding:8px 12px; font-size:12px; min-height:44px;">${m}</button>`; });
+                        pick += `</div>
+                            <div style="font-size:11px; color:#777; margin-top:6px;">Her tıklamada 1 hisse atanır; istenen kadar tıklayın.</div>
+                        </div>`;
+                        // remove old pickers
+                        panel.querySelectorAll('.bulk-pick-wrap').forEach(x => x.remove());
+                        let wrap = document.createElement('div');
+                        wrap.className = 'bulk-pick-wrap';
+                        wrap.innerHTML = pick;
+                        panel.appendChild(wrap);
+                        wrap.querySelectorAll('.bulk-pick-member').forEach(btn => {
+                            btn.addEventListener('click', () => {
+                                let m = btn.getAttribute('data-member');
+                                let pages2 = g3.bookPages[bObj.id];
+                                let assigned = false;
+                                for (let i = 0; i < pages2.length; i++) {
+                                    if (!pages2[i].owner) { pages2[i].owner = m; pages2[i].isRead = false; assigned = true; break; }
+                                }
+                                if (assigned) { bulkSave(data); showToast('✅ 1 hisse ' + m + ' üyesine atandı.', 'success'); loadGroupData(); }
+                                else { showToast('Boş hisse kalmadı.', 'info'); }
+                            });
+                        });
+                    });
 
                     document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         let bName = prompt("Eser adı:");
