@@ -1403,6 +1403,14 @@
                     });
                 });
 
+                // Bireysel havuz üyelerini de analiz tablosuna ekle
+                let _pool = getBireyselPool();
+                (_pool.members || []).forEach(pm => {
+                    if (!allMembers.find(a => a.name === pm)) {
+                        allMembers.push({ name: pm, groups: ['bireysel'], type: 'bireysel' });
+                    }
+                });
+
                 groupStats.sort((a, b) => a.name.localeCompare(b.name));
                 allMembers.sort((a, b) => a.name.localeCompare(b.name));
 
