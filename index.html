@@ -1921,27 +1921,33 @@
                                 <button id="modal-close-btn" style="background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px;">✕ Kapat</button>
                             </div>
                         </div>
-                        <div style="padding: 12px 20px; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border-color); display: flex; gap: 12px; flex-wrap: wrap;">
+                        <div style="padding: 12px 20px; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border-color);">
+                            <div style="font-size:13px; font-weight:bold; color:var(--gold-dark); margin-bottom:8px;">🔍 FİLTRE</div>
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                             <div style="flex: 1; min-width: 150px;">
                                 <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">📁 Grup Seç:</label>
+                                <div style="font-size:11px; color:#888; margin-bottom:3px;">Grup veya BİREYSEL seçin</div>
                                 <select id="analysis-group-select" style="width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 14px; min-height: 44px;">
                                     ${getGroupSelectHtml()}
                                 </select>
                             </div>
                             <div style="flex: 1; min-width: 150px;">
                                 <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">👤 Üye Seç:</label>
+                                <div style="font-size:11px; color:#888; margin-bottom:3px;">Analiz edilecek üyeyi seçin</div>
                                 <select id="analysis-member-select" style="width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 14px; min-height: 44px;">
                                     ${getMemberSelectHtml()}
                                 </select>
                             </div>
                             <div style="flex: 1; min-width: 150px;">
                                 <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">📚 Kitap Seç:</label>
+                                <div style="font-size:11px; color:#888; margin-bottom:3px;">Tümü veya tek bir kitap</div>
                                 <select id="analysis-book-select" style="width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 14px; min-height: 44px;">
                                     <option value="all">📚 Tüm Kitaplar</option>
                                     ${getBookSelectHtml()}
                                 </select>
                             </div>
                         </div>
+                        <div style="font-size:11px; color:#888; padding: 0 20px 3px 20px;">Sırala:</div>
                         <div style="display:flex; gap:8px; padding: 0 20px 8px 20px;">
                             <button id="analysis-sort-az" style="flex:1; padding:7px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:bold; border:1px solid var(--border-color); background:${analysisSortDir==='az'?'var(--gold-primary)':'var(--card-bg)'}; color:${analysisSortDir==='az'?'#fff':'inherit'};">A-Z</button>
                             <button id="analysis-sort-za" style="flex:1; padding:7px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:bold; border:1px solid var(--border-color); background:${analysisSortDir==='za'?'var(--gold-primary)':'var(--card-bg)'}; color:${analysisSortDir==='za'?'#fff':'inherit'};">Z-A</button>
@@ -2307,9 +2313,7 @@
                 let groupsHtml = `<option value="" selected>👤 BİREYSEL</option>` + allGroups.map(g => `<option value="${g}">${g.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
 
                 let groupMembers = appData.members.filter(m => !(appData.memberTypes && appData.memberTypes[m] === 'bireysel'));
-                let _bireyselPool = getBireyselPool();
-                let bireyselMembers = _bireyselPool.members || [];
-                let membersHtml = groupMembers.map(m => `
+                                let membersHtml = groupMembers.map(m => `
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; font-size: 14px; border: 1px solid var(--border-color);">
                         <span>• ${m}</span>
                         <div style="display: flex; gap: 6px;">
@@ -2337,16 +2341,7 @@
                         <div style="max-height: 180px; overflow-y: auto; border: 1px solid var(--border-color); padding: 6px; border-radius: 6px; background: var(--card-bg);">
                             ${groupMembers.length > 0 ? membersHtml : '<div style="font-size: 13px; text-align: center; padding: 12px; color: #777;">Grupta \u00fcye yok.</div>'}
                         </div>
-                        <div style="margin: 10px 0 8px; font-size: 12px; font-weight: bold; color: #27ae60;">\ud83d\udc64 Bireysel \u00dcyeler</div>
-                        <div style="max-height: 150px; overflow-y: auto; border: 1px solid var(--border-color); padding: 6px; border-radius: 6px; background: var(--card-bg);">
-                            ${bireyselMembers.length > 0 ? bireyselMembers.map(m => `<div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; font-size: 14px; border: 1px solid var(--border-color);">
-                                        <span>\ud83d\udc64 ${m}</span>
-                                        <div style="display: flex; gap: 6px;">
-                                            <button class="admin-edit-member" data-name="${m}" style="background: #f39c12; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; min-height: 40px;">D\u00fczelt</button>
-                                            <button class="admin-remove-member" data-name="${m}" style="background: #e74c3c; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; min-height: 40px;">\u00c7\u0131kart</button>
-                                        </div>
-                                    </div>`).join('') : '<div style="font-size: 13px; text-align: center; padding: 12px; color: #777;">Bireysel \u00fcye yok.</div>'}
-                        </div>
+                        
                         <div style="font-size: 12px; color: #7f8c8d; margin-top: 8px;">
                             💡 Şifre durumu: <span style="font-weight: bold; color: ${appData.password ? '#27ae60' : '#e67e22'};">${appData.password ? '🔒 Şifreli' : '🔓 Şifresiz'}</span>
                         </div>
@@ -2413,7 +2408,7 @@
                         </div>`;
                     } catch(e) { return ''; }
                 }).join('');
-                let infoBireyselHtml = (_infoPool.members || []).map(mm => `<div style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 6px; font-size: 13px; background: var(--card-bg); display:flex; justify-content:space-between; align-items:center;">👤 ${mm}${(_infoPool.passwords && _infoPool.passwords[mm]) ? ` (🔑 ${_infoPool.passwords[mm]})` : ''} <button class="admin-remove-bireysel" data-name="${mm}" style="background:#e74c3c;color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:12px;cursor:pointer;min-height:28px;">🗑 Sil</button></div>`).join('') || '<div style="font-size: 13px; color:#777;">Bireysel üye yok.</div>';
+                
                 let infoSectionHtml = `
                     <div class="admin-section info-section">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
@@ -2422,10 +2417,6 @@
                         <div style="font-size:12px; color:#7f8c8d; margin-bottom:8px;">💡 Üye şifresini unutursa, grubun şifresi buradan görülebilir.</div>
                         <div style="max-height:260px; overflow-y:auto; border:1px solid var(--border-color); padding:8px; border-radius:8px; background:var(--card-bg);">
                             ${infoRowsHtml || '<div style="font-size:13px; color:#777;">Kayıtlı grup yok.</div>'}
-                        </div>
-                        <div style="margin:12px 0 6px; font-size:13px; font-weight:bold; color:#27ae60;">👤 Bireysel Üyeler</div>
-                        <div style="max-height:150px; overflow-y:auto; border:1px solid var(--border-color); padding:8px; border-radius:8px; background:var(--card-bg);">
-                            ${infoBireyselHtml}
                         </div>
                     </div>
                 `;
