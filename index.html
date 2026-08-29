@@ -14,6 +14,8 @@
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
         }
+        button + button, button + a, a + button { margin-left: 10px; }
+        .btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
         :root {
             --bg-primary: #fdfbf7;
             --card-bg: #ffffff;
@@ -3084,7 +3086,7 @@ function infoSortTable(col) {
                                 </select>
                             </div>`;
                             h += `<div id="bv-units-wrap" style="max-height:220px; overflow-y:auto; border:1px solid var(--border-color); border-radius:6px; padding:8px; background:var(--card-bg);"></div>`;
-                            h += `<div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+                            h += `<div style="margin-top:10px; display:flex; gap:12px; flex-wrap:wrap;">
                                 <button id="bv-save" style="flex:1; padding:8px; background:#27ae60; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:12px; min-height:44px;">💾 Kaydet</button>
                                 <button id="bv-clear-sel" style="flex:1; padding:8px; background:#e67e22; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:12px; min-height:44px;">Temizle</button>
                                 <button id="bv-clear-owner" style="flex:1; padding:8px; background:#e74c3c; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:12px; min-height:44px;">🗑️ Hisseleri Temizle</button>
