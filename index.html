@@ -1192,6 +1192,18 @@
                 });
             }
 
+            const nameInput = document.getElementById('login-user-name');
+            if (nameInput) {
+                nameInput.addEventListener('input', function() {
+                    const nm = this.value.trim();
+                    const savedType = localStorage.getItem('hatim_member_type_' + nm);
+                    const typeSel = document.getElementById('login-user-type');
+                    if (savedType && typeSel && ['bireysel','grup'].includes(savedType)) {
+                        typeSel.value = savedType;
+                    }
+                });
+            }
+
             const joinBtn = document.getElementById('login-join-btn');
             if (joinBtn) {
                 joinBtn.addEventListener('click', function() {
@@ -1214,6 +1226,7 @@
                         }
                         loggedInMember = userName;
                         loggedInMemberType = "bireysel";
+                        localStorage.setItem('hatim_member_type_' + userName, "bireysel");
                         localStorage.setItem(`hatim_session_${currentGroup}`, userName);
                         localStorage.setItem(`hatim_session_type_${currentGroup}`, "bireysel");
                         saveGroupData();
@@ -1249,6 +1262,7 @@
                             currentGroup = groupKey;
                             loggedInMember = userName;
                             loggedInMemberType = "grup";
+                            localStorage.setItem('hatim_member_type_' + userName, "grup");
                             localStorage.setItem(`hatim_session_${groupKey}`, userName);
                             localStorage.setItem(`hatim_session_type_${groupKey}`, "grup");
                             showToast(`✅ ${userName}, "${groupKey.replace(/_/g, ' ').toUpperCase()}" grubuna katıldı!`, 'success');
@@ -1282,6 +1296,7 @@
                         currentGroup = groupKey;
                         loggedInMember = userName;
                         loggedInMemberType = "grup";
+                        localStorage.setItem('hatim_member_type_' + userName, "grup");
                         localStorage.setItem(`hatim_session_${groupKey}`, userName);
                         localStorage.setItem(`hatim_session_type_${groupKey}`, "grup");
                         showToast(`✅ "${groupKey.replace(/_/g, ' ').toUpperCase()}" grubu oluşturuldu!`, 'success');
@@ -2242,9 +2257,11 @@
                 bottomContainer.style.cssText = "margin: 20px 0; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--card-bg);";
 
                 let allGroups = getAllGroupKeysForAdmin();
-                let groupsHtml = allGroups.map(g => `<option value="${g}" ${g === currentGroup ? "selected" : ""}>${g.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
+                let groupsHtml = `<option value="">-- Seçin --</option>` + allGroups.map(g => `<option value="${g}">${g.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
 
-                let membersHtml = appData.members.map(m => `
+                let groupMembers = appData.members.filter(m => !(appData.memberTypes && appData.memberTypes[m] === 'bireysel'));
+                let bireyselMembers = appData.members.filter(m => (appData.memberTypes && appData.memberTypes[m] === 'bireysel'));
+                let membersHtml = groupMembers.map(m => `
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; font-size: 14px; border: 1px solid var(--border-color);">
                         <span>• ${m}</span>
                         <div style="display: flex; gap: 6px;">
@@ -2270,7 +2287,7 @@
                             <button id="admin-add-member" style="background: #2980b9; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 40px;">+ Üye Ekle</button>
                         </div>
                         <div style="max-height: 180px; overflow-y: auto; border: 1px solid var(--border-color); padding: 6px; border-radius: 6px; background: var(--card-bg);">
-                            ${appData.members.length > 0 ? membersHtml : '<div style="font-size: 13px; text-align: center; padding: 12px; color: #777;">Kayıtlı üye yok.</div>'}
+                            ${groupMembers.length > 0 ? membersHtml : '<div style="font-size: 13px; text-align: center; padding: 12px; color: #777;">Grupta \u00fcye yok.</div>'}
                         </div>
                         <div style="font-size: 12px; color: #7f8c8d; margin-top: 8px;">
                             💡 Şifre durumu: <span style="font-weight: bold; color: ${appData.password ? '#27ae60' : '#e67e22'};">${appData.password ? '🔒 Şifreli' : '🔓 Şifresiz'}</span>
