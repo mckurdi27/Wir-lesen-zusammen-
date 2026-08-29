@@ -1994,7 +1994,7 @@
                     }
                 }
 
-                modalOverlay.querySelector('.d-tab-content').addEventListener('click', function(e) {
+                modalOverlay.addEventListener('click', function(e) {
                     const th = e.target.closest('th[data-sortkey]');
                     if (!th) return;
                     const key = th.getAttribute('data-sortkey');
