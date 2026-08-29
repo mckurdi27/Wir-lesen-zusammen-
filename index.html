@@ -404,28 +404,23 @@
             <div id="login-form-area" class="login-form-area">
                 <div class="login-grid login-grid-2x3">
                     <div class="login-field">
-                        <label for="login-user-name" class="login-label">&#128100; İsim</label>
                         <input type="text" id="login-user-name" list="user-name-list" placeholder="İsminizi yazın" class="login-input">
                         <datalist id="user-name-list"></datalist>
                     </div>
                     <div class="login-field">
-                        <label for="login-user-password" class="login-label">&#128274; Şifre</label>
                         <input type="password" id="login-user-password" placeholder="Şifrenizi yazın" class="login-input">
                     </div>
                     <div class="login-field login-field-type">
-                        <label for="login-user-type" class="login-label">&#128100; Tip</label>
                         <select id="login-user-type" class="login-input login-select">
                             <option value="bireysel">&#128100; Tek</option>
                             <option value="grup">&#128101; Grup</option>
                         </select>
                     </div>
                     <div class="login-field">
-                        <label for="login-group-name" class="login-label">&#128101; Grup İsim</label>
                         <input type="text" id="login-group-name" list="group-name-list" placeholder="Grup adını yazın" class="login-input">
                         <datalist id="group-name-list"></datalist>
                     </div>
                     <div class="login-field">
-                        <label for="login-group-password" class="login-label">&#128274; Grup Şifre</label>
                         <input type="password" id="login-group-password" placeholder="Grup şifresi" class="login-input">
                     </div>
                     <div class="login-field login-field-btn">
@@ -1214,6 +1209,8 @@
                     if (userType === 'bireysel') {
                         if (!appData.members.includes(userName)) {
                             appData.members.push(userName);
+                            if (!appData.memberTypes) appData.memberTypes = {};
+                            appData.memberTypes[userName] = "bireysel";
                         }
                         loggedInMember = userName;
                         loggedInMemberType = "bireysel";
@@ -1245,6 +1242,8 @@
                             }
                             if (!parsed.members.includes(userName)) {
                                 parsed.members.push(userName);
+                                if (!parsed.memberTypes) parsed.memberTypes = {};
+                                parsed.memberTypes[userName] = "grup";
                             }
                             localStorage.setItem(`hatim_group_${groupKey}`, JSON.stringify(parsed));
                             currentGroup = groupKey;
@@ -1271,6 +1270,7 @@
                         });
                         const newGroupData = {
                             members: [userName],
+                            memberTypes: { [userName]: 'grup' },
                             password: groupPassword || "",
                             books: freshBooks,
                             bookPages: freshPages,
@@ -1337,8 +1337,9 @@
                     let gDataRaw = localStorage.getItem(`hatim_group_${gKey}`);
                     if (!gDataRaw) return;
                     let gData = JSON.parse(gDataRaw);
-                    let memberCount = gData.members ? gData.members.length : 0;
-                    let memberNames = gData.members || [];
+                    let allGMembers = gData.members || [];
+                    let memberNames = (gData.memberTypes) ? allGMembers.filter(m => (gData.memberTypes[m] || "grup") === "grup") : allGMembers;
+                    let memberCount = memberNames.length;
                     let groupBooks = 0, groupTaken = 0, groupRead = 0;
                     
                     if (gData.books && gData.bookPages) {
@@ -1353,6 +1354,7 @@
                         });
                     }
                     
+                    if (memberCount === 0) return;
                     groupStats.push({
                         name: gKey,
                         members: memberCount,
@@ -1365,9 +1367,9 @@
                         data: gData
                     });
                     
-                    memberNames.forEach(m => {
+                    allGMembers.forEach(m => {
                         if (!allMembers.find(a => a.name === m)) {
-                            allMembers.push({ name: m, groups: [gKey] });
+                            allMembers.push({ name: m, groups: [gKey], type: (gData.memberTypes && gData.memberTypes[m]) ? gData.memberTypes[m] : "grup" });
                         } else {
                             let existing = allMembers.find(a => a.name === m);
                             if (!existing.groups.includes(gKey)) {
@@ -1587,6 +1589,7 @@
                             let data = getMemberDetailData(m.name, groupName === 'all' ? null : groupName);
                             allMemberStats.push({
                                 name: m.name,
+                                type: m.type || 'grup',
                                 groups: data.groups,
                                 taken: data.totalTaken,
                                 read: data.totalRead,
@@ -1607,6 +1610,7 @@
                                         <tr style="background: rgba(212, 175, 55, 0.15);">
                                             <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">#</th>
                                             <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye</th>
+                                            <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Tip</th>
                                             <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Grup</th>
                                             <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Aldığı</th>
                                             <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okuduğu</th>
@@ -1620,6 +1624,7 @@
                                                 <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: ${idx === 0 ? 'bold' : 'normal'};">
                                                     ${idx === 0 ? '🥇 ' : idx === 1 ? '🥈 ' : idx === 2 ? '🥉 ' : ''}${m.name}
                                                 </td>
+                                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; font-size: 12px;">${m.type === 'bireysel' ? '\ud83d\udc64 Bireysel' : '\ud83d\udc65 Grup'}</td>
                                                 <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; font-size: 11px;">
                                                     ${m.groups.map(g => g.replace(/_/g, ' ').toUpperCase()).join(', ')}
                                                 </td>
@@ -1660,6 +1665,73 @@
                                 <span>✅ Tamamlanan Kitap: <strong>${data.completedBooks}</strong></span>
                             </div>
                         </div>
+                        ${(() => {
+                        const mt = allMembers.find(a => a.name === memberName);
+                        const isBireysel = mt && mt.type === 'bireysel';
+                        if (!isBireysel) return '';
+                        const logs = data.readingLogs || [];
+                        const activeDays = new Set(logs.map(l => l.date)).size;
+                        let groupAvg = null;
+                        const groupMems = allMembers.filter(a => a.type !== 'bireysel');
+                        if (groupMems.length > 0) {
+                            let sum = 0;
+                            groupMems.forEach(gm => {
+                                const dd = getMemberDetailData(gm.name, groupName === 'all' ? null : groupName);
+                                sum += dd.totalTaken > 0 ? (dd.totalRead / dd.totalTaken) * 100 : 0;
+                            });
+                            groupAvg = Math.round(sum / groupMems.length);
+                        }
+                        const diff = groupAvg !== null ? totalPercent - groupAvg : null;
+                        const statusColor = totalPercent >= 80 ? '#27ae60' : totalPercent >= 50 ? '#f39c12' : '#e74c3c';
+                        return `
+                        <div style="margin-bottom: 12px; padding: 14px; border-radius: 10px; border: 2px solid var(--gold-primary); background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(212,175,55,0.02));">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+                                <span style="font-weight: bold; color: var(--gold-dark); font-size: 14px;">\ud83d\udc64 Ki\u015fisel Analiz Kart\u0131</span>
+                                <span style="font-size: 11px; background: #27ae60; color: #fff; padding: 3px 10px; border-radius: 12px;">Bireysel Takip</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 12px;">
+                                <div style="text-align: center; padding: 10px; background: #fff; border-radius: 8px; border: 1px solid var(--border-color);">
+                                    <div style="font-size: 22px; font-weight: bold; color: ${statusColor};">%${totalPercent}</div>
+                                    <div style="font-size: 11px; opacity: 0.7;">Tamamlama</div>
+                                </div>
+                                <div style="text-align: center; padding: 10px; background: #fff; border-radius: 8px; border: 1px solid var(--border-color);">
+                                    <div style="font-size: 22px; font-weight: bold;">${data.completedBooks}</div>
+                                    <div style="font-size: 11px; opacity: 0.7;">Tamamlanan Kitap</div>
+                                </div>
+                                <div style="text-align: center; padding: 10px; background: #fff; border-radius: 8px; border: 1px solid var(--border-color);">
+                                    <div style="font-size: 22px; font-weight: bold;">${activeDays}</div>
+                                    <div style="font-size: 11px; opacity: 0.7;">Aktif G\u00fcn</div>
+                                </div>
+                                <div style="text-align: center; padding: 10px; background: #fff; border-radius: 8px; border: 1px solid var(--border-color);">
+                                    <div style="font-size: 22px; font-weight: bold;">${logs.length}</div>
+                                    <div style="font-size: 11px; opacity: 0.7;">Okuma Kayd\u0131</div>
+                                </div>
+                            </div>
+                            ${groupAvg !== null ? `
+                            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                                <span>Grup Ortalamas\u0131 ile Kar\u015f\u0131la\u015ft\u0131rma</span>
+                                <span style="color: ${diff >= 0 ? '#27ae60' : '#e74c3c'}; font-weight: bold;">${diff >= 0 ? '+' : ''}${diff}% ${diff >= 0 ? '\u2191' : '\u2193'}</span>
+                            </div>
+                            <div style="font-size: 12px; margin-bottom: 6px;">
+                                <div style="background: #e9ecef; border-radius: 10px; height: 12px; overflow: hidden;">
+                                    <div style="height: 100%; width: ${Math.min(groupAvg,100)}%; background: #bdc3c7; border-right: 2px solid #333;"></div>
+                                </div>
+                                <div style="background: #e9ecef; border-radius: 10px; height: 12px; margin-top: 4px; overflow: hidden;">
+                                    <div style="height: 100%; width: ${Math.min(totalPercent,100)}%; background: linear-gradient(to right, #f39c12, #27ae60);"></div>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                                <span>Grup Ort.: %${groupAvg}</span>
+                                <span>Siz: %${totalPercent}</span>
+                            </div>
+                            ` : `
+                            <div style="font-size: 12px; opacity: 0.8; text-align: center; padding: 8px; background: rgba(0,0,0,0.03); border-radius: 8px;">
+                                Hen\u00fcz grup \u00fcyesi yok. Ki\u015fisel ilerlemen takip ediliyor.
+                            </div>
+                            `}
+                        </div>
+                        `;
+                    })()}
                         <div style="display: flex; flex-direction: column; gap: 6px;">
                             ${data.books.map((b, idx) => {
                                 let statusColor = b.completed ? '#27ae60' : b.readPercent >= 50 ? '#f39c12' : '#e74c3c';
@@ -2517,7 +2589,7 @@
                                 hatims[b.id] = { hatimNo: 1, startDate: today, prayerDone: false };
                                 history[b.id] = [];
                             });
-                            appData = { members: [], password: pwd.trim(), books, bookPages: pages, bookHatims: hatims, bookHistory: history, readingLogs: [] };
+                            appData = { members: [], memberTypes: {}, password: pwd.trim(), books, bookPages: pages, bookHatims: hatims, bookHistory: history, readingLogs: [] };
                             saveGroupData();
                             await loadGroupData();
                             showToast('✅ Yeni grup oluşturuldu!', 'success');
@@ -2564,6 +2636,8 @@
                             let clean = name.trim();
                             if (!appData.members.includes(clean)) {
                                 appData.members.push(clean);
+                                if (!appData.memberTypes) appData.memberTypes = {};
+                                appData.memberTypes[clean] = "grup";
                                 saveGroupData();
                                 await loadGroupData();
                                 showToast(`✅ ${clean} eklendi!`, 'success');
@@ -2699,6 +2773,7 @@
                 appData = savedData ? JSON.parse(savedData) : { members: currentGroup === "grup_1" ? [] : [], password: "" };
 
                 if (!appData.members) appData.members = [];
+                if (!appData.memberTypes) appData.memberTypes = {};
                 if (appData.password === undefined) appData.password = "";
                 if (!appData.readingLogs) appData.readingLogs = [];
 
