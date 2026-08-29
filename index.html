@@ -2934,7 +2934,12 @@ function infoSortTable(col) {
                         if (type === "bireysel") {
                             let storeKey = 'hatim_group_' + mName.toLowerCase();
                             try { let gData = JSON.parse(localStorage.getItem(storeKey) || 'null'); if (gData) return { type:'bireysel', mName, gData }; } catch(e){}
-                            return null;
+                            let bBooks = (typeof appData !== 'undefined' && appData.books) ? appData.books : [];
+                            let bp = {};
+                            bBooks.forEach(b => { bp[b.id] = Array(b.totalUnits||0).fill(null).map(() => ({owner:'', isRead:false})); });
+                            let fresh = { members:[mName], memberTypes:{}, passwords:{}, books:bBooks, bookPages:bp, readingLogs:[] };
+                            try { fresh.memberTypes[mName] = 'bireysel'; } catch(e){}
+                            return { type:'bireysel', mName, gData:fresh };
                         }
                         try { let gData = JSON.parse(localStorage.getItem(`hatim_group_${gKey}`) || 'null'); if (gData) return { type, gKey, mName, gData }; } catch(e){}
                         return null;
@@ -3144,15 +3149,19 @@ function infoSortTable(col) {
                                 else { showToast('İşaretli hisse yok.', 'info'); }
                             });
                             document.getElementById('bv-clear-owner').addEventListener('click', () => {
-                                let m = document.getElementById('bv-member').value;
-                                let bId = document.getElementById('bv-book').value;
-                                let pages = g.bookPages[bId];
-                                if (!pages) return;
+                                let selV2 = document.getElementById('bv-member').value;
+                                let bId2 = document.getElementById('bv-book').value;
+                                let m2 = selV2.split(':').pop();
+                                let t2 = selV2.split(':')[0];
+                                let targetData2 = null, tpages2 = null;
+                                if (t2 === 'bireysel') { targetData2 = bulkResolveData('bireysel:' + m2); if (!targetData2 || !targetData2.gData.bookPages) return; tpages2 = targetData2.gData.bookPages[bId2]; }
+                                else { targetData2 = data; tpages2 = g.bookPages[bId2]; }
+                                if (!tpages2) return;
                                 let cnt = 0;
-                                for (let i = 0; i < pages.length; i++) {
-                                    if (pages[i].owner === m) { pages[i].owner = ''; pages[i].isRead = false; cnt++; }
+                                for (let i = 0; i < tpages2.length; i++) {
+                                    if (tpages2[i].owner === m2) { tpages2[i].owner = ''; tpages2[i].isRead = false; cnt++; }
                                 }
-                                if (cnt > 0) { bulkSave(data); showToast('🗑️ ' + cnt + ' hisse temizlendi.', 'info'); loadGroupData(); }
+                                if (cnt > 0) { bulkSave(targetData2); showToast('🗑️ ' + cnt + ' hisse temizlendi.', 'info'); loadGroupData(); }
                             });
                         });
                     }
