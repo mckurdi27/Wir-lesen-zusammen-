@@ -835,25 +835,35 @@
             async function fetchHijriMonthData(ayKodu) {
                 if (monthlyInspirationCache[ayKodu]) return monthlyInspirationCache[ayKodu];
                 const fileMap = {
-                    "01": "json/01-muharrem.json",
-                    "02": "json/02-sefer.json",
-                    "03": "json/03-rebiülevvel.json",
-                    "04": "json/04-rebiülahir.json",
-                    "05": "json/05-cemaziyelevvel.json",
-                    "06": "json/06-cemaziyelahir.json",
-                    "07": "json/07-recep.json",
-                    "08": "json/08-saban.json",
-                    "09": "json/09-ramazan.json",
-                    "10": "json/10-sevval.json",
-                    "11": "json/11-zilkade.json",
-                    "12": "json/12-zilhicce.json"
+                    "01": "json/01-muharrem.js",
+                    "02": "json/02-sefer.js",
+                    "03": "json/03-rebiülevvel.js",
+                    "04": "json/04-rebiülahir.js",
+                    "05": "json/05-cemaziyelevvel.js",
+                    "06": "json/06-cemaziyelahir.js",
+                    "07": "json/07-recep.js",
+                    "08": "json/08-saban.js",
+                    "09": "json/09-ramazan.js",
+                    "10": "json/10-sevval.js",
+                    "11": "json/11-zilkade.js",
+                    "12": "json/12-zilhicce.js"
                 };
-                let filePath = fileMap[ayKodu] || "json/03-rebiülevvel.json";
+                const varMap = {
+                    "01": "muharrem_veri", "02": "sefer_veri", "03": "rebiülevvel_veri", "04": "rebiülahir_veri",
+                    "05": "cemaziyelevvel_veri", "06": "cemaziyelahir_veri", "07": "recep_veri", "08": "saban_veri",
+                    "09": "ramazan_veri", "10": "sevval_veri", "11": "zilkade_veri", "12": "zilhicce_veri"
+                };
+                let filePath = fileMap[ayKodu] || "json/03-rebiülevvel.js";
+                let varName = varMap[ayKodu] || "rebiülevvel_veri";
                 try {
                     console.log('📂 JSON yükleniyor:', filePath);
                     const response = await fetch(filePath);
                     if (!response.ok) throw new Error(`HTTP hatası: ${response.status}`);
-                    const data = await response.json();
+                    const jsText = await response.text();
+                    (0, eval)(jsText);
+                    let raw = window[varName] || null;
+                    if (!raw) throw new Error('Global veri bulunamadı: ' + varName);
+                    let data = (raw.gunler && typeof raw.gunler === 'object') ? raw.gunler : raw;
                     monthlyInspirationCache[ayKodu] = data;
                     console.log('✅ JSON yüklendi:', ayKodu);
                     return data;
