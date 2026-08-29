@@ -2457,6 +2457,7 @@
                                 <div>
                                     <label style="font-size: 12px; font-weight: bold;">Eser Seçimi:</label>
                                     <select id="admin-bulk-book-select" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px; min-height: 44px;">
+                                        <option value="__all__">📚 Tüm Eserler</option>
                                         ${appData.books.map(b => `<option value="${b.id}">${b.name} (${b.totalUnits})</option>`).join('')}
                                     </select>
                                 </div>
@@ -2535,6 +2536,16 @@
                                 } catch(e){}
                             }
                         });
+                        try {
+                            let _bp = getBireyselPool();
+                            if (_bp.members && _bp.members.length > 0) {
+                                optionsHtml += `<optgroup label="👤 Bireysel Üyeler">`;
+                                _bp.members.forEach(mm => {
+                                    optionsHtml += `<option value="bireysel:${mm}">👤 ${mm}</option>`;
+                                });
+                                optionsHtml += `</optgroup>`;
+                            }
+                        } catch(e){}
                         targetSelect.innerHTML = optionsHtml;
                     }
 
@@ -2545,21 +2556,45 @@
                             let target = bottomContainer.querySelector("#admin-bulk-target-select").value;
                             if (!target) { showToast('Lütfen hedef seçin.', 'error'); return; }
                             let [type, gKey, mName] = target.split(":");
+                            let bookIds = (bookId === "__all__") ? (appData.books || []).map(b => b.id) : [bookId];
+
+                            // Bireysel üye hedefi: okuma verisi kendi anahtarında
+                            if (type === "bireysel") {
+                                let storeKey = 'hatim_group_' + mName.toLowerCase();
+                                let gData = null;
+                                try { gData = JSON.parse(localStorage.getItem(storeKey) || 'null'); } catch(e){}
+                                if (!gData) { showToast('Bireysel üyenin verisi bulunamadı.', 'error'); return; }
+                                if (!gData.bookPages) gData.bookPages = {};
+                                let assigned = 0;
+                                bookIds.forEach(bId => {
+                                    let pages = gData.bookPages[bId];
+                                    if (!pages) return;
+                                    pages.forEach(p => { if (!p.owner) { p.owner = mName; assigned++; } });
+                                });
+                                localStorage.setItem(storeKey, JSON.stringify(gData));
+                                showToast('✅ ' + assigned + ' hisse atandı (' + mName + ').', 'success');
+                                loadGroupData();
+                                return;
+                            }
+
                             let data = localStorage.getItem(`hatim_group_${gKey}`);
                             if (!data) { showToast('Grup bulunamadı.', 'error'); return; }
                             let gData = JSON.parse(data);
-                            if (!gData.bookPages[bookId]) { showToast('Eser bulunamadı.', 'error'); return; }
+                            let assigned = 0;
 
-                            if (type === "member") {
-                                gData.bookPages[bookId].forEach(p => { if (!p.owner) p.owner = mName; });
-                            } else if (type === "group") {
-                                let members = gData.members;
-                                if (!members || members.length === 0) { showToast('Grupta üye yok!', 'error'); return; }
-                                let idx = 0;
-                                gData.bookPages[bookId].forEach(p => { if (!p.owner) { p.owner = members[idx % members.length]; idx++; } });
-                            }
+                            bookIds.forEach(bId => {
+                                if (!gData.bookPages[bId]) { return; }
+                                if (type === "member") {
+                                    gData.bookPages[bId].forEach(p => { if (!p.owner) { p.owner = mName; assigned++; } });
+                                } else if (type === "group") {
+                                    let members = gData.members;
+                                    if (!members || members.length === 0) { return; }
+                                    let idx = 0;
+                                    gData.bookPages[bId].forEach(p => { if (!p.owner) { p.owner = members[idx % members.length]; idx++; assigned++; } });
+                                }
+                            });
                             localStorage.setItem(`hatim_group_${gKey}`, JSON.stringify(gData));
-                            showToast('✅ Toplu atama tamamlandı!', 'success');
+                            showToast('✅ ' + assigned + ' hisse atandı.', 'success');
                             loadGroupData();
                         });
                     }
@@ -2571,19 +2606,42 @@
                             let target = bottomContainer.querySelector("#admin-bulk-target-select").value;
                             if (!target) { showToast('Lütfen hedef seçin.', 'error'); return; }
                             let [type, gKey, mName] = target.split(":");
+                            let bookIds = (bookId === "__all__") ? (appData.books || []).map(b => b.id) : [bookId];
+                            if (!confirm('Seçilen hisseleri silmek istediğinize emin misiniz?')) return;
+
+                            if (type === "bireysel") {
+                                let storeKey = 'hatim_group_' + mName.toLowerCase();
+                                let gData = null;
+                                try { gData = JSON.parse(localStorage.getItem(storeKey) || 'null'); } catch(e){}
+                                if (!gData) return;
+                                if (!gData.bookPages) gData.bookPages = {};
+                                let removed = 0;
+                                bookIds.forEach(bId => {
+                                    let pages = gData.bookPages[bId];
+                                    if (!pages) return;
+                                    pages.forEach(p => { if (p.owner === mName) { p.owner = ""; p.isRead = false; removed++; } });
+                                });
+                                localStorage.setItem(storeKey, JSON.stringify(gData));
+                                showToast('🗑️ ' + removed + ' hisse silindi.', 'info');
+                                loadGroupData();
+                                return;
+                            }
+
                             let data = localStorage.getItem(`hatim_group_${gKey}`);
                             if (!data) return;
                             let gData = JSON.parse(data);
-                            if (confirm('Seçilen eserdeki hisseleri silmek istediğinize emin misiniz?')) {
+                            let removed = 0;
+                            bookIds.forEach(bId => {
+                                if (!gData.bookPages[bId]) return;
                                 if (type === "member") {
-                                    gData.bookPages[bookId].forEach(p => { if (p.owner === mName) { p.owner = ""; p.isRead = false; } });
+                                    gData.bookPages[bId].forEach(p => { if (p.owner === mName) { p.owner = ""; p.isRead = false; removed++; } });
                                 } else if (type === "group") {
-                                    gData.bookPages[bookId].forEach(p => { p.owner = ""; p.isRead = false; });
+                                    gData.bookPages[bId].forEach(p => { if (p.owner) { p.owner = ""; p.isRead = false; removed++; } });
                                 }
-                                localStorage.setItem(`hatim_group_${gKey}`, JSON.stringify(gData));
-                                showToast('🗑️ Silme işlemi tamamlandı.', 'info');
-                                loadGroupData();
-                            }
+                            });
+                            localStorage.setItem(`hatim_group_${gKey}`, JSON.stringify(gData));
+                            showToast('🗑️ ' + removed + ' hisse silindi.', 'info');
+                            loadGroupData();
                         });
                     }
 
@@ -2594,23 +2652,44 @@
                             let target = bottomContainer.querySelector("#admin-bulk-target-select").value;
                             if (!target) { showToast('Lütfen hedef seçin.', 'error'); return; }
                             let [type, gKey, mName] = target.split(":");
+                            let bookIds = (bookId === "__all__") ? (appData.books || []).map(b => b.id) : [bookId];
+                            if (!confirm('Seçilen hisseleri sıfırlamak istediğinize emin misiniz?')) return;
+
+                            if (type === "bireysel") {
+                                let storeKey = 'hatim_group_' + mName.toLowerCase();
+                                let gData = null;
+                                try { gData = JSON.parse(localStorage.getItem(storeKey) || 'null'); } catch(e){}
+                                if (!gData) return;
+                                if (!gData.bookPages) gData.bookPages = {};
+                                let reset = 0;
+                                bookIds.forEach(bId => {
+                                    let pages = gData.bookPages[bId];
+                                    if (!pages) return;
+                                    pages.forEach(p => { if (p.owner === mName) { p.owner = ""; p.isRead = false; reset++; } });
+                                    if (gData.bookHatims && gData.bookHatims[bId]) { gData.bookHatims[bId].hatimNo = 1; gData.bookHatims[bId].prayerDone = false; }
+                                });
+                                localStorage.setItem(storeKey, JSON.stringify(gData));
+                                showToast('🔄 ' + reset + ' hisse sıfırlandı.', 'info');
+                                loadGroupData();
+                                return;
+                            }
+
                             let data = localStorage.getItem(`hatim_group_${gKey}`);
                             if (!data) return;
                             let gData = JSON.parse(data);
-                            if (confirm('Seçilen eseri tamamen sıfırlamak istediğinize emin misiniz?')) {
+                            let reset = 0;
+                            bookIds.forEach(bId => {
+                                if (!gData.bookPages[bId]) return;
                                 if (type === "member") {
-                                    gData.bookPages[bookId].forEach(p => { if (p.owner === mName) { p.owner = ""; p.isRead = false; } });
+                                    gData.bookPages[bId].forEach(p => { if (p.owner === mName) { p.owner = ""; p.isRead = false; reset++; } });
                                 } else if (type === "group") {
-                                    gData.bookPages[bookId].forEach(p => { p.owner = ""; p.isRead = false; });
+                                    gData.bookPages[bId].forEach(p => { if (p.owner) { p.owner = ""; p.isRead = false; reset++; } });
                                 }
-                                if (gData.bookHatims && gData.bookHatims[bookId]) {
-                                    gData.bookHatims[bookId].hatimNo = 1;
-                                    gData.bookHatims[bookId].prayerDone = false;
-                                }
-                                localStorage.setItem(`hatim_group_${gKey}`, JSON.stringify(gData));
-                                showToast('🔄 Eser sıfırlandı.', 'info');
-                                loadGroupData();
-                            }
+                                if (gData.bookHatims && gData.bookHatims[bId]) { gData.bookHatims[bId].hatimNo = 1; gData.bookHatims[bId].prayerDone = false; }
+                            });
+                            localStorage.setItem(`hatim_group_${gKey}`, JSON.stringify(gData));
+                            showToast('🔄 ' + reset + ' hisse sıfırlandı.', 'info');
+                            loadGroupData();
                         });
                     }
 
