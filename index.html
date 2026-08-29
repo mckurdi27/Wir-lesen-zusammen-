@@ -1114,7 +1114,7 @@
                     let key = localStorage.key(i);
                     if (key && key.startsWith("hatim_group_")) {
                         let gName = key.replace("hatim_group_", "");
-                        keys.push(gName);
+                        if (String(gName).trim() !== '') keys.push(gName);
                     }
                 }
                 if (keys.length === 0) keys.push("");
@@ -2546,7 +2546,7 @@
                 bottomContainer.style.cssText = "margin: 20px 0; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--card-bg);";
 
                 let allGroups = getAllGroupKeysForAdmin();
-                let groupsHtml = `<option value="" selected>👤 BİREYSEL</option>` + allGroups.map(g => `<option value="${g}">${g.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
+                let groupsHtml = `<option value="" selected>👤 BİREYSEL</option>` + allGroups.filter(g => String(g).trim() !== '').map(g => `<option value="${g}">${g.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
 
                 let _bireyselPool = getBireyselPool();
                 let _poolForSelect = _bireyselPool.members || [];
