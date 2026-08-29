@@ -2728,26 +2728,36 @@ function infoSortTable(col) {
                     <div class="admin-section bulk-section">
                         <h4 style="color: #8e44ad;">📥 Toplu Atama / Silme</h4>
                         <div style="font-size:12px; color:#8e44ad; font-weight:bold; margin-bottom:8px;">📌 Seçili Grup: ${currentGroup.replace(/_/g,' ').toUpperCase()}</div>
-                        
+
                         <div style="border-top: 1px solid var(--border-color); padding-top: 12px;">
                             <div style="font-weight: bold; font-size: 13px; margin-bottom: 8px;">📚 Toplu Atama ve Silme:</div>
-                            <div style="display: flex; flex-direction: column; gap: 8px; background: var(--card-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                            <div style="display: flex; flex-direction: column; gap: 10px; background: var(--card-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
                                 <div>
-                                    <label style="font-size: 12px; font-weight: bold;">Eser Seçimi:</label>
-                                    <select id="admin-bulk-book-select" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px; min-height: 44px;">
-                                        <option value="__all__">📚 Tüm Eserler</option>
-                                        ${appData.books.map(b => `<option value="${b.id}">${b.name} (${b.totalUnits})</option>`).join('')}
+                                    <label style="font-size: 12px; font-weight: bold;">👥 Hedef (Grup / Üye / Bireysel):</label>
+                                    <select id="admin-bulk-target-select" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px; min-height: 44px;">
                                     </select>
                                 </div>
                                 <div>
-                                    <label style="font-size: 12px; font-weight: bold;">Hedef:</label>
-                                    <select id="admin-bulk-target-select" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px; min-height: 44px;">
+                                    <label style="font-size: 12px; font-weight: bold;">📖 Eser Seçimi (birden fazla seçilebilir):</label>
+                                    <div id="admin-bulk-book-checks" style="display: flex; flex-direction: column; gap: 5px; max-height: 180px; overflow-y: auto; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg);">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label style="font-size: 12px; font-weight: bold;">⚖️ Paylaştırma:</label>
+                                    <select id="admin-bulk-mode-select" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px; min-height: 44px;">
+                                        <option value="equal">⚖️ Eşit paylaştır (gruba dağıt)</option>
+                                        <option value="individual">🔀 Tek tek (seçilen üyeye)</option>
                                     </select>
                                 </div>
                                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                                     <button id="admin-bulk-assign-btn" style="flex: 1; padding: 10px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; min-width: 80px;">📥 Atama</button>
                                     <button id="admin-bulk-delete-btn" style="flex: 1; padding: 10px; background: #e74c3c; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; min-width: 80px;">🗑️ Sil</button>
                                     <button id="admin-bulk-reset-btn" style="flex: 1; padding: 10px; background: #f39c12; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; min-width: 80px;">🔄 Sıfırla</button>
+                                </div>
+                                <div>
+                                    <button id="admin-bulk-view-btn" style="width: 100%; padding: 10px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px;">👁️ Alınan Hisseleri Gör / Düzenle</button>
+                                </div>
+                                <div id="admin-bulk-view-panel" style="display: none; border-top: 1px dashed var(--border-color); padding-top: 10px;">
                                 </div>
                             </div>
                         </div>
@@ -2825,149 +2835,191 @@ function infoSortTable(col) {
                             }
                         } catch(e){}
                         targetSelect.innerHTML = optionsHtml;
+
+                    let bulkBookChecks = bottomContainer.querySelector("#admin-bulk-book-checks");
+                    if (bulkBookChecks) {
+                        let _books = (appData.books || []);
+                        let _checksHtml = `<label style="display:flex; align-items:center; gap:6px; font-size:12px; font-weight:bold;"><input type="checkbox" id="bulk-check-all" checked> Tümünü Seç</label>`;
+                        _books.forEach(b => {
+                            _checksHtml += `<label style="display:flex; align-items:center; gap:6px; font-size:12px;"><input type="checkbox" class="bulk-book-cb" value="${b.id}" checked> ${b.name} (${b.totalUnits})</label>`;
+                        });
+                        bulkBookChecks.innerHTML = _checksHtml;
+                        let _allCb = bulkBookChecks.querySelector("#bulk-check-all");
+                        if (_allCb) {
+                            _allCb.addEventListener("change", () => {
+                                bulkBookChecks.querySelectorAll(".bulk-book-cb").forEach(cb => cb.checked = _allCb.checked);
+                            });
+                        }
+                    }
+                    function getSelectedBulkBooks() {
+                        let ids = [];
+                        bottomContainer.querySelectorAll(".bulk-book-cb:checked").forEach(cb => ids.push(cb.value));
+                        return ids;
+                    }
                     }
 
                     const bulkAssignBtn = bottomContainer.querySelector("#admin-bulk-assign-btn");
+                    const bulkDeleteBtn = bottomContainer.querySelector("#admin-bulk-delete-btn");
+                    const bulkResetBtn = bottomContainer.querySelector("#admin-bulk-reset-btn");
+                    const bulkViewBtn = bottomContainer.querySelector("#admin-bulk-view-btn");
+
+                    function bulkResolveData(target) {
+                        if (!target) return null;
+                        let parts = target.split(":");
+                        let type = parts[0], gKey = parts[1], mName = parts[2];
+                        if (type === "bireysel") {
+                            let storeKey = 'hatim_group_' + mName.toLowerCase();
+                            try { let gData = JSON.parse(localStorage.getItem(storeKey) || 'null'); if (gData) return { type:'bireysel', mName, gData }; } catch(e){}
+                            return null;
+                        }
+                        try { let gData = JSON.parse(localStorage.getItem(`hatim_group_${gKey}`) || 'null'); if (gData) return { type, gKey, mName, gData }; } catch(e){}
+                        return null;
+                    }
+                    function bulkSave(data) {
+                        if (data.type === 'bireysel') localStorage.setItem('hatim_group_' + data.mName.toLowerCase(), JSON.stringify(data.gData));
+                        else localStorage.setItem(`hatim_group_${data.gKey}`, JSON.stringify(data.gData));
+                    }
+                    function bulkBookIds() {
+                        let ids = getSelectedBulkBooks();
+                        if (!ids.length) ids = (appData.books || []).map(b => b.id);
+                        return ids;
+                    }
+
                     if (bulkAssignBtn) {
                         bulkAssignBtn.addEventListener("click", () => {
-                            let bookId = bottomContainer.querySelector("#admin-bulk-book-select").value;
                             let target = bottomContainer.querySelector("#admin-bulk-target-select").value;
                             if (!target) { showToast('Lütfen hedef seçin.', 'error'); return; }
-                            let [type, gKey, mName] = target.split(":");
-                            let bookIds = (bookId === "__all__") ? (appData.books || []).map(b => b.id) : [bookId];
-
-                            // Bireysel üye hedefi: okuma verisi kendi anahtarında
-                            if (type === "bireysel") {
-                                let storeKey = 'hatim_group_' + mName.toLowerCase();
-                                let gData = null;
-                                try { gData = JSON.parse(localStorage.getItem(storeKey) || 'null'); } catch(e){}
-                                if (!gData) { showToast('Bireysel üyenin verisi bulunamadı.', 'error'); return; }
-                                if (!gData.bookPages) gData.bookPages = {};
-                                let assigned = 0;
-                                bookIds.forEach(bId => {
-                                    let pages = gData.bookPages[bId];
-                                    if (!pages) return;
-                                    pages.forEach(p => { if (!p.owner) { p.owner = mName; assigned++; } });
-                                });
-                                localStorage.setItem(storeKey, JSON.stringify(gData));
-                                showToast('✅ ' + assigned + ' hisse atandı (' + mName + ').', 'success');
-                                loadGroupData();
-                                return;
-                            }
-
-                            let data = localStorage.getItem(`hatim_group_${gKey}`);
-                            if (!data) { showToast('Grup bulunamadı.', 'error'); return; }
-                            let gData = JSON.parse(data);
+                            let mode = bottomContainer.querySelector("#admin-bulk-mode-select").value;
+                            let data = bulkResolveData(target);
+                            if (!data) { showToast('Hedef verisi bulunamadı.', 'error'); return; }
+                            let bookIds = bulkBookIds();
                             let assigned = 0;
-
+                            let g = data.gData;
+                            if (!g.bookPages) g.bookPages = {};
                             bookIds.forEach(bId => {
-                                if (!gData.bookPages[bId]) { return; }
-                                if (type === "member") {
-                                    gData.bookPages[bId].forEach(p => { if (!p.owner) { p.owner = mName; assigned++; } });
-                                } else if (type === "group") {
-                                    let members = gData.members;
-                                    if (!members || members.length === 0) { return; }
+                                let pages = g.bookPages[bId];
+                                if (!pages) return;
+                                if (data.type === "bireysel" || mode === "individual") {
+                                    let m = data.mName;
+                                    pages.forEach(p => { if (!p.owner) { p.owner = m; p.isRead = false; assigned++; } });
+                                } else if (data.type === "group") {
+                                    let members = g.members || [];
+                                    if (!members.length) return;
                                     let idx = 0;
-                                    gData.bookPages[bId].forEach(p => { if (!p.owner) { p.owner = members[idx % members.length]; idx++; assigned++; } });
+                                    pages.forEach(p => { if (!p.owner) { p.owner = members[idx % members.length]; idx++; assigned++; } });
+                                } else {
+                                    let m = data.mName;
+                                    pages.forEach(p => { if (!p.owner) { p.owner = m; p.isRead = false; assigned++; } });
                                 }
                             });
-                            localStorage.setItem(`hatim_group_${gKey}`, JSON.stringify(gData));
+                            bulkSave(data);
                             showToast('✅ ' + assigned + ' hisse atandı.', 'success');
                             loadGroupData();
                         });
                     }
 
-                    const bulkDeleteBtn = bottomContainer.querySelector("#admin-bulk-delete-btn");
                     if (bulkDeleteBtn) {
                         bulkDeleteBtn.addEventListener("click", () => {
-                            let bookId = bottomContainer.querySelector("#admin-bulk-book-select").value;
                             let target = bottomContainer.querySelector("#admin-bulk-target-select").value;
                             if (!target) { showToast('Lütfen hedef seçin.', 'error'); return; }
-                            let [type, gKey, mName] = target.split(":");
-                            let bookIds = (bookId === "__all__") ? (appData.books || []).map(b => b.id) : [bookId];
-                            if (!confirm('Seçilen hisseleri silmek istediğinize emin misiniz?')) return;
-
-                            if (type === "bireysel") {
-                                let storeKey = 'hatim_group_' + mName.toLowerCase();
-                                let gData = null;
-                                try { gData = JSON.parse(localStorage.getItem(storeKey) || 'null'); } catch(e){}
-                                if (!gData) return;
-                                if (!gData.bookPages) gData.bookPages = {};
-                                let removed = 0;
-                                bookIds.forEach(bId => {
-                                    let pages = gData.bookPages[bId];
-                                    if (!pages) return;
-                                    pages.forEach(p => { if (p.owner === mName) { p.owner = ""; p.isRead = false; removed++; } });
-                                });
-                                localStorage.setItem(storeKey, JSON.stringify(gData));
-                                showToast('🗑️ ' + removed + ' hisse silindi.', 'info');
-                                loadGroupData();
-                                return;
-                            }
-
-                            let data = localStorage.getItem(`hatim_group_${gKey}`);
+                            if (!confirm('Seçilen eserlerdeki hisseleri silmek istediğinize emin misiniz?')) return;
+                            let data = bulkResolveData(target);
                             if (!data) return;
-                            let gData = JSON.parse(data);
+                            let bookIds = bulkBookIds();
+                            let g = data.gData;
                             let removed = 0;
                             bookIds.forEach(bId => {
-                                if (!gData.bookPages[bId]) return;
-                                if (type === "member") {
-                                    gData.bookPages[bId].forEach(p => { if (p.owner === mName) { p.owner = ""; p.isRead = false; removed++; } });
-                                } else if (type === "group") {
-                                    gData.bookPages[bId].forEach(p => { if (p.owner) { p.owner = ""; p.isRead = false; removed++; } });
-                                }
+                                let pages = g.bookPages[bId];
+                                if (!pages) return;
+                                if (data.type === "group") { pages.forEach(p => { if (p.owner) { p.owner = ""; p.isRead = false; removed++; } }); }
+                                else { let m = data.mName; pages.forEach(p => { if (p.owner === m) { p.owner = ""; p.isRead = false; removed++; } }); }
                             });
-                            localStorage.setItem(`hatim_group_${gKey}`, JSON.stringify(gData));
+                            bulkSave(data);
                             showToast('🗑️ ' + removed + ' hisse silindi.', 'info');
                             loadGroupData();
                         });
                     }
 
-                    const bulkResetBtn = bottomContainer.querySelector("#admin-bulk-reset-btn");
                     if (bulkResetBtn) {
                         bulkResetBtn.addEventListener("click", () => {
-                            let bookId = bottomContainer.querySelector("#admin-bulk-book-select").value;
                             let target = bottomContainer.querySelector("#admin-bulk-target-select").value;
                             if (!target) { showToast('Lütfen hedef seçin.', 'error'); return; }
-                            let [type, gKey, mName] = target.split(":");
-                            let bookIds = (bookId === "__all__") ? (appData.books || []).map(b => b.id) : [bookId];
-                            if (!confirm('Seçilen hisseleri sıfırlamak istediğinize emin misiniz?')) return;
-
-                            if (type === "bireysel") {
-                                let storeKey = 'hatim_group_' + mName.toLowerCase();
-                                let gData = null;
-                                try { gData = JSON.parse(localStorage.getItem(storeKey) || 'null'); } catch(e){}
-                                if (!gData) return;
-                                if (!gData.bookPages) gData.bookPages = {};
-                                let reset = 0;
-                                bookIds.forEach(bId => {
-                                    let pages = gData.bookPages[bId];
-                                    if (!pages) return;
-                                    pages.forEach(p => { if (p.owner === mName) { p.owner = ""; p.isRead = false; reset++; } });
-                                    if (gData.bookHatims && gData.bookHatims[bId]) { gData.bookHatims[bId].hatimNo = 1; gData.bookHatims[bId].prayerDone = false; }
-                                });
-                                localStorage.setItem(storeKey, JSON.stringify(gData));
-                                showToast('🔄 ' + reset + ' hisse sıfırlandı.', 'info');
-                                loadGroupData();
-                                return;
-                            }
-
-                            let data = localStorage.getItem(`hatim_group_${gKey}`);
+                            if (!confirm('Seçilen eserlerdeki hisseleri sıfırlamak istediğinize emin misiniz?')) return;
+                            let data = bulkResolveData(target);
                             if (!data) return;
-                            let gData = JSON.parse(data);
+                            let bookIds = bulkBookIds();
+                            let g = data.gData;
                             let reset = 0;
                             bookIds.forEach(bId => {
-                                if (!gData.bookPages[bId]) return;
-                                if (type === "member") {
-                                    gData.bookPages[bId].forEach(p => { if (p.owner === mName) { p.owner = ""; p.isRead = false; reset++; } });
-                                } else if (type === "group") {
-                                    gData.bookPages[bId].forEach(p => { if (p.owner) { p.owner = ""; p.isRead = false; reset++; } });
-                                }
-                                if (gData.bookHatims && gData.bookHatims[bId]) { gData.bookHatims[bId].hatimNo = 1; gData.bookHatims[bId].prayerDone = false; }
+                                let pages = g.bookPages[bId];
+                                if (!pages) return;
+                                if (data.type === "group") { pages.forEach(p => { if (p.owner) { p.owner = ""; p.isRead = false; reset++; } }); }
+                                else { let m = data.mName; pages.forEach(p => { if (p.owner === m) { p.owner = ""; p.isRead = false; reset++; } }); }
+                                if (g.bookHatims && g.bookHatims[bId]) { g.bookHatims[bId].hatimNo = 1; g.bookHatims[bId].prayerDone = false; }
                             });
-                            localStorage.setItem(`hatim_group_${gKey}`, JSON.stringify(gData));
+                            bulkSave(data);
                             showToast('🔄 ' + reset + ' hisse sıfırlandı.', 'info');
                             loadGroupData();
+                        });
+                    }
+
+                    if (bulkViewBtn) {
+                        bulkViewBtn.addEventListener("click", () => {
+                            let target = bottomContainer.querySelector("#admin-bulk-target-select").value;
+                            let panel = bottomContainer.querySelector("#admin-bulk-view-panel");
+                            if (!panel) return;
+                            if (!target) { panel.style.display = 'none'; panel.innerHTML = ''; return; }
+                            let data = bulkResolveData(target);
+                            if (!data) { panel.style.display='block'; panel.innerHTML = '<div style="color:#777;font-size:13px;">Veri bulunamadı.</div>'; return; }
+                            let g = data.gData;
+                            let books = (g.books || appData.books || []);
+                            let rows = [];
+                            books.forEach(b => {
+                                let pages = g.bookPages[b.id];
+                                if (!pages) return;
+                                let mine = [];
+                                pages.forEach((p, i) => { if (data.type === "group") { if (p.owner) mine.push(i + 1); } else if (p.owner === data.mName) mine.push(i + 1); });
+                                if (mine.length) rows.push({ name: b.name, total: pages.length, units: mine, read: mine.filter(u => pages[u-1] && pages[u-1].isRead).length });
+                            });
+                            if (!rows.length) { panel.style.display='block'; panel.innerHTML = '<div style="color:#777;font-size:13px;">Bu hedefin seçili eserlerde hissesi yok.</div>'; return; }
+                            let h = `<div style="font-size:13px; font-weight:bold; margin-bottom:6px;">👁️ Alınan Hisseler (${data.mName || ('Grup: ' + (data.gKey||'').replace(/_/g,' '))}):</div>`;
+                            h += `<div style="max-height:220px; overflow-y:auto; border:1px solid var(--border-color); border-radius:6px;">`;
+                            h += `<table style="width:100%; border-collapse:collapse; font-size:12px;"><thead><tr style="background:rgba(142,68,173,0.1);">
+                                <th style="padding:6px; text-align:left; border:1px solid var(--border-color);">Eser</th>
+                                <th style="padding:6px; text-align:left; border:1px solid var(--border-color);">Birimler</th>
+                                <th style="padding:6px; text-align:left; border:1px solid var(--border-color);">Okunan</th>
+                            </tr></thead><tbody>`;
+                            rows.forEach(r => {
+                                h += `<tr><td style="padding:6px; border:1px solid var(--border-color); font-weight:bold;">${r.name}</td><td style="padding:6px; border:1px solid var(--border-color);">${r.units.length}/${r.total}</td><td style="padding:6px; border:1px solid var(--border-color); color:#27ae60;">${r.read} okundu</td></tr>`;
+                            });
+                            h += `</tbody></table></div>`;
+                            h += `<div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">`;
+                            h += `<button id="bulk-edit-owner-btn" style="flex:1; padding:8px; background:#8e44ad; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:12px; min-height:44px;">✏️ Sahibi Değiştir</button>`;
+                            h += `<button id="bulk-clear-owner-btn" style="flex:1; padding:8px; background:#e74c3c; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:12px; min-height:44px;">🗑️ Hisseleri Temizle</button>`;
+                            h += `</div>`;
+                            panel.innerHTML = h;
+                            panel.style.display = 'block';
+                            let editBtn = panel.querySelector("#bulk-edit-owner-btn");
+                            if (editBtn) editBtn.addEventListener("click", () => {
+                                let newOwner = prompt("Hisseleri kime devredelim? (yeni sahip adı)");
+                                if (!newOwner || !newOwner.trim()) return;
+                                let nm = newOwner.trim(); let g2 = data.gData; let cnt = 0;
+                                bulkBookIds().forEach(bId => {
+                                    let pages = g2.bookPages[bId]; if (!pages) return;
+                                    pages.forEach(p => { if (data.type === "group") { if (p.owner) { p.owner = nm; cnt++; } } else if (p.owner === data.mName) { p.owner = nm; cnt++; } });
+                                });
+                                bulkSave(data); showToast('✏️ ' + cnt + ' hisse sahibi ' + nm + ' yapıldı.', 'success'); loadGroupData();
+                            });
+                            let clearBtn = panel.querySelector("#bulk-clear-owner-btn");
+                            if (clearBtn) clearBtn.addEventListener("click", () => {
+                                if (!confirm('Bu hedefin hisselerini tamamen boşalt?')) return;
+                                let g2 = data.gData; let cnt = 0;
+                                bulkBookIds().forEach(bId => {
+                                    let pages = g2.bookPages[bId]; if (!pages) return;
+                                    pages.forEach(p => { if (data.type === "group") { if (p.owner) { p.owner = ""; p.isRead = false; cnt++; } } else if (p.owner === data.mName) { p.owner = ""; p.isRead = false; cnt++; } });
+                                });
+                                bulkSave(data); showToast('🗑️ ' + cnt + ' hisse temizlendi.', 'info'); loadGroupData();
+                            });
                         });
                     }
 
