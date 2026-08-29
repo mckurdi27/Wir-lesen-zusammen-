@@ -3207,7 +3207,7 @@ function infoSortTable(col) {
                                         tpages[i].owner = m; tpages[i].isRead = tpages[i].isRead || false; cnt++;
                                     }
                                 });
-                                if (cnt > 0) { bulkSave(targetData); showToast('✅ ' + cnt + ' hisse ' + m + ' üyesine atandı.', 'success'); loadGroupData(); }
+                                if (cnt > 0) { bulkSave(targetData); showToast('✅ ' + cnt + ' hisse ' + m + ' üyesine atandı.', 'success'); renderUnits(); }
                                 else { showToast('İşaretli hisse yok.', 'info'); }
                             });
                             document.getElementById('bv-clear-owner').addEventListener('click', () => {
@@ -3223,7 +3223,7 @@ function infoSortTable(col) {
                                 for (let i = 0; i < tpages2.length; i++) {
                                     if (tpages2[i].owner === m2) { tpages2[i].owner = ''; tpages2[i].isRead = false; cnt++; }
                                 }
-                                if (cnt > 0) { bulkSave(targetData2); showToast('🗑️ ' + cnt + ' hisse temizlendi.', 'info'); loadGroupData(); }
+                                if (cnt > 0) { bulkSave(targetData2); showToast('🗑️ ' + cnt + ' hisse temizlendi.', 'info'); renderUnits(); }
                             });
                         });
                     }
