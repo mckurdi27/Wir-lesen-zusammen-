@@ -2640,43 +2640,61 @@
 
                 let _infoGroups = getAllGroupKeysForAdmin();
                 let _infoPool = getBireyselPool();
-                let _infoBireyselHtml = (_infoPool.members || []).map(mm => `<div style="padding:6px 4px; border-bottom:1px solid var(--border-color); font-size:13px;">👤 ${mm}${(_infoPool.passwords && _infoPool.passwords[mm]) ? ` (🔑 ${_infoPool.passwords[mm]})` : ''}</div>`).join('');
-                let infoRowsHtml = _infoGroups.map(gKey => {
+                let _infoRows = [];
+                _infoGroups.forEach(gKey => {
                     let raw = localStorage.getItem(`hatim_group_${gKey}`);
-                    let gName = gKey.replace(/_/g, ' ').toUpperCase();
-                    if (!raw) return '';
+                    if (!raw) return;
                     try {
                         let d = JSON.parse(raw);
-                        let gPw = d.password || '(şifresiz)';
-                        let gMembers = (d.members || []).map(mm => {
-                            let mpw = (d.passwords && d.passwords[mm]) ? d.passwords[mm] : '';
-                            return mm + (mpw ? ` (🔑 ${mpw})` : '');
-                        }).join(', ') || '-';
-                        return `<div style="padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px; background: var(--card-bg);">
-                            <div style="font-weight: bold; color: #2980b9;">👥 ${gName}</div>
-                            <div style="font-size: 12px; margin-top: 4px;">🔑 Grup Şifresi: <span style="font-weight:bold; color:#8e44ad;">${gPw}</span></div>
-                            <div style="font-size: 12px; margin-top: 2px;">👤 Üyeler: ${gMembers}</div>
-                        </div>`;
-                    } catch(e) { return ''; }
-                }).join('');
-                
+                        let gName = gKey.replace(/_/g, ' ').toUpperCase();
+                        let gPw = d.password || '';
+                        _infoRows.push(['👥 Grup', gName, gPw ? ('🔑 ' + gPw) : '(şifresiz)', '', '']);
+                        (d.members || []).forEach(mm => {
+                            let mpw = (d.passwords && d.passwords[mm]) ? ('🔑 ' + d.passwords[mm]) : '';
+                            _infoRows.push(['👤 Üye', mm, mpw || '(şifresiz)', '', '']);
+                        });
+                    } catch(e) {}
+                });
+                (_infoPool.members || []).forEach(mm => {
+                    let mpw = (_infoPool.passwords && _infoPool.passwords[mm]) ? ('🔑 ' + _infoPool.passwords[mm]) : '';
+                    _infoRows.push(['👤 Bireysel', mm, mpw || '(şifresiz)', '', '']);
+                });
+                let infoTableHtml = _infoRows.length
+                    ? `<table style="width:100%; border-collapse:collapse; font-size:13px;">
+                        <thead>
+                            <tr style="background:rgba(142,68,173,0.1);">
+                                <th style="padding:8px; text-align:left; border:1px solid var(--border-color);">1. Grup/Bireysel</th>
+                                <th style="padding:8px; text-align:left; border:1px solid var(--border-color);">2. İsim</th>
+                                <th style="padding:8px; text-align:left; border:1px solid var(--border-color);">3. Şifre</th>
+                                <th style="padding:8px; text-align:left; border:1px solid var(--border-color);">4.</th>
+                                <th style="padding:8px; text-align:left; border:1px solid var(--border-color);">5.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${_infoRows.map(r => `<tr>
+                                <td style="padding:8px; border:1px solid var(--border-color);">${r[0]}</td>
+                                <td style="padding:8px; border:1px solid var(--border-color); font-weight:bold;">${r[1]}</td>
+                                <td style="padding:8px; border:1px solid var(--border-color); color:#8e44ad; font-weight:bold;">${r[2]}</td>
+                                <td style="padding:8px; border:1px solid var(--border-color);">${r[3]}</td>
+                                <td style="padding:8px; border:1px solid var(--border-color);">${r[4]}</td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>`
+                    : '<div style="font-size:13px; color:#777;">Kayıtlı üye/grup yok.</div>';
+
                 let infoSectionHtml = `
                     <div class="admin-section info-section">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
                             <h4 style="color:#8e44ad; margin:0;">🗂️ Üye ve Grup Bilgi Paneli</h4>
                         </div>
                         <div style="font-size:12px; color:#7f8c8d; margin-bottom:8px;">💡 Üye şifresini unutursa, grubun şifresi buradan görülebilir.</div>
-                        <div style="max-height:260px; overflow-y:auto; border:1px solid var(--border-color); padding:8px; border-radius:8px; background:var(--card-bg);">
-                            ${infoRowsHtml || '<div style="font-size:13px; color:#777;">Kayıtlı grup yok.</div>'}
-                        </div>
-                        <div style="margin:12px 0 6px; font-size:13px; font-weight:bold; color:#27ae60;">👤 Bireysel Üyeler</div>
-                        <div style="max-height:180px; overflow-y:auto; border:1px solid var(--border-color); padding:8px; border-radius:8px; background:var(--card-bg);">
-                            ${_infoBireyselHtml || '<div style="font-size:13px; color:#777;">Bireysel üye yok.</div>'}
+                        <div style="max-height:400px; overflow-y:auto; border:1px solid var(--border-color); padding:0; border-radius:8px; background:var(--card-bg);">
+                            ${infoTableHtml}
                         </div>
                     </div>
                 `;
 
-                let bulkSectionHtml = `
+let bulkSectionHtml = `
                     <div class="admin-section bulk-section">
                         <h4 style="color: #8e44ad;">📥 Toplu Atama / Silme</h4>
                         <div style="font-size:12px; color:#8e44ad; font-weight:bold; margin-bottom:8px;">📌 Seçili Grup: ${currentGroup.replace(/_/g,' ').toUpperCase()}</div>
