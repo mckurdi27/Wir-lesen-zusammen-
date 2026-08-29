@@ -2416,6 +2416,11 @@
                 let groupsHtml = `<option value="" selected>👤 BİREYSEL</option>` + allGroups.map(g => `<option value="${g}">${g.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
 
                 let _bireyselPool = getBireyselPool();
+                let _poolForSelect = _bireyselPool.members || [];
+                if (_poolForSelect.length > 0) {
+                    groupsHtml += `<option value="__bireysel__" disabled>👤 — BİREYSEL ÜYELER —</option>` +
+                        _poolForSelect.map(m => `<option value="${m.toLowerCase()}">👤 ${m}</option>`).join('');
+                }
                 let _bireyselPoolMembers = _bireyselPool.members || [];
                 let _bireyselMembersHtml = _bireyselPoolMembers.map(m => `<div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; border-bottom: 1px solid var(--border-color);">👤 ${m}${(_bireyselPool.passwords && _bireyselPool.passwords[m]) ? ` (🔑 ${_bireyselPool.passwords[m]})` : ''}<button class="admin-remove-bireysel" data-name="${m}" style="background:#e74c3c;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer;min-height:34px;">Sil</button></div>`).join('') || '';
                 let groupMembers = appData.members.filter(m => !(appData.memberTypes && appData.memberTypes[m] === 'bireysel'));
