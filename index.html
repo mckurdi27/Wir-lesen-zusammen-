@@ -1992,6 +1992,10 @@
                                     ${getBookSelectHtml()}
                                 </select>
                             </div>
+                            <div id="analysis-selected-group-col" style="flex: 1; min-width: 150px; align-self: center;">
+                                <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">📌 Seçili Grup:</label>
+                                <div id="analysis-selected-group-name" style="padding: 10px 12px; border-radius: 6px; background: rgba(39,174,96,0.12); border: 1px solid #27ae60; color: #1e7e46; font-weight: bold; font-size: 14px; min-height: 44px; display: flex; align-items: center; word-break: break-word;">Tüm Gruplar</div>
+                            </div>
                         </div>
 
                         <div style="display: flex; gap: 4px; padding: 10px 15px 0 15px; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border-color); overflow-x: auto;">
@@ -2084,6 +2088,8 @@
                     const group = this.value;
                     const memberSelect = document.getElementById('analysis-member-select');
                     memberSelect.innerHTML = getMemberSelectHtml(group);
+                    const sg = document.getElementById('analysis-selected-group-name');
+                    if (sg) sg.textContent = group === 'all' ? 'Tüm Gruplar' : group.replace(/_/g, ' ').toUpperCase();
                     updateAllTabs();
                 });
 
@@ -2426,6 +2432,7 @@
                 let groupSectionHtml = `
                     <div class="admin-section group-section">
                         <h4 style="color: #2980b9;">👥 Grup ve Üye Yönetimi</h4>
+                        <div style="font-size:12px; color:#27ae60; font-weight:bold; margin-bottom:8px;">📌 Seçili Grup: ${currentGroup.replace(/_/g,' ').toUpperCase()}</div>
                         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
                             <label style="font-weight: bold; font-size: 13px; white-space: nowrap;">Grup:</label>
                             <select id="admin-group-select" style="padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); flex: 1; min-width: 120px; min-height: 44px; font-size: 14px;">${groupsHtml}</select>
@@ -2483,6 +2490,7 @@
                     <div class="admin-section book-section">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
                             <h4 style="color: #27ae60; margin: 0;">📚 Eser Yönetimi</h4>
+                            <span style="font-size:11px; color:#27ae60; font-weight:bold;">📌 ${currentGroup.replace(/_/g,' ').toUpperCase()}</span>
                             <button id="admin-add-book-btn" style="background: #27ae60; color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 40px;">+ Yeni Eser Ekle</button>
                         </div>
                         <div style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); padding: 6px; border-radius: 6px; background: var(--card-bg);">
@@ -2533,6 +2541,7 @@
                 let bulkSectionHtml = `
                     <div class="admin-section bulk-section">
                         <h4 style="color: #8e44ad;">📥 Toplu Atama / Silme</h4>
+                        <div style="font-size:12px; color:#8e44ad; font-weight:bold; margin-bottom:8px;">📌 Seçili Grup: ${currentGroup.replace(/_/g,' ').toUpperCase()}</div>
                         
                         <div style="border-top: 1px solid var(--border-color); padding-top: 12px;">
                             <div style="font-weight: bold; font-size: 13px; margin-bottom: 8px;">📚 Toplu Atama ve Silme:</div>
@@ -2578,9 +2587,9 @@
                             </div>
                             <div class="admin-panel-grid">
                                 ${groupSectionHtml}
-                                ${infoSectionHtml}
                                 ${booksSectionHtml}
                                 ${bulkSectionHtml}
+                                ${infoSectionHtml}
                             </div>
                         </div>
                     `;
