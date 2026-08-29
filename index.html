@@ -2659,15 +2659,18 @@
                     let mpw = (_infoPool.passwords && _infoPool.passwords[mm]) ? ('🔑 ' + _infoPool.passwords[mm]) : '';
                     _infoRows.push(['👤 Bireysel', mm, mpw || '(şifresiz)', '', '']);
                 });
+                window._infoRowsCache = _infoRows.map(r => r.slice());
+                window._infoRowsSortCol = -1;
+                window._infoRowsSortAsc = true;
                 let infoTableHtml = _infoRows.length
-                    ? `<table style="width:100%; border-collapse:collapse; font-size:13px;">
+                    ? `<table id="info-table" style="width:100%; border-collapse:collapse; font-size:13px;">
                         <thead>
                             <tr style="background:rgba(142,68,173,0.1);">
-                                <th style="padding:8px; text-align:left; border:1px solid var(--border-color);">1. Grup/Bireysel</th>
-                                <th style="padding:8px; text-align:left; border:1px solid var(--border-color);">2. İsim</th>
-                                <th style="padding:8px; text-align:left; border:1px solid var(--border-color);">3. Şifre</th>
-                                <th style="padding:8px; text-align:left; border:1px solid var(--border-color);">4.</th>
-                                <th style="padding:8px; text-align:left; border:1px solid var(--border-color);">5.</th>
+                                <th onclick="infoSortTable(0)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">1. Grup/Bireysel ⇅</th>
+                                <th onclick="infoSortTable(1)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">2. İsim ⇅</th>
+                                <th onclick="infoSortTable(2)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">3. Şifre ⇅</th>
+                                <th onclick="infoSortTable(3)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">4. ⇅</th>
+                                <th onclick="infoSortTable(4)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">5. ⇅</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -2694,7 +2697,34 @@
                     </div>
                 `;
 
-let bulkSectionHtml = `
+function infoSortTable(col) {
+                    let tbl = document.getElementById('info-table');
+                    if (!tbl) return;
+                    if (window._infoRowsSortCol === col) { window._infoRowsSortAsc = !window._infoRowsSortAsc; }
+                    else { window._infoRowsSortCol = col; window._infoRowsSortAsc = true; }
+                    let rows = (window._infoRowsCache || []).slice();
+                    rows.sort((a, b) => {
+                        let av = a[col] || '', bv = b[col] || '';
+                        let an = parseFloat(String(av).replace(/[^0-9.]/g,''));
+                        let bn = parseFloat(String(bv).replace(/[^0-9.]/g,''));
+                        let cmp;
+                        if (!isNaN(an) && !isNaN(bn)) cmp = an - bn;
+                        else cmp = String(av).localeCompare(String(bv), 'tr');
+                        return window._infoRowsSortAsc ? cmp : -cmp;
+                    });
+                    let tbody = tbl.querySelector('tbody');
+                    if (tbody) {
+                        tbody.innerHTML = rows.map(r => `<tr>
+                            <td style="padding:8px; border:1px solid var(--border-color);">${r[0]}</td>
+                            <td style="padding:8px; border:1px solid var(--border-color); font-weight:bold;">${r[1]}</td>
+                            <td style="padding:8px; border:1px solid var(--border-color); color:#8e44ad; font-weight:bold;">${r[2]}</td>
+                            <td style="padding:8px; border:1px solid var(--border-color);">${r[3]}</td>
+                            <td style="padding:8px; border:1px solid var(--border-color);">${r[4]}</td>
+                        </tr>`).join('');
+                    }
+                }
+
+                let bulkSectionHtml = `
                     <div class="admin-section bulk-section">
                         <h4 style="color: #8e44ad;">📥 Toplu Atama / Silme</h4>
                         <div style="font-size:12px; color:#8e44ad; font-weight:bold; margin-bottom:8px;">📌 Seçili Grup: ${currentGroup.replace(/_/g,' ').toUpperCase()}</div>
