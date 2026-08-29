@@ -521,6 +521,22 @@
                 setTimeout(() => { toast.classList.remove('show'); }, duration);
             }
 
+            // GLOBAL BUTON HATA KORUMASI
+            let __lastBtn = '';
+            document.addEventListener('click', function(e) {
+                const el = e.target && e.target.closest ? e.target.closest('button, a, [onclick]') : null;
+                if (el) __lastBtn = el.id || el.getAttribute('data-name') || el.textContent.trim().slice(0,30) || 'buton';
+            }, true);
+            window.addEventListener('error', function(e) {
+                const msg = e.message || 'bilinmeyen hata';
+                console.error('[Buton Hatasi]', __lastBtn, msg);
+                try { showToast('⚠️ ' + (__lastBtn || 'Sayfa') + ' hatasi: ' + msg, 'error', 5000); } catch(err) {}
+            });
+            window.addEventListener('unhandledrejection', function(e) {
+                const msg = (e.reason && e.reason.message) || 'bilinmeyen hata';
+                try { showToast('⚠️ ' + (__lastBtn || 'Sayfa') + ' hatasi: ' + msg, 'error', 5000); } catch(err) {}
+            });
+
             // DEĞİŞKENLER
             let container = document.querySelector(".container");
             if (!container) {
