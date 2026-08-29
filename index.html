@@ -956,13 +956,13 @@
                 inspirationContainer.innerHTML = `
                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; width: 100%; flex-wrap: wrap;">
                        <div style="flex: 1; text-align: left; min-width: 120px;">
-                           <span style="font-size: 12px; padding: 4px 10px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(150,150,150,0.2); display: inline-block;">📅 ${inspirationData.miladiDateStr}</span>
+                           <span style="font-size: 16px; padding: 4px 10px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(150,150,150,0.2); display: inline-block;">📅 ${inspirationData.miladiDateStr}</span>
                        </div>
                        <div style="flex: 1; text-align: center; min-width: 120px;">
-                           <span style="font-size: 12px; padding: 4px 10px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(150,150,150,0.2); display: inline-block;">⭐ Manevi İlham</span>
+                           <span style="font-size: 16px; padding: 4px 10px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(150,150,150,0.2); display: inline-block;">⭐ Manevi İlham</span>
                        </div>
                        <div style="flex: 1; text-align: right; min-width: 120px;">
-                           <span style="font-size: 12px; padding: 4px 10px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(150,150,150,0.2); display: inline-block;">🌙 ${inspirationData.fullDateStr}</span>
+                           <span style="font-size: 16px; padding: 4px 10px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(150,150,150,0.2); display: inline-block;">🌙 ${inspirationData.fullDateStr}</span>
                        </div>
                    </div>
                    <div style="font-size: 14px; line-height: 1.7;">
@@ -1280,6 +1280,8 @@
                 if (e.target && e.target.id === 'logout-btn') {
                     loggedInMember = "";
                     localStorage.removeItem(`hatim_session_${currentGroup}`);
+                    localStorage.removeItem('hatim_bireysel_session');
+                    localStorage.removeItem('hatim_bireysel_session_type');
                     updateUserInterface();
                     renderBooks();
                     showToast('🚪 Başarıyla çıkış yapıldı.', 'info');
@@ -1337,6 +1339,8 @@
                         localStorage.setItem('hatim_member_type_' + userName, "bireysel");
                         localStorage.setItem(`hatim_session_${currentGroup}`, userName);
                         localStorage.setItem(`hatim_session_type_${currentGroup}`, "bireysel");
+                        localStorage.setItem('hatim_bireysel_session', userName);
+                        localStorage.setItem('hatim_bireysel_session_type', "bireysel");
                         saveGroupData();
                         showToast(`✅ ${userName} bireysel olarak giriş yaptı!`, 'success');
                         updateUserInterface();
@@ -3181,9 +3185,14 @@
                 if (appData.password === undefined) appData.password = "";
                 if (!appData.readingLogs) appData.readingLogs = [];
 
-                const savedSession = localStorage.getItem(`hatim_session_${currentGroup}`);
-                loggedInMember = (savedSession && appData.members.includes(savedSession)) ? savedSession : "";
-                loggedInMemberType = localStorage.getItem(`hatim_session_type_${currentGroup}`) || "";
+                let savedSession = localStorage.getItem(`hatim_session_${currentGroup}`);
+                let savedSessionType = localStorage.getItem(`hatim_session_type_${currentGroup}`) || "";
+                if (!savedSession || !appData.members.includes(savedSession)) {
+                    const bs = localStorage.getItem('hatim_bireysel_session');
+                    if (bs) { savedSession = bs; savedSessionType = 'bireysel'; }
+                }
+                loggedInMember = savedSession ? savedSession : "";
+                loggedInMemberType = savedSessionType || "";
 
                 if (!appData.bookPages) appData.bookPages = {};
                 if (!appData.bookHatims) appData.bookHatims = {};
@@ -3275,9 +3284,14 @@
                 if (appData.password === undefined) appData.password = "";
                 if (!appData.readingLogs) appData.readingLogs = [];
 
-                const savedSession = localStorage.getItem(`hatim_session_${currentGroup}`);
-                loggedInMember = (savedSession && appData.members.includes(savedSession)) ? savedSession : "";
-                loggedInMemberType = localStorage.getItem(`hatim_session_type_${currentGroup}`) || "";
+                let savedSession = localStorage.getItem(`hatim_session_${currentGroup}`);
+                let savedSessionType = localStorage.getItem(`hatim_session_type_${currentGroup}`) || "";
+                if (!savedSession || !appData.members.includes(savedSession)) {
+                    const bs = localStorage.getItem('hatim_bireysel_session');
+                    if (bs) { savedSession = bs; savedSessionType = 'bireysel'; }
+                }
+                loggedInMember = savedSession ? savedSession : "";
+                loggedInMemberType = savedSessionType || "";
 
                 if (!appData.bookPages) appData.bookPages = {};
                 if (!appData.bookHatims) appData.bookHatims = {};
