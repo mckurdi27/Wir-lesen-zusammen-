@@ -511,11 +511,12 @@
                 container.appendChild(booksGrid);
             }
 
-            let currentGroup = "grup_1";
+            let currentGroup = "";
             let isAdmin = false;
             let appData = null;
             let loggedInMember = "";
             let loggedInMemberType = "";
+            let analysisTab = "grup";
             let monthlyInspirationCache = {};
             const ADMIN_PASSWORD = "1234";
 
@@ -1069,7 +1070,7 @@
                         }
                     }
                 }
-                if (keys.length === 0) keys.push("grup_1");
+                if (keys.length === 0) keys.push("");
                 else keys.sort((a, b) => a.localeCompare(b, 'tr', { numeric: true }));
                 return keys;
             }
@@ -1083,7 +1084,7 @@
                         keys.push(gName);
                     }
                 }
-                if (keys.length === 0) keys.push("grup_1");
+                if (keys.length === 0) keys.push("");
                 else keys.sort((a, b) => a.localeCompare(b, 'tr', { numeric: true }));
                 return keys;
             }
@@ -2694,7 +2695,7 @@
                         if (confirm(`"${currentGroup}" grubu silinsin mi?`)) {
                             localStorage.removeItem(`hatim_group_${currentGroup}`);
                             let keys = getAllGroupKeysForAdmin();
-                            currentGroup = keys[0] || "grup_1";
+                            currentGroup = keys[0] || "";
                             await loadGroupData();
                             showToast('🗑️ Grup silindi.', 'info');
                         }
@@ -2796,6 +2797,39 @@
                 });
             }
 
+            function renderBireyselProgress() {
+                let pool = getBireyselPool();
+                let members = pool.members || [];
+                if (!members.length) return '<div style="font-size:13px;color:#777;padding:12px;text-align:center;">Bireysel \u00fcye yok.</div>';
+                let statMap = {};
+                members.forEach(m => statMap[m] = { taken: 0, read: 0 });
+                for (let i = 0; i < localStorage.length; i++) {
+                    let k = localStorage.key(i);
+                    if (k && k.startsWith('hatim_group_')) {
+                        try {
+                            let g = JSON.parse(localStorage.getItem(k));
+                            let pages = g.bookPages || {};
+                            Object.values(pages).forEach(arr => {
+                                (arr || []).forEach(p => {
+                                    if (p.owner && statMap[p.owner] !== undefined) {
+                                        statMap[p.owner].taken++;
+                                        if (p.isRead) statMap[p.owner].read++;
+                                    }
+                                });
+                            });
+                        } catch(e){}
+                    }
+                }
+                return members.map(m => {
+                    let s = statMap[m];
+                    return '<div style="padding:9px;border:1px solid var(--border-color);border-radius:8px;margin-bottom:6px;font-size:13px;background:var(--card-bg);">' +
+                        '\U0001f464 <b>' + m + '</b>' +
+                        '<span style="float:right;color:#f39c12;">Al\u0131nan: ' + s.taken + '</span>' +
+                        '<span style="float:right;color:#27ae60;margin-right:12px;">Okunan: ' + s.read + '</span>' +
+                        '</div>';
+                }).join('');
+            }
+
             function renderAnalysisSection() {
                 let analysisContainer = document.getElementById("analysis-section");
                 if (!analysisContainer) {
@@ -2819,27 +2853,37 @@
                 let percentRead = totalUnitsAll > 0 ? Math.round((totalReadUnits / totalUnitsAll) * 100) : 0;
 
                 analysisContainer.innerHTML = `
-                    <h3 style="margin-bottom: 10px; font-size: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div style="display:flex; gap:8px; margin-bottom:12px;">
+                        <button id="analysis-tab-grup" style="flex:1; padding:9px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:bold; border:1px solid var(--border-color); background:${analysisTab==='grup'?'#27ae60':'var(--card-bg)'}; color:${analysisTab==='grup'?'#fff':'inherit'};">👥 Grup İlerleme</button>
+                        <button id="analysis-tab-bireysel" style="flex:1; padding:9px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:bold; border:1px solid var(--border-color); background:${analysisTab==='bireysel'?'#2980b9':'var(--card-bg)'}; color:${analysisTab==='bireysel'?'#fff':'inherit'};">👤 Bireysel İlerleme</button>
+                    </div>
+                    ${analysisTab==='bireysel' ? renderBireyselProgress() : `
+                    <h3 style="margin-bottom:10px; font-size:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
                         <span>📈 Grup İlerleme</span>
-                        <span style="font-size: 12px; background: #27ae60; color: #fff; padding: 4px 12px; border-radius: 20px;">${currentGroup.replace(/_/g, ' ').toUpperCase()}</span>
+                        <span style="font-size:12px; background:#27ae60; color:#fff; padding:4px 12px; border-radius:20px;">${currentGroup ? currentGroup.replace(/_/g,' ').toUpperCase() : 'Grup Seçilmedi'}</span>
                     </h3>
                     <div class="analysis-grid">
-                        <div class="analysis-card" style="border-left: 4px solid #3498db;">
-                            <div style="font-size: 12px; opacity: 0.7;">Toplam Eser</div>
+                        <div class="analysis-card" style="border-left:4px solid #3498db;">
+                            <div style="font-size:12px; opacity:0.7;">Toplam Eser</div>
                             <div class="number">${totalBooks}</div>
                         </div>
-                        <div class="analysis-card" style="border-left: 4px solid #f39c12;">
-                            <div style="font-size: 12px; opacity: 0.7;">Alınan</div>
+                        <div class="analysis-card" style="border-left:4px solid #f39c12;">
+                            <div style="font-size:12px; opacity:0.7;">Alınan</div>
                             <div class="number">${totalTakenUnits} / ${totalUnitsAll}</div>
-                            <div style="font-size: 13px; color: #f39c12;">%${percentTaken}</div>
+                            <div style="font-size:13px; color:#f39c12;">%${percentTaken}</div>
                         </div>
-                        <div class="analysis-card" style="border-left: 4px solid #27ae60;">
-                            <div style="font-size: 12px; opacity: 0.7;">Okunan</div>
+                        <div class="analysis-card" style="border-left:4px solid #27ae60;">
+                            <div style="font-size:12px; opacity:0.7;">Okunan</div>
                             <div class="number">${totalReadUnits} / ${totalUnitsAll}</div>
-                            <div style="font-size: 13px; color: #27ae60;">%${percentRead}</div>
+                            <div style="font-size:13px; color:#27ae60;">%${percentRead}</div>
                         </div>
                     </div>
+                    `}
                 `;
+                let tabGrup = analysisContainer.querySelector("#analysis-tab-grup");
+                let tabBireysel = analysisContainer.querySelector("#analysis-tab-bireysel");
+                if (tabGrup) tabGrup.addEventListener("click", () => { analysisTab='grup'; renderAnalysisSection(); });
+                if (tabBireysel) tabBireysel.addEventListener("click", () => { analysisTab='bireysel'; renderAnalysisSection(); });
             }
 
             async function triggerAdminToggle() {
@@ -2875,7 +2919,7 @@
 
             async function loadGroupData() {
                 const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
-                appData = savedData ? JSON.parse(savedData) : { members: currentGroup === "grup_1" ? [] : [], password: "" };
+                appData = savedData ? JSON.parse(savedData) : { members: [], password: "" };
 
                 if (!appData.members) appData.members = [];
                 if (!appData.memberTypes) appData.memberTypes = {};
