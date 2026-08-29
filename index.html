@@ -1544,6 +1544,12 @@
 
                 function renderTab1(groupName = 'all', memberName = 'all') {
                     const container = document.getElementById('dtabs-1-content');
+                    groupStats.sort((a, b) => {
+                        let av = analysisSortKey==='members' ? a.members : analysisSortKey==='taken' ? a.taken : analysisSortKey==='read' ? a.read : analysisSortKey==='progress' ? a.takenPercent : a.name;
+                        let bv = analysisSortKey==='members' ? b.members : analysisSortKey==='taken' ? b.taken : analysisSortKey==='read' ? b.read : analysisSortKey==='progress' ? b.takenPercent : b.name;
+                        if (typeof av==='number' && typeof bv==='number') return analysisSortDir==='az' ? av-bv : bv-av;
+                        return analysisSortDir==='az' ? String(av).localeCompare(String(bv),'tr') : String(bv).localeCompare(String(av),'tr');
+                    });
                     let html = '';
                     
                     if (groupName === 'all') {
@@ -1592,12 +1598,24 @@
                     const container = document.getElementById('dtabs-2-content');
                     let stats = [...groupStats];
                     stats.sort((a, b) => {
+                        let av = analysisSortKey==='members' ? a.members : analysisSortKey==='taken' ? a.taken : analysisSortKey==='read' ? a.read : analysisSortKey==='progress' ? a.takenPercent : a.name;
+                        let bv = analysisSortKey==='members' ? b.members : analysisSortKey==='taken' ? b.taken : analysisSortKey==='read' ? b.read : analysisSortKey==='progress' ? b.takenPercent : b.name;
+                        if (typeof av==='number' && typeof bv==='number') return analysisSortDir==='az' ? av-bv : bv-av;
+                        return analysisSortDir==='az' ? String(av).localeCompare(String(bv),'tr') : String(bv).localeCompare(String(av),'tr');
+                    });
+                    stats.sort((a, b) => {
                         let av = analysisSortKey==='members' ? a.members : analysisSortKey==='taken' ? a.taken : analysisSortKey==='read' ? a.read : a.name;
                         let bv = analysisSortKey==='members' ? b.members : analysisSortKey==='taken' ? b.taken : analysisSortKey==='read' ? b.read : b.name;
                         if (typeof av === 'number' && typeof bv === 'number') return analysisSortDir==='az' ? av-bv : bv-av;
                         return analysisSortDir==='az' ? String(av).localeCompare(String(bv),'tr') : String(bv).localeCompare(String(av),'tr');
                       });
                     
+                    data.books.sort((a, b) => {
+                        let av = analysisSortKey==='btotal' ? a.total : analysisSortKey==='btaken' ? a.taken : analysisSortKey==='bread' ? a.read : analysisSortKey==='bpercent' ? a.readPercent : analysisSortKey==='bstatus' ? (a.completed?1:0) : a.name;
+                        let bv = analysisSortKey==='btotal' ? b.total : analysisSortKey==='btaken' ? b.taken : analysisSortKey==='bread' ? b.read : analysisSortKey==='bpercent' ? b.readPercent : analysisSortKey==='bstatus' ? (b.completed?1:0) : b.name;
+                        if (typeof av==='number' && typeof bv==='number') return analysisSortDir==='az' ? av-bv : bv-av;
+                        return analysisSortDir==='az' ? String(av).localeCompare(String(bv),'tr') : String(bv).localeCompare(String(av),'tr');
+                    });
                     let html = `
                         <div style="overflow-x: auto;">
                             <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
@@ -1608,7 +1626,7 @@
                                         <th data-sortkey="members" title="Sırala" style="cursor:pointer; padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Üye ⇅</th>
                                         <th data-sortkey="taken" title="Sırala" style="cursor:pointer; padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Alınan ⇅</th>
                                         <th data-sortkey="read" title="Sırala" style="cursor:pointer; padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okunan ⇅</th>
-                                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">İlerleme</th>
+                                        <th data-sortkey="progress" title="Sırala" style="cursor:pointer; padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">İlerleme ⇅</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1651,8 +1669,8 @@
                             });
                         });
                         allMemberStats.sort((a, b) => {
-                        let av = analysisSortKey==='taken' ? a.taken : analysisSortKey==='read' ? a.read : analysisSortKey==='percent' ? a.percent : a.name;
-                        let bv = analysisSortKey==='taken' ? b.taken : analysisSortKey==='read' ? b.read : analysisSortKey==='percent' ? b.percent : b.name;
+                        let av = analysisSortKey==='taken' ? a.taken : analysisSortKey==='read' ? a.read : analysisSortKey==='percent' ? a.percent : analysisSortKey==='type' ? (a.type==='grup'?'Grup':'Bireysel') : analysisSortKey==='groups' ? String(a.groups||[]).join(',') : a.name;
+                        let bv = analysisSortKey==='taken' ? b.taken : analysisSortKey==='read' ? b.read : analysisSortKey==='percent' ? b.percent : analysisSortKey==='type' ? (b.type==='grup'?'Grup':'Bireysel') : analysisSortKey==='groups' ? String(b.groups||[]).join(',') : b.name;
                         if (typeof av === 'number' && typeof bv === 'number') return analysisSortDir==='az' ? av-bv : bv-av;
                         return analysisSortDir==='az' ? String(av).localeCompare(String(bv),'tr') : String(bv).localeCompare(String(av),'tr');
                       });
@@ -1669,8 +1687,8 @@
                                         <tr style="background: rgba(212, 175, 55, 0.15);">
                                             <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">#</th>
                                             <th data-sortkey="name" title="Sırala" style="cursor:pointer; padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye ⇅</th>
-                                            <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Tip</th>
-                                            <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Grup</th>
+                                            <th data-sortkey="type" title="Sırala" style="cursor:pointer; padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Tip ⇅</th>
+                                            <th data-sortkey="groups" title="Sırala" style="cursor:pointer; padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Grup ⇅</th>
                                             <th data-sortkey="taken" title="Sırala" style="cursor:pointer; padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Aldığı ⇅</th>
                                             <th data-sortkey="read" title="Sırala" style="cursor:pointer; padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okuduğu ⇅</th>
                                             <th data-sortkey="percent" title="Sırala" style="cursor:pointer; padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Tamamlama ⇅</th>
@@ -1848,12 +1866,12 @@
                             <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                                 <thead>
                                     <tr style="background: rgba(212, 175, 55, 0.15);">
-                                        <th style="padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser</th>
-                                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Toplam</th>
-                                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Alınan</th>
-                                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okunan</th>
-                                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">İlerleme</th>
-                                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Durum</th>
+                                        <th data-sortkey="bname" title="Sırala" style="cursor:pointer; padding: 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser ⇅</th>
+                                        <th data-sortkey="btotal" title="Sırala" style="cursor:pointer; padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Toplam ⇅</th>
+                                        <th data-sortkey="btaken" title="Sırala" style="cursor:pointer; padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Alınan ⇅</th>
+                                        <th data-sortkey="bread" title="Sırala" style="cursor:pointer; padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Okunan ⇅</th>
+                                        <th data-sortkey="bpercent" title="Sırala" style="cursor:pointer; padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">İlerleme ⇅</th>
+                                        <th data-sortkey="bstatus" title="Sırala" style="cursor:pointer; padding: 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Durum ⇅</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1890,20 +1908,26 @@
                         return;
                     }
                     
+                    const sortedLogs = [...data.readingLogs].sort((a, b) => {
+                        let av = analysisSortKey==='lmember' ? a.member||'' : analysisSortKey==='lbook' ? a.bookName||'' : analysisSortKey==='lunit' ? Number(a.unit||0) : analysisSortKey==='lstatus' ? 1 : (a.date||'');
+                        let bv = analysisSortKey==='lmember' ? b.member||'' : analysisSortKey==='lbook' ? b.bookName||'' : analysisSortKey==='lunit' ? Number(b.unit||0) : analysisSortKey==='lstatus' ? 1 : (b.date||'');
+                        if (typeof av==='number' && typeof bv==='number') return analysisSortDir==='az' ? av-bv : bv-av;
+                        return analysisSortDir==='az' ? String(av).localeCompare(String(bv),'tr') : String(bv).localeCompare(String(av),'tr');
+                    });
                     let html = `
                         <div style="overflow-x: auto;">
                             <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
                                 <thead>
                                     <tr style="background: rgba(212, 175, 55, 0.15);">
-                                        <th style="padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Tarih</th>
-                                        <th style="padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye</th>
-                                        <th style="padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser</th>
-                                        <th style="padding: 8px 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Bölüm</th>
-                                        <th style="padding: 8px 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Durum</th>
+                                        <th data-sortkey="ldate" title="Sırala" style="cursor:pointer; padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Tarih ⇅</th>
+                                        <th data-sortkey="lmember" title="Sırala" style="cursor:pointer; padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye ⇅</th>
+                                        <th data-sortkey="lbook" title="Sırala" style="cursor:pointer; padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser ⇅</th>
+                                        <th data-sortkey="lunit" title="Sırala" style="cursor:pointer; padding: 8px 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Bölüm ⇅</th>
+                                        <th data-sortkey="lstatus" title="Sırala" style="cursor:pointer; padding: 8px 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Durum ⇅</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${data.readingLogs.slice(0, 50).map(log => `
+                                    ${sortedLogs.slice(0, 50).map(log => `
                                         <tr>
                                             <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-size: 11px;">${log.date}</td>
                                             <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${log.member || memberName}</td>
@@ -1914,7 +1938,7 @@
                                     `).join('')}
                                 </tbody>
                             </table>
-                            ${data.readingLogs.length > 50 ? `<p style="text-align: center; color: #777; font-size: 12px; margin-top: 8px;">... ve ${data.readingLogs.length - 50} kayıt daha</p>` : ''}
+                            ${sortedLogs.length > 50 ? `<p style="text-align: center; color: #777; font-size: 12px; margin-top: 8px;">... ve ${sortedLogs.length - 50} kayıt daha</p>` : ''}
                         </div>
                     `;
                     container.innerHTML = html;
@@ -1983,54 +2007,44 @@
                 function exportAnalysisToExcel() {
                     try {
                         if (typeof XLSX === 'undefined') { alert('Excel kütüphanesi yüklenemedi. İnternet bağlantınızı kontrol edin.'); return; }
-                        let groupKeys = (typeof getAllGroupKeysForAdmin === 'function') ? getAllGroupKeysForAdmin() : (typeof getAllGroupKeys === 'function' ? getAllGroupKeys() : []);
-                        if (!groupKeys.length && typeof allGroupKeys !== 'undefined') groupKeys = allGroupKeys;
-                        let groups = [];
-                        groupKeys.forEach(gKey => {
+                        // Aynı veri kaynaklarını renderTab3 ile kullan
+                        let bk = (typeof analysisBooks !== 'undefined') ? analysisBooks : [];
+                        let memberRows = [];
+                        (allMembers||[]).forEach(m => {
+                            let d = getMemberDetailData(m.name, null, bk.length ? bk : 'all');
+                            memberRows.push({ name: m.name, type: (m.type||'grup')==='grup'?'Grup':'Bireysel', groups: (d.groups||[]).join(', '), taken: d.totalTaken, read: d.totalRead, percent: d.totalTaken>0 ? Math.round((d.totalRead/d.totalTaken)*100) : 0 });
+                        });
+                        let grpRows = [];
+                        (allGroupKeys||[]).forEach(gKey => {
                             const raw = localStorage.getItem(`hatim_group_${gKey}`);
                             if (!raw) return;
                             try {
                                 const g = JSON.parse(raw);
-                                const members = (g.memberTypes) ? (g.members||[]).filter(m => (g.memberTypes[m]||"grup")==="grup") : (g.members||[]);
+                                const names = (g.members||[]).filter(m => !(g.memberTypes && (g.memberTypes[m]||'grup')==='bireysel'));
                                 let taken=0, read=0, units=0;
                                 if (g.books && g.bookPages) { g.books.forEach(b => { units += (b.totalUnits||0); if (g.bookPages[b.id]) g.bookPages[b.id].forEach(p => { if (p.owner) taken++; if (p.isRead) read++; }); }); }
-                                groups.push({ name: gKey, members: members.length, units: units, taken: taken, read: read, percent: units>0 ? Math.round((read/units)*100) : 0, passwords: g.passwords||{} });
+                                grpRows.push({ name: gKey.replace(/_/g,' ').toUpperCase(), members: names.length, units: units, taken: taken, read: read, percent: units>0 ? Math.round((read/units)*100) : 0 });
                             } catch(e){}
                         });
-                        let bireysel = { members: [], passwords: {} };
-                        try { const p = JSON.parse(localStorage.getItem('hatim_bireysel_pool')||'null'); if (p) { bireysel.members = p.members||[]; bireysel.passwords = p.passwords||{}; } } catch(e){}
-                        let members = [];
-                        groups.forEach(gg => gg.name && (gg.members)).length;
-                        groups.forEach(gKey => {
-                            const raw = localStorage.getItem(`hatim_group_${gKey.name}`);
-                            if (!raw) return;
-                            const g = JSON.parse(raw);
-                            (g.members||[]).forEach(m => {
-                                const isGrup = !(g.memberTypes && (g.memberTypes[m]||"grup")==="bireysel");
-                                let d = (typeof getMemberDetailData==='function') ? getMemberDetailData(m, null, 'all') : {totalTaken:0,totalRead:0};
-                                if (!members.find(x=>x.name===m)) members.push({ name:m, type: isGrup?'grup':'bireysel', taken:d.totalTaken, read:d.totalRead, percent:d.totalTaken>0?Math.round((d.totalRead/d.totalTaken)*100):0 });
-                            });
-                        });
-                        bireysel.members.forEach(m => { if (!members.find(x=>x.name===m)) { let d=(typeof getMemberDetailData==='function')?getMemberDetailData(m,null,'all'):{totalTaken:0,totalRead:0}; members.push({ name:m, type:'bireysel', taken:d.totalTaken, read:d.totalRead, percent:d.totalTaken>0?Math.round((d.totalRead/d.totalTaken)*100):0 }); } });
-                        members.sort((a,b)=>a.name.localeCompare(b.name,'tr'));
                         const wb = XLSX.utils.book_new();
-                        let ozet = [[ 'Grup', 'Üye Sayısı', 'Toplam Birim', 'Alınan', 'Okunan', 'Tamamlama %' ]];
-                        groups.forEach(g=>ozet.push([g.name, g.members, g.units, g.taken, g.read, g.percent]));
-                        ozet.push(['👤 BİREYSEL', bireysel.members.length, '', '', '', '']);
-                        let wsOzet = XLSX.utils.aoa_to_sheet(ozet);
-                        XLSX.utils.book_append_sheet(wb, wsOzet, 'Özet');
-                        let veri = [[ 'Üye', 'Tip', 'Aldığı', 'Okuduğu', 'Tamamlama %' ]];
-                        members.forEach(m=>veri.push([m.name, m.type==='grup'?'Grup':'Bireysel', m.taken, m.read, m.percent]));
-                        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(veri), 'Veri');
-                        let sifre = [[ 'Grup', 'Şifre' ]];
-                        groups.forEach(g=>{ if(g.passwords) Object.keys(g.passwords).forEach(p=>sifre.push([g.name, p])); });
-                        sifre.push([]); sifre.push(['👤 Bireysel Şifreleri']);
-                        if (bireysel.passwords) Object.keys(bireysel.passwords).forEach(p=>sifre.push([p, bireysel.passwords[p]]));
+                        let ozet = [['Grup','Üye Sayısı','Toplam Birim','Alınan','Okunan','Tamamlama %']];
+                        grpRows.forEach(g=>ozet.push([g.name, g.members, g.units, g.taken, g.read, g.percent]));
+                        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ozet), 'Özet');
+                        let veri = [['Üye','Tip','Grup','Aldığı','Okuduğu','Tamamlama %']];
+                        memberRows.forEach(m=>veri.push([m.name, m.type, m.groups, m.taken, m.read, m.percent]));
+                        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(veri), 'Üye Analizi');
+                        // Şifreler
+                        let sifre = [['Grup','Şifre']];
+                        (allGroupKeys||[]).forEach(gKey => {
+                            const raw = localStorage.getItem(`hatim_group_${gKey}`);
+                            if (!raw) return;
+                            try { const g = JSON.parse(raw); if (g.passwords) Object.keys(g.passwords).forEach(p=>sifre.push([gKey.replace(/_/g,' ').toUpperCase(), p])); } catch(e){}
+                        });
+                        try { const p = JSON.parse(localStorage.getItem('hatim_bireysel_pool')||'null'); if (p && p.passwords) Object.keys(p.passwords).forEach(pp=>sifre.push(['👤 '+pp, p.passwords[pp]])); } catch(e){}
                         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sifre), 'Şifreler');
                         XLSX.writeFile(wb, 'Hatim_Analiz.xlsx');
                     } catch(err) { alert('Excel oluşturulamadı: ' + err.message); }
                 }
-                
                 function updateAllTabs() {
                     const group = document.getElementById('analysis-group-select').value;
                     const member = document.getElementById('analysis-member-select').value;
