@@ -2592,7 +2592,15 @@
                 bottomContainer.style.cssText = "margin: 20px 0; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--card-bg);";
 
                 let allGroups = getAllGroupKeysForAdmin();
-                let groupsHtml = `<option value="" selected>👤 BİREYSEL</option>` + allGroups.filter(g => String(g).trim() !== '').map(g => `<option value="${g}">${g.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
+                let groupsHtml = `<option value="" selected>👤 BİREYSEL</option>`;
+                allGroups.filter(g => String(g).trim() !== '').forEach(gKey => {
+                    let gLabel = gKey.replace(/_/g, ' ').toUpperCase();
+                    let gRaw = null;
+                    try { gRaw = JSON.parse(localStorage.getItem('hatim_group_' + gKey) || 'null'); } catch(e){}
+                    let gMems = (gRaw && gRaw.members || []).filter(mm => !(gRaw.memberTypes && (gRaw.memberTypes[mm] === 'bireysel' || gRaw.memberTypes[mm] === 'pasif')));
+                    groupsHtml += `<option value="g:${gKey}">👥 [Grup] ${gLabel}</option>`;
+                    gMems.forEach(mm => { groupsHtml += `<option value="gm:${gKey}:${encodeURIComponent(mm)}"> 👤 ${mm} (${gLabel})</option>`; });
+                });
 
                 let _bireyselPool = getBireyselPool();
                 let _poolForSelect = _bireyselPool.members || [];
@@ -3264,8 +3272,10 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                     });
 
                     document.getElementById("admin-group-select").addEventListener("change", async (e) => {
-                        currentGroup = e.target.value;
-                        await loadGroupData();
+                        let v = e.target.value;
+                        if (v.startsWith("gm:")) { let p = v.split(':'); currentGroup = p[1]; await loadGroupData(); }
+                        else if (v.startsWith("g:")) { currentGroup = v.slice(2); await loadGroupData(); }
+                        else { currentGroup = v; await loadGroupData(); }
                     });
 
                     document.getElementById("admin-add-group").addEventListener("click", async () => {
