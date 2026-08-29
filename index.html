@@ -3039,14 +3039,20 @@ function infoSortTable(col) {
                             let books = (g.books || appData.books || []);
                             // 1) ÜYE seçimi (dropdown)
                             let cands = [];
-                            if (data.type === 'group') { cands = g.members || []; }
-                            else if (data.type === 'bireysel') { cands = [data.mName]; }
-                            else if (data.type === 'member') { cands = [data.mName]; }
+                            if (data.type === 'group') { cands = (g.members || []).map(mm => ({n:mm, t:'group'})); }
+                            else if (data.type === 'bireysel') { cands = [{n:data.mName, t:'bireysel'}]; }
+                            else if (data.type === 'member') { cands = [{n:data.mName, t:'group'}]; }
+                            try {
+                                let _bp2 = getBireyselPool();
+                                (_bp2.members || []).forEach(bm => {
+                                    if (!cands.find(c => c.t === 'bireysel' && c.n === bm)) cands.push({n:bm, t:'bireysel'});
+                                });
+                            } catch(e){}
                             let h = `<div style="font-size:13px; font-weight:bold; margin-bottom:6px;">👁️ Alınan Hisseleri Gör / Düzenle:</div>`;
                             h += `<div style="margin-bottom:8px;">
                                 <label style="font-size:12px; font-weight:bold;">👤 Üye:</label>
                                 <select id="bv-member" style="width:100%; padding:10px; border-radius:6px; border:1px solid var(--border-color); background:var(--card-bg); font-size:13px; min-height:44px;">
-                                    ${cands.map(m => `<option value="${m}">${m}</option>`).join('')}
+                                    ${cands.map(m => `<option value="${m.t}:${m.n}">${m.t === 'bireysel' ? '👤 ' : '👥 '}${m.n}${m.t === 'bireysel' ? ' (Bireysel)' : ''}</option>`).join('')}
                                 </select>
                             </div>`;
                             h += `<div style="margin-bottom:8px;">
@@ -3088,7 +3094,7 @@ function infoSortTable(col) {
                                 wrap.innerHTML = items.map((it, idx) => {
                                     let chunk = pages.slice(it.start, it.end);
                                     let owned = chunk.filter(p => p.owner).length;
-                                    let mine = chunk.filter(p => p.owner === document.getElementById('bv-member').value).length;
+                                    let selV = document.getElementById('bv-member').value; let selN = selV.split(':').pop(); let mine = chunk.filter(p => p.owner === selN).length;
                                     return `<label style="display:flex; align-items:center; gap:8px; padding:6px; border-bottom:1px solid var(--border-color); cursor:pointer;">
                                         <input type="checkbox" class="bv-unit" data-start="${it.start}" data-end="${it.end}">
                                         <span style="font-size:12px; font-weight:bold; flex:1;">${it.start+1}-${it.end}</span>
@@ -3109,21 +3115,32 @@ function infoSortTable(col) {
                                 panel.querySelectorAll('.bv-unit').forEach(c => c.checked = false);
                             });
                             document.getElementById('bv-save').addEventListener('click', () => {
-                                let m = document.getElementById('bv-member').value;
+                                let selV = document.getElementById('bv-member').value;
                                 let bId = document.getElementById('bv-book').value;
-                                let pages = g.bookPages[bId];
-                                if (!m || !pages) return;
+                                let m = selV.split(':').pop();
+                                let t = selV.split(':')[0];
+                                if (!m || !bId) return;
+                                let targetData = null, tpages = null;
+                                if (t === 'bireysel') {
+                                    targetData = bulkResolveData('bireysel:' + m);
+                                    if (!targetData) { showToast('Bireysel üyenin verisi bulunamadı.', 'error'); return; }
+                                    if (!targetData.gData.bookPages) targetData.gData.bookPages = {};
+                                    if (!targetData.gData.bookPages[bId]) { targetData.gData.bookPages[bId] = Array((targetData.gData.books||[]).find(x=>x.id===bId)?.totalUnits || (appData.books||[]).find(x=>x.id===bId)?.totalUnits || 0).fill(null).map(() => ({owner:'', isRead:false})); }
+                                    tpages = targetData.gData.bookPages[bId];
+                                } else {
+                                    targetData = data;
+                                    tpages = g.bookPages[bId];
+                                }
+                                if (!tpages) return;
                                 let cnt = 0;
                                 panel.querySelectorAll('.bv-unit:checked').forEach(cb => {
                                     let s = parseInt(cb.getAttribute('data-start'));
                                     let en = parseInt(cb.getAttribute('data-end'));
                                     for (let i = s; i < en; i++) {
-                                        // birden fazla üye seçili değil: bu üyeye ata (dolu olanları değiştir)
-                                        if (data.type === 'group') { pages[i].owner = m; pages[i].isRead = pages[i].isRead || false; cnt++; }
-                                        else if (pages[i].owner === data.mName || !pages[i].owner) { pages[i].owner = m; pages[i].isRead = pages[i].isRead || false; cnt++; }
+                                        tpages[i].owner = m; tpages[i].isRead = tpages[i].isRead || false; cnt++;
                                     }
                                 });
-                                if (cnt > 0) { bulkSave(data); showToast('✅ ' + cnt + ' hisse ' + m + ' üyesine atandı.', 'success'); loadGroupData(); }
+                                if (cnt > 0) { bulkSave(targetData); showToast('✅ ' + cnt + ' hisse ' + m + ' üyesine atandı.', 'success'); loadGroupData(); }
                                 else { showToast('İşaretli hisse yok.', 'info'); }
                             });
                             document.getElementById('bv-clear-owner').addEventListener('click', () => {
