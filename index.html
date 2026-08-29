@@ -2326,6 +2326,9 @@
                 let allGroups = getAllGroupKeysForAdmin();
                 let groupsHtml = `<option value="" selected>👤 BİREYSEL</option>` + allGroups.map(g => `<option value="${g}">${g.replace(/_/g, ' ').toUpperCase()}</option>`).join('');
 
+                let _bireyselPool = getBireyselPool();
+                let _bireyselPoolMembers = _bireyselPool.members || [];
+                let _bireyselMembersHtml = _bireyselPoolMembers.map(m => `<div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; border-bottom: 1px solid var(--border-color);">👤 ${m}${(_bireyselPool.passwords && _bireyselPool.passwords[m]) ? ` (🔑 ${_bireyselPool.passwords[m]})` : ''}<button class="admin-remove-bireysel" data-name="${m}" style="background:#e74c3c;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer;min-height:34px;">Sil</button></div>`).join('') || '';
                 let groupMembers = appData.members.filter(m => !(appData.memberTypes && appData.memberTypes[m] === 'bireysel'));
                                 let membersHtml = groupMembers.map(m => `
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; font-size: 14px; border: 1px solid var(--border-color);">
@@ -2354,6 +2357,10 @@
                         </div>
                         <div style="max-height: 180px; overflow-y: auto; border: 1px solid var(--border-color); padding: 6px; border-radius: 6px; background: var(--card-bg);">
                             ${groupMembers.length > 0 ? membersHtml : '<div style="font-size: 13px; text-align: center; padding: 12px; color: #777;">Grupta \u00fcye yok.</div>'}
+                        </div>
+                        <div style="margin: 10px 0 8px; font-size: 12px; font-weight: bold; color: #27ae60;">👤 Bireysel Üyeler</div>
+                        <div style="max-height: 150px; overflow-y: auto; border: 1px solid var(--border-color); padding: 6px; border-radius: 6px; background: var(--card-bg);">
+                            ${_bireyselPoolMembers.length > 0 ? _bireyselMembersHtml : '<div style="font-size: 13px; text-align: center; padding: 12px; color: #777;">Bireysel üye yok.</div>'}
                         </div>
                         
                         <div style="font-size: 12px; color: #7f8c8d; margin-top: 8px;">
@@ -2404,6 +2411,7 @@
 
                 let _infoGroups = getAllGroupKeysForAdmin();
                 let _infoPool = getBireyselPool();
+                let _infoBireyselHtml = (_infoPool.members || []).map(mm => `<div style="padding:6px 4px; border-bottom:1px solid var(--border-color); font-size:13px;">👤 ${mm}${(_infoPool.passwords && _infoPool.passwords[mm]) ? ` (🔑 ${_infoPool.passwords[mm]})` : ''}</div>`).join('');
                 let infoRowsHtml = _infoGroups.map(gKey => {
                     let raw = localStorage.getItem(`hatim_group_${gKey}`);
                     let gName = gKey.replace(/_/g, ' ').toUpperCase();
@@ -2431,6 +2439,10 @@
                         <div style="font-size:12px; color:#7f8c8d; margin-bottom:8px;">💡 Üye şifresini unutursa, grubun şifresi buradan görülebilir.</div>
                         <div style="max-height:260px; overflow-y:auto; border:1px solid var(--border-color); padding:8px; border-radius:8px; background:var(--card-bg);">
                             ${infoRowsHtml || '<div style="font-size:13px; color:#777;">Kayıtlı grup yok.</div>'}
+                        </div>
+                        <div style="margin:12px 0 6px; font-size:13px; font-weight:bold; color:#27ae60;">👤 Bireysel Üyeler</div>
+                        <div style="max-height:180px; overflow-y:auto; border:1px solid var(--border-color); padding:8px; border-radius:8px; background:var(--card-bg);">
+                            ${_infoBireyselHtml || '<div style="font-size:13px; color:#777;">Bireysel üye yok.</div>'}
                         </div>
                     </div>
                 `;
@@ -2794,6 +2806,22 @@
                                 showToast('Bu üye zaten var.', 'error');
                             }
                         }
+                    });
+
+                    document.querySelectorAll(".admin-remove-bireysel").forEach(btn => {
+                        btn.addEventListener("click", async (e) => {
+                            let name = e.target.getAttribute("data-name");
+                            if (!confirm(name + " bireysel üye silinsin mi?")) return;
+                            let pool = getBireyselPool();
+                            pool.members = pool.members.filter(mm => mm !== name);
+                            if (pool.memberTypes) delete pool.memberTypes[name];
+                            if (pool.passwords) delete pool.passwords[name];
+                            saveBireyselPool(pool);
+                            localStorage.removeItem('hatim_group_' + name.toLowerCase());
+                            showToast('✅ ' + name + ' bireysel üye silindi.', 'success');
+                            renderAdminSectionAtBottom();
+                            updateAutocompleteLists();
+                        });
                     });
 
                     document.querySelectorAll(".admin-remove-member").forEach(btn => {
