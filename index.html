@@ -1610,7 +1610,7 @@
                 function getGroupSelectHtml(selected = 'all') {
                     let html = `<option value="all">📁 Tüm Gruplar</option>`;
                     groupStats.forEach(g => {
-                        html += `<option value="${g.name}" ${g.name === selected ? 'selected' : ''}>📁 ${g.name.replace(/_/g, ' ').toUpperCase()}</option>`;
+                        html += `<option value="${g.name}" ${g.name === selected ? 'selected' : ''}>📁 ${g.name.replace(/_/g, ' ').toUpperCase()} (​${g.members} kişi)</option>`;
                     });
                     return html;
                 }
@@ -2647,7 +2647,7 @@
                     let gRaw = null;
                     try { gRaw = JSON.parse(localStorage.getItem('hatim_group_' + gKey) || 'null'); } catch(e){}
                     let gMems = (gRaw && gRaw.members || []).filter(mm => !(gRaw.memberTypes && (gRaw.memberTypes[mm] === 'bireysel' || gRaw.memberTypes[mm] === 'pasif')));
-                    groupsHtml += `<option value="g:${gKey}">👥 [Grup] ${gLabel}</option>`;
+                    groupsHtml += `<option value="g:${gKey}">👥 [Grup] ${gLabel} (​${gMems.length} kişi)</option>`;
                     gMems.forEach(mm => { groupsHtml += `<option value="gm:${gKey}:${encodeURIComponent(mm)}"> 👤 ${mm} (${gLabel})</option>`; });
                 });
 
@@ -2931,7 +2931,7 @@ function infoSortTable(col) {
                                 try {
                                     let parsed = JSON.parse(dRaw);
                                     if (parsed.members && parsed.members.length > 0) {
-                                        optionsHtml += `<optgroup label="📁 ${gName}">`;
+                                        optionsHtml += `<optgroup label="📁 ${gName} (${parsed.members.length} kişi)">`;
                                         optionsHtml += `<option value="group:${gKey}">[Grup Tamamı] ${gName}</option>`;
                                         parsed.members.forEach(m => {
                                             optionsHtml += `<option value="member:${gKey}:${m}">👤 ${m}</option>`;
