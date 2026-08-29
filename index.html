@@ -2130,14 +2130,11 @@
                 function exportAnalysisToExcel() {
                     try {
                         if (typeof XLSX === 'undefined') { alert('Excel kütüphanesi yüklenemedi. İnternet bağlantınızı kontrol edin.'); return; }
-                        // Aynı veri kaynaklarını renderTab3 ile kullan
                         let bk = (typeof analysisBooks !== 'undefined') ? analysisBooks : [];
-                        let memberRows = [];
-                        (allMembers||[]).forEach(m => {
-                            let d = getMemberDetailData(m.name, null, bk.length ? bk : 'all');
-                            memberRows.push({ name: m.name, type: (m.type||'grup')==='grup'?'Grup':'Bireysel', groups: (d.groups||[]).join(', '), taken: d.totalTaken, read: d.totalRead, percent: d.totalTaken>0 ? Math.round((d.totalRead/d.totalTaken)*100) : 0 });
-                        });
-                        let grpRows = [];
+                        const bookFilter = bk.length ? bk : 'all';
+
+                        // 1) ÖZET (Grup ve Bireysel Özet)
+                        let ozet = [['Grup','Üye Sayısı','Toplam Birim','Alınan','Okunan','Tamamlama %']];
                         (allGroupKeys||[]).forEach(gKey => {
                             const raw = localStorage.getItem(`hatim_group_${gKey}`);
                             if (!raw) return;
@@ -2146,24 +2143,51 @@
                                 const names = (g.members||[]).filter(m => !(g.memberTypes && (g.memberTypes[m]||'grup')==='bireysel'));
                                 let taken=0, read=0, units=0;
                                 if (g.books && g.bookPages) { g.books.forEach(b => { units += (b.totalUnits||0); if (g.bookPages[b.id]) g.bookPages[b.id].forEach(p => { if (p.owner) taken++; if (p.isRead) read++; }); }); }
-                                grpRows.push({ name: gKey.replace(/_/g,' ').toUpperCase(), members: names.length, units: units, taken: taken, read: read, percent: units>0 ? Math.round((read/units)*100) : 0 });
+                                ozet.push([gKey.replace(/_/g,' ').toUpperCase(), names.length, units, taken, read, units>0 ? Math.round((read/units)*100) : 0]);
                             } catch(e){}
                         });
-                        const wb = XLSX.utils.book_new();
-                        let ozet = [['Grup','Üye Sayısı','Toplam Birim','Alınan','Okunan','Tamamlama %']];
-                        grpRows.forEach(g=>ozet.push([g.name, g.members, g.units, g.taken, g.read, g.percent]));
-                        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ozet), 'Özet');
+
+                        // 2) ÜYE ANALİZİ (tüm üyeler: grup + bireysel)
                         let veri = [['Üye','Tip','Grup','Aldığı','Okuduğu','Tamamlama %']];
-                        memberRows.forEach(m=>veri.push([m.name, m.type, m.groups, m.taken, m.read, m.percent]));
-                        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(veri), 'Üye Analizi');
-                        // Şifreler
-                        let sifre = [['Grup','Şifre']];
+                        (allMembers||[]).forEach(m => {
+                            let d = getMemberDetailData(m.name, null, bookFilter);
+                            veri.push([m.name, (m.type||'grup')==='grup' ? 'Grup' : 'Bireysel', (d.groups||[]).join(', '), d.totalTaken, d.totalRead, d.totalTaken>0 ? Math.round((d.totalRead/d.totalTaken)*100) : 0]);
+                        });
+
+                        // 3) ESER DETAYI (üye x eser bazında)
+                        let eser = [['Üye','Eser','Toplam Birim','Alınan','Okunan','İlerleme %','Durum']];
+                        (allMembers||[]).forEach(m => {
+                            let d = getMemberDetailData(m.name, null, bookFilter);
+                            (d.books||[]).forEach(b => {
+                                const pct = b.taken>0 ? Math.round((b.read/b.taken)*100) : 0;
+                                const durum = b.completed ? 'Tamamlandı' : (b.taken>0 ? (b.read>=b.taken?'Okundu':'Devam ediyor') : 'Hisse yok');
+                                eser.push([m.name, b.name, b.total, b.taken, b.read, pct, durum]);
+                            });
+                        });
+
+                        // 4) OKUMA GÜNLÜĞÜ
+                        let gunluk = [['Tarih','Üye','Eser','Bölüm','Saat','Grup']];
+                        (allMembers||[]).forEach(m => {
+                            let d = getMemberDetailData(m.name, null, bookFilter);
+                            (d.readingLogs||[]).forEach(l => {
+                                gunluk.push([l.date||'Tarih yok', m.name, l.bookName||'', l.range||(l.unit?l.unit+'. bölüm':''), l.time||'--:--', (l.group||'').replace(/_/g,' ').toUpperCase()]);
+                            });
+                        });
+
+                        // 5) ŞİFRELER (grup + bireysel)
+                        let sifre = [['Grup/Üye','Şifre','Tip']];
                         (allGroupKeys||[]).forEach(gKey => {
                             const raw = localStorage.getItem(`hatim_group_${gKey}`);
                             if (!raw) return;
-                            try { const g = JSON.parse(raw); if (g.passwords) Object.keys(g.passwords).forEach(p=>sifre.push([gKey.replace(/_/g,' ').toUpperCase(), p])); } catch(e){}
+                            try { const g = JSON.parse(raw); if (g.passwords) Object.keys(g.passwords).forEach(p=>sifre.push([gKey.replace(/_/g,' ').toUpperCase(), p, 'Grup'])); } catch(e){}
                         });
-                        try { const p = JSON.parse(localStorage.getItem('hatim_bireysel_pool')||'null'); if (p && p.passwords) Object.keys(p.passwords).forEach(pp=>sifre.push(['👤 '+pp, p.passwords[pp]])); } catch(e){}
+                        try { const p = JSON.parse(localStorage.getItem('hatim_bireysel_pool')||'null'); if (p && p.passwords) Object.keys(p.passwords).forEach(pp=>sifre.push([pp, p.passwords[pp], 'Bireysel'])); } catch(e){}
+
+                        const wb = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ozet), 'Özet');
+                        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(veri), 'Üye Analizi');
+                        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(eser), 'Eser Detay');
+                        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(gunluk), 'Okuma Günlüğü');
                         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sifre), 'Şifreler');
                         XLSX.writeFile(wb, 'Hatim_Analiz.xlsx');
                     } catch(err) { alert('Excel oluşturulamadı: ' + err.message); }
