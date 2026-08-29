@@ -2904,6 +2904,101 @@
                 updateUserInterface();
             }
 
+            async function triggerAdminToggle() {
+                if (isAdmin) {
+                    isAdmin = false;
+                } else {
+                    const pwd = prompt("Yönetici şifresi:");
+                    if (pwd === ADMIN_PASSWORD) {
+                        isAdmin = true;
+                    } else if (pwd !== null) {
+                        showToast('❌ Hatalı şifre!', 'error');
+                        return;
+                    } else {
+                        return;
+                    }
+                }
+                await renderDailyInspiration();
+                renderBooks();
+                
+                renderAdminSectionAtBottom();
+                updateAutocompleteLists();
+                showToast(isAdmin ? '🔓 Yönetici modu açıldı!' : '🔐 Yönetici modu kapandı.', 'info');
+            }
+
+            function getBireyselPool() {
+                let p = JSON.parse(localStorage.getItem('hatim_bireysel_pool') || 'null');
+                if (!p || !p.members) p = { members: [], memberTypes: {} };
+                if (!p.memberTypes) p.memberTypes = {};
+                if (!p.passwords) p.passwords = {};
+                return p;
+            }
+            function saveBireyselPool(p) { localStorage.setItem('hatim_bireysel_pool', JSON.stringify(p)); }
+
+            async function loadGroupData() {
+                const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
+                appData = savedData ? JSON.parse(savedData) : { members: [], password: "" };
+
+                if (!appData.members) appData.members = [];
+                if (!appData.memberTypes) appData.memberTypes = {};
+                if (appData.password === undefined) appData.password = "";
+                if (!appData.readingLogs) appData.readingLogs = [];
+
+                const savedSession = localStorage.getItem(`hatim_session_${currentGroup}`);
+                loggedInMember = (savedSession && appData.members.includes(savedSession)) ? savedSession : "";
+                loggedInMemberType = localStorage.getItem(`hatim_session_type_${currentGroup}`) || "";
+
+                if (!appData.bookPages) appData.bookPages = {};
+                if (!appData.bookHatims) appData.bookHatims = {};
+                if (!appData.bookHistory) appData.bookHistory = {};
+
+                const todayStr = new Date().toLocaleDateString("tr-TR");
+                defaultBooksTemplate.forEach(defBook => {
+                    if (!appData.bookPages[defBook.id]) appData.bookPages[defBook.id] = Array(defBook.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
+                    if (!appData.bookHatims[defBook.id]) appData.bookHatims[defBook.id] = { hatimNo: 1, startDate: todayStr, prayerDone: false };
+                    if (!appData.bookHistory[defBook.id]) appData.bookHistory[defBook.id] = [];
+                });
+
+                if (!appData.books) {
+                    appData.books = JSON.parse(JSON.stringify(defaultBooksTemplate));
+                } else {
+                    defaultBooksTemplate.forEach(defBook => {
+                        let existing = appData.books.find(b => b.id === defBook.id);
+                        if (!existing) appData.books.push(JSON.parse(JSON.stringify(defBook)));
+                        else {
+                            if (!existing.currentMode) existing.currentMode = defBook.defaultMode;
+                            if (!existing.totalUnits) existing.totalUnits = defBook.totalUnits;
+                        }
+                    });
+                }
+
+                appData.books.forEach(b => {
+                    if (!appData.bookPages[b.id]) {
+                        appData.bookPages[b.id] = Array(b.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
+                    } else if (appData.bookPages[b.id].length !== b.totalUnits) {
+                        if (appData.bookPages[b.id].length < b.totalUnits) {
+                            while (appData.bookPages[b.id].length < b.totalUnits) {
+                                appData.bookPages[b.id].push({ owner: "", isRead: false });
+                            }
+                        } else {
+                            appData.bookPages[b.id] = appData.bookPages[b.id].slice(0, b.totalUnits);
+                        }
+                    }
+                    if (!appData.bookHatims[b.id]) appData.bookHatims[b.id] = { hatimNo: 1, startDate: todayStr, prayerDone: false };
+                    if (!appData.bookHistory[b.id]) appData.bookHistory[b.id] = [];
+                });
+
+                rebuildBookModesDefs();
+                saveGroupData();
+                await renderDailyInspiration();
+                renderBooks();
+                
+                renderAdminSectionAtBottom();
+                updateAutocompleteLists();
+                updateUserInterface();
+            }
+
+            
             function saveGroupData() {
                 localStorage.setItem(`hatim_group_${currentGroup}`, JSON.stringify(appData));
             }
