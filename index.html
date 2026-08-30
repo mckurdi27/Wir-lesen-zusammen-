@@ -1692,7 +1692,14 @@
                         readingLogs: []
                     };
                     
-                    let groups = groupName ? [groupName] : [...allGroupKeys];
+                    let groups = [];
+                    if (groupName) { groups = [groupName]; }
+                    else {
+                      for (var li = 0; li < localStorage.length; li++) {
+                        var lk = localStorage.key(li);
+                        if (lk && lk.indexOf("hatim_group_") === 0 && lk !== "hatim_bireysel_pool") groups.push(lk.replace("hatim_group_", ""));
+                      }
+                    }
                     if (!groupName && memberName) { let ownKey = memberName.toLowerCase(); if (ownKey && !groups.includes(ownKey)) groups.push(ownKey); }
                     
                     groups.forEach(gKey => {
