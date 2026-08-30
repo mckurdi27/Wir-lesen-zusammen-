@@ -3143,6 +3143,7 @@ function infoSortTable(col) {
                             panel.style.display = 'block';
 
                             function renderUnits() {
+                                let bId = document.getElementById('bv-book').value;
                                 let mSel = document.getElementById('bv-member').value || '';
                                 let mParts = mSel.split(':');
                                 let mName = mParts.length > 1 ? mParts[1] : mSel;
