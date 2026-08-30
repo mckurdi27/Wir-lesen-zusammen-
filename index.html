@@ -1306,6 +1306,32 @@
                     }
                 });
 
+
+            /* Giriş tipine göre: Tek -> üye adı = grup adı (aynı, tek ikon); Grup -> farklı (çift ikon) */
+            (function() {
+              var typeSel = document.getElementById('login-user-type');
+              var nameIn = document.getElementById('login-user-name');
+              var grpIn = document.getElementById('login-group-name');
+              if (!typeSel || !nameIn || !grpIn) return;
+              var tipEtiketi = document.createElement('div');
+              tipEtiketi.style.cssText = 'grid-column:1/-1;font-size:12px;font-weight:bold;text-align:center;padding:2px 0;border-radius:6px;';
+              tipEtiketi.style.background = '#e9ecef'; tipEtiketi.style.color = '#555';
+              tipEtiketi.id = 'login-type-hint';
+              var grid = typeSel.closest('.login-form-area, #login-form-area') || typeSel.parentElement.parentElement;
+              if (grid) { try { grid.appendChild(tipEtiketi); } catch(e){} }
+              function guncelleTip() {
+                var tip = typeSel.value;
+                if (tipEtiketi) {
+                  if (tip === 'bireysel') { tipEtiketi.textContent = 'Tek üye: isim ve grup aynıdır (👤)'; tipEtiketi.style.background='rgba(39,174,96,.12)'; tipEtiketi.style.color='#1e8f4e'; }
+                  else { tipEtiketi.textContent = 'Grup üyesi: üye adı ile grup adı farklıdır (👥)'; tipEtiketi.style.background='rgba(142,68,173,.12)'; tipEtiketi.style.color='#7d3c98'; }
+                }
+                if (tip === 'bireysel') { if (nameIn.value.trim()) grpIn.value = nameIn.value.trim(); }
+              }
+              typeSel.addEventListener('change', guncelleTip);
+              nameIn.addEventListener('input', function() { if (typeSel.value === 'bireysel' && nameIn.value.trim()) grpIn.value = nameIn.value.trim(); });
+              guncelleTip();
+            })();
+
                 function updateUserInterface() {
                 const loginArea = document.getElementById('login-form-area');
                 const userArea = document.getElementById('user-active-area');
