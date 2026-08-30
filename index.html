@@ -4050,7 +4050,7 @@ renderBooks();
           gm.forEach(function (m) { g.memberTypes[m.name] = m.type || "grup"; g.passwords[m.name] = m.password || ""; });
           bookDef.forEach(function (b) { g.bookPages[b.id] = Array(b.total_units).fill(null).map(function () { return { owner: "", isRead: false }; }); });
           var mIdName = {}; gm.forEach(function (m) { mIdName[m.id] = m.name; });
-          shares.forEach(function (s) { var owner = mIdName[s.member_id]; if (!owner) return; if (!g.bookPages[s.book_id]) g.bookPages[s.book_id] = []; if (g.bookPages[s.book_id][s.unit_index]) g.bookPages[s.book_id][s.unit_index] = { owner: owner, isRead: !!s.is_read, readDate: s.read_date || null, readTime: s.read_time || null }; });
+          shares.forEach(function (s) { var owner = mIdName[s.member_id]; if (!owner) return; if (!g.bookPages[s.book_id]) g.bookPages[s.book_id] = []; g.bookPages[s.book_id][s.unit_index] = { owner: owner, isRead: !!s.is_read, readDate: s.read_date || null, readTime: s.read_time || null }; });
           try { origSetItem("hatim_group_" + gk, JSON.stringify(g)); } catch (e) {}
         });
         var pool = { members: Array.from(poolNames), memberTypes: poolTypes, passwords: poolPass };
