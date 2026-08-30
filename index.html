@@ -315,7 +315,6 @@
             display: none !important;
         }
     </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div class="container">
@@ -3886,185 +3885,210 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
  * birbiriyle yarışıp üye kopyaları oluşturuyordu (aynı isimden birden çok).
  * Şimdi her yazım kuyrukta sırayla işlenir -> kopya imkansız.
  * ===================================================================== */
+</script>
+<script>
+/* =====================================================================
+ * Supabase Gerçek Zamanlı Senkron Köprüsü (v7)
+ * localStorage = cache ; Supabase = tek kaynak
+ * v7 kritik değişiklik: supabase-js CDN'e BAĞIMLILIK KALDIRILDI.
+ * Daha önce köprü, harici CDN kütüphanesine (jsdelivr supabase-js)
+ * güveniyordu; CDN bazı ağlarda/tarayıcılarda bloklanınca köprü sessizce
+ * çalışmıyor, localStorage ile Supabase asla senkron olmuyordu.
+ * Artık doğrudan fetch ile Supabase PostgREST REST API kullanılıyor
+ * (her tarayıcıda çalışır, harici kütüphane gerekmez).
+ * v6'daki seri kuyruk, _pulling/_myPush korumaları korundu.
+ * ===================================================================== */
 (function () {
-  const SUPABASE_URL = "https://dututlhijniendbpmdrg.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dHV0bGhpam5pZW5kYnBtZHJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwODE4MDQsImV4cCI6MjEwMzY1NzgwNH0.3ft8BNNk45vI0HK5hZHmgU1n2-oQaVknG1c0ZLzO-Xw";
-  if (typeof window.supabase === "undefined") { console.warn("supabase-js yüklü değil"); return; }
-  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  var SUPABASE_URL = "https://dututlhijniendbpmdrg.supabase.co";
+  var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dHV0bGhpam5pZW5kYnBtZHJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwODE4MDQsImV4cCI6MjEwMzY1NzgwNH0.3ft8BNNk45vI0HK5hZHmgU1n2-oQaVknG1c0ZLzO-Xw";
+  var BASE = SUPABASE_URL + "/rest/v1";
+  var H = { "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + SUPABASE_ANON_KEY, "Content-Type": "application/json" };
 
-  let _pulling = false;
-  let _myPush = false;
-  let _queue = Promise.resolve();   // seri kuyruk
-  const origSetItem = localStorage.setItem.bind(localStorage);
+  var _pulling = false;
+  var _myPush = false;
+  var _queue = Promise.resolve();
+  var origSetItem = localStorage.setItem.bind(localStorage);
+
+  // ---------- REST yardımcıları (fetch tabanlı) ----------
+  function api(path, opts) {
+    opts = opts || {};
+    var headers = Object.assign({}, H, opts.headers || {});
+    return fetch(BASE + path, { method: opts.method || "GET", headers: headers, body: opts.body || undefined }).then(function (r) {
+      if (r.status === 204) return null;
+      return r.text().then(function (t) {
+        if (!t) return null;
+        try { return JSON.parse(t); } catch (e) { return t; }
+      });
+    });
+  }
+  var rest = {
+    select: function (table, q) { return api("/" + table + (q ? q : "?select=*")); },
+    insert: function (table, rows) { return api("/" + table, { method: "POST", body: JSON.stringify(rows) }); },
+    del: function (table, q) { return api("/" + table + (q ? q : ""), { method: "DELETE" }); },
+    upsert: function (table, rows) { return api("/" + table + "?on_conflict=key", { method: "POST", body: JSON.stringify(rows) }); }
+  };
 
   function enqueue(fn) {
-    _queue = _queue.then(fn).catch(e => console.warn("kuyruk hata:", e));
+    _queue = _queue.then(fn).catch(function (e) { console.warn("kuyruk hata:", e); });
     return _queue;
   }
 
   function ownersOf(g) {
-    const s = new Set();
-    const bp = (g && g.bookPages) || {};
-    Object.keys(bp).forEach(bid => (bp[bid] || []).forEach(p => { if (p && p.owner) s.add(p.owner); }));
-    return [...s];
+    var s = new Set();
+    var bp = (g && g.bookPages) || {};
+    Object.keys(bp).forEach(function (bid) { (bp[bid] || []).forEach(function (p) { if (p && p.owner) s.add(p.owner); }); });
+    return Array.from(s);
   }
   function isIndividualGroup(g, key) {
-    const mem = (g && g.members) || [];
+    var mem = (g && g.members) || [];
     if (mem.length === 1) {
-      const mt = (g && g.memberTypes) || {};
+      var mt = (g && g.memberTypes) || {};
       if (mt[mem[0]] === 'bireysel') return true;
       if (mem[0].toLowerCase() === String(key).toLowerCase()) return true;
     }
     return false;
   }
 
-  // Bir grubun üyelerini ATOMİK olarak değiştir (sil + ekle) - kuyrukta.
   function replaceMembers(names, groupKey, passwords) {
-    return enqueue(async () => {
-      const pw = passwords || {};
-      try {
-        if (groupKey === null) await sb.from('members').delete().eq('group_key', null);
-        else await sb.from('members').delete().eq('group_key', groupKey);
-        const rows = names.map(n => ({ name: n, password: pw[n] || '', type: (groupKey === null ? 'bireysel' : 'grup'), group_key: groupKey }));
-        if (rows.length) {
-          const { error } = await sb.from('members').insert(rows);
-          if (error) console.warn("insert hata:", error.message);
-        }
-      } catch (e) { console.warn("replaceMembers hata:", e); }
+    return enqueue(function () {
+      var pw = passwords || {};
+      var q = (groupKey === null) ? "?group_key=is.null" : ("?group_key=eq." + encodeURIComponent(groupKey));
+      return rest.del("members", q).then(function () {
+        var rows = names.map(function (n) { return { name: n, password: pw[n] || "", type: (groupKey === null ? "bireysel" : "grup"), group_key: groupKey }; });
+        if (rows.length) return rest.insert("members", rows);
+      });
     });
   }
 
-  // Bir grubun hisselerini atomik değiştir - kuyrukta.
   function replaceShares(g, groupKey) {
-    return enqueue(async () => {
-      try {
-        const { data: allM } = await sb.from('members').select('id,name');
-        const nameId = {};
-        (allM||[]).forEach(r => { if (String(r.group_key) === String(groupKey)) nameId[r.name] = r.id; });
-        const ids = Object.values(nameId);
-        if (ids.length) await sb.from('shares').delete().in('member_id', ids);
-        const bp = (g && g.bookPages) || {};
-        for (const bid of Object.keys(bp)) {
-          const pages = bp[bid] || [];
-          const rows = [];
-          pages.forEach((p, idx) => { if (p && p.owner && nameId[p.owner]) rows.push({ member_id: nameId[p.owner], book_id: bid, unit_index: idx, is_read: !!p.isRead, read_date: p.readDate || null, read_time: p.readTime || null }); });
-          if (rows.length) { const { error } = await sb.from('shares').insert(rows); if (error) console.warn("shares hata:", error.message); }
-        }
-      } catch (e) { console.warn("replaceShares hata:", e); }
+    return enqueue(function () {
+      return rest.select("members", "?select=id,name,group_key").then(function (allM) {
+        var nameId = {};
+        (allM || []).forEach(function (r) { if (String(r.group_key) === String(groupKey)) nameId[r.name] = r.id; });
+        var ids = Object.keys(nameId).map(function (k) { return nameId[k]; });
+        var p = ids.length ? rest.del("shares", "?member_id=in.(" + ids.join(",") + ")") : Promise.resolve();
+        return p.then(function () {
+          var bp = (g && g.bookPages) || {};
+          var tasks = Object.keys(bp).map(function (bid) {
+            var pages = bp[bid] || [];
+            var rows = [];
+            pages.forEach(function (p, idx) { if (p && p.owner && nameId[p.owner]) rows.push({ member_id: nameId[p.owner], book_id: bid, unit_index: idx, is_read: !!p.isRead, read_date: p.readDate || null, read_time: p.readTime || null }); });
+            return rows.length ? rest.insert("shares", rows) : Promise.resolve();
+          });
+          return Promise.all(tasks);
+        });
+      });
     });
   }
 
   function pushGroup(key, g) {
     _myPush = true;
-    return enqueue(async () => {
-      try {
-        await sb.from('groups').upsert({ key: key, name: (g && g.name) || key.replace(/_/g,' '), password: (g && g.password) || '' }, { onConflict: 'key' });
-        const memArr = (g && g.members) || [];
-        const allNames = [...new Set([...memArr, ...ownersOf(g)])];
-        await replaceMembers(allNames, key, (g && g.passwords) || {});
-        await replaceShares(g, key);
-      } catch (e) { console.warn("pushGroup hata:", e); }
-    }).then(() => { setTimeout(()=>{ _myPush=false; }, 1200); });
+    return enqueue(function () {
+      return rest.upsert("groups", [{ key: key, name: (g && g.name) || String(key).replace(/_/g, " "), password: (g && g.password) || "" }])
+        .then(function () {
+          var memArr = (g && g.members) || [];
+          var allNames = Array.from(new Set(memArr.concat(ownersOf(g))));
+          return replaceMembers(allNames, key, (g && g.passwords) || {}).then(function () { return replaceShares(g, key); });
+        });
+    }).then(function () { setTimeout(function () { _myPush = false; }, 1200); });
   }
 
   function pushIndividual(g, key) {
     _myPush = true;
-    return enqueue(async () => {
-      try {
-        const memArr = (g && g.members) || [];
-        const allNames = [...new Set([...memArr, ...ownersOf(g)])];
-        if (!allNames.length && key) allNames.push(key);
-        await replaceMembers(allNames, null, (g && g.passwords) || {});
-        await replaceShares(g, null);
-      } catch (e) { console.warn("pushIndividual hata:", e); }
-    }).then(() => { setTimeout(()=>{ _myPush=false; }, 1200); });
+    return enqueue(function () {
+      var memArr = (g && g.members) || [];
+      var allNames = Array.from(new Set(memArr.concat(ownersOf(g))));
+      if (!allNames.length && key) allNames.push(key);
+      return replaceMembers(allNames, null, (g && g.passwords) || {}).then(function () { return replaceShares(g, null); });
+    }).then(function () { setTimeout(function () { _myPush = false; }, 1200); });
   }
 
   function pushPool(p) {
     if (!p || !p.members) return Promise.resolve();
     _myPush = true;
-    return enqueue(async () => {
-      try { await replaceMembers(p.members, null, p.passwords || {}); }
-      catch (e) { console.warn("pushPool hata:", e); }
-    }).then(() => { setTimeout(()=>{ _myPush=false; }, 1200); });
+    return enqueue(function () { return replaceMembers(p.members, null, p.passwords || {}); })
+      .then(function () { setTimeout(function () { _myPush = false; }, 1200); });
   }
 
-  async function pushAllLocal() {
+  function pushAllLocal() {
+    var tasks = [];
     try {
-      // ÖNCE bireysel havuzu tek seferde yaz (kuyrukta) - bireyseller hepsi group_key null
-      const poolRaw = localStorage.getItem('hatim_bireysel_pool');
-      if (poolRaw) { try { const p = JSON.parse(poolRaw); if (p && p.members) await pushPool(p); } catch(e){} }
-      // SONRA her grubu yaz
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k && k.indexOf('hatim_group_') === 0 && k !== 'hatim_bireysel_pool') {
-          const raw = localStorage.getItem(k); if (!raw) continue;
-          let g; try { g = JSON.parse(raw); } catch(e){ continue; }
+      var poolRaw = localStorage.getItem("hatim_bireysel_pool");
+      if (poolRaw) { try { var p = JSON.parse(poolRaw); if (p && p.members) tasks.push(pushPool(p)); } catch (e) {} }
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && k.indexOf("hatim_group_") === 0 && k !== "hatim_bireysel_pool") {
+          var raw = localStorage.getItem(k); if (!raw) continue;
+          var g; try { g = JSON.parse(raw); } catch (e) { continue; }
           if (!g) continue;
-          const gkey = k.replace('hatim_group_','');
-          if (isIndividualGroup(g, gkey)) continue; // bireysel zaten havuzdan yazıldı
-          await pushGroup(gkey, g);
+          var gkey = k.replace("hatim_group_", "");
+          if (isIndividualGroup(g, gkey)) continue;
+          tasks.push(pushGroup(gkey, g));
         }
       }
-    } catch (e) { console.warn("pushAllLocal hata:", e); }
+    } catch (e) {}
+    return Promise.all(tasks);
   }
 
-  async function pullAll() {
-    if (_pulling) return;
+  function pullAll() {
+    if (_pulling) return Promise.resolve();
     _pulling = true;
-    try {
-      const { data: groups } = await sb.from('groups').select('*');
-      const { data: members } = await sb.from('members').select('*');
-      const { data: shares } = await sb.from('shares').select('*');
-      let books = [];
-      try { const { data: b } = await sb.from('books').select('*'); books = b || []; } catch(e){}
-      const bookDef = (books && books.length) ? books.map(x=>({id:x.id,total_units:x.total_units})) : [];
-      const byKey = {}; (groups||[]).forEach(g => { byKey[g.key] = g; });
-      const poolNames = new Set(); const poolPass = {}; const poolTypes = {};
-      (members||[]).forEach(m => { if (!m.group_key) { poolNames.add(m.name); poolPass[m.name]=m.password; poolTypes[m.name]=m.type||'bireysel'; } });
-      Object.keys(byKey).forEach(gk => {
-        const gm = (members||[]).filter(m => m.group_key === gk);
-        let g = { members: gm.map(m=>m.name), memberTypes:{}, passwords:{}, password: byKey[gk].password||'', books:[], bookPages:{}, bookHatims:{}, bookHistory:{}, readingLogs:[] };
-        gm.forEach(m => { g.memberTypes[m.name]=m.type||'grup'; g.passwords[m.name]=m.password||''; });
-        bookDef.forEach(b => { g.bookPages[b.id] = Array(b.total_units).fill(null).map(()=>({owner:'',isRead:false})); });
-        const mIdName = {}; gm.forEach(m => { mIdName[m.id]=m.name; });
-        (shares||[]).forEach(s => { const owner = mIdName[s.member_id]; if (!owner) return; if (!g.bookPages[s.book_id]) g.bookPages[s.book_id]=[]; if (g.bookPages[s.book_id][s.unit_index]) g.bookPages[s.book_id][s.unit_index] = { owner, isRead: !!s.is_read, readDate: s.read_date||null, readTime: s.read_time||null }; });
-        try { origSetItem('hatim_group_'+gk, JSON.stringify(g)); } catch(e){}
-      });
-      const pool = { members:[...poolNames], memberTypes:poolTypes, passwords:poolPass };
-      try { origSetItem('hatim_bireysel_pool', JSON.stringify(pool)); } catch(e){}
-    } catch (e) { console.warn("pullAll hata:", e); }
-    _pulling = false;
+    return Promise.all([rest.select("groups"), rest.select("members"), rest.select("shares"), rest.select("books", "?select=id,total_units")])
+      .then(function (res) {
+        var groups = res[0] || [], members = res[1] || [], shares = res[2] || [], books = res[3] || [];
+        var bookDef = (books && books.length) ? books.map(function (x) { return { id: x.id, total_units: x.total_units }; }) : [];
+        var byKey = {}; groups.forEach(function (g) { byKey[g.key] = g; });
+        var poolNames = new Set(), poolPass = {}, poolTypes = {};
+        members.forEach(function (m) { if (!m.group_key) { poolNames.add(m.name); poolPass[m.name] = m.password; poolTypes[m.name] = m.type || "bireysel"; } });
+        Object.keys(byKey).forEach(function (gk) {
+          var gm = members.filter(function (m) { return m.group_key === gk; });
+          var g = { members: gm.map(function (m) { return m.name; }), memberTypes: {}, passwords: {}, password: byKey[gk].password || "", books: [], bookPages: {}, bookHatims: {}, bookHistory: {}, readingLogs: [] };
+          gm.forEach(function (m) { g.memberTypes[m.name] = m.type || "grup"; g.passwords[m.name] = m.password || ""; });
+          bookDef.forEach(function (b) { g.bookPages[b.id] = Array(b.total_units).fill(null).map(function () { return { owner: "", isRead: false }; }); });
+          var mIdName = {}; gm.forEach(function (m) { mIdName[m.id] = m.name; });
+          shares.forEach(function (s) { var owner = mIdName[s.member_id]; if (!owner) return; if (!g.bookPages[s.book_id]) g.bookPages[s.book_id] = []; if (g.bookPages[s.book_id][s.unit_index]) g.bookPages[s.book_id][s.unit_index] = { owner: owner, isRead: !!s.is_read, readDate: s.read_date || null, readTime: s.read_time || null }; });
+          try { origSetItem("hatim_group_" + gk, JSON.stringify(g)); } catch (e) {}
+        });
+        var pool = { members: Array.from(poolNames), memberTypes: poolTypes, passwords: poolPass };
+        try { origSetItem("hatim_bireysel_pool", JSON.stringify(pool)); } catch (e) {}
+      })
+      .catch(function (e) { console.warn("pullAll hata:", e); })
+      .then(function () { _pulling = false; });
   }
 
   localStorage.setItem = function (key, value) {
     origSetItem(key, value);
     try {
       if (_pulling) return;
-      if (key && key.indexOf('hatim_group_') === 0 && key !== 'hatim_bireysel_pool') {
-        let g; try { g = JSON.parse(value); } catch(e){ return; }
+      if (key && key.indexOf("hatim_group_") === 0 && key !== "hatim_bireysel_pool") {
+        var g; try { g = JSON.parse(value); } catch (e) { return; }
         if (!g) return;
-        const gkey = key.replace('hatim_group_','');
-        if (isIndividualGroup(g, gkey)) pushIndividual(g, gkey);
-        else pushGroup(gkey, g);
-      } else if (key === 'hatim_bireysel_pool') {
-        let p; try { p = JSON.parse(value); } catch(e){ return; }
+        var gkey = key.replace("hatim_group_", "");
+        if (isIndividualGroup(g, gkey)) pushIndividual(g, gkey); else pushGroup(gkey, g);
+      } else if (key === "hatim_bireysel_pool") {
+        var p; try { p = JSON.parse(value); } catch (e) { return; }
         if (p) pushPool(p);
       }
-    } catch(e){}
+    } catch (e) {}
   };
 
-  let _deb = null;
-  function schedulePull() {
-    if (_myPush) return;
-    if (_deb) clearTimeout(_deb);
-    _deb = setTimeout(() => { _deb=null; pullAll().then(() => { try { if (typeof loadGroupData==='function') loadGroupData(); if (typeof updateUserInterface==='function') updateUserInterface(); if (typeof renderAdminSectionAtBottom==='function') renderAdminSectionAtBottom(); } catch(e){} }); }, 600);
+  function refreshUI() {
+    try { if (typeof loadGroupData === "function") loadGroupData(); if (typeof updateUserInterface === "function") updateUserInterface(); if (typeof renderAdminSectionAtBottom === "function") renderAdminSectionAtBottom(); } catch (e) {}
   }
-  ['members','shares','groups','reading_logs'].forEach(t => { try { sb.channel('rt_'+t).on('postgres_changes', { event:'*', schema:'public', table:t }, schedulePull).subscribe(); } catch(e){} });
 
-  window.addEventListener('DOMContentLoaded', function () {
-    pushAllLocal().then(() => { pullAll().then(() => { try { if (typeof loadGroupData==='function') loadGroupData(); if (typeof updateUserInterface==='function') updateUserInterface(); } catch(e){} }); });
-  });
+  function doInit() {
+    // Sayfa açılışında: önce localStorage'daki veriyi Supabase'e push et, sonra çek.
+    pushAllLocal().then(function () { return pullAll(); }).then(function () { refreshUI(); });
+  }
+
+  // DOMContentLoaded'de değil, HEmen çalıştır (köprü body sonunda -> DOM hazır).
+  var t = setInterval(function () {
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+      clearInterval(t);
+      doInit();
+    }
+  }, 50);
+  setTimeout(function () { doInit(); }, 500); // güvence: interval kaçarsa
 })();
 
 </script>
