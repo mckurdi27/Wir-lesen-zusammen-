@@ -3167,17 +3167,14 @@ function infoSortTable(col) {
                                     let ownerNames = [...new Set(chunk.filter(p => p.owner).map(p => p.owner))];
                                     let allRead = chunk.length > 0 && chunk.every(p => p.owner && p.isRead);
                                     let hasOwner = owned > 0;
-                                    let bg = allRead ? '#27ae60' : hasOwner ? '#f39c12' : '#ffffff';
-                                    let fg = allRead ? '#fff' : hasOwner ? '#333' : '#333';
+                                    let bg = allRead ? '#27ae60' : hasOwner ? '#e74c3c' : '#f39c12';
+                                    let fg = (allRead || hasOwner) ? '#fff' : '#333';
                                     let pre = ''; // hisse sahibi renk ve etiketten belli, bloklar tiklenmemis gelir
                                     let stBadge = allRead ? '<span style="background:#27ae60;color:#fff;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:bold;">âœ“</span>' : hasOwner ? '<span style="background:#f39c12;color:#333;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:bold;">â– </span>' : '<span style="background:#e9ecef;color:#777;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:bold;">â—‹</span>';
                                     return `<label style="display:flex; align-items:center; gap:8px; padding:6px; border:1px solid var(--border-color); border-radius:6px; margin-bottom:4px; background:#ffffff; color:#333; cursor:pointer;">
                                         <input type="checkbox" class="bv-unit" ${pre} data-start="${it.start}" data-end="${it.end}">
-                                        ${stBadge}
-                                        <span style="font-size:12px; font-weight:bold; flex:1;">${it.start+1}-${it.end}</span>
-                                        <span style="font-size:11px; color:#27ae60;">dolu: ${owned}</span>
-                                        <span style="font-size:11px; color:#8a6d3b;">bu Ã¼ye: ${mine}</span>
-                                        ${ownerNames.length ? `<span style="font-size:13px; font-weight:bold; color:#333;">Sahip: í ½í±¥ ${ownerNames.join(', ')}</span>` : ''}
+                                        <span style="font-size:12px; font-weight:bold;">${it.start+1}-${it.end}</span>
+                                        ${ownerNames.length ? `<span style="font-size:12px; font-weight:bold; margin-left:6px;">í ½í±¥ ${ownerNames.join(', ')}</span>` : ''}
                                     </label>`;
                                 }).join('');
                             }
