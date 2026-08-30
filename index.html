@@ -2446,7 +2446,7 @@
                             pageNumber = pi.start + 1;
                         }
 
-                        let pdfBtn = `<button class="pdf-page-btn" data-book-id="${book.id}" data-page="${pageNumber}" style="padding: 8px 14px; background: #8e44ad; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px; touch-action: manipulation;">📄 PDF ${pageNumber}</button>`;
+                        let pdfBtn = `<button class="pdf-page-btn" data-book-id="${book.id}" data-page="${pageNumber}" style="padding: 8px 14px; background: #d4af37; color: #3e2723; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px; touch-action: manipulation;">📄 PDF ${pageNumber}</button>`;
 
                         if (loggedInMember) {
                             if (st.statusType === "free") {
@@ -2492,7 +2492,7 @@
                         `;
                     }).join('');
 
-                    let headerPdfBtn = `<button class="pdf-book-btn" data-book-id="${book.id}" style="padding: 8px 16px; background: #8e44ad; color: #fff; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: bold; min-height: 44px; touch-action: manipulation;">📄 PDF</button>`;
+                    let headerPdfBtn = `<button class="pdf-book-btn" data-book-id="${book.id}" style="padding: 8px 16px; background: #d4af37; color: #3e2723; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: bold; min-height: 44px; touch-action: manipulation;">📄 PDF</button>`;
 
                     card.innerHTML = `
                         <div class="book-header">
