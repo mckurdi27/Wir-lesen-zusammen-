@@ -2043,7 +2043,7 @@
                                         ${b.units.length > 0 ? `
                                             <div style="margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px; font-size: 11px;">
                                                 ${b.units.map(u => `
-                                                    <span style="padding: 2px 8px; border-radius: 4px; background: ${u.isRead ? '#27ae60' : u.owner ? '#f39c12' : '#e9ecef'}; color: ${u.isRead ? '#fff' : u.owner ? '#fff' : '#777'};">
+                                                    <span style="padding: 2px 8px; border-radius: 4px; background: ${u.isRead ? '#27ae60' : u.owner ? '#f39c12' : '#e9ecef'}; color: ${u.isRead ? '#fff' : u.owner ? '#333' : '#777'};">
                                                         ${u.unit}. ${u.isRead ? '✅' : u.owner ? '⬜' : '⚪'}
                                                     </span>
                                                 `).join('')}
@@ -3168,7 +3168,7 @@ function infoSortTable(col) {
                                     let allRead = chunk.length > 0 && chunk.every(p => p.owner && p.isRead);
                                     let hasOwner = owned > 0;
                                     let bg = allRead ? '#27ae60' : hasOwner ? '#f39c12' : '#ffffff';
-                                    let fg = allRead ? '#fff' : hasOwner ? '#fff' : '#333';
+                                    let fg = allRead ? '#fff' : hasOwner ? '#333' : '#333';
                                     let pre = ''; // hisse sahibi renk ve etiketten belli, bloklar tiklenmemis gelir
                                     return `<label style="display:flex; align-items:center; gap:8px; padding:6px; border:1px solid var(--border-color); border-radius:6px; margin-bottom:4px; background:${bg}; color:${fg}; cursor:pointer;">
                                         <input type="checkbox" class="bv-unit" ${pre} data-start="${it.start}" data-end="${it.end}">
