@@ -3174,7 +3174,7 @@ function infoSortTable(col) {
                                     return `<label style="display:flex; align-items:center; gap:8px; padding:6px; border:1px solid var(--border-color); border-radius:6px; margin-bottom:4px; background:#ffffff; color:#333; cursor:pointer;">
                                         <input type="checkbox" class="bv-unit" ${pre} data-start="${it.start}" data-end="${it.end}">
                                         <span style="font-size:12px; font-weight:bold;">${it.start+1}-${it.end}</span>
-                                        ${ownerNames.length ? `<span style="font-size:12px; font-weight:bold; margin-left:6px;">í ½í±¥ ${ownerNames.join(', ')}</span>` : ''}
+                                        ${ownerNames.length ? `<span style="font-size:12px; font-weight:bold; margin-left:6px;">${ownerNames.join(', ')}</span>` : ''}
                                     </label>`;
                                 }).join('');
                             }
