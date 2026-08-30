@@ -3215,10 +3215,11 @@ function infoSortTable(col) {
                                 if (selLabel) selLabel.textContent = (mType === 'bireysel' ? '👤 ' : '👥 ') + mName;
                                 let mode = document.getElementById('bv-mode').value;
                                 let wrap = document.getElementById('bv-units-wrap');
-                                let gcur = (mSel && mSel !== '') ? bulkResolveData(mSel) : null;
-                                let gPages = (mSel && mSel.indexOf('bireysel:') === 0)
-                                    ? ((gcur && gcur.gData && gcur.gData.bookPages) ? gcur.gData.bookPages : null)
-                                    : ((g && g.bookPages) ? g.bookPages : null);
+                                let mKey = null;
+                                if (mType === 'bireysel') { mKey = 'hatim_group_' + mName.toLowerCase(); }
+                                else if (typeof currentGroup !== 'undefined' && currentGroup) { mKey = 'hatim_group_' + currentGroup; }
+                                let gPages = null;
+                                if (mKey) { try { let gd0 = JSON.parse(localStorage.getItem(mKey) || 'null'); gPages = (gd0 && gd0.bookPages) ? gd0.bookPages : null; } catch(e){} }
                                 if (!bId || !gPages || !gPages[bId]) { wrap.innerHTML = '<div style="color:#777;font-size:12px;">Eser seçin.</div>'; return; }
                                 let pages = gPages[bId];
                                 let size = parseInt(mode);
