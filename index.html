@@ -1659,7 +1659,8 @@
                         readingLogs: []
                     };
                     
-                    let groups = groupName ? [groupName] : allGroupKeys;
+                    let groups = groupName ? [groupName] : [...allGroupKeys];
+                    if (!groupName && memberName) { let ownKey = memberName.toLowerCase(); if (ownKey && !groups.includes(ownKey)) groups.push(ownKey); }
                     
                     groups.forEach(gKey => {
                         const data = localStorage.getItem(`hatim_group_${gKey}`);
