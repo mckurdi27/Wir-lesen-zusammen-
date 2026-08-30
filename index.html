@@ -2688,7 +2688,7 @@
                     let gLabel = gKey.replace(/_/g, ' ').toUpperCase();
                     let gRaw = null;
                     try { gRaw = JSON.parse(localStorage.getItem('hatim_group_' + gKey) || 'null'); } catch(e){}
-                    let gMems = (gRaw && gRaw.members || []).filter(mm => !(gRaw.memberTypes && (gRaw.memberTypes[mm] === 'bireysel' || gRaw.memberTypes[mm] === 'pasif')));
+                    let gMems = (gRaw && gRaw.members || []).filter(mm => !(gRaw.memberTypes && gRaw.memberTypes[mm] === 'pasif'));
                     groupsHtml += `<option value="g:${gKey}">${gMems.length === 1 ? "👤" : "👥"} ${gMems.length === 1 ? "[Tek]" : "[Grup]"} ${gLabel} (​${gMems.length} kişi)</option>`;
                     gMems.forEach(mm => { groupsHtml += `<option value="gm:${gKey}:${encodeURIComponent(mm)}"> 👤 ${mm} (${gLabel})</option>`; });
                 });
@@ -2701,7 +2701,7 @@
                 }
                 let _bireyselPoolMembers = _bireyselPool.members || [];
                 let _bireyselMembersHtml = _bireyselPoolMembers.map(m => `<div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; border-bottom: 1px solid var(--border-color);">👤 ${m}${(_bireyselPool.passwords && _bireyselPool.passwords[m]) ? ` (🔑 ${_bireyselPool.passwords[m]})` : ''}<button class="admin-remove-bireysel" data-name="${m}" style="background:#e74c3c;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer;min-height:34px;">Sil</button></div>`).join('') || '';
-                let groupMembers = (appData && appData.members) ? appData.members.filter(m => !(appData.memberTypes && (appData.memberTypes[m] === 'bireysel' || appData.memberTypes[m] === 'pasif'))) : [];
+                let groupMembers = (appData && appData.members) ? appData.members.filter(m => !(appData.memberTypes && appData.memberTypes[m] === 'pasif')) : [];
                                 let membersHtml = groupMembers.map(m => `
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; font-size: 14px; border: 1px solid var(--border-color);">
                         <span>• ${m}</span>
