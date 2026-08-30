@@ -1714,7 +1714,8 @@
                             result.groups.push(gKey);
                             
                             if (parsed.books && parsed.bookPages) {
-                                parsed.books.filter(b => bookFilter === 'all' || b.name === bookFilter).forEach(b => {
+                                var _bks = (parsed.books && parsed.books.length) ? parsed.books : Object.keys(parsed.bookPages).map(function (bid) { return { id: bid, name: bid, totalUnits: (parsed.bookPages[bid] || []).length }; });
+                                _bks.filter(b => bookFilter === 'all' || b.name === bookFilter).forEach(b => {
                                     let taken = 0, read = 0;
                                     let unitDetails = [];
                                     if (parsed.bookPages[b.id]) {
