@@ -2141,7 +2141,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${sortedLogs.slice(0, 50).map(log => `
+                                    ${sortedLogs.map(log => `
                                         <tr>
                                             <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-size: 11px;">${log.date}</td>
                                             <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${log.member || memberName}</td>
