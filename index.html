@@ -1406,6 +1406,16 @@
                         localStorage.setItem(`hatim_session_type_${currentGroup}`, "bireysel");
                         localStorage.setItem('hatim_bireysel_session', userName);
                         localStorage.setItem('hatim_bireysel_session_type', "bireysel");
+                        const _prevB = localStorage.getItem(`hatim_group_${currentGroup}`);
+                        appData = _prevB ? JSON.parse(_prevB) : { members: [], password: "" };
+                        if (!appData.members) appData.members = [];
+                        if (!appData.memberTypes) appData.memberTypes = {};
+                        if (!appData.bookPages) appData.bookPages = {};
+                        if (!appData.bookHatims) appData.bookHatims = {};
+                        if (!appData.bookHistory) appData.bookHistory = {};
+                        if (!appData.readingLogs) appData.readingLogs = [];
+                        if (!appData.members.includes(userName)) appData.members.push(userName);
+                        appData.memberTypes[userName] = "bireysel";
                         saveGroupData();
                         showToast(`✅ ${userName} bireysel olarak giriş yaptı!`, 'success');
                         updateUserInterface();
