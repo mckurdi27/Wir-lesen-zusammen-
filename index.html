@@ -3813,14 +3813,18 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
 <script>
 </script>
 <script>
+</script>
+<script>
 /* =====================================================================
- * Supabase Gerçek Zamanlı Senkron Köprüsü (v2)
- * - localStorage = çalışma cache'i
- * - Supabase = tek kayıt kaynağı
- * - localStorage.setItem SARMALANIR: hatim_group_* ve bireysel havuz
- *   yazımları hangi kod yoluyla gelirse gelsin Supabase'e itilir.
- * - Açılışta mevcut localStorage verileri Supabase'e birleştirilir (pushAll)
- *   ve Supabase'ten çekilir (pullAll).
+ * Supabase Gerçek Zamanlı Senkron Köprüsü (v3)
+ * localStorage = cache ; Supabase = tek kaynak
+ * v3 düzeltmeleri:
+ *  - Üyeler yalnızca g.members değil, bookPages içindeki owner'lardan da
+ *    toplanır (admin atamasıyla eklenen üyeler members dizisinde olmayabilir).
+ *  - Bir hatim_group_<X> kaydı bireysel mi grup mu ayırt edilir:
+ *      * tek üyeli ve tipi bireysel, veya anahtar adı üyenin adıysa -> bireysel
+ *      * aksi -> grup
+ *  - Bireysel üyeler members'a group_key=null, gerçek gruplar group_key=X.
  * ===================================================================== */
 (function () {
   const SUPABASE_URL = "https://dututlhijniendbpmdrg.supabase.co";
@@ -3828,25 +3832,48 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
   if (typeof window.supabase === "undefined") { console.warn("supabase-js yüklü değil"); return; }
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   let _pulling = false;
-  let _lastPush = {}; // anahtar -> timestamp, döngüyü kır
+  let _lastPush = {};
+
+  /* bookPages'teki owner isimlerini topla */
+  function ownersOf(g) {
+    const s = new Set();
+    const bp = (g && g.bookPages) || {};
+    Object.keys(bp).forEach(bid => {
+      (bp[bid] || []).forEach(p => { if (p && p.owner) s.add(p.owner); });
+    });
+    return [...s];
+  }
+
+  /* kaydın bireysel mi grup mu olduğunu anla */
+  function isIndividualGroup(g, key) {
+    const mem = (g && g.members) || [];
+    if (mem.length === 1) {
+      const mt = (g && g.memberTypes) || {};
+      if (mt[mem[0]] === 'bireysel') return true;
+      if (mem[0].toLowerCase() === String(key).toLowerCase()) return true;
+    }
+    return false;
+  }
+
+  /* ---- bir grup/bireysel kaydını Supabase members'a yaz ---- */
+  async function upsertMembers(names, type, groupKey, passwords) {
+    const pw = passwords || {};
+    const rows = names.map(n => ({ name: n, password: pw[n] || '', type: type, group_key: groupKey }));
+    if (rows.length) await sb.from('members').upsert(rows, { onConflict: 'name,group_key' });
+  }
 
   /* ---- grup verisi -> Supabase ---- */
   async function pushGroup(key, g) {
     const now = Date.now();
-    if (_lastPush['g:'+key] && now - _lastPush['g:'+key] < 800) return; // debounce
+    if (_lastPush['g:'+key] && now - _lastPush['g:'+key] < 800) return;
     _lastPush['g:'+key] = now;
     try {
       await sb.from('groups').upsert({ key: key, name: (g && g.name) || key.replace(/_/g,' '), password: (g && g.password) || '' }, { onConflict: 'key' });
-      const members = (g && g.members) || [];
-      if (members.length) {
-        const mRows = members.map(m => ({
-          name: m,
-          password: (g.passwords && g.passwords[m]) || '',
-          type: (g.memberTypes && g.memberTypes[m]) || 'grup',
-          group_key: key
-        }));
-        await sb.from('members').upsert(mRows, { onConflict: 'name,group_key' });
-      }
+      const memArr = (g && g.members) || [];
+      const owners = ownersOf(g);
+      // hem members dizisi hem owner'lar birleştir
+      const allNames = [...new Set([...memArr, ...owners])];
+      if (allNames.length) await upsertMembers(allNames, 'grup', key, (g && g.passwords) || {});
       // hisseler
       const bp = (g && g.bookPages) || {};
       const { data: allM } = await sb.from('members').select('id,name');
@@ -3862,33 +3889,54 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
     } catch (e) { console.warn("pushGroup hata:", e); }
   }
 
-  /* ---- bireysel havuz -> Supabase members (group_key null) ---- */
+  /* ---- bireysel üye kaydı -> members (group_key null) ---- */
+  async function pushIndividual(g, key) {
+    const now = Date.now();
+    if (_lastPush['i:'+key] && now - _lastPush['i:'+key] < 800) return;
+    _lastPush['i:'+key] = now;
+    try {
+      const memArr = (g && g.members) || [];
+      const owners = ownersOf(g);
+      const allNames = [...new Set([...memArr, ...owners])];
+      const pw = (g && g.passwords) || {};
+      if (!allNames.length && key) allNames.push(key); // anahtar adı üye adıysa
+      if (allNames.length) await upsertMembers(allNames, 'bireysel', null, pw);
+      // hisseler (group_key null bireyseller)
+      const bp = (g && g.bookPages) || {};
+      const { data: allM } = await sb.from('members').select('id,name');
+      const nameId = {}; (allM||[]).forEach(r => { if (r.group_key === null) nameId[r.name] = r.id; });
+      for (const bid of Object.keys(bp)) {
+        const pages = bp[bid] || [];
+        const rows = [];
+        pages.forEach((p, idx) => { if (p && p.owner && nameId[p.owner]) rows.push({ member_id: nameId[p.owner], book_id: bid, unit_index: idx, is_read: !!p.isRead, read_date: p.readDate || null, read_time: p.readTime || null }); });
+        if (rows.length) await sb.from('shares').upsert(rows, { onConflict: 'member_id,book_id,unit_index' });
+      }
+    } catch (e) { console.warn("pushIndividual hata:", e); }
+  }
+
+  /* ---- bireysel havuz -> members (group_key null) ---- */
   async function pushPool(p) {
     if (!p || !p.members) return;
     const now = Date.now();
     if (_lastPush['pool'] && now - _lastPush['pool'] < 800) return;
     _lastPush['pool'] = now;
     try {
-      const mRows = p.members.map(m => ({
-        name: m,
-        password: (p.passwords && p.passwords[m]) || '',
-        type: (p.memberTypes && p.memberTypes[m]) || 'bireysel',
-        group_key: null
-      }));
-      if (mRows.length) await sb.from('members').upsert(mRows, { onConflict: 'name,group_key' });
+      await upsertMembers(p.members, 'bireysel', null, p.passwords || {});
     } catch (e) { console.warn("pushPool hata:", e); }
   }
 
-  /* ---- localStorage'daki mevcut verileri Supabase'e it (birleştir) ---- */
+  /* ---- localStorage'daki tüm veriyi Supabase'e it ---- */
   async function pushAllLocal() {
     try {
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
         if (k && k.indexOf('hatim_group_') === 0 && k !== 'hatim_bireysel_pool') {
-          const raw = localStorage.getItem(k);
-          if (!raw) continue;
+          const raw = localStorage.getItem(k); if (!raw) continue;
           let g; try { g = JSON.parse(raw); } catch(e){ continue; }
-          if (g && g.members) await pushGroup(k.replace('hatim_group_',''), g);
+          if (!g) continue;
+          const gkey = k.replace('hatim_group_','');
+          if (isIndividualGroup(g, gkey)) await pushIndividual(g, gkey);
+          else await pushGroup(gkey, g);
         }
       }
       const poolRaw = localStorage.getItem('hatim_bireysel_pool');
@@ -3896,7 +3944,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
     } catch (e) { console.warn("pushAllLocal hata:", e); }
   }
 
-  /* ---- Supabase -> localStorage yeniden inşa ---- */
+  /* ---- Supabase -> localStorage ---- */
   async function pullAll() {
     if (_pulling) return;
     _pulling = true;
@@ -3916,11 +3964,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
         gm.forEach(m => { g.memberTypes[m.name]=m.type||'grup'; g.passwords[m.name]=m.password||''; });
         bookDef.forEach(b => { g.bookPages[b.id] = Array(b.total_units).fill(null).map(()=>({owner:'',isRead:false})); });
         const mIdName = {}; gm.forEach(m => { mIdName[m.id]=m.name; });
-        (shares||[]).forEach(s => {
-          const owner = mIdName[s.member_id]; if (!owner) return;
-          if (!g.bookPages[s.book_id]) g.bookPages[s.book_id] = [];
-          if (g.bookPages[s.book_id][s.unit_index]) g.bookPages[s.book_id][s.unit_index] = { owner, isRead: !!s.is_read, readDate: s.read_date||null, readTime: s.read_time||null };
-        });
+        (shares||[]).forEach(s => { const owner = mIdName[s.member_id]; if (!owner) return; if (!g.bookPages[s.book_id]) g.bookPages[s.book_id]=[]; if (g.bookPages[s.book_id][s.unit_index]) g.bookPages[s.book_id][s.unit_index] = { owner, isRead: !!s.is_read, readDate: s.read_date||null, readTime: s.read_time||null }; });
         try { localStorage.setItem('hatim_group_'+gk, JSON.stringify(g)); } catch(e){}
       });
       const pool = { members:[...poolNames], memberTypes:poolTypes, passwords:poolPass };
@@ -3929,14 +3973,17 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
     _pulling = false;
   }
 
-  /* ---- localStorage.setItem sarmalama: her yazımı yakala ---- */
+  /* ---- localStorage.setItem sarmala ---- */
   const origSetItem = localStorage.setItem.bind(localStorage);
   localStorage.setItem = function (key, value) {
     origSetItem(key, value);
     try {
       if (key && key.indexOf('hatim_group_') === 0 && key !== 'hatim_bireysel_pool') {
         let g; try { g = JSON.parse(value); } catch(e){ return; }
-        if (g && g.members) pushGroup(key.replace('hatim_group_',''), g);
+        if (!g) return;
+        const gkey = key.replace('hatim_group_','');
+        if (isIndividualGroup(g, gkey)) pushIndividual(g, gkey);
+        else pushGroup(gkey, g);
       } else if (key === 'hatim_bireysel_pool') {
         let p; try { p = JSON.parse(value); } catch(e){ return; }
         if (p) pushPool(p);
@@ -3944,20 +3991,14 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
     } catch(e){}
   };
 
-  /* ---- Realtime abonelik ---- */
+  /* ---- Realtime ---- */
   let _deb = null;
   function schedulePull() { if (_deb) clearTimeout(_deb); _deb = setTimeout(() => { _deb=null; pullAll().then(() => { try { if (typeof loadGroupData==='function') loadGroupData(); if (typeof updateUserInterface==='function') updateUserInterface(); if (typeof renderAdminSectionAtBottom==='function') renderAdminSectionAtBottom(); } catch(e){} }); }, 600); }
-  ['members','shares','groups','reading_logs'].forEach(t => {
-    try {
-      sb.channel('rt_'+t).on('postgres_changes', { event:'*', schema:'public', table:t }, schedulePull).subscribe();
-    } catch(e){}
-  });
+  ['members','shares','groups','reading_logs'].forEach(t => { try { sb.channel('rt_'+t).on('postgres_changes', { event:'*', schema:'public', table:t }, schedulePull).subscribe(); } catch(e){} });
 
-  /* ---- İlk yükleme: localStorage'ı Supabase'e it, sonra Supabase'ten çek ---- */
+  /* ---- açılış ---- */
   window.addEventListener('DOMContentLoaded', function () {
-    pushAllLocal().then(() => {
-      pullAll().then(() => { try { if (typeof loadGroupData==='function') loadGroupData(); if (typeof updateUserInterface==='function') updateUserInterface(); } catch(e){} });
-    });
+    pushAllLocal().then(() => { pullAll().then(() => { try { if (typeof loadGroupData==='function') loadGroupData(); if (typeof updateUserInterface==='function') updateUserInterface(); } catch(e){} }); });
   });
 })();
 
