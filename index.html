@@ -2359,7 +2359,7 @@
                     const memberSelect = document.getElementById('analysis-member-select');
                     memberSelect.innerHTML = getMemberSelectHtml(group);
                     const sg = document.getElementById('analysis-selected-group-name');
-                    if (sg) sg.textContent = group === 'all' ? 'Tüm Gruplar' : group.replace(/_/g, ' ').toUpperCase();
+                    if (sg) sg.textContent = group === 'all' ? 'Tüm Gruplar' : group.replace(/_/g, ' ').toUpperCase() + (loggedInMember ? ' — ' + loggedInMember : '');
                     updateAllTabs();
                 });
 
@@ -2715,7 +2715,7 @@
                 let groupSectionHtml = `
                     <div class="admin-section group-section">
                         <h4 style="color: #2980b9;">👥 Grup ve Üye Yönetimi</h4>
-                        <div style="font-size:12px; color:#27ae60; font-weight:bold; margin-bottom:8px;">📌 Seçili Grup: ${currentGroup.replace(/_/g,' ').toUpperCase()}</div>
+                        <div style="font-size:12px; color:#27ae60; font-weight:bold; margin-bottom:8px;">📌 Seçili Grup: ${currentGroup.replace(/_/g,' ').toUpperCase()}${loggedInMember ? " — " + loggedInMember : ""}</div>
                         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
                             <label style="font-weight: bold; font-size: 13px; white-space: nowrap;">Grup:</label>
                             <select id="admin-group-select" style="padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); flex: 1; min-width: 120px; min-height: 44px; font-size: 14px;">${groupsHtml}</select>
@@ -2891,7 +2891,7 @@ function infoSortTable(col) {
                 let bulkSectionHtml = `
                     <div class="admin-section bulk-section">
                         <h4 style="color: #8e44ad;">📥 Toplu Atama / Silme</h4>
-                        <div style="font-size:12px; color:#8e44ad; font-weight:bold; margin-bottom:8px;">📌 Seçili Grup: ${currentGroup.replace(/_/g,' ').toUpperCase()}</div>
+                        <div style="font-size:12px; color:#8e44ad; font-weight:bold; margin-bottom:8px;">📌 Seçili Grup: ${currentGroup.replace(/_/g,' ').toUpperCase()}${loggedInMember ? " — " + loggedInMember : ""}</div>
 
                         <div style="border-top: 1px solid var(--border-color); padding-top: 12px;">
                             <div style="font-weight: bold; font-size: 13px; margin-bottom: 8px;">📚 Toplu Atama ve Silme:</div>
@@ -3435,7 +3435,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                     document.getElementById("admin-group-select").addEventListener("change", async (e) => {
                         let v = e.target.value;
                         if (v.startsWith("gm:")) { let p = v.split(':'); currentGroup = p[1]; loggedInMember = decodeURIComponent(p[2]||""); loggedInMemberType = "grup"; await loadGroupData(); updateUserInterface(); }
-                        else if (v.startsWith("g:")) { currentGroup = v.slice(2); await loadGroupData(); }
+                        else if (v.startsWith("g:")) { currentGroup = v.slice(2); loggedInMember = ""; loggedInMemberType = ""; await loadGroupData(); updateUserInterface(); }
                         else if (v === "__bireysel__" || v === "") { currentGroup = v === "__bireysel__" ? "" : v; await loadGroupData(); }
                         else { currentGroup = ""; loggedInMember = v; loggedInMemberType = "bireysel"; await loadGroupData(); updateUserInterface(); }
                     });
