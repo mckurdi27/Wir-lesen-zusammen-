@@ -2667,7 +2667,7 @@
                 }
                 let _bireyselPoolMembers = _bireyselPool.members || [];
                 let _bireyselMembersHtml = _bireyselPoolMembers.map(m => `<div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; border-bottom: 1px solid var(--border-color);">👤 ${m}${(_bireyselPool.passwords && _bireyselPool.passwords[m]) ? ` (🔑 ${_bireyselPool.passwords[m]})` : ''}<button class="admin-remove-bireysel" data-name="${m}" style="background:#e74c3c;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer;min-height:34px;">Sil</button></div>`).join('') || '';
-                let groupMembers = appData.members.filter(m => !(appData.memberTypes && (appData.memberTypes[m] === 'bireysel' || appData.memberTypes[m] === 'pasif')));
+                let groupMembers = (appData && appData.members) ? appData.members.filter(m => !(appData.memberTypes && (appData.memberTypes[m] === 'bireysel' || appData.memberTypes[m] === 'pasif'))) : [];
                                 let membersHtml = groupMembers.map(m => `
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; font-size: 14px; border: 1px solid var(--border-color);">
                         <span>• ${m}</span>
