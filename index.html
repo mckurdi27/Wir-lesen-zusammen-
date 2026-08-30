@@ -3514,22 +3514,26 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                             let sel = document.getElementById("admin-group-select");
                             let selVal = sel ? sel.value : "";
                             if (selVal === "") {
-                                let pw = prompt("Bireysel üye şifresi:");
-                                if (!pw || !pw.trim()) { showToast('❌ Şifre gerekli!', 'error'); return; }
-                                let pool = getBireyselPool();
-                                if (!pool.members.includes(clean)) {
-                                    pool.members.push(clean);
-                                    pool.memberTypes[clean] = "bireysel";
-                                    if (!pool.passwords) pool.passwords = {};
-                                    pool.passwords[clean] = pw.trim();
-                                    saveBireyselPool(pool);
-                                    showToast(`✅ ${clean} bireysel üye olarak eklendi!`, 'success');
-                                } else { showToast('Bu üye zaten var.', 'error'); }
+                                let pw = prompt(clean + " için şifre (grup adı üye adıyla aynı olur):");
+                                if (!pw || !pw.trim()) { showToast("❌ Şifre gerekli!", "error"); return; }
+                                let ownKey = clean.toLowerCase();
+                                let prev = localStorage.getItem("hatim_group_" + ownKey);
+                                let gd = prev ? JSON.parse(prev) : { members: [], memberTypes: {}, passwords: {}, password: "", books: [], bookPages: {}, bookHatims: {}, bookHistory: {}, readingLogs: [] };
+                                if (!gd.members) gd.members = [];
+                                if (!gd.memberTypes) gd.memberTypes = {};
+                                if (!gd.passwords) gd.passwords = {};
+                                if (!gd.members.includes(clean)) gd.members.push(clean);
+                                gd.memberTypes[clean] = "bireysel";
+                                gd.passwords[clean] = pw.trim();
+                                gd.password = pw.trim();
+                                localStorage.setItem("hatim_group_" + ownKey, JSON.stringify(gd));
+                                showToast("✅ " + clean + " eklendi (kişisel grup: " + ownKey.toUpperCase() + ")", "success");
                                 renderAdminSectionAtBottom();
                                 updateAutocompleteLists();
                                 return;
                             }
-                            currentGroup = selVal;
+                            
+currentGroup = selVal;
                             await loadGroupData();
                             let gpw = prompt("Grup üyesi şifresi:");
                             if (!gpw || !gpw.trim()) { showToast('❌ Şifre gerekli!', 'error'); return; }
