@@ -4033,16 +4033,17 @@ currentGroup = selVal;
   function pullAll() {
     if (_pulling) return Promise.resolve();
     _pulling = true;
-    return Promise.all([rest.select("groups"), rest.select("members"), rest.select("shares"), rest.select("books", "?select=id,total_units")])
+    return Promise.all([rest.select("groups"), rest.select("members"), rest.select("shares"), rest.select("books", "?select=id,name,total_units,type,default_mode,sort_order")])
       .then(function (res) {
         var groups = res[0] || [], members = res[1] || [], shares = res[2] || [], books = res[3] || [];
         var bookDef = (books && books.length) ? books.map(function (x) { return { id: x.id, total_units: x.total_units }; }) : [];
+        var bookFull = (books && books.length) ? books.map(function (x) { return { id: x.id, name: x.name, totalUnits: x.total_units, type: x.type || "page", defaultMode: x.default_mode || "yirmi_sayfa" }; }) : [];
         var byKey = {}; groups.forEach(function (g) { byKey[g.key] = g; });
         var poolNames = new Set(), poolPass = {}, poolTypes = {};
         members.forEach(function (m) { if (!m.group_key) { poolNames.add(m.name); poolPass[m.name] = m.password; poolTypes[m.name] = m.type || "bireysel"; } });
         Object.keys(byKey).forEach(function (gk) {
           var gm = members.filter(function (m) { return m.group_key === gk; });
-          var g = { members: gm.map(function (m) { return m.name; }), memberTypes: {}, passwords: {}, password: byKey[gk].password || "", books: [], bookPages: {}, bookHatims: {}, bookHistory: {}, readingLogs: [] };
+          var g = { members: gm.map(function (m) { return m.name; }), memberTypes: {}, passwords: {}, password: byKey[gk].password || "", books: bookFull, bookPages: {}, bookHatims: {}, bookHistory: {}, readingLogs: [] };
           gm.forEach(function (m) { g.memberTypes[m.name] = m.type || "grup"; g.passwords[m.name] = m.password || ""; });
           bookDef.forEach(function (b) { g.bookPages[b.id] = Array(b.total_units).fill(null).map(function () { return { owner: "", isRead: false }; }); });
           var mIdName = {}; gm.forEach(function (m) { mIdName[m.id] = m.name; });
