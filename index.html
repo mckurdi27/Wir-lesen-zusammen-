@@ -3434,10 +3434,10 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
 
                     document.getElementById("admin-group-select").addEventListener("change", async (e) => {
                         let v = e.target.value;
-                        if (v.startsWith("gm:")) { let p = v.split(':'); currentGroup = p[1]; loggedInMember = decodeURIComponent(p[2]||""); loggedInMemberType = "grup"; await loadGroupData(); updateUserInterface(); }
-                        else if (v.startsWith("g:")) { currentGroup = v.slice(2); loggedInMember = ""; loggedInMemberType = ""; await loadGroupData(); updateUserInterface(); }
+                        if (v.startsWith("gm:")) { let p = v.split(':'); currentGroup = p[1]; loggedInMember = decodeURIComponent(p[2]||""); loggedInMemberType = "grup"; await loadGroupData(true); updateUserInterface(); }
+                        else if (v.startsWith("g:")) { currentGroup = v.slice(2); loggedInMember = ""; loggedInMemberType = ""; await loadGroupData(true); updateUserInterface(); }
                         else if (v === "__bireysel__" || v === "") { currentGroup = v === "__bireysel__" ? "" : v; await loadGroupData(); }
-                        else { currentGroup = ""; loggedInMember = v; loggedInMemberType = "bireysel"; await loadGroupData(); updateUserInterface(); }
+                        else { currentGroup = ""; loggedInMember = v; loggedInMemberType = "bireysel"; await loadGroupData(true); updateUserInterface(); }
                     });
 
                     document.getElementById("admin-add-group").addEventListener("click", async () => {
@@ -3662,7 +3662,7 @@ currentGroup = selVal;
             }
             function saveBireyselPool(p) { localStorage.setItem('hatim_bireysel_pool', JSON.stringify(p)); }
 
-            async function loadGroupData() {
+            async function loadGroupData(skipSession) {
                 const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
                 appData = savedData ? JSON.parse(savedData) : { members: [], password: "" };
 
@@ -3671,6 +3671,7 @@ currentGroup = selVal;
                 if (appData.password === undefined) appData.password = "";
                 if (!appData.readingLogs) appData.readingLogs = [];
 
+                if (!skipSession) {
                 let savedSession = localStorage.getItem(`hatim_session_${currentGroup}`);
                 let savedSessionType = localStorage.getItem(`hatim_session_type_${currentGroup}`) || "";
                 if (!savedSession || !appData.members.includes(savedSession)) {
@@ -3679,6 +3680,7 @@ currentGroup = selVal;
                 }
                 loggedInMember = savedSession ? savedSession : "";
                 loggedInMemberType = savedSessionType || "";
+                }
 
                 if (!appData.bookPages) appData.bookPages = {};
                 if (!appData.bookHatims) appData.bookHatims = {};
