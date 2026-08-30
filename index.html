@@ -3671,7 +3671,7 @@ currentGroup = selVal;
                 if (appData.password === undefined) appData.password = "";
                 if (!appData.readingLogs) appData.readingLogs = [];
 
-                if (!skipSession) {
+                if (!skipSession && !loggedInMember) {
                 let savedSession = localStorage.getItem(`hatim_session_${currentGroup}`);
                 let savedSessionType = localStorage.getItem(`hatim_session_type_${currentGroup}`) || "";
                 if (!savedSession || !appData.members.includes(savedSession)) {
