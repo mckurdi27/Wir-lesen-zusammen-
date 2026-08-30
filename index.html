@@ -3170,12 +3170,14 @@ function infoSortTable(col) {
                                     let bg = allRead ? '#27ae60' : hasOwner ? '#f39c12' : '#ffffff';
                                     let fg = allRead ? '#fff' : hasOwner ? '#333' : '#333';
                                     let pre = ''; // hisse sahibi renk ve etiketten belli, bloklar tiklenmemis gelir
-                                    return `<label style="display:flex; align-items:center; gap:8px; padding:6px; border:1px solid var(--border-color); border-radius:6px; margin-bottom:4px; background:${bg}; color:${fg}; cursor:pointer;">
+                                    let stBadge = allRead ? '<span style="background:#27ae60;color:#fff;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:bold;">âœ“</span>' : hasOwner ? '<span style="background:#f39c12;color:#333;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:bold;">â– </span>' : '<span style="background:#e9ecef;color:#777;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:bold;">â—‹</span>';
+                                    return `<label style="display:flex; align-items:center; gap:8px; padding:6px; border:1px solid var(--border-color); border-radius:6px; margin-bottom:4px; background:#ffffff; color:#333; cursor:pointer;">
                                         <input type="checkbox" class="bv-unit" ${pre} data-start="${it.start}" data-end="${it.end}">
+                                        ${stBadge}
                                         <span style="font-size:12px; font-weight:bold; flex:1;">${it.start+1}-${it.end}</span>
-                                        <span style="font-size:11px; opacity:0.9;">dolu: ${owned}</span>
-                                        <span style="font-size:11px; opacity:0.9;">bu Ã¼ye: ${mine}</span>
-                                        ${ownerNames.length ? `<span style="font-size:13px; font-weight:bold; background:rgba(255,255,255,0.85); border-radius:4px; padding:1px 6px; margin-top:2px;">Sahip: í ½í±¥ ${ownerNames.join(', ')}</span>` : ''}
+                                        <span style="font-size:11px; color:#27ae60;">dolu: ${owned}</span>
+                                        <span style="font-size:11px; color:#8a6d3b;">bu Ã¼ye: ${mine}</span>
+                                        ${ownerNames.length ? `<span style="font-size:13px; font-weight:bold; color:#333;">Sahip: í ½í±¥ ${ownerNames.join(', ')}</span>` : ''}
                                     </label>`;
                                 }).join('');
                             }
