@@ -3925,7 +3925,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
     select: function (table, q) { return api("/" + table + (q ? q : "?select=*")); },
     insert: function (table, rows) { return api("/" + table, { method: "POST", body: JSON.stringify(rows) }); },
     del: function (table, q) { return api("/" + table + (q ? q : ""), { method: "DELETE" }); },
-    upsert: function (table, rows) { return api("/" + table + "?on_conflict=key", { method: "POST", body: JSON.stringify(rows) }); }
+    upsert: function (table, rows) { return api("/" + table + "?on_conflict=key", { method: "POST", headers: { "Prefer": "resolution=merge-duplicates" }, body: JSON.stringify(rows) }); }
   };
 
   function enqueue(fn) {
