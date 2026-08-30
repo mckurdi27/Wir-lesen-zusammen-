@@ -3654,11 +3654,8 @@ currentGroup = selVal;
 
             
             function getBireyselPool() {
-                let p = JSON.parse(localStorage.getItem('hatim_bireysel_pool') || 'null');
-                if (!p || !p.members) p = { members: [], memberTypes: {} };
-                if (!p.memberTypes) p.memberTypes = {};
-                if (!p.passwords) p.passwords = {};
-                return p;
+                // Yeni sistemde 'bireysel' yok: her kayıt bir gruptur (Tek = 1 kişilik grup). Havuz boş döner.
+                return { members: [], memberTypes: {}, passwords: {} };
             }
             function saveBireyselPool(p) { localStorage.setItem('hatim_bireysel_pool', JSON.stringify(p)); }
 
