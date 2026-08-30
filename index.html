@@ -1666,7 +1666,9 @@
                         if (!data) return;
                         try {
                             const parsed = JSON.parse(data);
-                            if (!parsed.members || !parsed.members.includes(memberName)) return;
+                            const inMembers = (parsed.members && parsed.members.includes(memberName)) ? true : false;
+                            const hasShares = (parsed.bookPages && Object.keys(parsed.bookPages).some(bid => (parsed.bookPages[bid]||[]).some(p => p.owner === memberName))) ? true : false;
+                            if (!inMembers && !hasShares) return;
                             
                             result.groups.push(gKey);
                             
@@ -3391,9 +3393,10 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
 
                     document.getElementById("admin-group-select").addEventListener("change", async (e) => {
                         let v = e.target.value;
-                        if (v.startsWith("gm:")) { let p = v.split(':'); currentGroup = p[1]; await loadGroupData(); }
+                        if (v.startsWith("gm:")) { let p = v.split(':'); currentGroup = p[1]; loggedInMember = decodeURIComponent(p[2]||""); loggedInMemberType = "grup"; await loadGroupData(); updateUserInterface(); }
                         else if (v.startsWith("g:")) { currentGroup = v.slice(2); await loadGroupData(); }
-                        else { currentGroup = v; await loadGroupData(); }
+                        else if (v === "__bireysel__" || v === "") { currentGroup = v === "__bireysel__" ? "" : v; await loadGroupData(); }
+                        else { currentGroup = ""; loggedInMember = v; loggedInMemberType = "bireysel"; await loadGroupData(); updateUserInterface(); }
                     });
 
                     document.getElementById("admin-add-group").addEventListener("click", async () => {
