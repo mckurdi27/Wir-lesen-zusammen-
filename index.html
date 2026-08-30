@@ -3116,6 +3116,7 @@ function infoSortTable(col) {
                                 <select id="bv-member" style="width:100%; padding:10px; border-radius:6px; border:1px solid var(--border-color); background:var(--card-bg); font-size:13px; min-height:44px;">
                                     ${cands.map(m => `<option value="${m.t}:${m.n}">${m.t === 'bireysel' ? 'ðŸ‘¤ ' : 'ðŸ‘¥ '}${m.n}${m.t === 'bireysel' ? ' (Bireysel)' : ''}</option>`).join('')}
                                 </select>
+                                <div id="bv-member-label" style="margin:6px 0 2px; font-size:13px; font-weight:bold; color:#27ae60;">Ãœye seÃ§in</div>
                             </div>`;
                             h += `<div style="margin-bottom:8px;">
                                 <label style="font-size:12px; font-weight:bold;">ðŸ“– Eser:</label>
@@ -3142,7 +3143,12 @@ function infoSortTable(col) {
                             panel.style.display = 'block';
 
                             function renderUnits() {
-                                let bId = document.getElementById('bv-book').value;
+                                let mSel = document.getElementById('bv-member').value || '';
+                                let mParts = mSel.split(':');
+                                let mName = mParts.length > 1 ? mParts[1] : mSel;
+                                let mType = mParts[0];
+                                let selLabel = document.getElementById('bv-member-label');
+                                if (selLabel) selLabel.textContent = (mType === 'bireysel' ? 'ðŸ‘¤ ' : 'ðŸ‘¥ ') + mName;
                                 let mode = document.getElementById('bv-mode').value;
                                 let wrap = document.getElementById('bv-units-wrap');
                                 if (!bId || !g.bookPages[bId]) { wrap.innerHTML = '<div style="color:#777;font-size:12px;">Eser seÃ§in.</div>'; return; }
@@ -3157,16 +3163,18 @@ function infoSortTable(col) {
                                     let chunk = pages.slice(it.start, it.end);
                                     let owned = chunk.filter(p => p.owner).length;
                                     let selV = document.getElementById('bv-member').value; let selN = selV.split(':').pop(); let mine = chunk.filter(p => p.owner === selN).length;
+                                    let ownerNames = [...new Set(chunk.filter(p => p.owner).map(p => p.owner))];
                                     let allRead = chunk.length > 0 && chunk.every(p => p.owner && p.isRead);
                                     let hasOwner = owned > 0;
                                     let bg = allRead ? '#27ae60' : hasOwner ? '#f39c12' : '#ffffff';
                                     let fg = allRead ? '#fff' : hasOwner ? '#fff' : '#333';
-                                    let pre = (mine > 0) ? 'checked' : '';
+                                    let pre = ''; // hisse sahibi renk ve etiketten belli, bloklar tiklenmemis gelir
                                     return `<label style="display:flex; align-items:center; gap:8px; padding:6px; border:1px solid var(--border-color); border-radius:6px; margin-bottom:4px; background:${bg}; color:${fg}; cursor:pointer;">
                                         <input type="checkbox" class="bv-unit" ${pre} data-start="${it.start}" data-end="${it.end}">
                                         <span style="font-size:12px; font-weight:bold; flex:1;">${it.start+1}-${it.end}</span>
                                         <span style="font-size:11px; opacity:0.9;">dolu: ${owned}</span>
                                         <span style="font-size:11px; opacity:0.9;">bu Ã¼ye: ${mine}</span>
+                                        ${ownerNames.length ? `<span style="font-size:11px; font-weight:bold;">í ½í±¥ ${ownerNames.join(', ')}</span>` : ''}
                                     </label>`;
                                 }).join('');
                             }
