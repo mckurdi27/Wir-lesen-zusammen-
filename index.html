@@ -3083,7 +3083,7 @@ function infoSortTable(col) {
                             if (!data) { showToast('Hedef verisi bulunamadı.', 'error'); return; }
                             let bookIds = bulkBookIds();
                             let assigned = 0;
-                            let g = data.gData;
+                                                        let g = data.gData;
                             if (!g.bookPages) g.bookPages = {};
                             bookIds.forEach(bId => {
                                 let pages = g.bookPages[bId];
@@ -3160,6 +3160,7 @@ function infoSortTable(col) {
                             if (!target) { panel.style.display = 'none'; panel.innerHTML = ''; return; }
                             let data = bulkResolveData(target);
                             if (!data) { panel.style.display='block'; panel.innerHTML = '<div style="color:#777;font-size:13px;">Veri bulunamadı.</div>'; return; }
+                            let bvGroupKey = (data.gKey || null);
                             let g = data.gData;
                             let books = (g.books || appData.books || []);
                             // 1) ÜYE seçimi (dropdown)
@@ -3217,7 +3218,7 @@ function infoSortTable(col) {
                                 let wrap = document.getElementById('bv-units-wrap');
                                 let mKey = null;
                                 if (mType === 'bireysel') { mKey = 'hatim_group_' + mName.toLowerCase(); }
-                                else if (typeof currentGroup !== 'undefined' && currentGroup) { mKey = 'hatim_group_' + currentGroup; }
+                                else if (bvGroupKey) { mKey = 'hatim_group_' + bvGroupKey; }
                                 let gPages = null;
                                 if (mKey) { try { let gd0 = JSON.parse(localStorage.getItem(mKey) || 'null'); gPages = (gd0 && gd0.bookPages) ? gd0.bookPages : null; } catch(e){} }
                                 if (!bId || !gPages || !gPages[bId]) { wrap.innerHTML = '<div style="color:#777;font-size:12px;">Eser seçin.</div>'; return; }
