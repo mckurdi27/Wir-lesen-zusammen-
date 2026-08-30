@@ -3996,7 +3996,9 @@ currentGroup = selVal;
       var memArr = (g && g.members) || [];
       var allNames = Array.from(new Set(memArr.concat(ownersOf(g))));
       if (!allNames.length && key) allNames.push(key);
-      return replaceMembers(allNames, null, (g && g.passwords) || {}).then(function () { return replaceShares(g, null); });
+      var gk = key || "bireysel";
+      return rest.upsert("groups", [{ key: gk, name: (g && g.name) || String(gk).replace(/_/g, " "), password: (g && g.password) || "" }])
+        .then(function () { return replaceMembers(allNames, gk, (g && g.passwords) || {}).then(function () { return replaceShares(g, gk); }); });
     }).then(function () { setTimeout(function () { _myPush = false; }, 1200); });
   }
 
