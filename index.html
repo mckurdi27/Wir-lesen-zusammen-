@@ -2793,18 +2793,19 @@
                         let d = JSON.parse(raw);
                         let gName = gKey.replace(/_/g, ' ').toUpperCase();
                         let gPw = d.password || '';
-                        // Grup satırı: 1=grup adı, 2=isim(yok), 3=şifre(yok), 4=grup şifresi
-                        _infoRows.push([gName, '', '', gPw || '(şifresiz)']);
+                        let gTip = (d.members || []).length === 1 ? 'tek' : 'grup';
+                        // Grup satırı: 1=grup adı, 2=isim(yok), 3=şifre(yok), 4=grup şifresi, 5=tip
+                        _infoRows.push([gName, '', '', gPw || '(şifresiz)', gTip]);
                         (d.members || []).forEach(mm => {
                             let mpw = (d.passwords && d.passwords[mm]) ? d.passwords[mm] : '';
-                            // Üye: 1=hangi grup, 2=isim, 3=üye şifresi, 4=grup şifresi
-                            _infoRows.push([gName, mm, mpw || '(şifresiz)', gPw || '(şifresiz)']);
+                            // Üye: 1=hangi grup, 2=isim, 3=üye şifresi, 4=grup şifresi, 5=tip
+                            _infoRows.push([gName, mm, mpw || '(şifresiz)', gPw || '(şifresiz)', gTip]);
                         });
                     } catch(e) {}
                 });
                 (_infoPool.members || []).forEach(mm => {
                     let mpw = (_infoPool.passwords && _infoPool.passwords[mm]) ? _infoPool.passwords[mm] : '';
-                    _infoRows.push(['Bireysel', mm, mpw || '(şifresiz)', '(bireysel)']);
+                    _infoRows.push(['Bireysel', mm, mpw || '(şifresiz)', '(bireysel)', 'tek']);
                 });
 
                 window._infoRowsCache = _infoRows.map(r => r.slice());
@@ -2826,7 +2827,7 @@
                 function infoRowHtml(r) {
                     let isMember = (r[1] !== '');
                     return `<tr${isMember ? '' : ' style="background:rgba(142,68,173,0.06); font-weight:bold;"'}>
-                        <td style="padding:8px; border:1px solid var(--border-color);">${isMember ? '👥 ' + r[0] : '🗂️ ' + r[0]}</td>
+                        <td style="padding:8px; border:1px solid var(--border-color);">${isMember ? (r[4] === 'tek' ? '👤 ' : '👥 ') + r[0] : '🗂️ ' + r[0]}</td>
                         <td style="padding:8px; border:1px solid var(--border-color); font-weight:${isMember ? 'bold' : 'normal'};">${isMember ? r[1] : '—'}</td>
                         <td style="padding:8px; border:1px solid var(--border-color); color:#8e44ad;">${isMember ? (r[2] || '(şifresiz)') : '—'}</td>
                         <td style="padding:8px; border:1px solid var(--border-color); color:#2980b9;">${r[3] || '(şifresiz)'}</td>
