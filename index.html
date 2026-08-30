@@ -3216,7 +3216,9 @@ function infoSortTable(col) {
                                 let mode = document.getElementById('bv-mode').value;
                                 let wrap = document.getElementById('bv-units-wrap');
                                 let gcur = (mSel && mSel !== '') ? bulkResolveData(mSel) : null;
-                                let gPages = (gcur && gcur.gData && gcur.gData.bookPages) ? gcur.gData.bookPages : null;
+                                let gPages = (mSel && mSel.indexOf('bireysel:') === 0)
+                                    ? ((gcur && gcur.gData && gcur.gData.bookPages) ? gcur.gData.bookPages : null)
+                                    : ((g && g.bookPages) ? g.bookPages : null);
                                 if (!bId || !gPages || !gPages[bId]) { wrap.innerHTML = '<div style="color:#777;font-size:12px;">Eser seçin.</div>'; return; }
                                 let pages = gPages[bId];
                                 let size = parseInt(mode);
