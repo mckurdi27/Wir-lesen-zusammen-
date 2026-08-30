@@ -3950,33 +3950,29 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
   }
 
   function replaceMembers(names, groupKey, passwords) {
-    return enqueue(function () {
-      var pw = passwords || {};
-      var q = (groupKey === null) ? "?group_key=is.null" : ("?group_key=eq." + encodeURIComponent(groupKey));
-      return rest.del("members", q).then(function () {
-        var rows = names.map(function (n) { return { name: n, password: pw[n] || "", type: (groupKey === null ? "bireysel" : "grup"), group_key: groupKey }; });
-        if (rows.length) return rest.insert("members", rows);
-      });
+    var pw = passwords || {};
+    var q = (groupKey === null) ? "?group_key=is.null" : ("?group_key=eq." + encodeURIComponent(groupKey));
+    return rest.del("members", q).then(function () {
+      var rows = names.map(function (n) { return { name: n, password: pw[n] || "", type: (groupKey === null ? "bireysel" : "grup"), group_key: groupKey }; });
+      if (rows.length) return rest.insert("members", rows);
     });
   }
 
   function replaceShares(g, groupKey) {
-    return enqueue(function () {
-      return rest.select("members", "?select=id,name,group_key").then(function (allM) {
-        var nameId = {};
-        (allM || []).forEach(function (r) { if (String(r.group_key) === String(groupKey)) nameId[r.name] = r.id; });
-        var ids = Object.keys(nameId).map(function (k) { return nameId[k]; });
-        var p = ids.length ? rest.del("shares", "?member_id=in.(" + ids.join(",") + ")") : Promise.resolve();
-        return p.then(function () {
-          var bp = (g && g.bookPages) || {};
-          var tasks = Object.keys(bp).map(function (bid) {
-            var pages = bp[bid] || [];
-            var rows = [];
-            pages.forEach(function (p, idx) { if (p && p.owner && nameId[p.owner]) rows.push({ member_id: nameId[p.owner], book_id: bid, unit_index: idx, is_read: !!p.isRead, read_date: p.readDate || null, read_time: p.readTime || null }); });
-            return rows.length ? rest.insert("shares", rows) : Promise.resolve();
-          });
-          return Promise.all(tasks);
+    return rest.select("members", "?select=id,name,group_key").then(function (allM) {
+      var nameId = {};
+      (allM || []).forEach(function (r) { if (String(r.group_key) === String(groupKey)) nameId[r.name] = r.id; });
+      var ids = Object.keys(nameId).map(function (k) { return nameId[k]; });
+      var p = ids.length ? rest.del("shares", "?member_id=in.(" + ids.join(",") + ")") : Promise.resolve();
+      return p.then(function () {
+        var bp = (g && g.bookPages) || {};
+        var tasks = Object.keys(bp).map(function (bid) {
+          var pages = bp[bid] || [];
+          var rows = [];
+          pages.forEach(function (p, idx) { if (p && p.owner && nameId[p.owner]) rows.push({ member_id: nameId[p.owner], book_id: bid, unit_index: idx, is_read: !!p.isRead, read_date: p.readDate || null, read_time: p.readTime || null }); });
+          return rows.length ? rest.insert("shares", rows) : Promise.resolve();
         });
+        return Promise.all(tasks);
       });
     });
   }
