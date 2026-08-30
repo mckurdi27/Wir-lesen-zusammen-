@@ -3214,8 +3214,10 @@ function infoSortTable(col) {
                                 if (selLabel) selLabel.textContent = (mType === 'bireysel' ? '👤 ' : '👥 ') + mName;
                                 let mode = document.getElementById('bv-mode').value;
                                 let wrap = document.getElementById('bv-units-wrap');
-                                if (!bId || !g.bookPages[bId]) { wrap.innerHTML = '<div style="color:#777;font-size:12px;">Eser seçin.</div>'; return; }
-                                let pages = g.bookPages[bId];
+                                let gcur = (mSel && mSel !== '') ? bulkResolveData(mSel) : null;
+                                let gPages = (gcur && gcur.gData && gcur.gData.bookPages) ? gcur.gData.bookPages : null;
+                                if (!bId || !gPages || !gPages[bId]) { wrap.innerHTML = '<div style="color:#777;font-size:12px;">Eser seçin.</div>'; return; }
+                                let pages = gPages[bId];
                                 let size = parseInt(mode);
                                 let items = [];
                                 for (let i = 0; i < pages.length; i += size) {
