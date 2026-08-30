@@ -2731,7 +2731,10 @@
                         <div style="max-height: 180px; overflow-y: auto; border: 1px solid var(--border-color); padding: 6px; border-radius: 6px; background: var(--card-bg);">
                             ${groupMembers.length > 0 ? membersHtml : '<div style="font-size: 13px; text-align: center; padding: 12px; color: #777;">Grupta \u00fcye yok.</div>'}
                         </div>
-
+                        <div style="margin: 10px 0 8px; font-size: 12px; font-weight: bold; color: #27ae60;">👤 Bireysel Üyeler</div>
+                        <div style="max-height: 150px; overflow-y: auto; border: 1px solid var(--border-color); padding: 6px; border-radius: 6px; background: var(--card-bg);">
+                            ${_bireyselPoolMembers.length > 0 ? _bireyselMembersHtml : '<div style="font-size: 13px; text-align: center; padding: 12px; color: #777;">Bireysel üye yok.</div>'}
+                        </div>
                         
                         <div style="font-size: 12px; color: #7f8c8d; margin-top: 8px;">
                             💡 Şifre durumu: <span style="font-weight: bold; color: ${appData.password ? '#27ae60' : '#e67e22'};">${appData.password ? '🔒 Şifreli' : '🔓 Şifresiz'}</span>
@@ -3042,7 +3045,11 @@ function infoSortTable(col) {
                         try {
                             let _bp = getBireyselPool();
                             if (_bp.members && _bp.members.length > 0) {
-`;
+                                optionsHtml += `<optgroup label="👤 Bireysel Üyeler">`;
+                                _bp.members.forEach(mm => {
+                                    optionsHtml += `<option value="bireysel:${mm}">👤 ${mm}</option>`;
+                                });
+                                optionsHtml += `</optgroup>`;
                             }
                         } catch(e){}
                         targetSelect.innerHTML = optionsHtml;
@@ -3737,9 +3744,7 @@ currentGroup = selVal;
                     }
                 }
                 await renderDailyInspiration();
-                                const _lf = document.getElementById('login-form-area');
-                if (_lf) _lf.style.display = isAdmin ? 'none' : '';
-renderBooks();
+                renderBooks();
                 
                 renderAdminSectionAtBottom();
                 updateAutocompleteLists();
