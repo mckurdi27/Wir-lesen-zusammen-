@@ -4073,7 +4073,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
   };
 
   function refreshUI() {
-    try { if (typeof loadGroupData === "function") loadGroupData(); if (typeof updateUserInterface === "function") updateUserInterface(); if (typeof renderAdminSectionAtBottom === "function") renderAdminSectionAtBottom(); } catch (e) {}
+    try { if (typeof loadGroupData === "function") loadGroupData(); if (typeof updateUserInterface === "function") updateUserInterface(); if (typeof renderAdminSectionAtBottom === "function") renderAdminSectionAtBottom(); if (typeof updateAutocompleteLists === "function") updateAutocompleteLists(); } catch (e) {}
   }
 
   function doInit() {
