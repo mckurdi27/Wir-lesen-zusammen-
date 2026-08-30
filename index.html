@@ -4055,7 +4055,6 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
   localStorage.setItem = function (key, value) {
     origSetItem(key, value);
     try {
-      if (_pulling) return;
       if (key && key.indexOf("hatim_group_") === 0 && key !== "hatim_bireysel_pool") {
         var g; try { g = JSON.parse(value); } catch (e) { return; }
         if (!g) return;
