@@ -3434,8 +3434,8 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
 
                     document.getElementById("admin-group-select").addEventListener("change", async (e) => {
                         let v = e.target.value;
-                        if (v.startsWith("gm:")) { let p = v.split(':'); currentGroup = p[1]; loggedInMember = decodeURIComponent(p[2]||""); loggedInMemberType = "grup"; await loadGroupData(true); updateUserInterface(); renderAdminSectionAtBottom(); }
-                        else if (v.startsWith("g:")) { currentGroup = v.slice(2); loggedInMember = ""; loggedInMemberType = ""; await loadGroupData(true); updateUserInterface(); renderAdminSectionAtBottom(); }
+                        if (v.startsWith("gm:")) { let p = v.split(':'); currentGroup = p[1]; loggedInMember = decodeURIComponent(p[2]||""); loggedInMemberType = "grup"; await loadGroupData(true); updateUserInterface(); renderAdminSectionAtBottom(); const _sel=document.getElementById("admin-group-select"); if(_sel) _sel.value=v; }
+                        else if (v.startsWith("g:")) { currentGroup = v.slice(2); loggedInMember = ""; loggedInMemberType = ""; await loadGroupData(true); updateUserInterface(); renderAdminSectionAtBottom(); const _sel=document.getElementById("admin-group-select"); if(_sel) _sel.value=v; }
                         else if (v === "__bireysel__" || v === "") { currentGroup = v === "__bireysel__" ? "" : v; await loadGroupData(); }
                         else { currentGroup = ""; loggedInMember = v; loggedInMemberType = "bireysel"; await loadGroupData(true); updateUserInterface(); renderAdminSectionAtBottom(); }
                     });
