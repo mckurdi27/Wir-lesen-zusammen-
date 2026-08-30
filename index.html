@@ -1419,11 +1419,6 @@
                     }
                     
                     if (userType === 'bireysel') {
-                        let _bp = getBireyselPool();
-                        if (!_bp.members.includes(userName)) { _bp.members.push(userName); _bp.memberTypes[userName] = "bireysel"; }
-                        if (!_bp.passwords) _bp.passwords = {};
-                        if (userPassword) _bp.passwords[userName] = userPassword;
-                        saveBireyselPool(_bp);
                         loggedInMember = userName;
                         loggedInMemberType = "bireysel";
                         currentGroup = userName.toLowerCase();
@@ -1436,19 +1431,21 @@
                         appData = _prevB ? JSON.parse(_prevB) : { members: [], password: "" };
                         if (!appData.members) appData.members = [];
                         if (!appData.memberTypes) appData.memberTypes = {};
+                        if (!appData.passwords) appData.passwords = {};
                         if (!appData.bookPages) appData.bookPages = {};
                         if (!appData.bookHatims) appData.bookHatims = {};
                         if (!appData.bookHistory) appData.bookHistory = {};
                         if (!appData.readingLogs) appData.readingLogs = [];
                         if (!appData.members.includes(userName)) appData.members.push(userName);
                         appData.memberTypes[userName] = "bireysel";
+                        if (userPassword) appData.passwords[userName] = userPassword;
+                        appData.password = userPassword || "";
                         saveGroupData();
-                        showToast(`✅ ${userName} bireysel olarak giriş yaptı!`, 'success');
+                        showToast("✅ " + userName + " kişisel grup ile giriş yaptı (grup: " + currentGroup.toUpperCase() + ")", 'success');
                         updateUserInterface();
                         loadGroupData();
                         return;
                     }
-                    
                     if (!groupName) {
                         showToast('❌ Lütfen grup adı girin!', 'error');
                         return;
