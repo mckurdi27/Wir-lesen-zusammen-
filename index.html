@@ -4078,7 +4078,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
 
   function doInit() {
     // Sayfa açılışında: önce localStorage'daki veriyi Supabase'e push et, sonra çek.
-    pushAllLocal().then(function () { return pullAll(); }).then(function () { refreshUI(); });
+    pullAll().then(function () { refreshUI(); });
   }
 
   // DOMContentLoaded'de değil, HEmen çalıştır (köprü body sonunda -> DOM hazır).
