@@ -3863,13 +3863,28 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
  * değiştirildi — idempotent, ek SQL gerekmez.
  * Ayrıca üyeler g.members + bookPages owner'larından toplanır.
  * ===================================================================== */
+</script>
+<script>
+/* =====================================================================
+ * Supabase Gerçek Zamanlı Senkron Köprüsü (v5)
+ * localStorage = cache ; Supabase = tek kaynak
+ * v5 düzeltmeleri (üye birikimini / sonsuz döngüyü giderir):
+ *  - pullAll, SARMALANMAMIŞ setItem (origSetItem) kullanır: Supabase'ten
+ *    yazılan veri tekrar push'a girmez -> realtime feedback döngüsü kırılır.
+ *  - push sırasında bir "outbox" bayrağıyla kendi insert'imizden doğan
+ *    realtime olayında yeniden pull yapmaz.
+ *  - replaceMembers (delete+insert) korundu; artık döngü olmadığı için
+ *    üyeler birikmez.
+ * ===================================================================== */
 (function () {
   const SUPABASE_URL = "https://dututlhijniendbpmdrg.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dHV0bGhpam5pZW5kYnBtZHJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwODE4MDQsImV4cCI6MjEwMzY1NzgwNH0.3ft8BNNk45vI0HK5hZHmgU1n2-oQaVknG1c0ZLzO-Xw";
   if (typeof window.supabase === "undefined") { console.warn("supabase-js yüklü değil"); return; }
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   let _pulling = false;
-  let _lastPush = {};
+  let _myPush = false;   // kendi push'umuzdan gelen realtime'ı yok say
+  const origSetItem = localStorage.setItem.bind(localStorage);
 
   function ownersOf(g) {
     const s = new Set();
@@ -3887,32 +3902,26 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
     return false;
   }
 
-  /* DELETE + INSERT (unique kısıt gerektirmez) */
   async function replaceMembers(names, type, groupKey, passwords) {
     const pw = passwords || {};
-    // o grubun eski üyelerini sil (groupKey null -> bireysel)
-    if (groupKey === null) {
-      await sb.from('members').delete().eq('group_key', null);
-    } else {
-      await sb.from('members').delete().eq('group_key', groupKey);
-    }
-    const rows = names.map(n => ({ name: n, password: pw[n] || '', type: type, group_key: groupKey }));
-    if (rows.length) {
-      const { error } = await sb.from('members').insert(rows);
-      if (error) console.warn("replaceMembers insert hata:", error.message);
-    }
+    try {
+      if (groupKey === null) await sb.from('members').delete().eq('group_key', null);
+      else await sb.from('members').delete().eq('group_key', groupKey);
+      const rows = names.map(n => ({ name: n, password: pw[n] || '', type: type, group_key: groupKey }));
+      if (rows.length) {
+        const { error } = await sb.from('members').insert(rows);
+        if (error) console.warn("replaceMembers insert hata:", error.message);
+      }
+    } catch (e) { console.warn("replaceMembers hata:", e); }
   }
 
   async function pushGroup(key, g) {
-    const now = Date.now();
-    if (_lastPush['g:'+key] && now - _lastPush['g:'+key] < 800) return;
-    _lastPush['g:'+key] = now;
+    _myPush = true;
     try {
       await sb.from('groups').upsert({ key: key, name: (g && g.name) || key.replace(/_/g,' '), password: (g && g.password) || '' }, { onConflict: 'key' });
       const memArr = (g && g.members) || [];
       const allNames = [...new Set([...memArr, ...ownersOf(g)])];
       await replaceMembers(allNames, 'grup', key, (g && g.passwords) || {});
-      // hisseler: o grubun üye id'lerine ait eski hisseleri sil, yeniden ekle
       const { data: allM } = await sb.from('members').select('id,name');
       const nameId = {}; (allM||[]).forEach(r => { if (r.group_key === key) nameId[r.name] = r.id; });
       const ids = Object.values(nameId);
@@ -3925,12 +3934,11 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
         if (rows.length) { const { error } = await sb.from('shares').insert(rows); if (error) console.warn("shares hata:", error.message); }
       }
     } catch (e) { console.warn("pushGroup hata:", e); }
+    finally { setTimeout(()=>{ _myPush=false; }, 1000); }
   }
 
   async function pushIndividual(g, key) {
-    const now = Date.now();
-    if (_lastPush['i:'+key] && now - _lastPush['i:'+key] < 800) return;
-    _lastPush['i:'+key] = now;
+    _myPush = true;
     try {
       const memArr = (g && g.members) || [];
       const allNames = [...new Set([...memArr, ...ownersOf(g)])];
@@ -3948,14 +3956,15 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
         if (rows.length) { const { error } = await sb.from('shares').insert(rows); if (error) console.warn("shares hata:", error.message); }
       }
     } catch (e) { console.warn("pushIndividual hata:", e); }
+    finally { setTimeout(()=>{ _myPush=false; }, 1000); }
   }
 
   async function pushPool(p) {
     if (!p || !p.members) return;
-    const now = Date.now();
-    if (_lastPush['pool'] && now - _lastPush['pool'] < 800) return;
-    _lastPush['pool'] = now;
-    try { await replaceMembers(p.members, 'bireysel', null, p.passwords || {}); } catch (e) { console.warn("pushPool hata:", e); }
+    _myPush = true;
+    try { await replaceMembers(p.members, 'bireysel', null, p.passwords || {}); }
+    catch (e) { console.warn("pushPool hata:", e); }
+    finally { setTimeout(()=>{ _myPush=false; }, 1000); }
   }
 
   async function pushAllLocal() {
@@ -3963,7 +3972,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
         if (k && k.indexOf('hatim_group_') === 0 && k !== 'hatim_bireysel_pool') {
-          const raw = localStorage.getItem(k); if (!raw) continue;
+          const raw = origSetItem && localStorage.getItem(k); if (!raw) continue;
           let g; try { g = JSON.parse(raw); } catch(e){ continue; }
           if (!g) continue;
           const gkey = k.replace('hatim_group_','');
@@ -3996,18 +4005,19 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
         bookDef.forEach(b => { g.bookPages[b.id] = Array(b.total_units).fill(null).map(()=>({owner:'',isRead:false})); });
         const mIdName = {}; gm.forEach(m => { mIdName[m.id]=m.name; });
         (shares||[]).forEach(s => { const owner = mIdName[s.member_id]; if (!owner) return; if (!g.bookPages[s.book_id]) g.bookPages[s.book_id]=[]; if (g.bookPages[s.book_id][s.unit_index]) g.bookPages[s.book_id][s.unit_index] = { owner, isRead: !!s.is_read, readDate: s.read_date||null, readTime: s.read_time||null }; });
-        try { localStorage.setItem('hatim_group_'+gk, JSON.stringify(g)); } catch(e){}
+        try { origSetItem('hatim_group_'+gk, JSON.stringify(g)); } catch(e){}
       });
       const pool = { members:[...poolNames], memberTypes:poolTypes, passwords:poolPass };
-      try { localStorage.setItem('hatim_bireysel_pool', JSON.stringify(pool)); } catch(e){}
+      try { origSetItem('hatim_bireysel_pool', JSON.stringify(pool)); } catch(e){}
     } catch (e) { console.warn("pullAll hata:", e); }
     _pulling = false;
   }
 
-  const origSetItem = localStorage.setItem.bind(localStorage);
+  // setItem sarmalama: yalnızca UYGULAMADAN gelen yazımları push et
   localStorage.setItem = function (key, value) {
     origSetItem(key, value);
     try {
+      if (_pulling) return; // pullAll içindeyken push etme
       if (key && key.indexOf('hatim_group_') === 0 && key !== 'hatim_bireysel_pool') {
         let g; try { g = JSON.parse(value); } catch(e){ return; }
         if (!g) return;
@@ -4022,7 +4032,11 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
   };
 
   let _deb = null;
-  function schedulePull() { if (_deb) clearTimeout(_deb); _deb = setTimeout(() => { _deb=null; pullAll().then(() => { try { if (typeof loadGroupData==='function') loadGroupData(); if (typeof updateUserInterface==='function') updateUserInterface(); if (typeof renderAdminSectionAtBottom==='function') renderAdminSectionAtBottom(); } catch(e){} }); }, 600); }
+  function schedulePull() {
+    if (_myPush) return; // kendi push'umuzun realtime olayını yok say
+    if (_deb) clearTimeout(_deb);
+    _deb = setTimeout(() => { _deb=null; pullAll().then(() => { try { if (typeof loadGroupData==='function') loadGroupData(); if (typeof updateUserInterface==='function') updateUserInterface(); if (typeof renderAdminSectionAtBottom==='function') renderAdminSectionAtBottom(); } catch(e){} }); }, 600);
+  }
   ['members','shares','groups','reading_logs'].forEach(t => { try { sb.channel('rt_'+t).on('postgres_changes', { event:'*', schema:'public', table:t }, schedulePull).subscribe(); } catch(e){} });
 
   window.addEventListener('DOMContentLoaded', function () {
