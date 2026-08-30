@@ -4047,6 +4047,16 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
         });
         var pool = { members: Array.from(poolNames), memberTypes: poolTypes, passwords: poolPass };
         try { origSetItem("hatim_bireysel_pool", JSON.stringify(pool)); } catch (e) {}
+        // Supabase'te artık olmayan eski grup anahtarlarını localStorage'dan temizle (çift görünüm/çakışma önleme)
+        try {
+          for (var li = 0; li < localStorage.length; li++) {
+            var lk = localStorage.key(li);
+            if (lk && lk.indexOf("hatim_group_") === 0) {
+              var gkk = lk.replace("hatim_group_", "");
+              if (!byKey[gkk]) { localStorage.removeItem(lk); li--; }
+            }
+          }
+        } catch (e) {}
       })
       .catch(function (e) { console.warn("pullAll hata:", e); })
       .then(function () { _pulling = false; });
