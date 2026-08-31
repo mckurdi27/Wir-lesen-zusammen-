@@ -3941,6 +3941,8 @@ document.addEventListener('click', function (e) {
   var _pulling = false;
   var _myPush = false;
   var _initDone = false;
+  var _userTouched = false;
+  try { document.addEventListener('click', function(){ _userTouched = true; }, true); document.addEventListener('change', function(){ _userTouched = true; }, true); document.addEventListener('input', function(){ _userTouched = true; }, true); } catch(e){}
   var _initDone = false; // açılış restore'u sırasında bayat local veri Supabase'e push edilmesin
   var _queue = Promise.resolve();
   var origSetItem = localStorage.setItem.bind(localStorage);
@@ -4159,7 +4161,7 @@ document.addEventListener('click', function (e) {
   localStorage.setItem = function (key, value) {
     origSetItem(key, value);
     try {
-      if (!_initDone) return; // açılış/geri yükleme sırasında Supabase'e bayat veri push edilmesin
+      if (!_initDone || !_userTouched) return; // yenileme/geri yükleme sırasında bayat local veri Supabase'e push edilmesin // açılış/geri yükleme sırasında Supabase'e bayat veri push edilmesin
       if (key && key.indexOf("hatim_group_") === 0 && key !== "hatim_bireysel_pool") {
         var g; try { g = JSON.parse(value); } catch (e) { return; }
         if (!g) return;
