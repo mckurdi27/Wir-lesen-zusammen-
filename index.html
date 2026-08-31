@@ -157,7 +157,7 @@
         .login-grid-2x4 { grid-template-columns: 2fr 2fr 1fr 1fr; gap: 10px; }
         .login-join-span { grid-column: 3 / 5; }
         .login-join-btn { min-height: 30px; }
-        .login-admin-bar { display: flex; justify-content: flex-start; gap: 8px; margin-top: 10px; }
+        .login-admin-bar { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; margin-bottom: 8px; }
         .login-admin-toggle { min-height: 30px; padding: 0 14px; border: none; border-radius: 6px; background: #f39c12; color: white; cursor: pointer; font-size: 14px; }
         .login-type-btn { width: 100%; min-height: 30px; padding: 6px 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; cursor: pointer; font-size: 14px; }
         .login-type-btn.active { background: #f39c12; color: #fff; border-color: #f39c12; font-weight: bold; }
@@ -452,9 +452,6 @@
                     </div>
                 </div>
             </div>
-            <div class="login-admin-bar">
-                <button id="admin-toggle-btn-custom" class="login-admin-toggle" title="Yönetici Modu">&#128272; Yönetici Modu</button>
-            </div>
             </div>
 
             <div id="bulk-share-area" class="bulk-share-area" style="display: none;">
@@ -482,6 +479,11 @@
                 <button id="bt-change-password" style="background:#27ae60; color:#fff; border:none; border-radius:8px; padding:10px 16px; cursor:pointer; font-weight:bold; font-size:14px; min-height:48px;">Şifre Değiştir</button>
             </div>
             <div id="bt-member-books" style="overflow-x:auto;"></div>
+        </div>
+
+<!-- BÖLÜM 3 - YÖNETİCİ PANELİ (kart altı) -->
+        <div class="login-admin-bar" id="admin-bar-host">
+            <button id="admin-toggle-btn-custom" class="login-admin-toggle" title="Yönetici Modu">&#128272; Yönetici Modu</button>
         </div>
 
 <!-- BÖLÜM 6 - KİTAP LİSTESİ -->
@@ -2721,11 +2723,11 @@
                 if (!bottomContainer) {
                     bottomContainer = document.createElement("div");
                     bottomContainer.id = "admin-bottom-section";
-                    var _lf = document.getElementById("login-form-area");
+                    var _lf = document.getElementById("admin-bar-host");
                     if (_lf && _lf.parentNode) { _lf.parentNode.insertBefore(bottomContainer, _lf.nextSibling); }
                     else { container.appendChild(bottomContainer); }
                 } else {
-                    var _lf2 = document.getElementById("login-form-area");
+                    var _lf2 = document.getElementById("admin-bar-host");
                     if (_lf2 && _lf2.parentNode && bottomContainer.parentNode !== _lf2.parentNode) { _lf2.parentNode.insertBefore(bottomContainer, _lf2.nextSibling); }
                 }
                 bottomContainer.style.cssText = "margin: 20px 0; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--card-bg);";
