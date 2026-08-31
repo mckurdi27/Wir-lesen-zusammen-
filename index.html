@@ -78,7 +78,7 @@
         @media (max-width: 640px) {
             .container { padding: 0 5px; }
             .row-3col { grid-template-columns: 1fr !important; gap: 8px !important; }
-            .login-grid, .login-grid-2, .login-grid-2x3 { grid-template-columns: 1fr !important; gap: 10px !important; }
+            .login-grid, .login-grid-2, .login-grid-2x3, .login-grid-2x4 { grid-template-columns: 1fr !important; gap: 10px !important; }
             .login-panel { padding: 14px; }
             .login-submit-row { justify-content: stretch; }
             .login-join-btn { width: 100%; }
@@ -154,6 +154,10 @@
             grid-template-columns: 2fr 2fr 1fr;
             gap: 12px;
         }
+        .login-grid-2x4 { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .login-type-btn { width: 100%; min-height: 44px; padding: 10px 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; cursor: pointer; font-size: 14px; }
+        .login-type-btn.active { background: #f39c12; color: #fff; border-color: #f39c12; font-weight: bold; }
+        .login-admin-btn { flex: 1; width: auto; min-height: 44px; padding: 10px 6px; border: none; border-radius: 6px; background: #95a5a6; color: white; cursor: pointer; font-size: 15px; }
         .login-grid-2 { grid-template-columns: 1fr 1fr; }
         .login-grid-2x3 {
             display: grid;
@@ -410,7 +414,7 @@
             </div>
 
             <div id="login-form-area" class="login-form-area">
-                <div class="login-grid login-grid-2x3">
+                <div class="login-grid login-grid-2x4">
                     <div class="login-field">
                         <input type="text" id="login-user-name" list="user-name-list" placeholder="İsminizi yazın" class="login-input">
                         <datalist id="user-name-list"></datalist>
@@ -419,10 +423,14 @@
                         <input type="password" id="login-user-password" placeholder="Şifrenizi yazın" class="login-input">
                     </div>
                     <div class="login-field login-field-type">
-                        <select id="login-user-type" class="login-input login-select">
+                        <select id="login-user-type" class="login-input login-select" style="display:none;">
                             <option value="bireysel">&#128100; Tek</option>
                             <option value="grup">&#128101; Grup</option>
                         </select>
+                        <button type="button" id="login-type-tek" class="login-type-btn active">&#128100; Tek</button>
+                    </div>
+                    <div class="login-field login-field-type">
+                        <button type="button" id="login-type-grup" class="login-type-btn">&#128101; Grup</button>
                     </div>
                     <div class="login-field">
                         <input type="text" id="login-group-name" list="group-name-list" placeholder="Grup adını yazın" class="login-input">
@@ -431,8 +439,10 @@
                     <div class="login-field">
                         <input type="password" id="login-group-password" placeholder="Grup şifresi" class="login-input">
                     </div>
-                    <div class="login-field login-field-btn login-btn-split">
+                    <div class="login-field login-field-btn">
                         <button id="login-join-btn" class="login-join-btn">&#10133; Katıl</button>
+                    </div>
+                    <div class="login-field login-field-btn">
                         <button id="login-admin-btn" class="login-admin-btn" title="Yönetici">&#128272;</button>
                     </div>
                 </div>
@@ -1386,12 +1396,20 @@
 
             const typeSelect = document.getElementById('login-user-type');
             if (typeSelect) {
-                typeSelect.addEventListener('change', function() {
-                    // 2x3 ızgarada tüm alanlar her zaman görünür; gizleme gerekmez.
-                    if (this.value === 'grup') {
-                        document.getElementById('login-group-name').focus();
-                    }
-                });
+                // Tek/Grup butonları gizli select'i günceller
+                const setType = function(v) {
+                    typeSelect.value = v;
+                    const tek = document.getElementById('login-type-tek');
+                    const grp = document.getElementById('login-type-grup');
+                    if (tek) tek.classList.toggle('active', v === 'bireysel');
+                    if (grp) grp.classList.toggle('active', v === 'grup');
+                };
+                const tekBtn = document.getElementById('login-type-tek');
+                const grpBtn = document.getElementById('login-type-grup');
+                if (tekBtn) tekBtn.addEventListener('click', function(){ setType('bireysel'); document.getElementById('login-user-name').focus(); });
+                if (grpBtn) grpBtn.addEventListener('click', function(){ setType('grup'); document.getElementById('login-group-name').focus(); });
+                typeSelect.addEventListener('change', function(){ setType(this.value); });
+                setType('bireysel');
             }
 
             const nameInput = document.getElementById('login-user-name');
@@ -1402,6 +1420,10 @@
                     const typeSel = document.getElementById('login-user-type');
                     if (savedType && typeSel && ['bireysel','grup'].includes(savedType)) {
                         typeSel.value = savedType;
+                        var _tek2 = document.getElementById('login-type-tek');
+                        var _grp2 = document.getElementById('login-type-grup');
+                        if (_tek2) _tek2.classList.toggle('active', savedType === 'bireysel');
+                        if (_grp2) _grp2.classList.toggle('active', savedType === 'grup');
                     }
                 });
             }
@@ -3765,8 +3787,7 @@ currentGroup = selVal;
                     }
                 }
                 await renderDailyInspiration();
-                                const _lf = document.getElementById('login-form-area');
-                if (_lf) _lf.style.display = isAdmin ? 'none' : '';
+                                // Giriş paneli her zaman görünür kalır (admin modunda da)
 renderBooks();
                 
                 renderAdminSectionAtBottom();
