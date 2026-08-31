@@ -3644,7 +3644,12 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                                 return;
                             }
                             
-currentGroup = (selVal || '').replace(/^g:/, '');
+var _cg = selVal || '';
+                            if (_cg.startsWith('g:')) { _cg = _cg.slice(2); }
+                            else if (_cg.startsWith('gm:')) { _cg = _cg.split(':')[1]; }
+                            else if (_cg.startsWith('__bireysel__')) { _cg = ''; }
+                            if (!_cg) { showToast('Önce bir grup seçin.', 'info'); return; }
+                            currentGroup = _cg;
                             await loadGroupData();
                             let gpw = prompt("Grup üyesi şifresi:");
                             if (!gpw || !gpw.trim()) { showToast('❌ Şifre gerekli!', 'error'); return; }
