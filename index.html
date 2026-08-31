@@ -1198,62 +1198,57 @@
                     if (!panel) return;
                     if (!loggedInMember) { panel.style.display='none'; return; }
                     panel.style.display = 'block';
-                    var _sd = document.getElementById('bt-member-books');
-                    if (_sd && typeof window._sbPullAll === 'function' && !window._btpRefreshing) {
-                        window._btpRefreshing = true;
-                        window._sbPullAll().then(function(){ window._btpRefreshing = false; if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel(); });
-                    }
                     const nameEl = document.getElementById('bt-member-name');
-                    const pwdEl = document.getElementById('bt-member-password');
                     if (nameEl) nameEl.value = loggedInMember;
-                    let _bp = getBireyselPool();
-                    let _pwdVal = '';
-                    if (loggedInMemberType === 'grup') {
-                        try { if (appData && appData.passwords) _pwdVal = appData.passwords[loggedInMember] || ''; } catch(e){}
-                    } else {
-                        _pwdVal = (_bp.passwords && _bp.passwords[loggedInMember]) ? _bp.passwords[loggedInMember] : '';
-                    }
-                    if (pwdEl) pwdEl.value = _pwdVal;
                     const booksEl = document.getElementById('bt-member-books');
                     if (!booksEl) return;
-                    let data;
-                    try { data = getMemberDetailData(loggedInMember, null, 'all'); } catch(e){ data=null; }
-                    if (!data || !data.books || data.books.length===0) {
-                        booksEl.innerHTML = '<div style="text-align:center; color:#777; padding:16px;">Henüz hisse alınmamış.</div>';
-                        return;
-                    }
-                    let totalTaken = data.books.reduce((s,b)=>s+b.taken,0);
-                    let totalRead = data.books.reduce((s,b)=>s+b.read,0);
-                    let totalPct = totalTaken>0 ? Math.round((totalRead/totalTaken)*100) : 0;
-                    let rows = data.books.map(b => {
-                        const pct = b.taken>0 ? Math.round((b.read/b.taken)*100) : 0;
-                        const durum = b.completed ? '✓ Tamamlandı' : (b.taken>0 ? (b.read>=b.taken?'Okundu':'Devam ediyor') : 'Hisse yok');
-                        return `<tr>
-                            <td style="padding:8px; border-bottom:1px solid var(--border-color); font-weight:bold;">${b.name}</td>
-                            <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${b.taken}</td>
-                            <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${b.read}</td>
-                            <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">%${pct}</td>
-                            <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${durum}</td>
-                            <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">—</td>
-                        </tr>`;
-                    }).join('');
-                    booksEl.innerHTML = `
-                        <div style="display:flex; gap:12px; margin-bottom:10px; flex-wrap:wrap;">
-                            <div style="background:rgba(212,175,55,0.12); padding:8px 14px; border-radius:8px; font-size:13px;"><b>Toplam Hisse:</b> ${totalTaken}</div>
-                            <div style="background:rgba(39,174,96,0.12); padding:8px 14px; border-radius:8px; font-size:13px;"><b>Okunan:</b> ${totalRead}</div>
-                            <div style="background:rgba(142,68,173,0.12); padding:8px 14px; border-radius:8px; font-size:13px;"><b>Tamamlama:</b> %${totalPct}</div>
-                        </div>
-                        <table style="width:100%; border-collapse:collapse; font-size:13px;">
-                            <thead><tr style="background:rgba(212,175,55,0.15);">
-                                <th style="padding:8px; text-align:left;">Eser</th>
-                                <th style="padding:8px;">Alınan Hisse</th>
-                                <th style="padding:8px;">Okunan</th>
-                                <th style="padding:8px;">İlerleme</th>
-                                <th style="padding:8px;">Durum</th>
-                                <th style="padding:8px;">Düzenle</th>
-                            </tr></thead>
-                            <tbody>${rows}</tbody>
-                        </table>`;
+                    booksEl.innerHTML = '<div style="text-align:center; color:#777; padding:16px;">Y\u00fckleniyor\u2026</div>';
+                    if (typeof window._sbMemberDetail !== 'function') { booksEl.innerHTML = '<div style="text-align:center; color:#e74c3c; padding:16px;">Senkron k\u00f6pr\u00fcs\u00fc haz\u0131r de\u011fil.</div>'; return; }
+                    window._sbMemberDetail(loggedInMember).then(function (data) {
+                        var pwdEl = document.getElementById('bt-member-password');
+                        if (pwdEl) pwdEl.value = data.password || '';
+                        var passInfo = document.getElementById('bt-member-password-hint');
+                        if (passInfo) passInfo.textContent = 'Grup: ' + (data.groupKey || '\u2014');
+                        if (!data.books || data.books.length === 0) {
+                            booksEl.innerHTML = '<div style="text-align:center; color:#777; padding:16px;">Hen\u00fcz hisse al\u0131nmam\u0131\u015f.</div>';
+                            return;
+                        }
+                        var totalTaken = data.books.reduce(function(s,b){return s+b.taken;},0);
+                        var totalRead = data.books.reduce(function(s,b){return s+b.read;},0);
+                        var totalPct = totalTaken>0 ? Math.round((totalRead/totalTaken)*100) : 0;
+                        var rows = data.books.map(function (b) {
+                            const pct = b.taken>0 ? Math.round((b.read/b.taken)*100) : 0;
+                            const durum = b.completed ? '\u2713 Tamamland\u0131' : (b.taken>0 ? (b.read>=b.taken?'Okundu':'Devam ediyor') : 'Hisse yok');
+                            const sonTarih = b.dates && b.dates.length ? (b.dates[b.dates.length-1]||'').slice(0,10) : '\u2014';
+                            return `<tr>
+                                <td style="padding:8px; border-bottom:1px solid var(--border-color); font-weight:bold;">${b.name}</td>
+                                <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${b.taken}</td>
+                                <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${b.read}</td>
+                                <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">%${pct}</td>
+                                <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${durum}</td>
+                                <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${sonTarih}</td>
+                            </tr>`;
+                        }).join('');
+                        booksEl.innerHTML = `
+                            <div style="display:flex; gap:12px; margin-bottom:10px; flex-wrap:wrap;">
+                                <div style="background:rgba(212,175,55,0.12); padding:8px 14px; border-radius:8px; font-size:13px;"><b>Toplam Hisse:</b> ${totalTaken}</div>
+                                <div style="background:rgba(39,174,96,0.12); padding:8px 14px; border-radius:8px; font-size:13px;"><b>Okunan:</b> ${totalRead}</div>
+                                <div style="background:rgba(142,68,173,0.12); padding:8px 14px; border-radius:8px; font-size:13px;"><b>Tamamlama:</b> %${totalPct}</div>
+                            </div>
+                            <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                                <thead><tr style="background:rgba(212,175,55,0.15);">
+                                    <th style="padding:8px; text-align:left;">Eser</th>
+                                    <th style="padding:8px;">Al\u0131nan Hisse</th>
+                                    <th style="padding:8px;">Okunan</th>
+                                    <th style="padding:8px;">\u0130lerleme</th>
+                                    <th style="padding:8px;">Durum</th>
+                                    <th style="padding:8px;">Son Al\u0131m</th>
+                                </tr></thead>
+                                <tbody>${rows}</tbody>
+                            </table>`;
+                    }).catch(function (e) {
+                        booksEl.innerHTML = '<div style="text-align:center; color:#e74c3c; padding:16px;">Veri \u00e7ekilirken hata: ' + e.message + '</div>';
+                    });
                 }
 
                 document.addEventListener('click', function(e) {
@@ -4074,6 +4069,42 @@ renderBooks();
       .catch(function (e) { console.warn("pullAll hata:", e); })
       .then(function () { _pulling = false; });
   }
+  window._sbMemberDetail = function (name) {
+    return Promise.all([
+      rest.select("members", "?select=id,name,password,group_key"),
+      rest.select("shares", "?select=member_id,book_id,unit_index,is_read,read_date,read_time"),
+      rest.select("books", "?select=id,name,total_units")
+    ]).then(function (res) {
+      var members = res[0] || [], shares = res[1] || [], books = res[2] || [];
+      var mem = null;
+      for (var i=0;i<members.length;i++){ if (members[i].name === name) { mem = members[i]; break; } }
+      if (!mem) return { name: name, password: "", groupKey: null, books: [] };
+      var myShares = shares.filter(function (s) { return s.member_id === mem.id; });
+      var byBook = {};
+      myShares.forEach(function (s) {
+        if (!byBook[s.book_id]) byBook[s.book_id] = { taken: 0, read: 0, dates: [] };
+        byBook[s.book_id].taken++;
+        if (s.is_read) byBook[s.book_id].read++;
+        if (s.read_date) byBook[s.book_id].dates.push(s.read_date);
+      });
+      var bookRows = Object.keys(byBook).map(function (bid) {
+        var b = null;
+        for (var j=0;j<books.length;j++){ if (books[j].id === bid) { b = books[j]; break; } }
+        if (!b) b = { id: bid, name: bid, total_units: 0 };
+        var d = byBook[bid];
+        return { id: b.id, name: b.name, taken: d.taken, read: d.read, totalUnits: b.total_units || 0, completed: d.read >= d.taken, dates: d.dates };
+      });
+      return { name: name, password: mem.password || "", groupKey: mem.group_key, books: bookRows };
+    });
+  };
+  window._sbUpdatePassword = function (name, newPwd) {
+    return rest.select("members", "?select=id,name").then(function (allM) {
+      var target = null;
+      (allM || []).forEach(function (m) { if (m.name === name) target = m; });
+      if (!target) throw new Error("\u00dcye bulunamad\u0131: " + name);
+      return api("/members?id=eq." + target.id, { method: "PATCH", headers: { "Prefer": "return=representation" }, body: JSON.stringify({ password: newPwd }) });
+    });
+  };
   window._sbPullAll = function () { return pullAll(); };
 
   localStorage.setItem = function (key, value) {
@@ -4113,6 +4144,38 @@ renderBooks();
 
 })();
 
+</script>
+
+<script>
+// Kişisel kart buton işleyicileri (document delegasyonu — render sonrası da çalışır)
+document.addEventListener('click', function (e) {
+  var t = e.target;
+  if (!t || !t.id) return;
+  if (t.id === 'bt-password-toggle') {
+    var pw = document.getElementById('bt-member-password');
+    if (pw) pw.type = (pw.type === 'password') ? 'text' : 'password';
+    return;
+  }
+  if (t.id === 'bt-change-password') {
+    var pwIn = document.getElementById('bt-member-password');
+    if (!pwIn || !loggedInMember) return;
+    var np = pwIn.value ? pwIn.value.trim() : '';
+    if (!np) { showToast('❌ Şifre boş olamaz', 'error'); return; }
+    if (typeof window._sbUpdatePassword === 'function') {
+      window._sbUpdatePassword(loggedInMember, np).then(function () {
+        showToast('✓ Şifre güncellendi', 'success');
+        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel();
+      }).catch(function (err) { showToast('❌ Hata: ' + (err && err.message || ''), 'error'); });
+    }
+    return;
+  }
+  if (t.id === 'bt-change-name') {
+    var nm = document.getElementById('bt-member-name');
+    if (!nm || !loggedInMember) return;
+    showToast('İsim değişikliği şu an devre dışı (kayıt adıyla bağlı).', 'info');
+    return;
+  }
+});
 </script>
 </body>
 </html>
