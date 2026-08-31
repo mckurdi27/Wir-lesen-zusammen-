@@ -3540,6 +3540,9 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                             });
                             appData = { members: [], memberTypes: {}, password: pwd.trim(), books, bookPages: pages, bookHatims: hatims, bookHistory: history, readingLogs: [] };
                             saveGroupData();
+                            // Supabase'e de yaz (tek doğruluk kaynağı)
+                            var _api = (typeof window.api === 'function') ? window.api : null;
+                            if (_api) { try { await _api("/groups", { method: "POST", body: JSON.stringify({ key: key, name: name.trim(), password: pwd.trim() }) }); } catch(e){ console.warn('grup ekle', e); } }
                             await loadGroupData();
                             showToast('✅ Yeni grup oluşturuldu!', 'success');
                         }
@@ -3552,6 +3555,13 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                             if (key !== currentGroup) {
                                 localStorage.setItem(`hatim_group_${key}`, JSON.stringify(appData));
                                 localStorage.removeItem(`hatim_group_${currentGroup}`);
+                                var _api2 = (typeof window.api === 'function') ? window.api : null;
+                                var _oldKey = encodeURIComponent(currentGroup);
+                                if (_api2) {
+                                    try { await _api2("/groups?key=eq." + _oldKey, { method: "DELETE" }); } catch(e){}
+                                    try { await _api2("/members?group_key=eq." + _oldKey, { method: "PATCH", headers: { "Content-Type": "application/json", "Prefer": "return=minimal" }, body: JSON.stringify({ group_key: key }) }); } catch(e){}
+                                    try { await _api2("/groups", { method: "POST", body: JSON.stringify({ key: key, name: name.trim(), password: (appData && appData.password) || "" }) }); } catch(e){ console.warn('grup düzelt', e); }
+                                }
                                 currentGroup = key;
                                 await loadGroupData();
                                 showToast('✅ Grup adı güncellendi!', 'success');
