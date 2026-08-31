@@ -3698,8 +3698,11 @@ var _cg = selVal || '';
                                     if (!appData.memberTypes) appData.memberTypes = {};
                                     appData.memberTypes[name] = 'pasif';
                                     appData.members = appData.members.filter(m => m !== name);
+                                    try { if (typeof window.api === 'function') await window.api("/members?name=eq." + encodeURIComponent(name) + "&group_key=eq." + encodeURIComponent(currentGroup), { method: "DELETE" }); } catch(e){}
                                     saveGroupData();
                                     await loadGroupData();
+                                    await pullAll();
+                                    refreshUI();
                                     showToast(`ℹ️ ${name} pasif üye yapıldı (tamamlanmış eserleri korundu).`, 'info');
                                 } else {
                                     appData.members = appData.members.filter(m => m !== name);
@@ -3708,8 +3711,11 @@ var _cg = selVal || '';
                                             if (p.owner === name) { p.owner = ""; p.isRead = false; }
                                         });
                                     });
+                                    try { if (typeof window.api === 'function') await window.api("/members?name=eq." + encodeURIComponent(name) + "&group_key=eq." + encodeURIComponent(currentGroup), { method: "DELETE" }); } catch(e){}
                                     saveGroupData();
                                     await loadGroupData();
+                                    await pullAll();
+                                    refreshUI();
                                     showToast(`❌ ${name} çıkartıldı.`, 'info');
                                 }
                             }
