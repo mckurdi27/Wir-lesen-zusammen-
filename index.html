@@ -1198,6 +1198,11 @@
                     if (!panel) return;
                     if (!loggedInMember) { panel.style.display='none'; return; }
                     panel.style.display = 'block';
+                    var _sd = document.getElementById('bt-member-books');
+                    if (_sd && typeof window._sbPullAll === 'function' && !window._btpRefreshing) {
+                        window._btpRefreshing = true;
+                        window._sbPullAll().then(function(){ window._btpRefreshing = false; if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel(); });
+                    }
                     const nameEl = document.getElementById('bt-member-name');
                     const pwdEl = document.getElementById('bt-member-password');
                     if (nameEl) nameEl.value = loggedInMember;
@@ -4069,6 +4074,7 @@ renderBooks();
       .catch(function (e) { console.warn("pullAll hata:", e); })
       .then(function () { _pulling = false; });
   }
+  window._sbPullAll = function () { return pullAll(); };
 
   localStorage.setItem = function (key, value) {
     origSetItem(key, value);
