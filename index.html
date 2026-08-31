@@ -3989,10 +3989,20 @@ document.addEventListener('click', function (e) {
 
   function replaceMembers(names, groupKey, passwords) {
     var pw = passwords || {};
-    var q = (groupKey === null) ? "?group_key=is.null" : ("?group_key=eq." + encodeURIComponent(groupKey));
-    return rest.del("members", q).then(function () {
-      var rows = names.map(function (n) { return { name: n, password: pw[n] || "", type: (groupKey === null ? "bireysel" : "grup"), group_key: groupKey }; });
-      if (rows.length) return rest.insert("members", rows);
+    var q = (groupKey === null) ? "?select=id,name,group_key&group_key=is.null" : ("?select=id,name,group_key&group_key=eq." + encodeURIComponent(groupKey));
+    return rest.select("members", q).then(function (existing) {
+      var have = {};
+      (existing || []).forEach(function (r) { have[r.name] = r.id; });
+      var tasks = [];
+      // Asla silme: var olan üyenin UUID'si ve hisseleri korunur; yalnızca şifre güncellenir
+      names.forEach(function (n) {
+        if (have[n]) {
+          tasks.push(api("/members?id=eq." + have[n], { method: "PATCH", headers: { "Prefer": "return=minimal" }, body: JSON.stringify({ password: pw[n] || "", type: (groupKey === null ? "bireysel" : "grup") }) }));
+        } else {
+          tasks.push(api("/members", { method: "POST", body: JSON.stringify({ name: n, password: pw[n] || "", type: (groupKey === null ? "bireysel" : "grup"), group_key: groupKey }) }));
+        }
+      });
+      return Promise.all(tasks);
     });
   }
 
