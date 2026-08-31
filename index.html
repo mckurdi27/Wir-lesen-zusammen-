@@ -2933,7 +2933,7 @@
                 window._infoRowsSortAsc = true;
                 window._infoRowsFilter = '';
 
-                function infoFilterTable(val) {
+                window.infoFilterTable = function infoFilterTable(val) {
                     window._infoRowsFilter = (val || '').toLowerCase();
                     let rows = (window._infoRowsCache || []).filter(r => {
                         let all = r.join(' ').toLowerCase();
@@ -2941,12 +2941,13 @@
                     });
                     let tbody = document.querySelector('#info-table tbody');
                     if (tbody) {
-                        tbody.innerHTML = rows.map(r => infoRowHtml(r)).join('');
+                        tbody.innerHTML = rows.map((r,i) => infoRowHtml(r,i)).join('');
                     }
                 }
-                function infoRowHtml(r) {
+                function infoRowHtml(r, idx) {
                     let isMember = (r[1] !== '');
                     return `<tr${isMember ? '' : ' style="background:rgba(142,68,173,0.06); font-weight:bold;"'}>
+                        <td style="padding:8px; border:1px solid var(--border-color); text-align:center;">${(idx||0)+1}</td>
                         <td style="padding:8px; border:1px solid var(--border-color);">${isMember ? (r[4] === 'tek' ? '👤 ' : '👥 ') + r[0] : '🗂️ ' + r[0]}</td>
                         <td style="padding:8px; border:1px solid var(--border-color); font-weight:${isMember ? 'bold' : 'normal'};">${isMember ? r[1] : '—'}</td>
                         <td style="padding:8px; border:1px solid var(--border-color); color:#8e44ad;">${isMember ? (r[2] || '(şifresiz)') : '—'}</td>
@@ -2958,14 +2959,15 @@
                     ? `<table id="info-table" style="width:100%; border-collapse:collapse; font-size:13px;">
                         <thead>
                             <tr style="background:rgba(142,68,173,0.1);">
-                                <th onclick="infoSortTable(0)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">1. Grup ⇅</th>
-                                <th onclick="infoSortTable(1)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">2. İsim ⇅</th>
-                                <th onclick="infoSortTable(2)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">3. Şifre ⇅</th>
-                                <th onclick="infoSortTable(3)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">4. Grup Şifresi ⇅</th>
+                                <th style="padding:8px; text-align:center; border:1px solid var(--border-color); width:44px;">Sıra</th>
+                                <th onclick="infoSortTable(1)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">1. Grup ⇅</th>
+                                <th onclick="infoSortTable(2)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">2. İsim ⇅</th>
+                                <th onclick="infoSortTable(3)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">3. Şifre ⇅</th>
+                                <th onclick="infoSortTable(4)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">4. Grup Şifresi ⇅</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${_infoRows.map(r => infoRowHtml(r)).join('')}
+                            ${_infoRows.map((r,i) => infoRowHtml(r,i)).join('')}
                         </tbody>
                     </table>`
                     : '<div style="font-size:13px; color:#777;">Kayıtlı üye/grup yok.</div>';
@@ -2984,7 +2986,7 @@
                     </div>
                 `;
 
-function infoSortTable(col) {
+window.infoSortTable = function infoSortTable(col) {
                     let tbl = document.getElementById('info-table');
                     if (!tbl) return;
                     if (window._infoRowsSortCol === col) { window._infoRowsSortAsc = !window._infoRowsSortAsc; }
@@ -3004,7 +3006,7 @@ function infoSortTable(col) {
                     });
                     let tbody = tbl.querySelector('tbody');
                     if (tbody) {
-                        tbody.innerHTML = rows.map(r => infoRowHtml(r)).join('');
+                        tbody.innerHTML = rows.map((r,i) => infoRowHtml(r,i)).join('');
                     }
                 }
 
