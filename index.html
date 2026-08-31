@@ -1373,17 +1373,42 @@
               var grpIn = document.getElementById('login-group-name');
               if (!typeSel || !nameIn || !grpIn) return;
               var tipEtiketi = document.createElement('div');
-              tipEtiketi.style.cssText = 'grid-column:1/-1;font-size:12px;font-weight:bold;text-align:center;padding:2px 0;border-radius:6px;';
+              tipEtiketi.style.cssText = 'grid-column:1/-1;font-size:12px;font-weight:bold;padding:2px 6px;border-radius:6px;display:flex;align-items:center;justify-content:space-between;';
               tipEtiketi.style.background = '#e9ecef'; tipEtiketi.style.color = '#555';
               tipEtiketi.id = 'login-type-hint';
               tipEtiketi.style.marginTop = '10px';
+              var tipMetin = document.createElement('span');
+              tipMetin.id = 'login-type-hint-text';
+              tipMetin.style.flex = '1';
+              tipMetin.style.textAlign = 'center';
+              tipEtiketi.appendChild(tipMetin);
+              var hatirlaLabel = document.createElement('label');
+              hatirlaLabel.style.cssText = 'display:flex;align-items:center;gap:4px;font-size:12px;font-weight:normal;cursor:pointer;white-space:nowrap;';
+              hatirlaLabel.title = 'Giriş bilgilerini hatırla';
+              var hatirlaKutu = document.createElement('input');
+              hatirlaKutu.type = 'checkbox';
+              hatirlaKutu.id = 'login-remember';
+              hatirlaKutu.style.cssText = 'width:14px;height:14px;margin:0;cursor:pointer;accent-color:#27ae60;';
+              hatirlaKutu.checked = localStorage.getItem('hatim_remember') === '1';
+              hatirlaKutu.addEventListener('change', function(){ localStorage.setItem('hatim_remember', hatirlaKutu.checked ? '1' : '0'); });
+              hatirlaLabel.appendChild(hatirlaKutu);
+              hatirlaLabel.appendChild(document.createTextNode('Beni hatırla'));
+              tipEtiketi.appendChild(hatirlaLabel);
               var grid = typeSel.closest('.login-form-area, #login-form-area') || typeSel.parentElement.parentElement;
               if (grid) { try { grid.appendChild(tipEtiketi); } catch(e){} }
+              // Beni hatırla: kayıtlı kullanıcıyı geri yükle
+              var _rum = localStorage.getItem('hatim_remember_user');
+              if (_rum) {
+                var _rn = document.getElementById('login-user-name'); if (_rn) _rn.value = _rum;
+                var _rt = localStorage.getItem('hatim_remember_type');
+                if (_rt === 'grup') { if (typeof window._guncelleTip === 'function') window._guncelleTip(); }
+                else if (_rt === 'bireysel') { typeSel.value = 'bireysel'; if (typeof window._guncelleTip === 'function') window._guncelleTip(); }
+              }
               function guncelleTip() {
                 var tip = typeSel.value;
                 if (tipEtiketi) {
-                  if (tip === 'bireysel') { tipEtiketi.textContent = 'Tek üye: isim ve grup aynıdır (👤)'; tipEtiketi.style.background='rgba(39,174,96,.12)'; tipEtiketi.style.color='#1e8f4e'; }
-                  else { tipEtiketi.textContent = 'Grup üyesi: üye adı ile grup adı farklıdır (👥)'; tipEtiketi.style.background='rgba(142,68,173,.12)'; tipEtiketi.style.color='#7d3c98'; }
+                  if (tip === 'bireysel') { var _tm = document.getElementById('login-type-hint-text') || tipEtiketi; _tm.textContent = 'Tek üye: isim ve grup aynıdır (👤)'; tipEtiketi.style.background='rgba(39,174,96,.12)'; tipEtiketi.style.color='#1e8f4e'; }
+                  else { var _tm2 = document.getElementById('login-type-hint-text') || tipEtiketi; _tm2.textContent = 'Grup üyesi: üye adı ile grup adı farklıdır (👥)'; tipEtiketi.style.background='rgba(142,68,173,.12)'; tipEtiketi.style.color='#7d3c98'; }
                 }
                 if (tip === 'bireysel') { if (nameIn.value.trim()) grpIn.value = nameIn.value.trim(); }
               }
@@ -1499,6 +1524,7 @@
                         currentGroup = userName.toLowerCase();
                         localStorage.setItem('hatim_member_type_' + userName, "bireysel");
                         localStorage.setItem(`hatim_session_${currentGroup}`, userName);
+                        if (document.getElementById('login-remember') && document.getElementById('login-remember').checked) { localStorage.setItem('hatim_remember_user', userName); localStorage.setItem('hatim_remember_type', 'bireysel'); }
                         localStorage.setItem(`hatim_session_type_${currentGroup}`, "bireysel");
                         localStorage.setItem('hatim_bireysel_session', userName);
                         localStorage.setItem('hatim_bireysel_session_type', "bireysel");
@@ -1551,6 +1577,7 @@
                             loggedInMemberType = "grup";
                             localStorage.setItem('hatim_member_type_' + userName, "grup");
                             localStorage.setItem(`hatim_session_${groupKey}`, userName);
+                            if (document.getElementById('login-remember') && document.getElementById('login-remember').checked) { localStorage.setItem('hatim_remember_user', userName); localStorage.setItem('hatim_remember_type', 'grup'); }
                             localStorage.setItem(`hatim_session_type_${groupKey}`, "grup");
                             showToast(`✅ ${userName}, "${groupKey.replace(/_/g, ' ').toUpperCase()}" grubuna katıldı!`, 'success');
                             updateUserInterface();
@@ -1586,6 +1613,7 @@
                         loggedInMemberType = "grup";
                         localStorage.setItem('hatim_member_type_' + userName, "grup");
                         localStorage.setItem(`hatim_session_${groupKey}`, userName);
+                            if (document.getElementById('login-remember') && document.getElementById('login-remember').checked) { localStorage.setItem('hatim_remember_user', userName); localStorage.setItem('hatim_remember_type', 'grup'); }
                         localStorage.setItem(`hatim_session_type_${groupKey}`, "grup");
                         showToast(`✅ "${groupKey.replace(/_/g, ' ').toUpperCase()}" grubu oluşturuldu!`, 'success');
                         updateUserInterface();
