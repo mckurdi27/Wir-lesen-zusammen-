@@ -545,6 +545,23 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
+            // Tek/Grup seçimi - her koşulda çalışsın (event delegation, callback hatalarından etkilenmez)
+            document.addEventListener('click', function(ev) {
+                var _t = ev.target;
+                if (!_t || !_t.id) return;
+                if (_t.id === 'login-type-tek' || _t.id === 'login-type-grup') {
+                    var _v = (_t.id === 'login-type-tek') ? 'bireysel' : 'grup';
+                    var _sl = document.getElementById('login-user-type');
+                    if (_sl) _sl.value = _v;
+                    var _a = document.getElementById('login-type-tek');
+                    var _b = document.getElementById('login-type-grup');
+                    if (_a) _a.classList.toggle('active', _v === 'bireysel');
+                    if (_b) _b.classList.toggle('active', _v === 'grup');
+                    if (_v === 'bireysel') { var _nm = document.getElementById('login-user-name'); if (_nm) _nm.focus(); }
+                    else { var _gn = document.getElementById('login-group-name'); if (_gn) _gn.focus(); }
+                }
+            }, true);
+
             // TOAST FONKSİYONU
             function showToast(message, type = 'info', duration = 3000) {
                 const toast = document.getElementById('toast');
@@ -2739,13 +2756,16 @@
                 bottomContainer.style.cssText = "margin: 20px 0; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--card-bg);";
 
                 let allGroups = getAllGroupKeysForAdmin();
-                let groupsHtml = `<option value="" selected>-- Seçin --</option>`;
+                let _grpSelFirst = true;
+                let groupsHtml = `<option value="">-- Seçin --</option>`;
                 allGroups.filter(g => String(g).trim() !== '').forEach(gKey => {
+                    let _selMark = _grpSelFirst ? ' selected' : '';
+                    _grpSelFirst = false;
                     let gLabel = gKey.replace(/_/g, ' ').toUpperCase();
                     let gRaw = null;
                     try { gRaw = JSON.parse(localStorage.getItem('hatim_group_' + gKey) || 'null'); } catch(e){}
                     let gMems = (gRaw && gRaw.members || []).filter(mm => !(gRaw.memberTypes && gRaw.memberTypes[mm] === 'pasif'));
-                    groupsHtml += `<option value="g:${gKey}">${gMems.length === 1 ? "👤" : "👥"} ${gMems.length === 1 ? "[Tek]" : "[Grup]"} ${gLabel} (​${gMems.length} kişi)</option>`;
+                    groupsHtml += `<option value="g:${gKey}"${_selMark}>${gMems.length === 1 ? "👤" : "👥"} ${gMems.length === 1 ? "[Tek]" : "[Grup]"} ${gLabel} (​${gMems.length} kişi)</option>`;
                     gMems.forEach(mm => { groupsHtml += `<option value="gm:${gKey}:${encodeURIComponent(mm)}"> 👤 ${mm} (${gLabel})</option>`; });
                 });
 
