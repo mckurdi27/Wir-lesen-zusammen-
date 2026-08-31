@@ -4242,6 +4242,7 @@ document.addEventListener('click', function (e) {
       var mems = members.filter(function (m) { return m.name === name; });
       if (!mems.length) return { name: name, password: "", groupKey: null, books: [] };
       if (groupKey) { var _gk = mems.filter(function (m) { return m.group_key === groupKey; }); if (_gk.length) mems = _gk; }
+      else { var _gk0 = mems.filter(function (m) { return !m.group_key; }); if (_gk0.length) mems = _gk0; }
       var ids = mems.map(function (m) { return m.id; });
       var myShares = shares.filter(function (s) { return ids.indexOf(s.member_id) !== -1; });
       var byBook = {};
