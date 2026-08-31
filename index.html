@@ -3561,10 +3561,16 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
 
                     document.getElementById("admin-delete-group").addEventListener("click", async () => {
                         if (confirm(`"${currentGroup}" grubu silinsin mi?`)) {
+                            var _gk = encodeURIComponent(currentGroup);
+                            // Supabase'ten grubu ve üyelerini sil (tek doğruluk kaynağı)
+                            try { await api("/groups?key=eq." + _gk, { method: "DELETE" }); } catch(e){}
+                            try { await api("/members?group_key=eq." + _gk, { method: "DELETE" }); } catch(e){}
                             localStorage.removeItem(`hatim_group_${currentGroup}`);
                             let keys = getAllGroupKeysForAdmin();
                             currentGroup = keys[0] || "";
                             await loadGroupData();
+                            await pullAll();
+                            refreshUI();
                             showToast('🗑️ Grup silindi.', 'info');
                         }
                     });
