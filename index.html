@@ -3067,6 +3067,7 @@ window.infoSortTable = function infoSortTable(col) {
                             <div style="text-align:center; margin-bottom:16px;">
                                 <button id="admin-open-detailed-analysis" style="background:#8e44ad;color:#fff;border:none;padding:14px 20px;border-radius:8px;font-size:15px;font-weight:bold;min-height:50px;width:100%;cursor:pointer;">📊 Detaylı Analiz</button>
                                 <button id="admin-test-data-btn" style="background:#27ae60;color:#fff;border:none;padding:14px 20px;border-radius:8px;font-size:15px;font-weight:bold;min-height:50px;width:100%;cursor:pointer;margin-top:10px;">🧪 Sanal Test Verisi Oluştur</button>
+                            <button id="admin-test-clear-btn" style="background:#c0392b;color:#fff;border:none;padding:14px 20px;border-radius:8px;font-size:15px;font-weight:bold;min-height:50px;width:100%;cursor:pointer;margin-top:8px;">🗑️ Sanal Test Verisi Kaldır</button>
                             </div>
                             <div class="admin-panel-grid">
                                 ${groupSectionHtml}
@@ -3095,6 +3096,17 @@ window.infoSortTable = function infoSortTable(col) {
                     const analysisBtn = document.getElementById("admin-open-detailed-analysis");
                     if (analysisBtn) {
                         analysisBtn.addEventListener("click", () => { openDetailedAnalysisModal(); });
+                    }
+                    const testClearBtn = document.getElementById("admin-test-clear-btn");
+                    if (testClearBtn) {
+                        testClearBtn.addEventListener("click", async () => {
+                            const testKeys = Object.keys(localStorage).filter(k => k.indexOf("hatim_group_test_") === 0);
+                            testKeys.forEach(k => localStorage.removeItem(k));
+                            localStorage.removeItem("hatim_bireysel_pool");
+                            await pullAll();
+                            showToast("Sanal test verisi kaldırıldı.", "success");
+                            refreshUI();
+                        });
                     }
                     const testDataBtn = document.getElementById("admin-test-data-btn");
                     if (testDataBtn) {
