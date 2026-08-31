@@ -3066,9 +3066,7 @@ window.infoSortTable = function infoSortTable(col) {
                             <h3 style="color: var(--gold-dark); font-size: 17px; margin-bottom: 15px;">🛠️ Yönetici Kontrol Paneli</h3>
                             <div style="text-align:center; margin-bottom:16px;">
                                 <button id="admin-open-detailed-analysis" style="background:#8e44ad;color:#fff;border:none;padding:14px 20px;border-radius:8px;font-size:15px;font-weight:bold;min-height:50px;width:100%;cursor:pointer;">📊 Detaylı Analiz</button>
-                                <button id="admin-test-data-btn" style="background:#27ae60;color:#fff;border:none;padding:14px 20px;border-radius:8px;font-size:15px;font-weight:bold;min-height:50px;width:100%;cursor:pointer;margin-top:10px;">🧪 Sanal Test Verisi Oluştur</button>
-                            <button id="admin-test-clear-btn" style="background:#c0392b;color:#fff;border:none;padding:14px 20px;border-radius:8px;font-size:15px;font-weight:bold;min-height:50px;width:100%;cursor:pointer;margin-top:8px;">🗑️ Sanal Test Verisi Kaldır</button>
-                            </div>
+                                
                             <div class="admin-panel-grid">
                                 ${groupSectionHtml}
                                 ${booksSectionHtml}
@@ -3097,68 +3095,8 @@ window.infoSortTable = function infoSortTable(col) {
                     if (analysisBtn) {
                         analysisBtn.addEventListener("click", () => { openDetailedAnalysisModal(); });
                     }
-                    const testClearBtn = document.getElementById("admin-test-clear-btn");
-                    if (testClearBtn) {
-                        testClearBtn.addEventListener("click", async () => {
-                            const testKeys = Object.keys(localStorage).filter(k => k.indexOf("hatim_group_test_") === 0);
-                            testKeys.forEach(k => localStorage.removeItem(k));
-                            localStorage.removeItem("hatim_bireysel_pool");
-                            await pullAll();
-                            showToast("Sanal test verisi kaldırıldı.", "success");
-                            refreshUI();
-                        });
-                    }
-                    const testDataBtn = document.getElementById("admin-test-data-btn");
-                    if (testDataBtn) {
-                        testDataBtn.addEventListener("click", async () => {
-                            try {
-                                const today = new Date().toLocaleDateString("tr-TR");
-                                const books = (appData && appData.books && appData.books.length) ? appData.books : (typeof defaultBooksTemplate !== 'undefined' ? defaultBooksTemplate : []);
-                                if (!books.length) { showToast("Eser listesi bulunamadı.", "error"); return; }
-                                const mkData = (members) => {
-                                    const bp = {};
-                                    books.forEach(b => { bp[b.id] = Array(b.totalUnits||1).fill(null).map(() => ({owner:"",isRead:false})); });
-                                    const fresh = JSON.parse(JSON.stringify(books.map(b => ({id:b.id, totalUnits:b.totalUnits||1}))));
-                                    return { members, memberTypes:{}, passwords:{}, bookPages:bp, bookUnits: fresh, readingLogs: [], hatims:{}, bookHatims:{}, bookHistory:{} };
-                                };
-                                // 3 grup
-                                const groups = [
-                                    { key:"test_grup_1", name:"Test Grup 1", pwd:"1234", mems:["Ali","Ayşe"] },
-                                    { key:"test_grup_2", name:"Test Grup 2", pwd:"5678", mems:["Mehmet","Zeynep"] },
-                                    { key:"test_grup_3", name:"Test Grup 3", pwd:"", mems:["Fatma","Veli"] }
-                                ];
-                                groups.forEach(g => {
-                                    let gd = mkData(g.mems);
-                                    gd.password = g.pwd;
-                                    gd.members.forEach((m,i)=> { gd.memberTypes[m]="grup"; gd.passwords[m] = "sifre"+i; });
-                                    // örnek hisse: ilk kitabın ilk 3 birimini ilk üyeye, sonraki 2'yi ikinci üyeye ver
-                                    if (books[0]) {
-                                        let arr = gd.bookPages[books[0].id]||[];
-                                        for (let i=0;i<arr.length && i<5;i++){ arr[i].owner = gd.members[i<3?0:1]; arr[i].isRead = (i<2); }
-                                    }
-                                    localStorage.setItem("hatim_group_"+g.key, JSON.stringify(gd));
-                                });
-                                // 5 bireysel üye
-                                const bis = ["Hasan","Hüseyin","Merve","Elif","Kemal"];
-                                const pool = { members: bis, memberTypes:{}, passwords:{} };
-                                bis.forEach((m,i)=>{ pool.memberTypes[m]="bireysel"; pool.passwords[m]="bs"+i; });
-                                localStorage.setItem("hatim_bireysel_pool", JSON.stringify(pool));
-                                bis.forEach((m,i)=>{
-                                    let bd = mkData([m]);
-                                    bd.memberTypes[m]="bireysel";
-                                    if (books[0]) {
-                                        let arr = bd.bookPages[books[0].id]||[];
-                                        for (let j=0;j<arr.length && j<3;j++){ arr[j].owner=m; arr[j].isRead=(j<1); }
-                                    }
-                                    localStorage.setItem("hatim_group_"+m.toLowerCase(), JSON.stringify(bd));
-                                });
-                                await loadGroupData();
-                                renderBooks();
-                                renderAdminSectionAtBottom && renderAdminSectionAtBottom();
-                                showToast("Sanal test verisi oluşturuldu: 3 grup + 5 bireysel üye.", "success");
-                            } catch(err) { console.error(err); showToast("Test verisi hatası: "+err.message, "error"); }
-                        });
-                    }
+                    
+                    
 
 
 
