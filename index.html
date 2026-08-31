@@ -159,6 +159,7 @@
         .login-join-btn { min-height: 30px; }
         .login-admin-bar { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; margin-bottom: 8px; }
         .login-admin-toggle { min-height: 30px; padding: 0 14px; border: none; border-radius: 6px; background: #f39c12; color: white; cursor: pointer; font-size: 14px; }
+        #login-type-hint { margin-top: 10px; }
         .login-type-btn { width: 100%; min-height: 30px; padding: 6px 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; cursor: pointer; font-size: 14px; }
         .login-type-btn.active { background: #f39c12; color: #fff; border-color: #f39c12; font-weight: bold; }
         #login-type-grup { background: #27ae60; color: #fff; border-color: #27ae60; }
@@ -564,7 +565,7 @@
                 if (_t.id === 'login-type-tek' || _t.id === 'login-type-grup') {
                     var _v = (_t.id === 'login-type-tek') ? 'bireysel' : 'grup';
                     var _sl = document.getElementById('login-user-type');
-                    if (_sl) _sl.value = _v;
+                    if (_sl) { _sl.value = _v; if (typeof guncelleTip === 'function') guncelleTip(); }
                     var _a = document.getElementById('login-type-tek');
                     var _b = document.getElementById('login-type-grup');
                     if (_a) _a.classList.toggle('active', _v === 'bireysel');
@@ -1375,6 +1376,7 @@
               tipEtiketi.style.cssText = 'grid-column:1/-1;font-size:12px;font-weight:bold;text-align:center;padding:2px 0;border-radius:6px;';
               tipEtiketi.style.background = '#e9ecef'; tipEtiketi.style.color = '#555';
               tipEtiketi.id = 'login-type-hint';
+              tipEtiketi.style.marginTop = '10px';
               var grid = typeSel.closest('.login-form-area, #login-form-area') || typeSel.parentElement.parentElement;
               if (grid) { try { grid.appendChild(tipEtiketi); } catch(e){} }
               function guncelleTip() {
@@ -1446,6 +1448,7 @@
                     const grp = document.getElementById('login-type-grup');
                     if (tek) tek.classList.toggle('active', v === 'bireysel');
                     if (grp) grp.classList.toggle('active', v === 'grup');
+                    if (typeof guncelleTip === 'function') guncelleTip();
                 };
                 const tekBtn = document.getElementById('login-type-tek');
                 const grpBtn = document.getElementById('login-type-grup');
