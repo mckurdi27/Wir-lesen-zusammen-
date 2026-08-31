@@ -3940,6 +3940,8 @@ document.addEventListener('click', function (e) {
 
   var _pulling = false;
   var _myPush = false;
+  var _initDone = false;
+  var _initDone = false; // açılış restore'u sırasında bayat local veri Supabase'e push edilmesin
   var _queue = Promise.resolve();
   var origSetItem = localStorage.setItem.bind(localStorage);
 
@@ -4157,6 +4159,7 @@ document.addEventListener('click', function (e) {
   localStorage.setItem = function (key, value) {
     origSetItem(key, value);
     try {
+      if (!_initDone) return; // açılış/geri yükleme sırasında Supabase'e bayat veri push edilmesin
       if (key && key.indexOf("hatim_group_") === 0 && key !== "hatim_bireysel_pool") {
         var g; try { g = JSON.parse(value); } catch (e) { return; }
         if (!g) return;
@@ -4174,8 +4177,9 @@ document.addEventListener('click', function (e) {
   }
 
   function doInit() {
-    // Sayfa açılışında: önce localStorage'daki veriyi Supabase'e push et, sonra çek.
+    // Sayfa açılışında: yalnızca Supabase'ten çek (push etme). Bayat local veri kaynağı ezmesin.
     pullAll().then(function () { refreshUI(); });
+    setTimeout(function () { _initDone = true; }, 1800); // restore penceresi bittikten sonra push aktif
   }
 
   // DOMContentLoaded'de değil, HEmen çalıştır (köprü body sonunda -> DOM hazır).
