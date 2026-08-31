@@ -437,7 +437,6 @@
                     </div>
                 </div>
             </div>
-            <div id="admin-bottom-anchor"></div>
 
             <div id="bulk-share-area" class="bulk-share-area" style="display: none;">
                 <button id="bulk-whatsapp-btn" class="bulk-whatsapp-btn">&#128172; Tüm Seçtiklerimi WhatsApp'ta Paylaş</button>
@@ -2691,12 +2690,9 @@
                 if (!bottomContainer) {
                     bottomContainer = document.createElement("div");
                     bottomContainer.id = "admin-bottom-section";
-                    var anchor = document.getElementById("admin-bottom-anchor");
-                    if (anchor) { anchor.parentNode.insertBefore(bottomContainer, anchor.nextSibling); }
-                    else { container.appendChild(bottomContainer); }
+                    container.appendChild(bottomContainer);
                 } else {
-                    var anchor2 = document.getElementById("admin-bottom-anchor");
-                    if (anchor2 && bottomContainer.parentNode !== anchor2.parentNode) { anchor2.parentNode.insertBefore(bottomContainer, anchor2.nextSibling); }
+                    container.appendChild(bottomContainer);
                 }
                 bottomContainer.style.cssText = "margin: 20px 0; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--card-bg);";
 
