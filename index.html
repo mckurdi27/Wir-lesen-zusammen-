@@ -4005,16 +4005,16 @@ document.addEventListener('click', function (e) {
           var nm = null;
           for (var k in nameId) { if (nameId[k] === s.member_id) { nm = k; break; } }
           if (!nm) return;
-          var key = s.book_id + ":" + s.unit_index;
+          var key = s.member_id + ":" + s.book_id + ":" + s.unit_index;
           bySlot[key] = { owner: nm, isRead: !!s.is_read, readDate: s.read_date || null, readTime: s.read_time || null };
         });
         // LocalStorage'daki g'yi mevcutların üstüne yaz (local daha güncel)
         var bp = (g && g.bookPages) || {};
         Object.keys(bp).forEach(function (bid) {
-          (bp[bid] || []).forEach(function (p, idx) { if (p && p.owner) bySlot[bid + ":" + idx] = { owner: p.owner, isRead: !!p.isRead, readDate: p.readDate || null, readTime: p.readTime || null }; });
+          (bp[bid] || []).forEach(function (p, idx) { if (p && p.owner && nameId[p.owner]) bySlot[nameId[p.owner] + ":" + bid + ":" + idx] = { owner: p.owner, isRead: !!p.isRead, readDate: p.readDate || null, readTime: p.readTime || null }; });
         });
         var rows = Object.keys(bySlot).map(function (slot) {
-          var parts = slot.split(":"); var bid = parts[0]; var idx = parseInt(parts[1], 10);
+          var parts = slot.split(":"); var mid = parts[0]; var bid = parts[1]; var idx = parseInt(parts[2], 10);
           var p = bySlot[slot];
           if (!p.owner || !nameId[p.owner]) return null;
           return { member_id: nameId[p.owner], book_id: bid, unit_index: idx, is_read: !!p.isRead, read_date: p.readDate || null, read_time: p.readTime || null };
