@@ -3839,7 +3839,38 @@ renderBooks();
 
             await loadGroupData();
         });
-    </script>
+    
+// Kişisel kart buton işleyicileri (document delegasyonu — render sonrası da çalışır)
+document.addEventListener('click', function (e) {
+  var t = e.target;
+  if (!t || !t.id) return;
+  if (t.id === 'bt-password-toggle') {
+    var pw = document.getElementById('bt-member-password');
+    if (pw) pw.type = (pw.type === 'password') ? 'text' : 'password';
+    return;
+  }
+  if (t.id === 'bt-change-password') {
+    var pwIn = document.getElementById('bt-member-password');
+    if (!pwIn || !loggedInMember) return;
+    var np = pwIn.value ? pwIn.value.trim() : '';
+    if (!np) { showToast('❌ Şifre boş olamaz', 'error'); return; }
+    if (typeof window._sbUpdatePassword === 'function') {
+      window._sbUpdatePassword(loggedInMember, np).then(function () {
+        showToast('✓ Şifre güncellendi', 'success');
+        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel();
+      }).catch(function (err) { showToast('❌ Hata: ' + (err && err.message || ''), 'error'); });
+    }
+    return;
+  }
+  if (t.id === 'bt-change-name') {
+    var nm = document.getElementById('bt-member-name');
+    if (!nm || !loggedInMember) return;
+    showToast('İsim değişikliği şu an devre dışı (kayıt adıyla bağlı).', 'info');
+    return;
+  }
+});
+
+</script>
 <script>
 </script>
 <script>
@@ -4146,36 +4177,6 @@ renderBooks();
 
 </script>
 
-<script>
-// Kişisel kart buton işleyicileri (document delegasyonu — render sonrası da çalışır)
-document.addEventListener('click', function (e) {
-  var t = e.target;
-  if (!t || !t.id) return;
-  if (t.id === 'bt-password-toggle') {
-    var pw = document.getElementById('bt-member-password');
-    if (pw) pw.type = (pw.type === 'password') ? 'text' : 'password';
-    return;
-  }
-  if (t.id === 'bt-change-password') {
-    var pwIn = document.getElementById('bt-member-password');
-    if (!pwIn || !loggedInMember) return;
-    var np = pwIn.value ? pwIn.value.trim() : '';
-    if (!np) { showToast('❌ Şifre boş olamaz', 'error'); return; }
-    if (typeof window._sbUpdatePassword === 'function') {
-      window._sbUpdatePassword(loggedInMember, np).then(function () {
-        showToast('✓ Şifre güncellendi', 'success');
-        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel();
-      }).catch(function (err) { showToast('❌ Hata: ' + (err && err.message || ''), 'error'); });
-    }
-    return;
-  }
-  if (t.id === 'bt-change-name') {
-    var nm = document.getElementById('bt-member-name');
-    if (!nm || !loggedInMember) return;
-    showToast('İsim değişikliği şu an devre dışı (kayıt adıyla bağlı).', 'info');
-    return;
-  }
-});
-</script>
+
 </body>
 </html>
