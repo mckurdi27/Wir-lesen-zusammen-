@@ -4000,33 +4000,19 @@ document.addEventListener('click', function (e) {
     return rest.select("members", "?select=id,name,group_key").then(function (allM) {
       var nameId = {};
       (allM || []).forEach(function (r) { if (String(r.group_key) === String(groupKey)) nameId[r.name] = r.id; });
-      var ids = Object.keys(nameId).map(function (k) { return nameId[k]; });
-      // Mevcut share'leri Supabase'ten oku; localStorage'daki g boş/stale olsa da kaybolmasın
-      var fetchP = ids.length ? rest.select("shares", "?select=member_id,book_id,unit_index,is_read,read_date,read_time&member_id=in.(" + ids.join(",") + ")") : Promise.resolve([]);
-      return fetchP.then(function (existing) {
-        var bySlot = {};
-        (existing || []).forEach(function (s) {
-          var nm = null;
-          for (var k in nameId) { if (nameId[k] === s.member_id) { nm = k; break; } }
-          if (!nm) return;
-          var key = s.member_id + ":" + s.book_id + ":" + s.unit_index;
-          bySlot[key] = { owner: nm, isRead: !!s.is_read, readDate: s.read_date || null, readTime: s.read_time || null };
+      var bp = (g && g.bookPages) || {};
+      var rows = [];
+      Object.keys(bp).forEach(function (bid) {
+        (bp[bid] || []).forEach(function (p, idx) {
+          if (p && p.owner && nameId[p.owner]) {
+            rows.push({ member_id: nameId[p.owner], book_id: bid, unit_index: idx, is_read: !!p.isRead, read_date: p.readDate || null, read_time: p.readTime || null });
+          }
         });
-        // LocalStorage'daki g'yi mevcutların üstüne yaz (local daha güncel)
-        var bp = (g && g.bookPages) || {};
-        Object.keys(bp).forEach(function (bid) {
-          (bp[bid] || []).forEach(function (p, idx) { if (p && p.owner && nameId[p.owner]) bySlot[nameId[p.owner] + ":" + bid + ":" + idx] = { owner: p.owner, isRead: !!p.isRead, readDate: p.readDate || null, readTime: p.readTime || null }; });
-        });
-        var rows = Object.keys(bySlot).map(function (slot) {
-          var parts = slot.split(":"); var mid = parts[0]; var bid = parts[1]; var idx = parseInt(parts[2], 10);
-          var p = bySlot[slot];
-          if (!p.owner || !nameId[p.owner]) return null;
-          return { member_id: nameId[p.owner], book_id: bid, unit_index: idx, is_read: !!p.isRead, read_date: p.readDate || null, read_time: p.readTime || null };
-        }).filter(function (r) { return r; });
-        // Sadece bu grubun share'lerini yenile (delete+insert) ama mevcutları koruyarak
-        var delP = ids.length ? rest.del("shares", "?member_id=in.(" + ids.join(",") + ")") : Promise.resolve();
-        return delP.then(function () { return rows.length ? rest.insert("shares", rows) : Promise.resolve(); });
       });
+      // Hisseleri ASLA silme — yalnızca ekle/güncelle (upsert).
+      // Bayat/eksik localStorage verisi Supabase'teki doğru hisseleri silemez;
+      // unique anahtar (member_id,book_id,unit_index) aynı slotun iki kez eklenmesini engeller.
+      return rows.length ? api("/shares?on_conflict=member_id,book_id,unit_index", { method: "POST", headers: { "Prefer": "resolution=merge-duplicates" }, body: JSON.stringify(rows) }) : Promise.resolve();
     });
   }
 
