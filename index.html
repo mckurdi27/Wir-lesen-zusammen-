@@ -3549,24 +3549,31 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                     });
 
                     document.getElementById("admin-edit-group").addEventListener("click", async () => {
-                        let name = prompt("Yeni grup adı:", currentGroup.replace(/_/g, ' '));
-                        if (name?.trim()) {
-                            let key = name.trim().toLowerCase().replace(/\s+/g, '_');
-                            if (key !== currentGroup) {
-                                localStorage.setItem(`hatim_group_${key}`, JSON.stringify(appData));
-                                localStorage.removeItem(`hatim_group_${currentGroup}`);
-                                var _api2 = (typeof window.api === 'function') ? window.api : null;
-                                var _oldKey = encodeURIComponent(currentGroup);
-                                if (_api2) {
-                                    try { await _api2("/groups?key=eq." + _oldKey, { method: "DELETE" }); } catch(e){}
-                                    try { await _api2("/members?group_key=eq." + _oldKey, { method: "PATCH", headers: { "Content-Type": "application/json", "Prefer": "return=minimal" }, body: JSON.stringify({ group_key: key }) }); } catch(e){}
-                                    try { await _api2("/groups", { method: "POST", body: JSON.stringify({ key: key, name: name.trim(), password: (appData && appData.password) || "" }) }); } catch(e){ console.warn('grup düzelt', e); }
-                                }
-                                currentGroup = key;
-                                await loadGroupData();
-                                showToast('✅ Grup adı güncellendi!', 'success');
-                            }
+                        var _selV = (document.getElementById("admin-group-select") || {}).value || "";
+                        var _oldKey = (_selV.startsWith("g:") ? _selV.slice(2) : currentGroup || "").trim();
+                        if (!_oldKey) { showToast("Önce bir grup seçin.", "info"); return; }
+                        let name = prompt("Yeni grup adı:", _oldKey.replace(/_/g, ' '));
+                        if (!name || !name.trim()) return;
+                        let key = name.trim().toLowerCase().replace(/\s+/g, '_');
+                        if (key === _oldKey) { showToast("Ad aynı, değişiklik yok.", "info"); return; }
+                        localStorage.setItem(`hatim_group_${key}`, JSON.stringify(appData));
+                        localStorage.removeItem(`hatim_group_${_oldKey}`);
+                        var _api2 = (typeof window.api === 'function') ? window.api : null;
+                        if (_api2) {
+                            var _oldEnc = encodeURIComponent(_oldKey);
+                            var _newEnc = encodeURIComponent(key);
+                            var _body = JSON.stringify({ key: key, name: name.trim(), password: (appData && appData.password) || "" });
+                            // Doğru sıra: önce YENİ grubu oluştur, sonra üyeleri taşı, en son eski grubu sil
+                            try { await _api2("/groups", { method: "POST", body: _body }); } catch(e){ console.warn('yeni grup', e); }
+                            try { await _api2("/members?group_key=eq." + _oldEnc, { method: "PATCH", headers: { "Content-Type": "application/json", "Prefer": "return=minimal" }, body: JSON.stringify({ group_key: key }) }); } catch(e){ console.warn('üye taşı', e); }
+                            try { await _api2("/groups?key=eq." + _oldEnc, { method: "DELETE" }); } catch(e){ console.warn('eski grup sil', e); }
                         }
+                        currentGroup = key;
+                        await loadGroupData();
+                        await pullAll();
+                        refreshUI();
+                        renderAdminSectionAtBottom();
+                        showToast('✅ Grup adı güncellendi!', 'success');
                     });
 
                     document.getElementById("admin-delete-group").addEventListener("click", async () => {
