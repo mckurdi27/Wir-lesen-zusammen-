@@ -3561,10 +3561,16 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
 
                     document.getElementById("admin-delete-group").addEventListener("click", async () => {
                         if (confirm(`"${currentGroup}" grubu silinsin mi?`)) {
-                            var _gk = encodeURIComponent(currentGroup);
-                            // Supabase'ten grubu ve üyelerini sil (tek doğruluk kaynağı)
-                            try { await api("/groups?key=eq." + _gk, { method: "DELETE" }); } catch(e){}
-                            try { await api("/members?group_key=eq." + _gk, { method: "DELETE" }); } catch(e){}
+                            var _gkRaw = (currentGroup || '').trim();
+                            if (_gkRaw) {
+                                var _gk = encodeURIComponent(_gkRaw);
+                                var _api = (typeof window.api === 'function') ? window.api : (typeof window._sbApi === 'function') ? window._sbApi : null;
+                                // Önce üyeleri, sonra grubu sil (FK bağımlılığı)
+                                if (_api) {
+                                    try { await _api("/members?group_key=eq." + _gk, { method: "DELETE" }); } catch(e){ console.warn('üye silme', e); }
+                                    try { await _api("/groups?key=eq." + _gk, { method: "DELETE" }); } catch(e){ console.warn('grup silme', e); }
+                                }
+                            }
                             localStorage.removeItem(`hatim_group_${currentGroup}`);
                             let keys = getAllGroupKeysForAdmin();
                             currentGroup = keys[0] || "";
@@ -4048,6 +4054,8 @@ document.addEventListener('click', function (e) {
       });
     });
   }
+  window.api = api;
+  window._sbApi = api;
   var rest = {
     select: function (table, q) { return api("/" + table + (q ? q : "?select=*")); },
     insert: function (table, rows) { return api("/" + table, { method: "POST", body: JSON.stringify(rows) }); },
