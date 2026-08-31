@@ -3182,6 +3182,20 @@ window.infoSortTable = function infoSortTable(col) {
                     function bulkSave(data) {
                         if (data.type === 'bireysel') localStorage.setItem('hatim_group_' + data.mName.toLowerCase(), JSON.stringify(data.gData));
                         else localStorage.setItem(`hatim_group_${data.gKey}`, JSON.stringify(data.gData));
+                        // Supabase tam senkron: önce grubun share'lerini sil, sonra gData ile yeniden yaz (sil/sıfırla kalıcı olsun)
+                        try {
+                            var _k = (data.type === 'bireysel') ? (data.mName || '').toLowerCase() : data.gKey;
+                            if (_k && typeof window.api === 'function' && typeof window.replaceShares === 'function') {
+                                var _keyEnc = encodeURIComponent(_k);
+                                window.api("/members?select=id&group_key=eq." + _keyEnc).then(function (mems) {
+                                    var ids = (mems || []).map(function (mm) { return mm.id; });
+                                    var del = ids.map(function (id) { return window.api("/shares?member_id=eq." + id, { method: "DELETE" }); });
+                                    return Promise.all(del).catch(function(){});
+                                }).then(function () {
+                                    return window.replaceShares(data.gData, _k);
+                                }).catch(function(e){ console.warn('bulkSave supabase', e); });
+                            }
+                        } catch(e){ console.warn('bulkSave supabase', e); }
                     }
                     function bulkBookIds() {
                         let ids = getSelectedBulkBooks();
@@ -4150,6 +4164,7 @@ document.addEventListener('click', function (e) {
       return rows.length ? api("/shares?on_conflict=member_id,book_id,unit_index", { method: "POST", headers: { "Prefer": "resolution=merge-duplicates" }, body: JSON.stringify(rows) }) : Promise.resolve();
     });
   }
+  window.replaceShares = replaceShares;
 
   function pushGroup(key, g) {
     _myPush = true;
