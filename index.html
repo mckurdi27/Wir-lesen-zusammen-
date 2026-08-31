@@ -2967,6 +2967,7 @@ function infoSortTable(col) {
                     `;
                 }
 
+                bottomContainer.style.display = isAdmin ? '' : 'none';
                 bottomContainer.innerHTML = `${adminPanelHtml}${messageSectionHtml}`;
 
                 if (isAdmin) {
