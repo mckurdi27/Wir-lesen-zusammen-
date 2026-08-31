@@ -82,6 +82,11 @@
             .login-panel { padding: 14px; }
             .login-submit-row { justify-content: stretch; }
             .login-join-btn { width: 100%; }
+        .login-btn-split { display: flex; gap: 8px; }
+        .login-join-btn { flex: 2; width: auto; }
+        .login-admin-btn { flex: 1; width: auto; min-height: 44px; padding: 10px 6px; border: none; border-radius: 6px; background: #95a5a6; color: white; cursor: pointer; font-size: 15px; }
+        .login-admin-btn:hover { background: #7f8c8d; }
+        .login-admin-btn.admin-active { background: #c0392b; }
             .book-body { padding: 10px; }
             .book-header { flex-direction: column; align-items: stretch; text-align: center; }
             .mode-btn, .take-range-btn, .read-range-btn, .release-range-btn, .unread-range-btn {
@@ -426,11 +431,13 @@
                     <div class="login-field">
                         <input type="password" id="login-group-password" placeholder="Grup şifresi" class="login-input">
                     </div>
-                    <div class="login-field login-field-btn">
+                    <div class="login-field login-field-btn login-btn-split">
                         <button id="login-join-btn" class="login-join-btn">&#10133; Katıl</button>
+                        <button id="login-admin-btn" class="login-admin-btn" title="Yönetici">&#128272;</button>
                     </div>
                 </div>
             </div>
+            <div id="admin-bottom-anchor"></div>
 
             <div id="bulk-share-area" class="bulk-share-area" style="display: none;">
                 <button id="bulk-whatsapp-btn" class="bulk-whatsapp-btn">&#128172; Tüm Seçtiklerimi WhatsApp'ta Paylaş</button>
@@ -2684,9 +2691,12 @@
                 if (!bottomContainer) {
                     bottomContainer = document.createElement("div");
                     bottomContainer.id = "admin-bottom-section";
-                    container.appendChild(bottomContainer);
+                    var anchor = document.getElementById("admin-bottom-anchor");
+                    if (anchor) { anchor.parentNode.insertBefore(bottomContainer, anchor.nextSibling); }
+                    else { container.appendChild(bottomContainer); }
                 } else {
-                    container.appendChild(bottomContainer);
+                    var anchor2 = document.getElementById("admin-bottom-anchor");
+                    if (anchor2 && bottomContainer.parentNode !== anchor2.parentNode) { anchor2.parentNode.insertBefore(bottomContainer, anchor2.nextSibling); }
                 }
                 bottomContainer.style.cssText = "margin: 20px 0; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--card-bg);";
 
@@ -3647,6 +3657,8 @@ currentGroup = selVal;
                 }
 
                 document.getElementById("admin-toggle-btn-custom").addEventListener("click", () => triggerAdminToggle());
+                var _loginAdmin = document.getElementById("login-admin-btn");
+                if (_loginAdmin) _loginAdmin.addEventListener("click", () => triggerAdminToggle());
                 document.getElementById("send-admin-msg-btn").addEventListener("click", () => {
                     let text = document.getElementById("admin-msg-input").value.trim();
                     if (!text) { showToast('Mesaj yazın!', 'error'); return; }
