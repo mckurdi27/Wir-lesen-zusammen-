@@ -2690,9 +2690,12 @@
                 if (!bottomContainer) {
                     bottomContainer = document.createElement("div");
                     bottomContainer.id = "admin-bottom-section";
-                    container.appendChild(bottomContainer);
+                    var _lf = document.getElementById("login-form-area");
+                    if (_lf && _lf.parentNode) { _lf.parentNode.insertBefore(bottomContainer, _lf.nextSibling); }
+                    else { container.appendChild(bottomContainer); }
                 } else {
-                    container.appendChild(bottomContainer);
+                    var _lf2 = document.getElementById("login-form-area");
+                    if (_lf2 && _lf2.parentNode && bottomContainer.parentNode !== _lf2.parentNode) { _lf2.parentNode.insertBefore(bottomContainer, _lf2.nextSibling); }
                 }
                 bottomContainer.style.cssText = "margin: 20px 0; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--card-bg);";
 
@@ -2968,7 +2971,15 @@ function infoSortTable(col) {
                 }
 
                 bottomContainer.style.display = isAdmin ? '' : 'none';
-                bottomContainer.innerHTML = `${adminPanelHtml}${messageSectionHtml}`;
+                bottomContainer.innerHTML = adminPanelHtml;
+                // Yöneticiye mesaj bölümü: admin panelden ayrı, sayfanın en altında
+                let msgContainer = document.getElementById("admin-message-section");
+                if (!msgContainer) {
+                    msgContainer = document.createElement("div");
+                    msgContainer.id = "admin-message-section";
+                    container.appendChild(msgContainer);
+                }
+                msgContainer.innerHTML = messageSectionHtml;
 
                 if (isAdmin) {
                     const analysisBtn = document.getElementById("admin-open-detailed-analysis");
