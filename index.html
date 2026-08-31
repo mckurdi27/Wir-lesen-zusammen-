@@ -4105,10 +4105,10 @@ document.addEventListener('click', function (e) {
       rest.select("books", "?select=id,name,total_units")
     ]).then(function (res) {
       var members = res[0] || [], shares = res[1] || [], books = res[2] || [];
-      var mem = null;
-      for (var i=0;i<members.length;i++){ if (members[i].name === name) { mem = members[i]; break; } }
-      if (!mem) return { name: name, password: "", groupKey: null, books: [] };
-      var myShares = shares.filter(function (s) { return s.member_id === mem.id; });
+      var mems = members.filter(function (m) { return m.name === name; });
+      if (!mems.length) return { name: name, password: "", groupKey: null, books: [] };
+      var ids = mems.map(function (m) { return m.id; });
+      var myShares = shares.filter(function (s) { return ids.indexOf(s.member_id) !== -1; });
       var byBook = {};
       myShares.forEach(function (s) {
         if (!byBook[s.book_id]) byBook[s.book_id] = { taken: 0, read: 0, dates: [] };
@@ -4123,7 +4123,9 @@ document.addEventListener('click', function (e) {
         var d = byBook[bid];
         return { id: b.id, name: b.name, taken: d.taken, read: d.read, totalUnits: b.total_units || 0, completed: d.read >= d.taken, dates: d.dates };
       });
-      return { name: name, password: mem.password || "", groupKey: mem.group_key, books: bookRows };
+      var groupKey = null;
+      mems.forEach(function (m) { if (m.group_key) groupKey = m.group_key; });
+      return { name: name, password: mems[0].password || "", groupKey: groupKey, books: bookRows };
     });
   };
   window._sbUpdatePassword = function (name, newPwd) {
