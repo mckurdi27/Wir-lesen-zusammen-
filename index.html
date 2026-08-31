@@ -2813,7 +2813,7 @@
                     try { gRaw = JSON.parse(localStorage.getItem('hatim_group_' + gKey) || 'null'); } catch(e){}
                     let gMems = (gRaw && gRaw.members || []).filter(mm => !(gRaw.memberTypes && gRaw.memberTypes[mm] === 'pasif'));
                     groupsHtml += `<option value="g:${gKey}"${_selMark}>${gMems.length === 1 ? "👤" : "👥"} ${gMems.length === 1 ? "[Tek]" : "[Grup]"} ${gLabel} (​${gMems.length} kişi)</option>`;
-                    gMems.forEach(mm => { groupsHtml += `<option value="gm:${gKey}:${encodeURIComponent(mm)}"> 👤 ${mm} (${gLabel})</option>`; });
+                    gMems.slice().sort(function(a,b){return a.localeCompare(b);}).forEach(mm => { groupsHtml += `<option value="gm:${gKey}:${encodeURIComponent(mm)}"> 👤 ${mm} (${gLabel})</option>`; });
                 });
 
                 let _bireyselPool = getBireyselPool();
@@ -2837,7 +2837,7 @@
 
                 let groupSectionHtml = `
                     <div class="admin-section group-section">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <div style="display:flex; justify-content:center; align-items:center; margin-bottom:8px;">
                         <h4 style="color: #2980b9; margin:0;">&#128101; Grup ve Üye Yönetimi</h4>
                         <div style="font-size:12px; color:#27ae60; font-weight:bold;">📌 Seçili Grup: ${currentGroup.replace(/_/g,' ').toUpperCase()}${loggedInMember ? " — " + loggedInMember : ""}</div>
                     </div>
@@ -3069,7 +3069,7 @@ window.infoSortTable = function infoSortTable(col) {
                         <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid var(--gold-primary); padding: 18px; border-radius: 12px; margin-bottom: 20px;">
                             <h3 style="color: var(--gold-dark); font-size: 17px; margin-bottom: 15px;">🛠️ Yönetici Kontrol Paneli</h3>
                             <div style="text-align:center; margin-bottom:16px;">
-                                <button id="admin-open-detailed-analysis" style="background:#8e44ad;color:#fff;border:none;padding:14px 20px;border-radius:8px;font-size:15px;font-weight:bold;min-height:50px;width:100%;cursor:pointer;">📊 Detaylı Analiz</button>
+                                <button id="admin-open-detailed-analysis" style="background:#8e44ad;color:#fff;border:none;padding:14px 20px;border-radius:8px;font-size:15px;font-weight:bold;min-height:50px;width:100%;cursor:pointer;margin-bottom:14px;">📊 Detaylı Analiz</button>
                                 
                             <div class="admin-panel-grid">
                                 ${groupSectionHtml}
