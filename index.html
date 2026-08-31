@@ -1204,7 +1204,7 @@
                     if (!booksEl) return;
                     booksEl.innerHTML = '<div style="text-align:center; color:#777; padding:16px;">Y\u00fckleniyor\u2026</div>';
                     if (typeof window._sbMemberDetail !== 'function') { booksEl.innerHTML = '<div style="text-align:center; color:#e74c3c; padding:16px;">Senkron k\u00f6pr\u00fcs\u00fc haz\u0131r de\u011fil.</div>'; return; }
-                    window._sbMemberDetail(loggedInMember).then(function (data) {
+                    window._sbMemberDetail(loggedInMember, currentGroup).then(function (data) {
                         var pwdEl = document.getElementById('bt-member-password');
                         if (pwdEl) pwdEl.value = data.password || '';
                         var passInfo = document.getElementById('bt-member-password-hint');
@@ -4098,7 +4098,7 @@ document.addEventListener('click', function (e) {
       .catch(function (e) { console.warn("pullAll hata:", e); })
       .then(function () { _pulling = false; });
   }
-  window._sbMemberDetail = function (name) {
+  window._sbMemberDetail = function (name, groupKey) {
     return Promise.all([
       rest.select("members", "?select=id,name,password,group_key"),
       rest.select("shares", "?select=member_id,book_id,unit_index,is_read,read_date,read_time"),
@@ -4107,6 +4107,7 @@ document.addEventListener('click', function (e) {
       var members = res[0] || [], shares = res[1] || [], books = res[2] || [];
       var mems = members.filter(function (m) { return m.name === name; });
       if (!mems.length) return { name: name, password: "", groupKey: null, books: [] };
+      if (groupKey) { var _gk = mems.filter(function (m) { return m.group_key === groupKey; }); if (_gk.length) mems = _gk; }
       var ids = mems.map(function (m) { return m.id; });
       var myShares = shares.filter(function (s) { return ids.indexOf(s.member_id) !== -1; });
       var byBook = {};
