@@ -565,7 +565,7 @@
                 if (_t.id === 'login-type-tek' || _t.id === 'login-type-grup') {
                     var _v = (_t.id === 'login-type-tek') ? 'bireysel' : 'grup';
                     var _sl = document.getElementById('login-user-type');
-                    if (_sl) { _sl.value = _v; if (typeof guncelleTip === 'function') guncelleTip(); }
+                    if (_sl) { _sl.value = _v; if (typeof window._guncelleTip === 'function') window._guncelleTip(); }
                     var _a = document.getElementById('login-type-tek');
                     var _b = document.getElementById('login-type-grup');
                     if (_a) _a.classList.toggle('active', _v === 'bireysel');
@@ -1388,6 +1388,7 @@
                 if (tip === 'bireysel') { if (nameIn.value.trim()) grpIn.value = nameIn.value.trim(); }
               }
               typeSel.addEventListener('change', guncelleTip);
+              window._guncelleTip = guncelleTip;
               nameIn.addEventListener('input', function() { if (typeSel.value === 'bireysel' && nameIn.value.trim()) grpIn.value = nameIn.value.trim(); });
               guncelleTip();
             })();
@@ -1448,7 +1449,7 @@
                     const grp = document.getElementById('login-type-grup');
                     if (tek) tek.classList.toggle('active', v === 'bireysel');
                     if (grp) grp.classList.toggle('active', v === 'grup');
-                    if (typeof guncelleTip === 'function') guncelleTip();
+                    if (typeof window._guncelleTip === 'function') window._guncelleTip();
                 };
                 const tekBtn = document.getElementById('login-type-tek');
                 const grpBtn = document.getElementById('login-type-grup');
