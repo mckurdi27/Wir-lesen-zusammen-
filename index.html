@@ -3637,7 +3637,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                                 return;
                             }
                             
-currentGroup = selVal;
+currentGroup = (selVal || '').replace(/^g:/, '');
                             await loadGroupData();
                             let gpw = prompt("Grup üyesi şifresi:");
                             if (!gpw || !gpw.trim()) { showToast('❌ Şifre gerekli!', 'error'); return; }
