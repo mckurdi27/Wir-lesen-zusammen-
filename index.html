@@ -81,10 +81,10 @@
             .login-grid, .login-grid-2, .login-grid-2x3, .login-grid-2x4 { grid-template-columns: 1fr !important; gap: 10px !important; }
             .login-panel { padding: 14px; }
             .login-submit-row { justify-content: stretch; }
-            .login-join-btn { width: 100%; }
+            .login-join-btn { width: 100%; min-height: 30px; padding: 6px 8px; font-size: 14px; }
         .login-btn-split { display: flex; gap: 8px; }
         .login-join-btn { flex: 2; width: auto; }
-        .login-admin-btn { flex: 1; width: auto; min-height: 44px; padding: 10px 6px; border: none; border-radius: 6px; background: #95a5a6; color: white; cursor: pointer; font-size: 15px; }
+        .login-admin-btn { flex: 1; width: auto; min-height: 30px; padding: 6px 4px; border: none; border-radius: 6px; background: #e74c3c; color: white; cursor: pointer; font-size: 14px; }
         .login-admin-btn:hover { background: #7f8c8d; }
         .login-admin-btn.admin-active { background: #c0392b; }
             .book-body { padding: 10px; }
@@ -101,7 +101,7 @@
         }
         @media (max-width: 480px) {
             body { padding: 5px; font-size: 14px; }
-            button { font-size: 14px; padding: 12px 16px; min-height: 48px; margin: 3px 0; }
+            button { font-size: 14px; padding: 12px 16px; min-height: 32px; margin: 3px 0; }
             .book-header h3 { font-size: 14px; }
         }
         @media (prefers-color-scheme: dark) {
@@ -154,9 +154,13 @@
             grid-template-columns: 2fr 2fr 1fr;
             gap: 12px;
         }
-        .login-grid-2x4 { grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .login-type-btn { width: 100%; min-height: 44px; padding: 10px 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; cursor: pointer; font-size: 14px; }
+        .login-grid-2x4 { grid-template-columns: 2fr 2fr 1fr 1fr; gap: 10px; }
+        .login-type-btn { width: 100%; min-height: 30px; padding: 6px 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; cursor: pointer; font-size: 14px; }
         .login-type-btn.active { background: #f39c12; color: #fff; border-color: #f39c12; font-weight: bold; }
+        #login-type-grup { background: #27ae60; color: #fff; border-color: #27ae60; }
+        #login-type-grup.active { background: #1e8449; border-color: #1e8449; }
+        #login-type-tek { background: var(--card-bg); color: var(--text-main); }
+        #login-type-tek.active { background: #f39c12; color: #fff; border-color: #f39c12; }
         .login-admin-btn { flex: 1; width: auto; min-height: 44px; padding: 10px 6px; border: none; border-radius: 6px; background: #95a5a6; color: white; cursor: pointer; font-size: 15px; }
         .login-grid-2 { grid-template-columns: 1fr 1fr; }
         .login-grid-2x3 {
@@ -174,7 +178,7 @@
             color: var(--gold-dark);
         }
         .login-input {
-            padding: 12px 14px;
+            padding: 8px 10px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
             font-size: 16px;
