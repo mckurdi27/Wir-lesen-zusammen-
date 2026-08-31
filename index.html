@@ -84,6 +84,8 @@
             .login-input { font-size: 10px !important; }
             .login-type-btn { font-size: 10px !important; padding: 6px 4px; }
             .login-join-btn { font-size: 10px !important; }
+            .login-grid-2x4 .login-field { min-height: 30px; justify-content: center; }
+            .login-grid-2x4 .login-input, .login-grid-2x4 .login-type-btn, .login-grid-2x4 .login-join-btn { height: 30px; min-height: 30px; box-sizing: border-box; }
             .login-panel { padding: 14px; }
             .login-submit-row { justify-content: stretch; }
             .login-join-btn { width: 100%; min-height: 30px; padding: 6px 8px; font-size: 14px; }
@@ -451,7 +453,7 @@
                         <datalist id="user-name-list"></datalist>
                     </div>
                     <div class="login-field">
-                        <input type="password" id="login-user-password" placeholder="Şifrenizi yazın" class="login-input">
+                        <input type="password" id="login-user-password" placeholder="Şifre" class="login-input">
                     </div>
                     <div class="login-field login-field-type">
                         <select id="login-user-type" class="login-input login-select" style="display:none;">
@@ -1412,7 +1414,7 @@
                 var tip = typeSel.value;
                 if (tipEtiketi) {
                   if (tip === 'bireysel') { var _tm = document.getElementById('login-type-hint-text') || tipEtiketi; _tm.textContent = 'Tek üye: isim ve grup aynıdır (👤)'; tipEtiketi.style.background='rgba(39,174,96,.12)'; tipEtiketi.style.color='#1e8f4e'; }
-                  else { var _tm2 = document.getElementById('login-type-hint-text') || tipEtiketi; _tm2.textContent = 'Grup üyesi: üye adı ile grup adı farklıdır (👥)'; tipEtiketi.style.background='rgba(142,68,173,.12)'; tipEtiketi.style.color='#7d3c98'; }
+                  else { var _tm2 = document.getElementById('login-type-hint-text') || tipEtiketi; _tm2.textContent = 'Grup: üye ve grup adı farklıdır (������)'; tipEtiketi.style.background='rgba(142,68,173,.12)'; tipEtiketi.style.color='#7d3c98'; }
                 }
                 if (tip === 'bireysel') { if (nameIn.value.trim()) grpIn.value = nameIn.value.trim(); }
               }
