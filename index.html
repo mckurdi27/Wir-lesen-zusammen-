@@ -3673,12 +3673,11 @@ currentGroup = selVal;
                 if (!skipSession && !loggedInMember) {
                 let savedSession = localStorage.getItem(`hatim_session_${currentGroup}`);
                 let savedSessionType = localStorage.getItem(`hatim_session_type_${currentGroup}`) || "";
-                if (!savedSession || !appData.members.includes(savedSession)) {
+                if (!loggedInMember && (!savedSession || !appData.members.includes(savedSession))) {
                     const bs = localStorage.getItem('hatim_bireysel_session');
                     if (bs) { savedSession = bs; savedSessionType = 'bireysel'; }
                 }
-                loggedInMember = savedSession ? savedSession : "";
-                loggedInMemberType = savedSessionType || "";
+                if (!loggedInMember) { loggedInMember = savedSession ? savedSession : ""; loggedInMemberType = savedSessionType || ""; }
                 }
 
                 if (!appData.bookPages) appData.bookPages = {};
@@ -3775,12 +3774,11 @@ renderBooks();
 
                 let savedSession = localStorage.getItem(`hatim_session_${currentGroup}`);
                 let savedSessionType = localStorage.getItem(`hatim_session_type_${currentGroup}`) || "";
-                if (!savedSession || !appData.members.includes(savedSession)) {
+                if (!loggedInMember && (!savedSession || !appData.members.includes(savedSession))) {
                     const bs = localStorage.getItem('hatim_bireysel_session');
                     if (bs) { savedSession = bs; savedSessionType = 'bireysel'; }
                 }
-                loggedInMember = savedSession ? savedSession : "";
-                loggedInMemberType = savedSessionType || "";
+                if (!loggedInMember) { loggedInMember = savedSession ? savedSession : ""; loggedInMemberType = savedSessionType || ""; }
 
                 if (!appData.bookPages) appData.bookPages = {};
                 if (!appData.bookHatims) appData.bookHatims = {};
