@@ -3013,6 +3013,8 @@ function infoSortTable(col) {
                     container.appendChild(msgContainer);
                 }
                 msgContainer.innerHTML = messageSectionHtml;
+                // Y\u00f6neticiye mesaj b\u00f6l\u00fcm\u00fc her zaman en altta kals\u0131n
+                container.appendChild(msgContainer);
 
                 if (isAdmin) {
                     const analysisBtn = document.getElementById("admin-open-detailed-analysis");
