@@ -443,10 +443,12 @@
                         <input type="number" id="pdf-top-page-input" min="1" value="1" style="width:46px;padding:3px;border:1px solid #ccc;border-radius:4px;font-size:12px;min-height:28px;">
                         <span style="font-size:12px;color:#777;">/ <span id="pdf-top-total-pages">1</span></span>
                         <button id="pdf-top-next-btn" style="background:#e0e0e0;color:#333;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;min-height:30px;">Sayfa &#9654;</button>
+                        <button id="pdf-rtl-btn" title="Arapca sayfa: sagdan sola" style="background:#8e44ad;color:#fff;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;min-height:30px;">RTL</button>
+                        <button id="pdf-land-btn" title="Yatay mod: buyuk yazi icin dik kaydir" style="background:#16a085;color:#fff;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;min-height:30px;">Yatay</button>
                     </div>
                 </div>
                 <!-- Canvas - Tam Ekran -->
-                <div id="pdf-canvas-container" style="flex: 1; width: 100%; background: #ffffff; display: flex; justify-content: center; align-items: center; overflow: hidden; padding: 0; position: relative; touch-action: pan-y;">
+                <div id="pdf-canvas-container" style="flex: 1; width: 100%; background: #ffffff; display: flex; justify-content: center; align-items: center; overflow: auto; padding: 0; position: relative; touch-action: pan-y;">
                     <canvas id="pdf-canvas" style="max-width: 100%; max-height: 100%; box-shadow: 0 2px 10px rgba(0,0,0,0.3); background: #fff;"></canvas>
                 </div>
                 <!-- Alt Kontroller -->
@@ -918,6 +920,27 @@
                 if (_tpi) _tpi.addEventListener('keypress', function(e){ if (e.key === 'Enter') { var pg = parseInt(this.value); if (pdfDoc && pg >= 1 && pg <= pdfTotalPages) { pdfCurrentPage = pg; renderPdfPage(pg); } else { alert('Ge蔒rsiz sayfa! (1-' + pdfTotalPages + ')'); this.value = pdfCurrentPage; } } });
 
                 // Pencere yeniden boyutlan覺nca sayfay覺 yeniden s覺��d覺r
+                // RTL (Arapca sagdan-sola) ve Yatay mod butonlari
+                let pdfRtl = false, pdfLand = false;
+                var _rtl = document.getElementById('pdf-rtl-btn');
+                var _land = document.getElementById('pdf-land-btn');
+                if (_rtl) _rtl.addEventListener('click', function(){
+                    pdfRtl = !pdfRtl;
+                    var _c = document.getElementById('pdf-canvas-container');
+                    _c.style.flexDirection = pdfRtl ? 'row-reverse' : 'row';
+                    this.style.background = pdfRtl ? '#2c3e50' : '#8e44ad';
+                });
+                if (_land) _land.addEventListener('click', function(){
+                    pdfLand = !pdfLand;
+                    if (pdfLand) {
+                        var _cc = document.getElementById('pdf-canvas-container');
+                        pdfScale = Math.max(_cc.clientWidth / 300, 1.6);
+                        renderPdfPage(pdfCurrentPage);
+                        this.style.background = '#1abc9c';
+                    } else {
+                        this.style.background = '#16a085';
+                    }
+                });
                 window.addEventListener('resize', function() {
                     if (!pdfDoc || modal.style.display !== 'flex') return;
                     const c = document.getElementById('pdf-canvas-container');
