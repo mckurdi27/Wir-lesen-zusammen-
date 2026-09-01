@@ -221,8 +221,8 @@
     var ok=row.querySelector('.chk.ok'), bx=row.querySelector('.chk.bozuk'), rk=sa(row.getAttribute('data-key'));
     // kaydet (kaydedilen durumu geri yukle)
     var kayit = localStorage.getItem(rk);
-    if (kayit==='ok' && ok){ ok.textContent='✓'; ok.classList.add('marked'); }
     if (kayit==='bozuk' && bx){ bx.textContent='✗'; bx.classList.add('marked'); }
+    else { if(ok){ ok.textContent='✓'; ok.classList.add('marked'); } } // varsayilan: calisiyor
     function tık(cell, val){
       return function(){
         if (cell.textContent){ cell.textContent=''; cell.classList.remove('marked'); localStorage.removeItem(rk); }
