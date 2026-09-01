@@ -3024,7 +3024,7 @@
 
                 let infoTableHtml = _infoRows.length
                     ? `<table id="info-table" style="width:100%; border-collapse:collapse; font-size:13px;">
-                        <thead>
+                        <thead style="position:sticky; top:0; z-index:2; background:#fff;">
                             <tr style="background:rgba(142,68,173,0.1);">
                                 <th style="padding:8px; text-align:center; border:1px solid var(--border-color); width:44px;">Sıra</th>
                                 <th onclick="infoSortTable(1)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">1. Grup ⇅</th>
@@ -3049,7 +3049,7 @@
                                 style="flex:1; min-width:160px; padding:10px 12px; border-radius:6px; border:1px solid var(--border-color); background:var(--card-bg); color:var(--text-main); font-size:13px; min-height:44px;">
                         </div>
                         <div style="font-size:12px; color:#7f8c8d; margin-bottom:8px;">💡 Üye şifresini unutursa, grubun şifresi buradan görülebilir.</div>
-                        <div style="max-height:400px; overflow-y:auto; border:1px solid var(--border-color); padding:0; border-radius:8px; background:var(--card-bg);">
+                        <div style="max-height:400px; max-width:100%; overflow:auto; border:1px solid var(--border-color); padding:0; border-radius:8px; background:var(--card-bg);">
                             ${infoTableHtml}
                         </div>
                     </div>
