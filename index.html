@@ -847,15 +847,15 @@
                 });
                 
                 prevBtn.addEventListener('click', function() {
-                    if (pdfDoc && pdfCurrentPage > 1) {
-                        pdfCurrentPage--;
+                    if (pdfDoc && (window._pdfRtl ? pdfCurrentPage < pdfTotalPages : pdfCurrentPage > 1)) {
+                        pdfCurrentPage = window._pdfRtl ? pdfCurrentPage + 1 : pdfCurrentPage - 1;
                         renderPdfPage(pdfCurrentPage);
                     }
                 });
                 
                 nextBtn.addEventListener('click', function() {
-                    if (pdfDoc && pdfCurrentPage < pdfTotalPages) {
-                        pdfCurrentPage++;
+                    if (pdfDoc && (window._pdfRtl ? pdfCurrentPage > 1 : pdfCurrentPage < pdfTotalPages)) {
+                        pdfCurrentPage = window._pdfRtl ? pdfCurrentPage - 1 : pdfCurrentPage + 1;
                         renderPdfPage(pdfCurrentPage);
                     }
                 });
@@ -882,12 +882,12 @@
                     const dy = e.changedTouches[0].clientY - touchStartY;
                     touchStartX = null; touchStartY = null;
                     if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return;
-                    if (dx < 0 && pdfDoc && pdfCurrentPage < pdfTotalPages) {
-                        pdfCurrentPage++;
-                        renderPdfPage(pdfCurrentPage);
-                    } else if (dx > 0 && pdfDoc && pdfCurrentPage > 1) {
-                        pdfCurrentPage--;
-                        renderPdfPage(pdfCurrentPage);
+                    if (window._pdfRtl) {
+                        if (dx > 0 && pdfDoc && pdfCurrentPage < pdfTotalPages) { pdfCurrentPage++; renderPdfPage(pdfCurrentPage); }
+                        else if (dx < 0 && pdfDoc && pdfCurrentPage > 1) { pdfCurrentPage--; renderPdfPage(pdfCurrentPage); }
+                    } else {
+                        if (dx < 0 && pdfDoc && pdfCurrentPage < pdfTotalPages) { pdfCurrentPage++; renderPdfPage(pdfCurrentPage); }
+                        else if (dx > 0 && pdfDoc && pdfCurrentPage > 1) { pdfCurrentPage--; renderPdfPage(pdfCurrentPage); }
                     }
                 }, { passive: true });
 
