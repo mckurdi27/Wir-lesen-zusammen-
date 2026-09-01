@@ -53,6 +53,20 @@
                 100% { transform: none; opacity: 1; transform-origin: center; }
             }
             #pdf-canvas.sb-page-turn { animation: pdfPageTurn 0.28s ease-out; }
+            /* Flipbook sayfa cevirme katmani */
+            #pdf-flip-overlay {
+                position: absolute; top: 0; left: 0;
+                transform-origin: left center;
+                box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+                pointer-events: none; z-index: 5;
+                background: #fff;
+                display: none;
+            }
+            #pdf-flip-overlay.sb-flipping { animation: pdfFlip 0.5s ease-in-out forwards; }
+            @keyframes pdfFlip {
+                0%   { transform: perspective(1800px) rotateY(0deg); opacity: 1; }
+                100% { transform: perspective(1800px) rotateY(-180deg); opacity: 0.25; }
+            }
             border-radius: 8px;
             font-size: 14px;
         }
@@ -453,6 +467,7 @@
                 <!-- Canvas - Tam Ekran -->
                 <div id="pdf-canvas-container" style="flex: 1; width: 100%; background: #ffffff; display: flex; justify-content: center; align-items: center; overflow: auto; padding: 0; position: relative; touch-action: pan-y;">
                     <canvas id="pdf-canvas" style="max-width: none; max-height: none; box-shadow: 0 2px 10px rgba(0,0,0,0.3); background: #fff; display:block;"></canvas>
+                    <div id="pdf-flip-overlay"></div>
                 </div>
                 <!-- Alt Kontroller -->
                 <div class="pdf-toolbar" style="background: linear-gradient(135deg, #fdfbf7, #f4ebd0); border-top: 2px solid #d4af37; padding: 6px 8px; display: flex; justify-content: center;"><div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
@@ -821,6 +836,21 @@
                 if (!pdfDoc) return;
                 var _rt = document.getElementById('pdf-canvas');
                 if (_rt) { _rt.classList.remove('sb-page-turn'); void _rt.offsetWidth; _rt.classList.add('sb-page-turn'); }
+                // Flipbook: mevcut sayfayi yakala ve cevir (yeni sayfa alttan belirir)
+                try {
+                    var _ov = document.getElementById('pdf-flip-overlay');
+                    if (_ov && _rt && _rt.width > 0 && window._pdfLastPage && window._pdfLastPage !== pageNum) {
+                        _ov.width = _rt.width; _ov.height = _rt.height;
+                        _ov.style.width = _rt.width + 'px'; _ov.style.height = _rt.height + 'px';
+                        _ov.getContext('2d').drawImage(_rt, 0, 0);
+                        _ov.classList.remove('sb-flipping'); void _ov.offsetWidth;
+                        _ov.style.display = 'block';
+                        _ov.classList.add('sb-flipping');
+                        var _done = function(){ _ov.style.display = 'none'; };
+                        _ov.addEventListener('animationend', _done, { once: true });
+                    }
+                    window._pdfLastPage = pageNum;
+                } catch(e){}
                 
                 const canvas = document.getElementById('pdf-canvas');
                 const ctx = canvas.getContext('2d');
