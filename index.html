@@ -477,6 +477,16 @@
                     </div>
                 </div>
             </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:8px;">
+                    <div class="login-field">
+                        <input type="text" id="login-region" list="region-list" placeholder="Bölge" class="login-input">
+                        <datalist id="region-list"></datalist>
+                    </div>
+                    <div class="login-field">
+                        <input type="text" id="login-city" list="city-list" placeholder="Şehir" class="login-input">
+                        <datalist id="city-list"></datalist>
+                    </div>
+                </div>
             </div>
 
             <div id="bulk-share-area" class="bulk-share-area" style="display: none;">
@@ -1497,6 +1507,8 @@
                     const userType = document.getElementById('login-user-type').value;
                     const groupName = document.getElementById('login-group-name').value.trim();
                     const groupPassword = document.getElementById('login-group-password').value.trim();
+                    const loginRegion = (document.getElementById('login-region') || {}).value ? document.getElementById('login-region').value.trim() : '';
+                    const loginCity = (document.getElementById('login-city') || {}).value ? document.getElementById('login-city').value.trim() : '';
                     
                     if (!userName) {
                         showToast('❌ Lütfen isminizi girin!', 'error');
@@ -1530,6 +1542,10 @@
                         appData.memberTypes[userName] = "bireysel";
                         if (userPassword) appData.passwords[userName] = userPassword;
                         appData.password = userPassword || "";
+                        if (!appData.regions) appData.regions = {};
+                        if (!appData.cities) appData.cities = {};
+                        if (loginRegion) appData.regions[userName] = loginRegion;
+                        if (loginCity) appData.cities[userName] = loginCity;
                         saveGroupData();
                         showToast("✅ " + userName + " kişisel grup ile giriş yaptı (grup: " + currentGroup.toUpperCase() + ")", 'success');
                         updateUserInterface();
@@ -1560,6 +1576,10 @@
                             }
                             if (!parsed.passwords) parsed.passwords = {};
                             if (userPassword) parsed.passwords[userName] = userPassword;
+                            if (!parsed.regions) parsed.regions = {};
+                            if (!parsed.cities) parsed.cities = {};
+                            if (loginRegion) parsed.regions[userName] = loginRegion;
+                            if (loginCity) parsed.cities[userName] = loginCity;
                             localStorage.setItem(`hatim_group_${groupKey}`, JSON.stringify(parsed));
                             currentGroup = groupKey;
                             loggedInMember = userName;
@@ -1594,7 +1614,9 @@
                             bookPages: freshPages,
                             bookHatims: freshHatims,
                             bookHistory: freshHistory,
-                            readingLogs: []
+                            readingLogs: [],
+                            regions: loginRegion ? { [userName]: loginRegion } : {},
+                            cities: loginCity ? { [userName]: loginCity } : {}
                         };
                         localStorage.setItem(`hatim_group_${groupKey}`, JSON.stringify(newGroupData));
                         currentGroup = groupKey;
@@ -2905,17 +2927,17 @@
                         let gPw = d.password || '';
                         let gTip = (d.members || []).length === 1 ? 'tek' : 'grup';
                         // Grup satırı: 1=grup adı, 2=isim(yok), 3=şifre(yok), 4=grup şifresi, 5=tip
-                        _infoRows.push([gName, '', '', gPw || '(şifresiz)', gTip]);
+                        _infoRows.push([gName, '', '', gPw || '(şifresiz)', gTip, (d.regions && d.regions[gName]) || '', (d.cities && d.cities[gName]) || '']);
                         (d.members || []).forEach(mm => {
                             let mpw = (d.passwords && d.passwords[mm]) ? d.passwords[mm] : '';
                             // Üye: 1=hangi grup, 2=isim, 3=üye şifresi, 4=grup şifresi, 5=tip
-                            _infoRows.push([gName, mm, mpw || '(şifresiz)', gPw || '(şifresiz)', gTip]);
+                            _infoRows.push([gName, mm, mpw || '(şifresiz)', gPw || '(şifresiz)', gTip, (d.regions && d.regions[mm]) || '', (d.cities && d.cities[mm]) || '']);
                         });
                     } catch(e) {}
                 });
                 (_infoPool.members || []).forEach(mm => {
                     let mpw = (_infoPool.passwords && _infoPool.passwords[mm]) ? _infoPool.passwords[mm] : '';
-                    _infoRows.push(['Bireysel', mm, mpw || '(şifresiz)', '(bireysel)', 'tek']);
+                    _infoRows.push(['Bireysel', mm, mpw || '(şifresiz)', '(bireysel)', 'tek', (_infoPool.regions && _infoPool.regions[mm]) || '', (_infoPool.cities && _infoPool.cities[mm]) || '']);
                 });
 
                 window._infoRowsCache = _infoRows.map(r => r.slice());
@@ -2942,6 +2964,8 @@
                         <td style="padding:8px; border:1px solid var(--border-color); font-weight:${isMember ? 'bold' : 'normal'};">${isMember ? r[1] : '—'}</td>
                         <td style="padding:8px; border:1px solid var(--border-color); color:#8e44ad;">${isMember ? (r[2] || '(şifresiz)') : '—'}</td>
                         <td style="padding:8px; border:1px solid var(--border-color); color:#2980b9;">${r[3] || '(şifresiz)'}</td>
+                        <td style="padding:8px; border:1px solid var(--border-color);">${r[5] || '—'}</td>
+                        <td style="padding:8px; border:1px solid var(--border-color);">${r[6] || '—'}</td>
                     </tr>`;
                 }
 
@@ -2954,6 +2978,8 @@
                                 <th onclick="infoSortTable(2)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">2. İsim ⇅</th>
                                 <th onclick="infoSortTable(3)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">3. Şifre ⇅</th>
                                 <th onclick="infoSortTable(4)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">4. Grup Şifresi ⇅</th>
+                                <th onclick="infoSortTable(5)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">5. Bölge ⇅</th>
+                                <th onclick="infoSortTable(6)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">6. Şehir ⇅</th>
                             </tr>
                         </thead>
                         <tbody>
