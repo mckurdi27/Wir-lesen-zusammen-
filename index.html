@@ -438,6 +438,12 @@
                         <span id="pdf-modal-page-info" style="font-size: 12px; opacity: 0.7; margin-left: 8px;"></span>
                     </div>
 
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: nowrap;">
+                        <button id="pdf-top-prev-btn" style="background:#e0e0e0;color:#333;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;min-height:30px;">&#9664; Sayfa</button>
+                        <input type="number" id="pdf-top-page-input" min="1" value="1" style="width:46px;padding:3px;border:1px solid #ccc;border-radius:4px;font-size:12px;min-height:28px;">
+                        <span style="font-size:12px;color:#777;">/ <span id="pdf-top-total-pages">1</span></span>
+                        <button id="pdf-top-next-btn" style="background:#e0e0e0;color:#333;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;min-height:30px;">Sayfa &#9654;</button>
+                    </div>
                 </div>
                 <!-- Canvas - Tam Ekran -->
                 <div id="pdf-canvas-container" style="flex: 1; width: 100%; background: #ffffff; display: flex; justify-content: center; align-items: center; overflow: hidden; padding: 0; position: relative; touch-action: pan-y;">
@@ -450,8 +456,6 @@
                         <input type="number" id="pdf-page-input" min="1" value="1" style="width: 45px; padding: 3px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; text-align: center; background: #fff; color: #333;">
                         <span style="font-size: 12px; color: #777;">/ <span id="pdf-total-pages">1</span></span>
                         <button id="pdf-next-btn" style="background: #e0e0e0; color: #333; border: 1px solid #ccc; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px;">▶</button>
-                        <button id="pdf-zoom-in" style="background: #e0e0e0; color: #333; border: 1px solid #ccc; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px;">🔍+</button>
-                        <button id="pdf-zoom-out" style="background: #e0e0e0; color: #333; border: 1px solid #ccc; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px;">🔍-</button>
                         <button id="pdf-fit-btn" style="background: #d4af37; color: #3e2723; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px;">⬚ Sığdır</button>
                         <button id="pdf-close-btn" style="background: #e74c3c; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px;">✕</button>
                     </div>
@@ -813,6 +817,10 @@
                     page.render(renderContext);
                     pageInfo.textContent = `(${pageNum} / ${pdfTotalPages})`;
                     pageInput.value = pageNum;
+                    var _topIn = document.getElementById('pdf-top-page-input');
+                    var _topTot = document.getElementById('pdf-top-total-pages');
+                    if (_topIn) _topIn.value = pageNum;
+                    if (_topTot) _topTot.textContent = pdfTotalPages;
                 });
             }
 
@@ -822,8 +830,6 @@
                 const prevBtn = document.getElementById('pdf-prev-btn');
                 const nextBtn = document.getElementById('pdf-next-btn');
                 const pageInput = document.getElementById('pdf-page-input');
-                const zoomInBtn = document.getElementById('pdf-zoom-in');
-                const zoomOutBtn = document.getElementById('pdf-zoom-out');
                 const fitBtn = document.getElementById('pdf-fit-btn');
                 
                 closeBtn.addEventListener('click', function() {
@@ -882,6 +888,34 @@
                         renderPdfPage(pdfCurrentPage);
                     }
                 }, { passive: true });
+
+                // El ile yak\u0131nla\u015ft\u0131rma / uzakla\u015ft\u0131rma (pinch)
+                let pinchStartDist = null;
+                swipeContainer.addEventListener('touchstart', function(e) {
+                    if (e.touches.length === 2) {
+                        pinchStartDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                    }
+                }, { passive: true });
+                swipeContainer.addEventListener('touchmove', function(e) {
+                    if (e.touches.length === 2 && pinchStartDist !== null) {
+                        e.preventDefault();
+                        const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                        const ratio = dist / pinchStartDist;
+                        if (pdfDoc && ratio > 1.02) { pdfScale = Math.min(pdfScale * ratio, 4); pinchStartDist = dist; renderPdfPage(pdfCurrentPage); }
+                        else if (pdfDoc && ratio < 0.98) { pdfScale = Math.max(pdfScale * ratio, 0.3); pinchStartDist = dist; renderPdfPage(pdfCurrentPage); }
+                    }
+                }, { passive: false });
+                swipeContainer.addEventListener('touchend', function(e) {
+                    if (e.touches.length < 2) { pinchStartDist = null; }
+                }, { passive: true });
+
+                // �st sayfa gezinme butonlar\u0131
+                var _tpv = document.getElementById('pdf-top-prev-btn');
+                var _tpn = document.getElementById('pdf-top-next-btn');
+                var _tpi = document.getElementById('pdf-top-page-input');
+                if (_tpv) _tpv.addEventListener('click', function(){ if (pdfDoc && pdfCurrentPage > 1) { pdfCurrentPage--; renderPdfPage(pdfCurrentPage); } });
+                if (_tpn) _tpn.addEventListener('click', function(){ if (pdfDoc && pdfCurrentPage < pdfTotalPages) { pdfCurrentPage++; renderPdfPage(pdfCurrentPage); } });
+                if (_tpi) _tpi.addEventListener('keypress', function(e){ if (e.key === 'Enter') { var pg = parseInt(this.value); if (pdfDoc && pg >= 1 && pg <= pdfTotalPages) { pdfCurrentPage = pg; renderPdfPage(pg); } else { alert('Ge�ersiz sayfa! (1-' + pdfTotalPages + ')'); this.value = pdfCurrentPage; } } });
 
                 // Pencere yeniden boyutlanınca sayfayı yeniden sığdır
                 window.addEventListener('resize', function() {
