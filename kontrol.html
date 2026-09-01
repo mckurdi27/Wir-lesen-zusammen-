@@ -45,11 +45,11 @@
     <p>İsim + Şifre + Tip (Tek/Grup) üst satır; Grup İsmi + Grup Şifre + Katıl alt satır. Bu panel asla gizlenmez.</p>
   </div>
   <table>
-    <tr><th>Buton / Alan</th><th>Ne yapar</th><th>Not</th></tr>
-    <tr><td class="buton">Katıl (&#10133; Katıl)</td><td>Seçilen tipe göre giriş yapar: <b>Tek</b> → bireysel üye, <b>Grup</b> → gruba üye olarak giriş. Yeni üyeyse kayıt eder.</td><td><span class="rozet çalışıyor">Çalışıyor</span> İsim/şifre/grup bilgilerini doğrular.</td></tr>
-    <tr><td class="buton">🔒 Kilit (Yönetici Modu)</td><td>Admin panelini açar/kapatır (şifre: 1234). Yazısız, sadece ikon.</td><td><span class="rozet çalışıyor">Çalışıyor</span> Katıl butonunun yanında, aynı satırda.</td></tr>
-    <tr><td class="buton">Tek / Grup seçimi</td><td>Giriş tipini belirler. İlk girişte seçilen tip kalıcıdır; sonraki girişlerde isim yazınca otomatik seçilir.</td><td>Bireysel 👤, grup 👥 ikonu.</td></tr>
-    <tr><td class="buton">Beni Hatırla</td><td>İsim, şifre, grup ismi ve grup şifresini kaydeder; sayfa yenilenince geri yükler.</td><td><span class="rozet çalışıyor">Çalışıyor</span> Tek ve grup için de geçerli.</td></tr>
+    <tr><th>Buton / Alan</th><th>Ne yapar</th><th>Not</th><th>✅ Çalışıyor</th><th>❌ Çalışmıyor</th></tr>
+    <tr data-key="k1"><td class="buton">Katıl (&#10133; Katıl)</td><td>Seçilen tipe göre giriş yapar: <b>Tek</b> → bireysel üye, <b>Grup</b> → gruba üye olarak giriş. Yeni üyeyse kayıt eder.</td><td><span class="rozet çalışıyor">Çalışıyor</span> İsim/şifre/grup bilgilerini doğrular.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k2"><td class="buton">🔒 Kilit (Yönetici Modu)</td><td>Admin panelini açar/kapatır (şifre: 1234). Yazısız, sadece ikon.</td><td><span class="rozet çalışıyor">Çalışıyor</span> Katıl butonunun yanında, aynı satırda.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k3"><td class="buton">Tek / Grup seçimi</td><td>Giriş tipini belirler. İlk girişte seçilen tip kalıcıdır; sonraki girişlerde isim yazınca otomatik seçilir.</td><td>Bireysel 👤, grup 👥 ikonu.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k4"><td class="buton">Beni Hatırla</td><td>İsim, şifre, grup ismi ve grup şifresini kaydeder; sayfa yenilenince geri yükler.</td><td><span class="rozet çalışıyor">Çalışıyor</span> Tek ve grup için de geçerli.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
   </table>
 
   <!-- ============ BÖLÜM 2: KİŞİ KARTI ============ -->
@@ -58,16 +58,16 @@
     <p>Giriş yapıldığında giriş panelinin hemen altında belirir. Üyenin bilgileri ve hisseleri gösterilir.</p>
   </div>
   <table>
-    <tr><th>Buton / Alan</th><th>Ne yapar</th><th>Not</th></tr>
-    <tr><td class="buton">Ad Değiştir</td><td>Üyenin adını değiştirir; hisse sahibi, okuma kayıtları ve şifre anahtarı da taşınır.</td><td><span class="rozet çalışıyor">Çalışıyor</span></td></tr>
-    <tr><td class="buton">Şifre Değiştir</td><td>Üyenin şifresini günceller (Supabase'e yazılır).</td><td><span class="rozet çalışıyor">Çalışıyor</span></td></tr>
-    <tr><td class="buton">👁 (göz)</td><td>Şifreyi gösterir / gizler. Şifre alanının içinde, sağda.</td><td><span class="rozet çalışıyor">Çalışıyor</span></td></tr>
-    <tr><td class="buton">Bölge / Şehir Değiştir</td><td>Üyenin bölge ve şehir bilgisini günceller.</td><td>Boş bırakılabilir.</td></tr>
-    <tr><td class="buton">📄 PDF</td><td>O eseri PDF okuyucuda açar.</td><td>Hisse durumuna göre görünür/kaybolur.</td></tr>
-    <tr><td class="buton">Hisse Al</td><td>Seçili bloğu üyenin hissesi olarak alır.</td><td>Mobilde içerik boyutunda buton.</td></tr>
-    <tr><td class="buton">✅ Okundu</td><td>Alınan hisseyi "okundu" işaretler; okunma tarih/saati kaydedilir.</td><td></td></tr>
-    <tr><td class="buton">↩ Okunmadı</td><td>"Okundu" işaretini geri alır.</td><td></td></tr>
-    <tr><td class="buton">❌ Vazgeç</td><td>Hisseden vazgeçer, hisseyi siler (localStorage + Supabase'ten).</td><td><span class="rozet risk">Kontrol edildi</span> Supabase silme eklendi; doğrula.</td></tr>
+    <tr><th>Buton / Alan</th><th>Ne yapar</th><th>Not</th><th>✅ Çalışıyor</th><th>❌ Çalışmıyor</th></tr>
+    <tr data-key="k5"><td class="buton">Ad Değiştir</td><td>Üyenin adını değiştirir; hisse sahibi, okuma kayıtları ve şifre anahtarı da taşınır.</td><td><span class="rozet çalışıyor">Çalışıyor</span></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k6"><td class="buton">Şifre Değiştir</td><td>Üyenin şifresini günceller (Supabase'e yazılır).</td><td><span class="rozet çalışıyor">Çalışıyor</span></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k7"><td class="buton">👁 (göz)</td><td>Şifreyi gösterir / gizler. Şifre alanının içinde, sağda.</td><td><span class="rozet çalışıyor">Çalışıyor</span></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k8"><td class="buton">Bölge / Şehir Değiştir</td><td>Üyenin bölge ve şehir bilgisini günceller.</td><td>Boş bırakılabilir.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k9"><td class="buton">📄 PDF</td><td>O eseri PDF okuyucuda açar.</td><td>Hisse durumuna göre görünür/kaybolur.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k10"><td class="buton">Hisse Al</td><td>Seçili bloğu üyenin hissesi olarak alır.</td><td>Mobilde içerik boyutunda buton.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k11"><td class="buton">✅ Okundu</td><td>Alınan hisseyi "okundu" işaretler; okunma tarih/saati kaydedilir.</td><td></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k12"><td class="buton">↩ Okunmadı</td><td>"Okundu" işaretini geri alır.</td><td></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k13"><td class="buton">❌ Vazgeç</td><td>Hisseden vazgeçer, hisseyi siler (localStorage + Supabase'ten).</td><td><span class="rozet risk">Kontrol edildi</span> Supabase silme eklendi; doğrula.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
   </table>
 
   <!-- ============ BÖLÜM 3: KİTAP LİSTESİ ============ -->
@@ -76,12 +76,12 @@
     <p>Her eser bir karttır. Kart içinde sayfa/bab modu butonları, hisse blokları ve aksiyon butonları vardır.</p>
   </div>
   <table>
-    <tr><th>Buton / Alan</th><th>Ne yapar</th><th>Not</th></tr>
-    <tr><td class="buton">20 / 10 / 5 / 1 (mod)</td><td>Eserin sayfa/bab bölme modunu seçer; bloğun kaç birim olduğunu belirler.</td><td>Tüm eserlerde (yeni eklenen dahil) olmalı.</td></tr>
-    <tr><td class="buton">📄 PDF</td><td>O sayfa/bab aralığını PDF okuyucuda açar.</td><td>Her blokta ayrı PDF butonu.</td></tr>
-    <tr><td class="buton">Hisse Al</td><td>Boş bloğu giriş yapmış üyenin hissesi yapar.</td><td>Giriş şart.</td></tr>
-    <tr><td class="buton">✅ Okundu / ↩ Okunmadı</td><td>Hissenin okunma durumunu değiştirir; tarih/saat kaydedilir.</td><td></td></tr>
-    <tr><td class="buton">🗑 Sil / ❌ Vazgeç</td><td>Hissesi olan üye hissesini bırakır (silinir).</td><td>Supabase'ten de silinmeli.</td></tr>
+    <tr><th>Buton / Alan</th><th>Ne yapar</th><th>Not</th><th>✅ Çalışıyor</th><th>❌ Çalışmıyor</th></tr>
+    <tr data-key="k14"><td class="buton">20 / 10 / 5 / 1 (mod)</td><td>Eserin sayfa/bab bölme modunu seçer; bloğun kaç birim olduğunu belirler.</td><td>Tüm eserlerde (yeni eklenen dahil) olmalı.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k15"><td class="buton">📄 PDF</td><td>O sayfa/bab aralığını PDF okuyucuda açar.</td><td>Her blokta ayrı PDF butonu.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k16"><td class="buton">Hisse Al</td><td>Boş bloğu giriş yapmış üyenin hissesi yapar.</td><td>Giriş şart.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k17"><td class="buton">✅ Okundu / ↩ Okunmadı</td><td>Hissenin okunma durumunu değiştirir; tarih/saat kaydedilir.</td><td></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k18"><td class="buton">🗑 Sil / ❌ Vazgeç</td><td>Hissesi olan üye hissesini bırakır (silinir).</td><td>Supabase'ten de silinmeli.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
   </table>
 
   <!-- ============ BÖLÜM 4: ADMIN PANELİ ============ -->
@@ -92,63 +92,63 @@
 
   <h3>4.1 Üst Bar</h3>
   <table>
-    <tr><th>Buton</th><th>Ne yapar</th><th>Not</th></tr>
-    <tr><td class="buton">Beni Hatırla</td><td>Admin panelin açık kalmasını sağlar (sayfa yenilenince şifresiz açılır).</td><td><span class="rozet çalışıyor">Çalışıyor</span></td></tr>
-    <tr><td class="buton">Mod Kapalı</td><td>Admin modunu kapatır, paneli gizler.</td><td></td></tr>
+    <tr><th>Buton</th><th>Ne yapar</th><th>Not</th><th>✅ Çalışıyor</th><th>❌ Çalışmıyor</th></tr>
+    <tr data-key="k19"><td class="buton">Beni Hatırla</td><td>Admin panelin açık kalmasını sağlar (sayfa yenilenince şifresiz açılır).</td><td><span class="rozet çalışıyor">Çalışıyor</span></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k20"><td class="buton">Mod Kapalı</td><td>Admin modunu kapatır, paneli gizler.</td><td></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
   </table>
 
   <h3>4.2 Detaylı Analiz butonları</h3>
   <table>
-    <tr><th>Buton / Sekme</th><th>Ne yapar</th><th>Not</th></tr>
-    <tr><td class="buton">📊 Detaylı Analiz</td><td>Analiz modalını açar. Açılmadan önce Supabase'ten taze veri çeker.</td><td><span class="rozet çalışıyor">Çalışıyor</span></td></tr>
-    <tr><td class="buton">📊 Genel Özet</td><td>Grup bazlı özet: üye sayısı, alınan, okunan, % ilerleme.</td><td></td></tr>
-    <tr><td class="buton">🏆 Grup Sıralama</td><td>Grupları okuma durumuna göre sıralar.</td><td><span class="rozet risk">Kontrol edildi</span> data.books.sort hatası kaldırıldı.</td></tr>
-    <tr><td class="buton">👥 Üye Analizi</td><td>Üye bazlı analiz. Aynı isimli üyeler grup etiketiyle ayrılır (👥 İsim (GRUP)).</td><td><span class="rozet çalışıyor">Çalışıyor</span></td></tr>
-    <tr><td class="buton">📚 Eser Detay</td><td>Eser bazlı analiz; sütun başlıklarına tıklayınca sıralanır.</td><td><span class="rozet çalışıyor">Çalışıyor</span></td></tr>
-    <tr><td class="buton">📖 Okuma Günlüğü</td><td>Tüm okuma kayıtlarını gösterir (sınır kaldırıldı).</td><td><span class="rozet çalışıyor">Çalışıyor</span></td></tr>
-    <tr><td class="buton">🔍 Filtreler</td><td>Grup / Üye / Eser seçicileri analizi daraltır.</td><td>Aynı isimler grup etiketiyle ayrışır.</td></tr>
-    <tr><td class="buton">💾 Excel</td><td>5 sekmeli analizi .xlsx olarak indirir (Özet, Üye, Eser, Günlük, Şifreler).</td><td></td></tr>
-    <tr><td class="buton">🖨 Yazdır</td><td>Analizi yazdırır / PDF olarak kaydeder.</td><td></td></tr>
+    <tr><th>Buton / Sekme</th><th>Ne yapar</th><th>Not</th><th>✅ Çalışıyor</th><th>❌ Çalışmıyor</th></tr>
+    <tr data-key="k21"><td class="buton">📊 Detaylı Analiz</td><td>Analiz modalını açar. Açılmadan önce Supabase'ten taze veri çeker.</td><td><span class="rozet çalışıyor">Çalışıyor</span></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k22"><td class="buton">📊 Genel Özet</td><td>Grup bazlı özet: üye sayısı, alınan, okunan, % ilerleme.</td><td></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k23"><td class="buton">🏆 Grup Sıralama</td><td>Grupları okuma durumuna göre sıralar.</td><td><span class="rozet risk">Kontrol edildi</span> data.books.sort hatası kaldırıldı.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k24"><td class="buton">👥 Üye Analizi</td><td>Üye bazlı analiz. Aynı isimli üyeler grup etiketiyle ayrılır (👥 İsim (GRUP)).</td><td><span class="rozet çalışıyor">Çalışıyor</span></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k25"><td class="buton">📚 Eser Detay</td><td>Eser bazlı analiz; sütun başlıklarına tıklayınca sıralanır.</td><td><span class="rozet çalışıyor">Çalışıyor</span></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k26"><td class="buton">📖 Okuma Günlüğü</td><td>Tüm okuma kayıtlarını gösterir (sınır kaldırıldı).</td><td><span class="rozet çalışıyor">Çalışıyor</span></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k27"><td class="buton">🔍 Filtreler</td><td>Grup / Üye / Eser seçicileri analizi daraltır.</td><td>Aynı isimler grup etiketiyle ayrışır.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k28"><td class="buton">💾 Excel</td><td>5 sekmeli analizi .xlsx olarak indirir (Özet, Üye, Eser, Günlük, Şifreler).</td><td></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k29"><td class="buton">🖨 Yazdır</td><td>Analizi yazdırır / PDF olarak kaydeder.</td><td></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
   </table>
 
   <h3>4.3 Toplu Atama / Silme</h3>
   <table>
-    <tr><th>Buton</th><th>Ne yapar</th><th>Not</th></tr>
-    <tr><td class="buton">📤 Atama</td><td>Seçili eser + üye + adede göre hisseleri atar.</td><td>Adet girişi mevcut.</td></tr>
-    <tr><td class="buton">🗑 Sil</td><td>Seçili üyenin hisselerini siler.</td><td>Supabase'e yazılmalı.</td></tr>
-    <tr><td class="buton">🔄 Sıfırla</td><td>Seçimleri temizler.</td><td></td></tr>
-    <tr><td class="buton">👁 Gör</td><td>Alınan hisseleri görüntüler.</td><td></td></tr>
-    <tr><td class="buton">💬 WhatsApp ile Gönder</td><td>Hisse bilgisini WhatsApp'ta paylaşır.</td><td></td></tr>
+    <tr><th>Buton</th><th>Ne yapar</th><th>Not</th><th>✅ Çalışıyor</th><th>❌ Çalışmıyor</th></tr>
+    <tr data-key="k30"><td class="buton">📤 Atama</td><td>Seçili eser + üye + adede göre hisseleri atar.</td><td>Adet girişi mevcut.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k31"><td class="buton">🗑 Sil</td><td>Seçili üyenin hisselerini siler.</td><td>Supabase'e yazılmalı.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k32"><td class="buton">🔄 Sıfırla</td><td>Seçimleri temizler.</td><td></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k33"><td class="buton">👁 Gör</td><td>Alınan hisseleri görüntüler.</td><td></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k34"><td class="buton">💬 WhatsApp ile Gönder</td><td>Hisse bilgisini WhatsApp'ta paylaşır.</td><td></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
   </table>
 
   <h3>4.4 Grup ve Üye Yönetimi</h3>
   <table>
-    <tr><th>Buton</th><th>Ne yapar</th><th>Not</th></tr>
-    <tr><td class="buton">+ Grup</td><td>Yeni grup ekler.</td><td></td></tr>
-    <tr><td class="buton">✏ Düzenle / 🗑 Sil (grup)</td><td>Grubu düzenler / siler.</td><td>Silme Supabase'e yansımalı.</td></tr>
-    <tr><td class="buton">+ Üye Ekle</td><td>Gruba veya bireysel havuza üye ekler.</td><td>Bireysel üye için şifre zorunlu.</td></tr>
-    <tr><td class="buton">✏ Düzenle / 🗑 Sil (üye)</td><td>Üyenin adını/şifresini düzenler, siler.</td><td>Silinen üye tamamlanmış kitabı varsa "pasif" kalır.</td></tr>
+    <tr><th>Buton</th><th>Ne yapar</th><th>Not</th><th>✅ Çalışıyor</th><th>❌ Çalışmıyor</th></tr>
+    <tr data-key="k35"><td class="buton">+ Grup</td><td>Yeni grup ekler.</td><td></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k36"><td class="buton">✏ Düzenle / 🗑 Sil (grup)</td><td>Grubu düzenler / siler.</td><td>Silme Supabase'e yansımalı.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k37"><td class="buton">+ Üye Ekle</td><td>Gruba veya bireysel havuza üye ekler.</td><td>Bireysel üye için şifre zorunlu.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k38"><td class="buton">✏ Düzenle / 🗑 Sil (üye)</td><td>Üyenin adını/şifresini düzenler, siler.</td><td>Silinen üye tamamlanmış kitabı varsa "pasif" kalır.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
   </table>
 
   <h3>4.5 Üye ve Grup Bilgi Paneli</h3>
   <table>
-    <tr><th>Öğe</th><th>Ne yapar</th><th>Not</th></tr>
-    <tr><td class="buton">🔍 Arama</td><td>Bilgi tablosunda üye/grup arar.</td><td></td></tr>
-    <tr><td class="buton">Tablo sütunları</td><td>Sıra, Grup, İsim, Şifre, Grup Şifresi, Bölge, Şehir.</td><td>Başlık sabit, sağa/sola/aşağı kaydırılabilir.</td></tr>
-    <tr><td class="buton">👁 Alınan Hisseleri Gör / Düzenle</td><td>Seçili üyenin hisselerini görüntüler ve düzenler.</td><td></td></tr>
+    <tr><th>Öğe</th><th>Ne yapar</th><th>Not</th><th>✅ Çalışıyor</th><th>❌ Çalışmıyor</th></tr>
+    <tr data-key="k39"><td class="buton">🔍 Arama</td><td>Bilgi tablosunda üye/grup arar.</td><td></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k40"><td class="buton">Tablo sütunları</td><td>Sıra, Grup, İsim, Şifre, Grup Şifresi, Bölge, Şehir.</td><td>Başlık sabit, sağa/sola/aşağı kaydırılabilir.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k41"><td class="buton">👁 Alınan Hisseleri Gör / Düzenle</td><td>Seçili üyenin hisselerini görüntüler ve düzenler.</td><td></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
   </table>
 
   <h3>4.6 Eser Yönetimi</h3>
   <table>
-    <tr><th>Buton</th><th>Ne yapar</th><th>Not</th></tr>
-    <tr><td class="buton">+ Yeni Eser Ekle</td><td>Yeni eser ekler; PDF yolu <code>pdf/&lt;dosya&gt;.pdf</code> formatında.</td><td>Yeni eserler 20/10/5/1 modlarıyla gelir.</td></tr>
-    <tr><td class="buton">✏ Düzenle / 🗑 Sil (eser)</td><td>Eseri düzenler / siler.</td><td></td></tr>
+    <tr><th>Buton</th><th>Ne yapar</th><th>Not</th><th>✅ Çalışıyor</th><th>❌ Çalışmıyor</th></tr>
+    <tr data-key="k42"><td class="buton">+ Yeni Eser Ekle</td><td>Yeni eser ekler; PDF yolu <code>pdf/&lt;dosya&gt;.pdf</code> formatında.</td><td>Yeni eserler 20/10/5/1 modlarıyla gelir.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k43"><td class="buton">✏ Düzenle / 🗑 Sil (eser)</td><td>Eseri düzenler / siler.</td><td></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
   </table>
 
   <h3>4.7 Yöneticiye Mesaj</h3>
   <table>
-    <tr><th>Buton</th><th>Ne yapar</th><th>Not</th></tr>
-    <tr><td class="buton">💬 Gönder</td><td>Mesajı yöneticiye iletir.</td><td>Sayfanın en altında.</td></tr>
+    <tr><th>Buton</th><th>Ne yapar</th><th>Not</th><th>✅ Çalışıyor</th><th>❌ Çalışmıyor</th></tr>
+    <tr data-key="k44"><td class="buton">💬 Gönder</td><td>Mesajı yöneticiye iletir.</td><td>Sayfanın en altında.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
   </table>
 
   <!-- ============ BÖLÜM 5: PDF OKUYUCU ============ -->
@@ -157,14 +157,14 @@
     <p>Eser PDF'lerini tam ekran açan okuyucu. Flipbook sayfa çevirme + gerçek sayfa çevirme sesi vardır.</p>
   </div>
   <table>
-    <tr><th>Buton</th><th>Ne yapar</th><th>Not</th></tr>
-    <tr><td class="buton">◀ Sayfa / Sayfa ▶</td><td>Önceki / sonraki sayfaya gider.</td><td>RTL açıkken yön tersine döner.</td></tr>
-    <tr><td class="buton">Sayfa numarası kutusu</td><td>Sayfa girip Enter'a basınca o sayfaya atlar.</td><td></td></tr>
-    <tr><td class="buton">RTL (العربية)</td><td>Arapça için içeriği sağdan sola çevirir; sayfa numaraları Arapça rakam olur, gezinme ters çalışır.</td><td><span class="rozet çalışıyor">Çalışıyor</span></td></tr>
-    <tr><td class="buton">Yatay</td><td>Sayfayı büyütüp dikey kaydırmayla okumayı sağlar; buton çubukları gizlenir.</td><td></td></tr>
-    <tr><td class="buton">Sığdır</td><td>Sayfayı ekrana sığdırır.</td><td></td></tr>
-    <tr><td class="buton">✕ Kapat</td><td>Okuyucuyu kapatır.</td><td></td></tr>
-    <tr><td class="buton">Sayfa köşesinden tutma</td><td>Sayfayı köşeden sürükleyerek çevirme (flipbook).</td><td>RTL duyarlı.</td></tr>
+    <tr><th>Buton</th><th>Ne yapar</th><th>Not</th><th>✅ Çalışıyor</th><th>❌ Çalışmıyor</th></tr>
+    <tr data-key="k45"><td class="buton">◀ Sayfa / Sayfa ▶</td><td>Önceki / sonraki sayfaya gider.</td><td>RTL açıkken yön tersine döner.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k46"><td class="buton">Sayfa numarası kutusu</td><td>Sayfa girip Enter'a basınca o sayfaya atlar.</td><td></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k47"><td class="buton">RTL (العربية)</td><td>Arapça için içeriği sağdan sola çevirir; sayfa numaraları Arapça rakam olur, gezinme ters çalışır.</td><td><span class="rozet çalışıyor">Çalışıyor</span></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k48"><td class="buton">Yatay</td><td>Sayfayı büyütüp dikey kaydırmayla okumayı sağlar; buton çubukları gizlenir.</td><td></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k49"><td class="buton">Sığdır</td><td>Sayfayı ekrana sığdırır.</td><td></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k50"><td class="buton">✕ Kapat</td><td>Okuyucuyu kapatır.</td><td></td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
+    <tr data-key="k51"><td class="buton">Sayfa köşesinden tutma</td><td>Sayfayı köşeden sürükleyerek çevirme (flipbook).</td><td>RTL duyarlı.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td></tr>
   </table>
 
   <!-- ============ KONTROL LİSTESİ ============ -->
@@ -185,5 +185,32 @@
 
   <div class="alt" style="margin-top:24px;">Bu sayfa salt okunur rehberdir; anasayfanın çalışmasını etkilemez. Güncelleme: 2026-09-02.</div>
 </div>
+
+<style>
+  .chk{text-align:center;cursor:pointer;min-width:44px;user-select:none;font-size:18px;font-weight:bold;}
+  .chk.ok:hover{background:#e8f8ef;} .chk.bozuk:hover{background:#fdecea;}
+  .chk.ok.marked{color:#27ae60;} .chk.bozuk.marked{color:#e74c3c;}
+</style>
+<script>
+(function(){
+  function sa (r){ return 'kc_'+ r; }
+  function temizle(row){ var ok=row.querySelector('.chk.ok'), bx=row.querySelector('.chk.bozuk'); if(ok)ok.textContent=''; if(bx)bx.textContent=''; }
+  document.querySelectorAll('tr[data-key]').forEach(function(row){
+    var ok=row.querySelector('.chk.ok'), bx=row.querySelector('.chk.bozuk'), rk=sa(row.getAttribute('data-key'));
+    // kaydet (kaydedilen durumu geri yukle)
+    var kayit = localStorage.getItem(rk);
+    if (kayit==='ok' && ok){ ok.textContent='✓'; ok.classList.add('marked'); }
+    if (kayit==='bozuk' && bx){ bx.textContent='✗'; bx.classList.add('marked'); }
+    function tık(cell, val){
+      return function(){
+        if (cell.textContent){ cell.textContent=''; cell.classList.remove('marked'); localStorage.removeItem(rk); }
+        else { temizle(row); cell.textContent=val; cell.classList.add('marked'); localStorage.setItem(rk, (val==='✓'?'ok':'bozuk')); }
+      };
+    }
+    if(ok) ok.addEventListener('click', tık(ok,'✓'));
+    if(bx) bx.addEventListener('click', tık(bx,'✗'));
+  });
+})();
+</script>
 </body>
 </html>
