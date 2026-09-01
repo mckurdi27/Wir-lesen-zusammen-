@@ -821,12 +821,12 @@
                     };
                     
                     page.render(renderContext);
-                    pageInfo.textContent = (pdfRtl ? `(${toArabicNum(pageNum)} / ${toArabicNum(pdfTotalPages)})` : `(${pageNum} / ${pdfTotalPages})`);
+                    pageInfo.textContent = (window._pdfRtl ? `(${toArabicNum(pageNum)} / ${toArabicNum(pdfTotalPages)})` : `(${pageNum} / ${pdfTotalPages})`);
                     pageInput.value = pageNum;
                     var _topIn = document.getElementById('pdf-top-page-input');
                     var _topTot = document.getElementById('pdf-top-total-pages');
                     if (_topIn) _topIn.value = pageNum;
-                    if (_topTot) _topTot.textContent = pdfRtl ? toArabicNum(pdfTotalPages) : pdfTotalPages;
+                    if (_topTot) _topTot.textContent = window._pdfRtl ? toArabicNum(pdfTotalPages) : pdfTotalPages;
                 });
             }
 
@@ -925,18 +925,18 @@
 
                 // Pencere yeniden boyutlanınca sayfayı yeniden sığdır
                 // RTL (Arapca sagdan-sola) ve Yatay mod butonlari
-                let pdfRtl = false, pdfLand = false;
+                window._pdfRtl = false; window._pdfLand = false;
                 var _rtl = document.getElementById('pdf-rtl-btn');
                 var _land = document.getElementById('pdf-land-btn');
                 if (_rtl) _rtl.addEventListener('click', function(){
-                    pdfRtl = !pdfRtl;
+                    window._pdfRtl = !window._pdfRtl;
                     var _c = document.getElementById('pdf-canvas-container');
-                    _c.style.flexDirection = pdfRtl ? 'row-reverse' : 'row';
-                    this.style.background = pdfRtl ? '#2c3e50' : '#8e44ad';
+                    _c.style.flexDirection = window._pdfRtl ? 'row-reverse' : 'row';
+                    this.style.background = window._pdfRtl ? '#2c3e50' : '#8e44ad';
                 });
                 if (_land) _land.addEventListener('click', function(){
-                    pdfLand = !pdfLand;
-                    if (pdfLand) {
+                    window._pdfLand = !window._pdfLand;
+                    if (window._pdfLand) {
                         var _cc = document.getElementById('pdf-canvas-container');
                         pdfScale = Math.max(_cc.clientWidth / 300, 1.6);
                         renderPdfPage(pdfCurrentPage);
@@ -947,7 +947,7 @@
                 });
                 window.addEventListener('resize', function() {
                     if (!pdfDoc || modal.style.display !== 'flex') return;
-                    if (pdfLand) return;
+                    if (window._pdfLand) return;
                     const c = document.getElementById('pdf-canvas-container');
                     const cw2 = c.clientWidth, ch2 = c.clientHeight;
                     pdfDoc.getPage(pdfCurrentPage).then(function(pg) {
