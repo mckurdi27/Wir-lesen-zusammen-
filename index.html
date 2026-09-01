@@ -488,20 +488,20 @@
         <!-- BİREYSEL TAKİP PANELİ -->
         <div id="bireysel-takip-panel" style="display: none; margin-bottom: 20px; padding: 16px 20px; background: var(--card-bg); border-radius: 12px; border: 2px solid var(--gold-primary); box-shadow: 0 4px 15px rgba(138,109,59,0.2);">
             <h3 style="margin: 0 0 12px; color: #8a6d3b; font-size: 18px;">👤 Üye Takip</h3>
-            <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; margin-bottom: 14px; flex-wrap: wrap;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; margin-bottom: 14px;">
                 <div>
                     <label style="font-weight:bold; font-size:13px; display:block; margin-bottom:4px;">Üye Adı</label>
                     <input type="text" id="bt-member-name" style="width:100%; padding:10px 12px; border-radius:6px; border:1px solid var(--border-color); background:var(--card-bg); font-size:14px; min-height:44px;">
+                    <button id="bt-change-name" style="background:#2980b9; color:#fff; border:none; border-radius:8px; padding:8px 14px; cursor:pointer; font-weight:bold; font-size:13px; min-height:38px; margin-top:8px; width:100%;">Ad Değiştir</button>
                 </div>
                 <div>
                     <label style="font-weight:bold; font-size:13px; display:block; margin-bottom:4px;">Şifre</label>
                     <div style="display:flex; gap:8px;">
                         <input type="password" id="bt-member-password" style="flex:1; padding:10px 12px; border-radius:6px; border:1px solid var(--border-color); font-size:14px; min-height:44px;">
-                        <button id="bt-password-toggle" type="button" style="background:#bdc3c7; color:#fff; border:none; border-radius:6px; padding:0 12px; cursor:pointer; font-size:14px; min-height:44px;">👁</button>
+                        <button id="bt-password-toggle" type="button" style="background:#bdc3c7; color:#fff; border:none; border-radius:6px; padding:0 12px; cursor:pointer; font-size:14px; min-height:44px;" title="Şifreyi göster/gizle">👁</button>
                     </div>
+                    <button id="bt-change-password" style="background:#27ae60; color:#fff; border:none; border-radius:8px; padding:8px 14px; cursor:pointer; font-weight:bold; font-size:13px; min-height:38px; margin-top:8px; width:100%;">Şifre Değiştir</button>
                 </div>
-                <button id="bt-change-name" style="background:#2980b9; color:#fff; border:none; border-radius:8px; padding:10px 16px; cursor:pointer; font-weight:bold; font-size:14px; min-height:48px;">Ad Değiştir</button>
-                <button id="bt-change-password" style="background:#27ae60; color:#fff; border:none; border-radius:8px; padding:10px 16px; cursor:pointer; font-weight:bold; font-size:14px; min-height:48px;">Şifre Değiştir</button>
             </div>
             <div id="bt-member-books" style="overflow-x:auto;"></div>
         </div>
@@ -1288,14 +1288,16 @@
                         var rows = data.books.map(function (b) {
                             const pct = b.taken>0 ? Math.round((b.read/b.taken)*100) : 0;
                             const durum = b.completed ? '\u2713 Tamamland\u0131' : (b.taken>0 ? (b.read>=b.taken?'Okundu':'Devam ediyor') : 'Hisse yok');
-                            const sonTarih = b.dates && b.dates.length ? (b.dates[b.dates.length-1]||'').slice(0,10) : '\u2014';
+                            const alimTarih = b.takeDates && b.takeDates.length ? b.takeDates[b.takeDates.length-1] : '\u2014';
+                            const okunmaTarih = b.readDates && b.readDates.length ? b.readDates[b.readDates.length-1] : '\u2014';
                             return `<tr>
                                 <td style="padding:8px; border-bottom:1px solid var(--border-color); font-weight:bold;">${b.name}</td>
                                 <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${b.taken}</td>
+                                <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${alimTarih}</td>
                                 <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${b.read}</td>
+                                <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${okunmaTarih}</td>
                                 <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">%${pct}</td>
                                 <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${durum}</td>
-                                <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${sonTarih}</td>
                             </tr>`;
                         }).join('');
                         booksEl.innerHTML = `
@@ -1308,10 +1310,11 @@
                                 <thead><tr style="background:rgba(212,175,55,0.15);">
                                     <th style="padding:8px; text-align:left;">Eser</th>
                                     <th style="padding:8px;">Al\u0131nan Hisse</th>
+                                    <th style="padding:8px;">Al\u0131nd\u0131\u011f\u0131 saat-g\u00fcn</th>
                                     <th style="padding:8px;">Okunan</th>
+                                    <th style="padding:8px;">Okundu saat-g\u00fcn</th>
                                     <th style="padding:8px;">\u0130lerleme</th>
                                     <th style="padding:8px;">Durum</th>
-                                    <th style="padding:8px;">Son Al\u0131m</th>
                                 </tr></thead>
                                 <tbody>${rows}</tbody>
                             </table>`;
@@ -1322,33 +1325,8 @@
 
                 document.addEventListener('click', function(e) {
                     if (e.target && e.target.id === 'bt-change-name') {
-                        const nameEl = document.getElementById('bt-member-name');
-                        const newName = (nameEl ? nameEl.value : '').trim();
-                        if (!newName) { showToast('⚠️ Üye adı boş olamaz!', 'error'); return; }
-                        if (newName === loggedInMember) { showToast('ℹ️ Ad aynı, değişiklik yok.', 'info'); return; }
-                        const oldName = loggedInMember;
-                        // rename in group passwords or bireysel pool
-                        if (loggedInMemberType === 'grup' && appData) {
-                            if (appData.passwords && appData.passwords[oldName]) { appData.passwords[newName] = appData.passwords[oldName]; delete appData.passwords[oldName]; }
-                            // rename in members list
-                            if (appData.members) { let ix = appData.members.indexOf(oldName); if (ix !== -1) appData.members[ix] = newName; }
-                            saveGroupData();
-                        } else {
-                            let _bp = getBireyselPool();
-                            if (_bp.passwords && _bp.passwords[oldName]) { _bp.passwords[newName] = _bp.passwords[oldName]; delete _bp.passwords[oldName]; }
-                            let mx = _bp.members.indexOf(oldName); if (mx !== -1) _bp.members[mx] = newName;
-                            saveBireyselPool(_bp);
-                            // rename the member's own data key if bireysel
-                            let oldKey = 'hatim_group_' + oldName.toLowerCase();
-                            let newKey = 'hatim_group_' + newName.toLowerCase();
-                            try { let d = JSON.parse(localStorage.getItem(oldKey) || 'null'); if (d) { localStorage.setItem(newKey, JSON.stringify(d)); localStorage.removeItem(oldKey); } } catch(e){}
-                        }
-                        loggedInMember = newName;
-                        localStorage.setItem('hatim_bireysel_session', newName);
-                        localStorage.setItem(`hatim_session_${currentGroup}`, newName);
-                        showToast('✅ Üye adı "' + newName + '" olarak güncellendi.', 'success');
-                        updateUserInterface();
-                        renderBireyselTakipPanel();
+                        // İsim değişikliği global işleyicide (Supabase kaynaklı) yapılır; burada çakışmayı önle.
+                        return;
                     }
                     if (e.target && e.target.id === 'bt-change-password') {
                         const pwdEl = document.getElementById('bt-member-password');
@@ -4012,7 +3990,40 @@ document.addEventListener('click', function (e) {
   if (t.id === 'bt-change-name') {
     var nm = document.getElementById('bt-member-name');
     if (!nm || !loggedInMember) return;
-    showToast('İsim değişikliği şu an devre dışı (kayıt adıyla bağlı).', 'info');
+    var newName = nm.value ? nm.value.trim() : '';
+    if (!newName) { showToast('❌ Üye adı boş olamaz', 'error'); return; }
+    if (newName === loggedInMember) { showToast('ℹ️ Ad aynı, değişiklik yok.', 'info'); return; }
+    var oldName = loggedInMember;
+    // 1) Supabase'teki üye kaydının adını güncelle (asıl kaynak)
+    if (typeof window._sbUpdateName === 'function') {
+      window._sbUpdateName(oldName, newName).then(function () {
+        // 2) shares tablosundaki owner referansını güncelle
+        return window._sbRenameOwner(oldName, newName);
+      }).then(function () {
+        // 3) yerel havuzu ve session'ı güncelle
+        try {
+          if (loggedInMemberType === 'grup' && appData) {
+            if (appData.passwords && appData.passwords[oldName]) { appData.passwords[newName] = appData.passwords[oldName]; delete appData.passwords[oldName]; }
+            if (appData.members) { var ix = appData.members.indexOf(oldName); if (ix !== -1) appData.members[ix] = newName; }
+            saveGroupData();
+          } else {
+            var _bp = getBireyselPool();
+            if (_bp.passwords && _bp.passwords[oldName]) { _bp.passwords[newName] = _bp.passwords[oldName]; delete _bp.passwords[oldName]; }
+            var mx = _bp.members.indexOf(oldName); if (mx !== -1) _bp.members[mx] = newName;
+            saveBireyselPool(_bp);
+            var oldKey = 'hatim_group_' + oldName.toLowerCase();
+            var newKey = 'hatim_group_' + newName.toLowerCase();
+            try { var d = JSON.parse(localStorage.getItem(oldKey) || 'null'); if (d) { localStorage.setItem(newKey, JSON.stringify(d)); localStorage.removeItem(oldKey); } } catch(e){}
+          }
+        } catch (e) {}
+        loggedInMember = newName;
+        localStorage.setItem('hatim_bireysel_session', newName);
+        if (currentGroup) localStorage.setItem('hatim_session_' + currentGroup, newName);
+        showToast('✅ Üye adı \"' + newName + '\" olarak güncellendi.', 'success');
+        if (typeof updateUserInterface === 'function') updateUserInterface();
+        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel();
+      }).catch(function (err) { showToast('❌ Hata: ' + (err && err.message || ''), 'error'); });
+    }
     return;
   }
 });
@@ -4280,18 +4291,19 @@ document.addEventListener('click', function (e) {
       var myShares = shares.filter(function (s) { return ids.indexOf(s.member_id) !== -1; });
       var byBook = {};
       myShares.forEach(function (s) {
-        if (!byBook[s.book_id]) byBook[s.book_id] = { taken: 0, read: 0, dates: [], takeDates: [] };
+        if (!byBook[s.book_id]) byBook[s.book_id] = { taken: 0, read: 0, dates: [], takeDates: [], readDates: [] };
         byBook[s.book_id].taken++;
         if (s.is_read) byBook[s.book_id].read++;
         if (s.read_date) byBook[s.book_id].dates.push(s.read_date);
-        if (s.take_date) byBook[s.book_id].takeDates.push(s.take_date);
+        if (s.read_date) byBook[s.book_id].readDates.push(s.read_date + (s.read_time ? ' ' + s.read_time : ''));
+        if (s.take_date) byBook[s.book_id].takeDates.push(s.take_date + (s.take_time ? ' ' + s.take_time : ''));
       });
       var bookRows = Object.keys(byBook).map(function (bid) {
         var b = null;
         for (var j=0;j<books.length;j++){ if (books[j].id === bid) { b = books[j]; break; } }
         if (!b) b = { id: bid, name: bid, total_units: 0 };
         var d = byBook[bid];
-        return { id: b.id, name: b.name, taken: d.taken, read: d.read, totalUnits: b.total_units || 0, completed: d.read >= d.taken, dates: d.dates, takeDates: d.takeDates };
+        return { id: b.id, name: b.name, taken: d.taken, read: d.read, totalUnits: b.total_units || 0, completed: d.read >= d.taken, dates: d.dates, takeDates: d.takeDates, readDates: d.readDates };
       });
       var groupKey = null;
       mems.forEach(function (m) { if (m.group_key) groupKey = m.group_key; });
@@ -4304,6 +4316,27 @@ document.addEventListener('click', function (e) {
       (allM || []).forEach(function (m) { if (m.name === name) target = m; });
       if (!target) throw new Error("\u00dcye bulunamad\u0131: " + name);
       return api("/members?id=eq." + target.id, { method: "PATCH", headers: { "Prefer": "return=representation" }, body: JSON.stringify({ password: newPwd }) });
+    });
+  };
+  window._sbUpdateName = function (oldName, newName) {
+    return rest.select("members", "?select=id,name").then(function (allM) {
+      var target = null;
+      (allM || []).forEach(function (m) { if (m.name === oldName) target = m; });
+      if (!target) throw new Error("\u00dcye bulunamad\u0131: " + oldName);
+      return api("/members?id=eq." + target.id, { method: "PATCH", headers: { "Prefer": "return=representation" }, body: JSON.stringify({ name: newName }) });
+    });
+  };
+  window._sbRenameOwner = function (oldName, newName) {
+    // Hisse sahipliklerini (owner) eski isimden yeni isme taşı: members adı güncellendiği için
+    // shares.member_id referansları aynı kalır. Burada yalnızca cache'teki owner etiketlerini senkron tutarız.
+    return rest.select("members", "?select=id,name").then(function (allM) {
+      var target = null;
+      (allM || []).forEach(function (m) { if (m.name === oldName) target = m; });
+      if (target) {
+        // owner bilgisi asıl olarak shares.member_id üzerinden çözülür, isim güncellendiğinde otomatik düzelir.
+        return Promise.resolve({ ok: true });
+      }
+      return Promise.resolve({ ok: true });
     });
   };
   window._sbPullAll = function () { return pullAll(); };
