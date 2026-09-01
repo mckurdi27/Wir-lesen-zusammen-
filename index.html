@@ -46,6 +46,12 @@
             min-width: var(--touch-target);
             padding: 10px 16px;
             touch-action: manipulation;
+            /* PDF sayfa cevirme gecis animasyonu */
+            @keyframes pdfPageTurn {
+                from { transform: translateX(24px) scale(0.985); opacity: 0.35; }
+                to   { transform: none; opacity: 1; }
+            }
+            #pdf-canvas.sb-page-turn { animation: pdfPageTurn 0.28s ease-out; }
             border-radius: 8px;
             font-size: 14px;
         }
@@ -802,27 +808,29 @@
             function playPageTurnSound() {
                 try {
                     if (!_pageAudioCtx) { _pageAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-                    var c = _pageAudioCtx, now = c.currentTime, dur = 0.5;
+                    var c = _pageAudioCtx, now = c.currentTime, dur = 0.55;
                     var buf = c.createBuffer(2, c.sampleRate * dur, c.sampleRate);
                     for (var ch = 0; ch < 2; ch++) {
                         var d = buf.getChannelData(ch);
                         for (var i = 0; i < d.length; i++) {
                             var t = i / c.sampleRate;
-                            // iki darbe: ilk buyuk kagida dokunma, ikinci hafif hisirti
-                            var env = Math.pow(1 - t / dur, 1.4);
-                            var env2 = Math.exp(-Math.pow((t - 0.28) / 0.06, 2)) * 0.5;
-                            d[i] = (Math.random() * 2 - 1) * env * 0.7 + (Math.random() * 2 - 1) * env2;
+                            // yumusak hisirti: sin giris/cikis, cok dusuk genlik
+                            var env = Math.sin(Math.PI * Math.min(t / dur, 1));
+                            d[i] = (Math.random() * 2 - 1) * env * 0.22;
                         }
                     }
                     var src = c.createBufferSource(); src.buffer = buf;
-                    var filt = c.createBiquadFilter(); filt.type = 'bandpass'; filt.frequency.value = 1600; filt.Q.value = 0.7;
-                    var g = c.createGain(); g.gain.setValueAtTime(0.6, now);
+                    var filt = c.createBiquadFilter(); filt.type = 'lowpass'; filt.frequency.value = 900; filt.Q.value = 0.5;
+                    var g = c.createGain(); g.gain.setValueAtTime(0.0001, now);
+                    g.gain.exponentialRampToValueAtTime(0.3, now + 0.08);
                     g.gain.exponentialRampToValueAtTime(0.001, now + dur);
                     src.connect(filt); filt.connect(g); g.connect(c.destination); src.start(now);
                 } catch(e){}
             }
             function renderPdfPage(pageNum) {
                 if (!pdfDoc) return;
+                var _rt = document.getElementById('pdf-canvas');
+                if (_rt) { _rt.classList.remove('sb-page-turn'); void _rt.offsetWidth; _rt.classList.add('sb-page-turn'); }
                 
                 const canvas = document.getElementById('pdf-canvas');
                 const ctx = canvas.getContext('2d');
