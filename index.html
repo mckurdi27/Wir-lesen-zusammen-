@@ -1626,7 +1626,7 @@
                 var _rg = document.getElementById('login-group-name'); if (_rg) _rg.value = localStorage.getItem('hatim_remember_group') || '';
                 var _rgp = document.getElementById('login-group-password'); if (_rgp) _rgp.value = localStorage.getItem('hatim_remember_group_pass') || '';
                 var _rt = localStorage.getItem('hatim_remember_type');
-                if (_rt === 'grup') { if (typeof window._guncelleTip === 'function') window._guncelleTip(); }
+                if (_rt === 'grup') { typeSel.value = 'grup'; if (typeof window._guncelleTip === 'function') window._guncelleTip(); }
                 else if (_rt === 'bireysel') { typeSel.value = 'bireysel'; if (typeof window._guncelleTip === 'function') window._guncelleTip(); }
               }
               function guncelleTip() {
