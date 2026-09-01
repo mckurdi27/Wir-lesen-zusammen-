@@ -3402,7 +3402,11 @@ window.infoSortTable = function infoSortTable(col) {
                 if (isAdmin) {
                     const analysisBtn = document.getElementById("admin-open-detailed-analysis");
                     if (analysisBtn) {
-                        analysisBtn.addEventListener("click", () => { openDetailedAnalysisModal(); });
+                        analysisBtn.addEventListener("click", () => {
+                            // Once taze veri cek (Supabase -> localStorage), sonra analizi ac
+                            var _p = (typeof pullAll === 'function') ? pullAll() : Promise.resolve();
+                            _p.then(function(){ try { openDetailedAnalysisModal(); } catch(e){ openDetailedAnalysisModal(); } }).catch(function(){ try { openDetailedAnalysisModal(); } catch(e){} });
+                        });
                     }
                     
                     
