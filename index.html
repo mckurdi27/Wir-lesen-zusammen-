@@ -3002,11 +3002,11 @@ window.infoSortTable = function infoSortTable(col) {
 
                 let bulkSectionHtml = `
                     <div class="admin-section bulk-section">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                            <h4 style="color: #8e44ad; margin:0;">&#128229; Toplu Atama / Silme</h4>
-                            <div style="font-size:12px; color:#8e44ad; font-weight:bold;">📌 Seçili Grup: ${currentGroup.replace(/_/g,' ').toUpperCase()}${loggedInMember ? " — " + loggedInMember : ""}</div>
+                        <div style="display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:8px; margin-bottom:8px;">
+                            <h4 style="color: #8e44ad; margin:0; justify-self:start;">&#128229; Toplu Atama / Silme</h4>
+                            <div style="font-size:12px; color:#8e44ad; font-weight:bold; justify-self:center; text-align:center;">📌 Seçili Grup: ${currentGroup.replace(/_/g,' ').toUpperCase()}${loggedInMember ? " — " + loggedInMember : ""}</div>
+                            <div></div>
                         </div>
-
                         <div style="border-top: 1px solid var(--border-color); padding-top: 12px;">
                             <div style="font-weight: bold; font-size: 13px; margin-bottom: 8px;">📚 Toplu Atama ve Silme:</div>
                             <div style="display: flex; flex-direction: column; gap: 10px; background: var(--card-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
