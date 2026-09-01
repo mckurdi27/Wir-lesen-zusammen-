@@ -472,21 +472,13 @@
                     <div class="login-field">
                         <input type="password" id="login-group-password" placeholder="Grup şifresi" class="login-input">
                     </div>
-                    <div class="login-field login-field-btn login-join-span">
-                        <button id="login-join-btn" class="login-join-btn">&#10133; Katıl</button>
+                    <div class="login-field login-field-btn login-join-span" style="display:flex; gap:8px;">
+                        <button id="login-join-btn" class="login-join-btn" style="flex:2;">&#10133; Katıl</button>
+                        <button id="login-admin-lock" class="login-admin-btn" title="Yönetici Modu" style="flex:1; display:flex; align-items:center; justify-content:center;">&#128272;</button>
                     </div>
                 </div>
             </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:8px;">
-                    <div class="login-field">
-                        <input type="text" id="login-region" list="region-list" placeholder="Bölge" class="login-input">
-                        <datalist id="region-list"></datalist>
-                    </div>
-                    <div class="login-field">
-                        <input type="text" id="login-city" list="city-list" placeholder="Şehir" class="login-input">
-                        <datalist id="city-list"></datalist>
-                    </div>
-                </div>
+
             </div>
 
             <div id="bulk-share-area" class="bulk-share-area" style="display: none;">
@@ -1542,9 +1534,9 @@
                     const userType = document.getElementById('login-user-type').value;
                     const groupName = document.getElementById('login-group-name').value.trim();
                     const groupPassword = document.getElementById('login-group-password').value.trim();
-                    const loginRegion = (document.getElementById('login-region') || {}).value ? document.getElementById('login-region').value.trim() : '';
-                    const loginCity = (document.getElementById('login-city') || {}).value ? document.getElementById('login-city').value.trim() : '';
-                    
+                    const loginRegion = '';
+                    const loginCity = '';
+                                                            
                     if (!userName) {
                         showToast('❌ Lütfen isminizi girin!', 'error');
                         return;
@@ -3855,6 +3847,8 @@ var _cg = selVal || '';
 
                 var _loginAdmin = document.getElementById("login-admin-btn");
                 if (_loginAdmin) _loginAdmin.addEventListener("click", () => triggerAdminToggle());
+                var _loginLock = document.getElementById("login-admin-lock");
+                if (_loginLock && !_loginLock._sbLock) { _loginLock._sbLock = true; _loginLock.addEventListener("click", function(){ if (typeof window.triggerAdminToggle==='function') window.triggerAdminToggle(); }); }
                 document.getElementById("send-admin-msg-btn").addEventListener("click", () => {
                     let text = document.getElementById("admin-msg-input").value.trim();
                     if (!text) { showToast('Mesaj yazın!', 'error'); return; }
