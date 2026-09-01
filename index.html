@@ -443,13 +443,13 @@
                         <input type="number" id="pdf-top-page-input" min="1" value="1" style="width:46px;padding:3px;border:1px solid #ccc;border-radius:4px;font-size:12px;min-height:28px;">
                         <span style="font-size:12px;color:#777;">/ <span id="pdf-top-total-pages">1</span></span>
                         <button id="pdf-top-next-btn" style="background:#e0e0e0;color:#333;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;min-height:30px;">Sayfa &#9654;</button>
-                        <button id="pdf-rtl-btn" title="Arapca sayfa: sagdan sola" style="background:#8e44ad;color:#fff;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;min-height:30px;">RTL</button>
+                        <button id="pdf-rtl-btn" title="Arapca sayfa: sagdan sola" style="background:#8e44ad;color:#fff;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;min-height:30px;">العربية</button>
                         <button id="pdf-land-btn" title="Yatay mod: buyuk yazi icin dik kaydir" style="background:#16a085;color:#fff;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;min-height:30px;">Yatay</button>
                     </div>
                 </div>
                 <!-- Canvas - Tam Ekran -->
                 <div id="pdf-canvas-container" style="flex: 1; width: 100%; background: #ffffff; display: flex; justify-content: center; align-items: center; overflow: auto; padding: 0; position: relative; touch-action: pan-y;">
-                    <canvas id="pdf-canvas" style="max-width: 100%; max-height: 100%; box-shadow: 0 2px 10px rgba(0,0,0,0.3); background: #fff;"></canvas>
+                    <canvas id="pdf-canvas" style="max-width: none; max-height: none; box-shadow: 0 2px 10px rgba(0,0,0,0.3); background: #fff; display:block;"></canvas>
                 </div>
                 <!-- Alt Kontroller -->
                 <div class="pdf-toolbar" style="background: linear-gradient(135deg, #fdfbf7, #f4ebd0); border-top: 2px solid #d4af37; padding: 6px 8px; display: flex; justify-content: center;"><div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
@@ -798,6 +798,10 @@
                 });
             }
 
+            function toArabicNum(n) {
+                var m = { '0':'٠','1':'١','2':'٢','3':'٣','4':'٤','5':'٥','6':'٦','7':'٧','8':'٨','9':'٩' };
+                return String(n).replace(/[0-9]/g, function(d){ return m[d]; });
+            }
             function renderPdfPage(pageNum) {
                 if (!pdfDoc) return;
                 
@@ -817,12 +821,12 @@
                     };
                     
                     page.render(renderContext);
-                    pageInfo.textContent = `(${pageNum} / ${pdfTotalPages})`;
+                    pageInfo.textContent = (pdfRtl ? `(${toArabicNum(pageNum)} / ${toArabicNum(pdfTotalPages)})` : `(${pageNum} / ${pdfTotalPages})`);
                     pageInput.value = pageNum;
                     var _topIn = document.getElementById('pdf-top-page-input');
                     var _topTot = document.getElementById('pdf-top-total-pages');
                     if (_topIn) _topIn.value = pageNum;
-                    if (_topTot) _topTot.textContent = pdfTotalPages;
+                    if (_topTot) _topTot.textContent = pdfRtl ? toArabicNum(pdfTotalPages) : pdfTotalPages;
                 });
             }
 
@@ -943,6 +947,7 @@
                 });
                 window.addEventListener('resize', function() {
                     if (!pdfDoc || modal.style.display !== 'flex') return;
+                    if (pdfLand) return;
                     const c = document.getElementById('pdf-canvas-container');
                     const cw2 = c.clientWidth, ch2 = c.clientHeight;
                     pdfDoc.getPage(pdfCurrentPage).then(function(pg) {
