@@ -107,7 +107,7 @@
             #admin-bottom-section, .admin-section, .admin-panel-grid { max-width: 100% !important; overflow-x: auto; box-sizing: border-box; }
             #admin-bottom-section { padding: 10px !important; }
             .admin-section { padding: 10px !important; margin-bottom: 10px !important; }
-            .admin-section table { width: 100%; table-layout: fixed; }
+            .admin-section table { table-layout: auto; }
             /* eser karti aksiyon butonlari: mobilde ortala + yari genislik */
             .book-body .pdf-page-btn, .book-body .take-range-btn, .book-body .read-range-btn,
             .book-body .unread-range-btn, .book-body .release-range-btn {
@@ -3023,7 +3023,7 @@
                 }
 
                 let infoTableHtml = _infoRows.length
-                    ? `<table id="info-table" style="width:100%; border-collapse:collapse; font-size:13px;">
+                    ? `<table id="info-table" style="width:max-content; min-width:100%; border-collapse:collapse; font-size:13px; white-space:nowrap;">
                         <thead style="position:sticky; top:0; z-index:2; background:#fff;">
                             <tr style="background:rgba(142,68,173,0.1);">
                                 <th style="padding:8px; text-align:center; border:1px solid var(--border-color); width:44px;">Sıra</th>
