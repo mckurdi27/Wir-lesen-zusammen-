@@ -3134,7 +3134,7 @@ window.infoSortTable = function infoSortTable(col) {
 
                     let bulkBookChecks = bottomContainer.querySelector("#admin-bulk-book-checks");
                     if (bulkBookChecks) {
-                        let _books = (appData.books || []);
+                        let _books = (appData && appData.books) || [];
                         let _checksHtml = `<label style="display:flex; align-items:center; gap:6px; font-size:12px; font-weight:bold;"><input type="checkbox" id="bulk-check-all" checked> Tümünü Seç</label>`;
                         _books.forEach(b => {
                             _checksHtml += `<label style="display:flex; align-items:center; gap:6px; font-size:12px;"><input type="checkbox" class="bulk-book-cb" value="${b.id}" checked> ${b.name} (${b.totalUnits})</label>`;
