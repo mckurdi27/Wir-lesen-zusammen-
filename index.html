@@ -104,6 +104,11 @@
             #simple-login-panel { padding: 12px; }
             #main-title-ornate-section img { height: 110px !important; }
             .admin-panel-grid { grid-template-columns: 1fr !important; }
+            #admin-bottom-section, .admin-section, .admin-panel-grid { max-width: 100% !important; overflow-x: auto; box-sizing: border-box; }
+            #admin-bottom-section { padding: 10px !important; }
+            .admin-section { padding: 10px !important; margin-bottom: 10px !important; }
+            .admin-section table { width: 100%; table-layout: fixed; }
+            .admin-section th, .admin-section td { word-wrap: break-word; white-space: normal; }
         }
         @media (max-width: 480px) {
             body { padding: 5px; font-size: 14px; }
