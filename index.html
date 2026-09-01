@@ -1147,6 +1147,17 @@
 
             function createBabModes(totalBabs) {
                 return {
+                    yirmi_bab: { 
+                        name: "20", 
+                        getItems: () => { 
+                            let items = [], count = Math.ceil(totalBabs / 20); 
+                            for (let i = 0; i < count; i++) { 
+                                let start = i * 20, end = Math.min((i + 1) * 20, totalBabs); 
+                                items.push({ id: i + 1, name: `${start + 1}-${end}`, start, end }); 
+                            } 
+                            return items; 
+                        }
+                    },
                     on_bab: { 
                         name: "10", 
                         getItems: () => { 
@@ -3518,7 +3529,8 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         let bType = type?.toLowerCase() === "bab" ? "bab" : "page";
                         let pdf = prompt("PDF yolu (boş bırakabilirsiniz):", "") || "";
                         let id = "book_" + Date.now();
-                        appData.books.push({ id, name: bName.trim(), totalUnits: units, type: bType, defaultMode: bType === "bab" ? "on_bab" : "yirmi_sayfa", currentMode: bType === "bab" ? "on_bab" : "yirmi_sayfa", pdf });
+                        appData.books.push({ id, name: bName.trim(), totalUnits: units, type: bType, defaultMode: bType === "bab" ? "yirmi_bab" : "yirmi_sayfa", currentMode: bType === "bab" ? "yirmi_bab" : "yirmi_sayfa", pdf });
+                        rebuildBookModesDefs();
                         appData.bookPages[id] = Array(units).fill(null).map(() => ({ owner: "", isRead: false }));
                         appData.bookHatims[id] = { hatimNo: 1, startDate: new Date().toLocaleDateString("tr-TR"), prayerDone: false };
                         appData.bookHistory[id] = [];
