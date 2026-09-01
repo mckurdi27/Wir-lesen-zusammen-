@@ -623,6 +623,8 @@
 
             let currentGroup = "";
             let isAdmin = false;
+            window._sbIsAdmin = function(){ return isAdmin; };
+            window._sbSetAdmin = function(v){ isAdmin = !!v; };
             let appData = null;
             let loggedInMember = "";
             let loggedInMemberType = "";
@@ -4373,8 +4375,8 @@ document.addEventListener('click', function (e) {
     setTimeout(function () { _initDone = true; }, 1800); // restore penceresi bittikten sonra push aktif
     // Yönetici modunu hatırla: 'Beni hatırla' işaretliyse şifre sormadan aç
     try {
-      if (localStorage.getItem('hatim_admin_remember') === '1' && !isAdmin) {
-        isAdmin = true;
+      if (localStorage.getItem('hatim_admin_remember') === '1' && typeof window._sbIsAdmin==='function' && !window._sbIsAdmin()) {
+        window._sbSetAdmin(true);
         setTimeout(function () {
           renderAdminSectionAtBottom();
           showToast('🔓 Yönetici modu açıldı.', 'info');
