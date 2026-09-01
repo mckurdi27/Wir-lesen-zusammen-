@@ -44,6 +44,22 @@
   <div class="kart başlık">
     <p>İsim + Şifre + Tip (Tek/Grup) üst satır; Grup İsmi + Grup Şifre + Katıl alt satır. Bu panel asla gizlenmez.</p>
   </div>
+  <div class="kart" style="border-left:4px solid #2980b9;">
+    <h3 style="margin-top:0;color:#2980b9;">📌 Not / Hata / İstek Defteri</h3>
+    <p class="not">Görsel ekleyip hata, istek veya güncelleme fikirlerini buraya yazın. İçerik otomatik kaydedilir (aynı tarayıcıda kalıcıdır).</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+      <label style="font-size:13px;background:#eaf2fb;border:1px solid #bcd4ee;padding:6px 10px;border-radius:6px;cursor:pointer;">🖼 Görsel Ekle / Değiştir
+        <input type="file" id="kb-gorsel" accept="image/*" style="display:none;">
+      </label>
+      <button id="kb-kaydet" style="background:#27ae60;color:#fff;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-weight:bold;">💾 Yedek İndir</button>
+      <button id="kb-yukle-btn" style="background:#2980b9;color:#fff;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-weight:bold;">⬆ Yedekten Yükle</button>
+      <input type="file" id="kb-yukle" accept=".json" style="display:none;">
+      <span id="kb-durum" style="font-size:12px;color:#27ae60;align-self:center;"></span>
+    </div>
+    <div id="kb-gorsel-oniz" style="margin-bottom:8px;"></div>
+    <textarea id="kb-not" rows="4" placeholder="Hata, istek veya güncelleme fikirlerinizi buraya yazın..." style="width:100%;box-sizing:border-box;padding:8px;border:1px solid #bcd4ee;border-radius:6px;font-size:13px;"></textarea>
+  </div>
+
   <table>
     <tr><th>Buton / Alan</th><th>Ne yapar</th><th>Not</th><th>✅ Çalışıyor</th><th>❌ Çalışmıyor</th><th>📝 Açıklama</th></tr>
     <tr data-key="k1"><td class="buton">Katıl (&#10133; Katıl)</td><td>Seçilen tipe göre giriş yapar: <b>Tek</b> → bireysel üye, <b>Grup</b> → gruba üye olarak giriş. Yeni üyeyse kayıt eder.</td><td><span class="rozet çalışıyor">Çalışıyor</span> İsim/şifre/grup bilgilerini doğrular.</td><td class="chk ok" title="Tıkla: çalışıyor işaretle"></td><td class="chk bozuk" title="Tıkla: çalışmıyor işaretle"></td><td class="acik"><input type="text" class="acik-in" placeholder="Açıklama..."></td></tr>
@@ -215,6 +231,67 @@
     }
     if(ok) ok.addEventListener('click', tık(ok,'✓'));
     if(bx) bx.addEventListener('click', tık(bx,'✗'));
+  });
+
+  // --- Not defteri: gorunum + not + yedek ---
+  var durum=document.getElementById('kb-durum');
+  function durumMesaj(m){ if(durum){ durum.textContent=m; setTimeout(function(){ durum.textContent=''; },2500); } }
+  function notKaydet(){
+    var gorsel=localStorage.getItem('kc_not_gorsel')||'';
+    var metin=(document.getElementById('kb-not')||{}).value||'';
+    localStorage.setItem('kc_not_gorsel', gorsel);
+    localStorage.setItem('kc_not_metin', metin);
+  }
+  function gorselGoster(){
+    var oniz=document.getElementById('kb-gorsel-oniz'); if(!oniz) return;
+    var gorsel=localStorage.getItem('kc_not_gorsel')||'';
+    oniz.innerHTML = gorsel ? '<img src="'+gorsel+'" style="max-width:280px;max-height:220px;border:1px solid #bcd4ee;border-radius:6px;">' : '';
+  }
+  // metni geri yukle
+  var kbNot=document.getElementById('kb-not');
+  if(kbNot){ kbNot.value = localStorage.getItem('kc_not_metin')||''; kbNot.addEventListener('input', notKaydet); }
+  gorselGoster();
+  // gorsel sec
+  var gFile=document.getElementById('kb-gorsel');
+  if(gFile) gFile.addEventListener('change', function(){
+    if(!gFile.files || !gFile.files[0]) return;
+    var r=new FileReader();
+    r.onload=function(){ localStorage.setItem('kc_not_gorsel', r.result); gorselGoster(); notKaydet(); durumMesaj('Görsel kaydedildi.'); };
+    r.readAsDataURL(gFile.files[0]);
+  });
+  // yedek indir
+  var kbKaydet=document.getElementById('kb-kaydet');
+  if(kbKaydet) kbKaydet.addEventListener('click', function(){
+    notKaydet();
+    var veri={ gorsel: localStorage.getItem('kc_not_gorsel')||'', metin: localStorage.getItem('kc_not_metin')||'', satirlar:{} };
+    document.querySelectorAll('tr[data-key]').forEach(function(row){
+      var k=row.getAttribute('data-key');
+      veri.satirlar[k]={ durum: localStorage.getItem('kc_'+k)||'', not: localStorage.getItem('kc_acik_'+k)||'' };
+    });
+    var blob=new Blob([JSON.stringify(veri,null,2)],{type:'application/json'});
+    var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='kontrol_yedek.json'; a.click();
+    durumMesaj('Yedek indirildi.');
+  });
+  // yedekten yukle
+  var yBtn=document.getElementById('kb-yukle-btn'), yFile=document.getElementById('kb-yukle');
+  if(yBtn) yBtn.addEventListener('click', function(){ if(yFile) yFile.click(); });
+  if(yFile) yFile.addEventListener('change', function(){
+    if(!yFile.files||!yFile.files[0]) return;
+    var r=new FileReader();
+    r.onload=function(){
+      try{
+        var v=JSON.parse(r.result);
+        localStorage.setItem('kc_not_gorsel', v.gorsel||''); localStorage.setItem('kc_not_metin', v.metin||'');
+        if(kbNot) kbNot.value=v.metin||'';
+        gorselGoster();
+        document.querySelectorAll('tr[data-key]').forEach(function(row){
+          var k=row.getAttribute('data-key'), s=v.satirlar&&v.satirlar[k];
+          if(s){ localStorage.setItem('kc_'+k, s.durum||''); localStorage.setItem('kc_acik_'+k, s.not||''); }
+        });
+        location.reload();
+      }catch(e){ alert('Yedek okunamadı.'); }
+    };
+    r.readAsText(yFile.files[0]);
   });
 })();
 </script>
