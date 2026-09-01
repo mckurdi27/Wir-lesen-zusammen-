@@ -2545,7 +2545,7 @@
                 let firstIsRead = subset[0].isRead;
                 let allSame = subset.every(p => p.owner === firstOwner && p.isRead === firstIsRead && p.owner !== "");
                 if (allFree) return { owner: "", isRead: false, statusType: "free" };
-                else if (allSame) return { owner: firstOwner, isRead: firstIsRead, statusType: firstIsRead ? "read" : "taken" };
+                else if (allSame) return { owner: firstOwner, isRead: firstIsRead, statusType: firstIsRead ? "read" : "taken", takeDate: subset[0].takeDate || null, takeTime: subset[0].takeTime || null, readDate: subset[0].readDate || null, readTime: subset[0].readTime || null };
                 else {
                     let owners = [...new Set(subset.map(p => p.owner).filter(Boolean))];
                     return { owner: owners.join(", "), isRead: false, statusType: "mixed" };
@@ -2589,10 +2589,10 @@
 
                         if (st.statusType === "taken") {
                             statusClass = "status-taken";
-                            statusText = `🔴 ${st.owner} (Alındı)`;
+                            statusText = st.takeTime ? `🔴 ${st.owner} · Alındı ${st.takeDate} ${st.takeTime}` : `🔴 ${st.owner} (Alındı)`;
                         } else if (st.statusType === "read") {
                             statusClass = "status-read";
-                            statusText = `🟢 ${st.owner} (✓ Okundu)`;
+                            statusText = st.readTime ? `🟢 ${st.owner} · Okundu ${st.readDate} ${st.readTime}` : `🟢 ${st.owner} (✓ Okundu)`;
                         } else if (st.statusType === "mixed") {
                             statusClass = "status-mixed";
                             statusText = `🔵 Karma: ${st.owner}`;
@@ -2716,7 +2716,9 @@
                         let start = parseInt(btn.getAttribute("data-start"), 10);
                         let end = parseInt(btn.getAttribute("data-end"), 10);
                         let baseArray = appData.bookPages[bId];
-                        for (let i = start; i < end; i++) { baseArray[i].owner = loggedInMember; baseArray[i].isRead = false; }
+                        let takeNow = new Date().toLocaleDateString("tr-TR");
+                        let takeClock = new Date().toLocaleTimeString("tr-TR", {hour: '2-digit', minute:'2-digit'});
+                        for (let i = start; i < end; i++) { baseArray[i].owner = loggedInMember; baseArray[i].isRead = false; baseArray[i].takeDate = takeNow; baseArray[i].takeTime = takeClock; }
                         if (!appData.readingLogs) appData.readingLogs = [];
                         let defModes = bookModesDefs[bId];
                         let modeObj = Object.values(defModes).find(m => m.getItems().some(item => item.start === start && item.end === end));
@@ -2782,6 +2784,8 @@
                             baseArray[i].isRead = false;
                             baseArray[i].readDate = undefined;
                             baseArray[i].readTime = undefined;
+                            baseArray[i].takeDate = undefined;
+                            baseArray[i].takeTime = undefined;
                         }
                         saveGroupData();
                         renderBooks();
@@ -4162,7 +4166,7 @@ document.addEventListener('click', function (e) {
       Object.keys(bp).forEach(function (bid) {
         (bp[bid] || []).forEach(function (p, idx) {
           if (p && p.owner && nameId[p.owner]) {
-            rows.push({ member_id: nameId[p.owner], book_id: bid, unit_index: idx, is_read: !!p.isRead, read_date: p.readDate || null, read_time: p.readTime || null });
+            rows.push({ member_id: nameId[p.owner], book_id: bid, unit_index: idx, is_read: !!p.isRead, read_date: p.readDate || null, read_time: p.readTime || null, take_date: p.takeDate || null, take_time: p.takeTime || null });
           }
         });
       });
@@ -4228,7 +4232,7 @@ document.addEventListener('click', function (e) {
   function pullAll() {
     if (_pulling) return Promise.resolve();
     _pulling = true;
-    return Promise.all([rest.select("groups"), rest.select("members"), rest.select("shares"), rest.select("books", "?select=id,name,total_units,type,default_mode,sort_order")])
+    return Promise.all([rest.select("groups"), rest.select("members"), rest.select("shares", "?select=member_id,book_id,unit_index,is_read,read_date,read_time,take_date,take_time"), rest.select("books", "?select=id,name,total_units,type,default_mode,sort_order")])
       .then(function (res) {
         var groups = res[0] || [], members = res[1] || [], shares = res[2] || [], books = res[3] || [];
         var bookDef = (books && books.length) ? books.map(function (x) { return { id: x.id, total_units: x.total_units }; }) : [];
@@ -4242,7 +4246,7 @@ document.addEventListener('click', function (e) {
           gm.forEach(function (m) { g.memberTypes[m.name] = m.type || "grup"; g.passwords[m.name] = m.password || ""; });
           bookDef.forEach(function (b) { g.bookPages[b.id] = Array(b.total_units).fill(null).map(function () { return { owner: "", isRead: false }; }); });
           var mIdName = {}; gm.forEach(function (m) { mIdName[m.id] = m.name; });
-          shares.forEach(function (s) { var owner = mIdName[s.member_id]; if (!owner) return; if (!g.bookPages[s.book_id]) g.bookPages[s.book_id] = []; g.bookPages[s.book_id][s.unit_index] = { owner: owner, isRead: !!s.is_read, readDate: s.read_date || null, readTime: s.read_time || null }; });
+          shares.forEach(function (s) { var owner = mIdName[s.member_id]; if (!owner) return; if (!g.bookPages[s.book_id]) g.bookPages[s.book_id] = []; g.bookPages[s.book_id][s.unit_index] = { owner: owner, isRead: !!s.is_read, readDate: s.read_date || null, readTime: s.read_time || null, takeDate: s.take_date || null, takeTime: s.take_time || null }; });
           try { origSetItem("hatim_group_" + gk, JSON.stringify(g)); } catch (e) {}
         });
         var pool = { members: Array.from(poolNames), memberTypes: poolTypes, passwords: poolPass };
@@ -4264,7 +4268,7 @@ document.addEventListener('click', function (e) {
   window._sbMemberDetail = function (name, groupKey) {
     return Promise.all([
       rest.select("members", "?select=id,name,password,group_key"),
-      rest.select("shares", "?select=member_id,book_id,unit_index,is_read,read_date,read_time"),
+      rest.select("shares", "?select=member_id,book_id,unit_index,is_read,read_date,read_time,take_date,take_time"),
       rest.select("books", "?select=id,name,total_units")
     ]).then(function (res) {
       var members = res[0] || [], shares = res[1] || [], books = res[2] || [];
@@ -4276,17 +4280,18 @@ document.addEventListener('click', function (e) {
       var myShares = shares.filter(function (s) { return ids.indexOf(s.member_id) !== -1; });
       var byBook = {};
       myShares.forEach(function (s) {
-        if (!byBook[s.book_id]) byBook[s.book_id] = { taken: 0, read: 0, dates: [] };
+        if (!byBook[s.book_id]) byBook[s.book_id] = { taken: 0, read: 0, dates: [], takeDates: [] };
         byBook[s.book_id].taken++;
         if (s.is_read) byBook[s.book_id].read++;
         if (s.read_date) byBook[s.book_id].dates.push(s.read_date);
+        if (s.take_date) byBook[s.book_id].takeDates.push(s.take_date);
       });
       var bookRows = Object.keys(byBook).map(function (bid) {
         var b = null;
         for (var j=0;j<books.length;j++){ if (books[j].id === bid) { b = books[j]; break; } }
         if (!b) b = { id: bid, name: bid, total_units: 0 };
         var d = byBook[bid];
-        return { id: b.id, name: b.name, taken: d.taken, read: d.read, totalUnits: b.total_units || 0, completed: d.read >= d.taken, dates: d.dates };
+        return { id: b.id, name: b.name, taken: d.taken, read: d.read, totalUnits: b.total_units || 0, completed: d.read >= d.taken, dates: d.dates, takeDates: d.takeDates };
       });
       var groupKey = null;
       mems.forEach(function (m) { if (m.group_key) groupKey = m.group_key; });
@@ -4333,7 +4338,7 @@ document.addEventListener('click', function (e) {
         isAdmin = true;
         setTimeout(function () {
           renderAdminSectionAtBottom();
-          showToast('������ Yönetici modu açıldı.', 'info');
+          showToast('🔓 Yönetici modu açıldı.', 'info');
         }, 400);
       }
       var _ar = document.getElementById('admin-remember');
