@@ -117,6 +117,11 @@
                 white-space: nowrap !important; }
             .book-header > div:last-child { width: 100% !important; justify-content: center !important; }
             .book-body .book-item { padding: 8px 10px !important; }
+            /* PDF okuyucu alt kontroller: mobilde tek satir */
+            #pdf-reader-modal .pdf-toolbar { flex-wrap: nowrap !important; overflow-x: auto; }
+            #pdf-reader-modal button { min-height: 0 !important; padding: 3px 8px !important; font-size: 11px !important; }
+            #pdf-reader-modal input { font-size: 11px !important; width: 38px !important; padding: 2px !important; }
+            #pdf-reader-modal [id$="-btn"] { white-space: nowrap; }
             /* mobil yazi boyutu 11px'i gecmesin */
             .container, #bireysel-takip-panel, .book-card, .book-header, .book-body,
             .login-panel, .admin-section, #admin-bottom-section, .bulk-share-area {
@@ -432,7 +437,14 @@
                         <span id="pdf-modal-title">📄 PDF Okuyucu</span>
                         <span id="pdf-modal-page-info" style="font-size: 12px; opacity: 0.7; margin-left: 8px;"></span>
                     </div>
-                    <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+
+                </div>
+                <!-- Canvas - Tam Ekran -->
+                <div id="pdf-canvas-container" style="flex: 1; width: 100%; background: #ffffff; display: flex; justify-content: center; align-items: center; overflow: hidden; padding: 0; position: relative; touch-action: pan-y;">
+                    <canvas id="pdf-canvas" style="max-width: 100%; max-height: 100%; box-shadow: 0 2px 10px rgba(0,0,0,0.3); background: #fff;"></canvas>
+                </div>
+                <!-- Alt Kontroller -->
+                <div class="pdf-toolbar" style="background: linear-gradient(135deg, #fdfbf7, #f4ebd0); border-top: 2px solid #d4af37; padding: 6px 8px; display: flex; justify-content: center;"><div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
                         <button id="pdf-prev-btn" style="background: #e0e0e0; color: #333; border: 1px solid #ccc; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px;">◀</button>
                         <span style="font-size: 12px; color: #777;">Sayfa</span>
                         <input type="number" id="pdf-page-input" min="1" value="1" style="width: 45px; padding: 3px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; text-align: center; background: #fff; color: #333;">
@@ -443,10 +455,6 @@
                         <button id="pdf-fit-btn" style="background: #d4af37; color: #3e2723; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px;">⬚ Sığdır</button>
                         <button id="pdf-close-btn" style="background: #e74c3c; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px;">✕</button>
                     </div>
-                </div>
-                <!-- Canvas - Tam Ekran -->
-                <div id="pdf-canvas-container" style="flex: 1; width: 100%; background: #ffffff; display: flex; justify-content: center; align-items: center; overflow: hidden; padding: 0; position: relative; touch-action: pan-y;">
-                    <canvas id="pdf-canvas" style="max-width: 100%; max-height: 100%; box-shadow: 0 2px 10px rgba(0,0,0,0.3); background: #fff;"></canvas>
                 </div>
                 <!-- Yükleniyor -->
                 <div id="pdf-loading" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #333; font-size: 18px; background: rgba(255,255,255,0.92); border: 1px solid #ddd; padding: 20px 30px; border-radius: 8px; z-index: 10;">
