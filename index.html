@@ -802,17 +802,23 @@
             function playPageTurnSound() {
                 try {
                     if (!_pageAudioCtx) { _pageAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-                    var c = _pageAudioCtx, now = c.currentTime;
-                    var buf = c.createBuffer(1, c.sampleRate * 0.18, c.sampleRate);
-                    var d = buf.getChannelData(0);
-                    for (var i = 0; i < d.length; i++) {
-                        var t = i / c.sampleRate;
-                        d[i] = (Math.random() * 2 - 1) * Math.pow(1 - t / 0.18, 2);
+                    var c = _pageAudioCtx, now = c.currentTime, dur = 0.5;
+                    var buf = c.createBuffer(2, c.sampleRate * dur, c.sampleRate);
+                    for (var ch = 0; ch < 2; ch++) {
+                        var d = buf.getChannelData(ch);
+                        for (var i = 0; i < d.length; i++) {
+                            var t = i / c.sampleRate;
+                            // iki darbe: ilk buyuk kagida dokunma, ikinci hafif hisirti
+                            var env = Math.pow(1 - t / dur, 1.4);
+                            var env2 = Math.exp(-Math.pow((t - 0.28) / 0.06, 2)) * 0.5;
+                            d[i] = (Math.random() * 2 - 1) * env * 0.7 + (Math.random() * 2 - 1) * env2;
+                        }
                     }
                     var src = c.createBufferSource(); src.buffer = buf;
-                    var g = c.createGain(); g.gain.setValueAtTime(0.5, now);
-                    g.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
-                    src.connect(g); g.connect(c.destination); src.start(now);
+                    var filt = c.createBiquadFilter(); filt.type = 'bandpass'; filt.frequency.value = 1600; filt.Q.value = 0.7;
+                    var g = c.createGain(); g.gain.setValueAtTime(0.6, now);
+                    g.gain.exponentialRampToValueAtTime(0.001, now + dur);
+                    src.connect(filt); filt.connect(g); g.connect(c.destination); src.start(now);
                 } catch(e){}
             }
             function renderPdfPage(pageNum) {
@@ -893,15 +899,22 @@
                         var _rc2 = swipeContainer.getBoundingClientRect();
                         var _dx = e.touches[0].clientX - _rc2.left;
                         var _frac = Math.max(0, Math.min(1, Math.abs(_dx - (window._pdfCornerSide === 'left' ? 0 : _rc2.width)) / (_rc2.width * 0.6)));
-                        // page fold preview transform on canvas
+                        // sayfa cevirme onizleme: yatay kayma + hafif donme (parlama degil)
                         var _cv = document.getElementById('pdf-canvas');
-                        if (_cv) _cv.style.transform = 'perspective(1200px) rotateY(' + (_frac * (window._pdfCornerSide === 'left' ? 1 : -1) * 40) + 'deg)';
+                        if (_cv) {
+                            var _dir = (window._pdfCornerSide === 'left') ? 1 : -1;
+                            var _tx = _frac * _dir * 90;
+                            var _ry = _frac * _dir * 22;
+                            _cv.style.transform = 'translateX(' + _tx + 'px) rotateY(' + _ry + 'deg)';
+                            _cv.style.transition = 'none';
+                            _cv.style.transformOrigin = (window._pdfCornerSide === 'left') ? 'left center' : 'right center';
+                        }
                     }
                 }, { passive: true });
                 swipeContainer.addEventListener('touchend', function(e) {
                     var _side = window._pdfCornerSide; window._pdfCornerSide = null;
                     var _cv2 = document.getElementById('pdf-canvas');
-                    if (_cv2) _cv2.style.transform = '';
+                    if (_cv2) { _cv2.style.transition = 'transform 0.25s ease'; _cv2.style.transform = ''; }
                     if (_side && e.changedTouches[0]) {
                         var _rc3 = swipeContainer.getBoundingClientRect();
                         var _dx2 = e.changedTouches[0].clientX - _rc3.left;
