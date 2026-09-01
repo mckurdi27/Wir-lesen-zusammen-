@@ -2961,6 +2961,7 @@
                         });
                         saveGroupData();
                         renderBooks();
+                        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel();
                         showToast(`✅ ${rangeName} hissesi alındı!`, 'success');
                     });
                 });
@@ -2980,6 +2981,7 @@
                         }
                         saveGroupData();
                         renderBooks();
+                        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel();
                         showToast(`✅ Bölüm okundu olarak işaretlendi!`, 'success');
                     });
                 });
@@ -2997,6 +2999,7 @@
                         }
                         saveGroupData();
                         renderBooks();
+                        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel();
                         showToast(`↩️ Bölüm okunmadı olarak işaretlendi.`, 'info');
                     });
                 });
@@ -3017,6 +3020,7 @@
                         }
                         saveGroupData();
                         renderBooks();
+                        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel();
                         showToast(`❌ Hisseden vazgeçildi.`, 'error');
                     });
                 });
