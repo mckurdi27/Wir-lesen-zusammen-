@@ -1584,10 +1584,7 @@
                         }
                         showToast('✅ Şifreniz güncellendi.', 'success');
                     }
-                    if (e.target && e.target.id === 'bt-password-toggle') {
-                        const pwdEl = document.getElementById('bt-member-password');
-                        if (pwdEl) pwdEl.type = pwdEl.type === 'password' ? 'text' : 'password';
-                    }
+
                 });
 
 
@@ -1625,6 +1622,9 @@
               var _rum = localStorage.getItem('hatim_remember_user');
               if (_rum) {
                 var _rn = document.getElementById('login-user-name'); if (_rn) _rn.value = _rum;
+                var _rp = document.getElementById('login-user-password'); if (_rp) _rp.value = localStorage.getItem('hatim_remember_pass') || '';
+                var _rg = document.getElementById('login-group-name'); if (_rg) _rg.value = localStorage.getItem('hatim_remember_group') || '';
+                var _rgp = document.getElementById('login-group-password'); if (_rgp) _rgp.value = localStorage.getItem('hatim_remember_group_pass') || '';
                 var _rt = localStorage.getItem('hatim_remember_type');
                 if (_rt === 'grup') { if (typeof window._guncelleTip === 'function') window._guncelleTip(); }
                 else if (_rt === 'bireysel') { typeSel.value = 'bireysel'; if (typeof window._guncelleTip === 'function') window._guncelleTip(); }
@@ -1751,7 +1751,7 @@
                         currentGroup = userName.toLowerCase();
                         localStorage.setItem('hatim_member_type_' + userName, "bireysel");
                         localStorage.setItem(`hatim_session_${currentGroup}`, userName);
-                        if (document.getElementById('login-remember') && document.getElementById('login-remember').checked) { localStorage.setItem('hatim_remember_user', userName); localStorage.setItem('hatim_remember_type', 'bireysel'); }
+                        if (document.getElementById('login-remember') && document.getElementById('login-remember').checked) { localStorage.setItem('hatim_remember_user', userName); localStorage.setItem('hatim_remember_pass', userPassword || ''); localStorage.setItem('hatim_remember_group', ''); localStorage.setItem('hatim_remember_group_pass', ''); localStorage.setItem('hatim_remember_type', 'bireysel'); }
                         localStorage.setItem(`hatim_session_type_${currentGroup}`, "bireysel");
                         localStorage.setItem('hatim_bireysel_session', userName);
                         localStorage.setItem('hatim_bireysel_session_type', "bireysel");
@@ -1812,7 +1812,7 @@
                             loggedInMemberType = "grup";
                             localStorage.setItem('hatim_member_type_' + userName, "grup");
                             localStorage.setItem(`hatim_session_${groupKey}`, userName);
-                            if (document.getElementById('login-remember') && document.getElementById('login-remember').checked) { localStorage.setItem('hatim_remember_user', userName); localStorage.setItem('hatim_remember_type', 'grup'); }
+                            if (document.getElementById('login-remember') && document.getElementById('login-remember').checked) { localStorage.setItem('hatim_remember_user', userName); localStorage.setItem('hatim_remember_pass', userPassword || ''); localStorage.setItem('hatim_remember_group', groupName || ''); localStorage.setItem('hatim_remember_group_pass', groupPassword || ''); localStorage.setItem('hatim_remember_type', 'grup'); }
                             localStorage.setItem(`hatim_session_type_${groupKey}`, "grup");
                             showToast(`✅ ${userName}, "${groupKey.replace(/_/g, ' ').toUpperCase()}" grubuna katıldı!`, 'success');
                             updateUserInterface();
@@ -1850,7 +1850,7 @@
                         loggedInMemberType = "grup";
                         localStorage.setItem('hatim_member_type_' + userName, "grup");
                         localStorage.setItem(`hatim_session_${groupKey}`, userName);
-                            if (document.getElementById('login-remember') && document.getElementById('login-remember').checked) { localStorage.setItem('hatim_remember_user', userName); localStorage.setItem('hatim_remember_type', 'grup'); }
+                            if (document.getElementById('login-remember') && document.getElementById('login-remember').checked) { localStorage.setItem('hatim_remember_user', userName); localStorage.setItem('hatim_remember_pass', userPassword || ''); localStorage.setItem('hatim_remember_group', groupName || ''); localStorage.setItem('hatim_remember_group_pass', groupPassword || ''); localStorage.setItem('hatim_remember_type', 'grup'); }
                         localStorage.setItem(`hatim_session_type_${groupKey}`, "grup");
                         showToast(`✅ "${groupKey.replace(/_/g, ' ').toUpperCase()}" grubu oluşturuldu!`, 'success');
                         updateUserInterface();
