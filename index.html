@@ -798,6 +798,23 @@
                 var m = { '0':'٠','1':'١','2':'٢','3':'٣','4':'٤','5':'٥','6':'٦','7':'٧','8':'٨','9':'٩' };
                 return String(n).replace(/[0-9]/g, function(d){ return m[d]; });
             }
+            var _pageAudioCtx = null;
+            function playPageTurnSound() {
+                try {
+                    if (!_pageAudioCtx) { _pageAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+                    var c = _pageAudioCtx, now = c.currentTime;
+                    var buf = c.createBuffer(1, c.sampleRate * 0.18, c.sampleRate);
+                    var d = buf.getChannelData(0);
+                    for (var i = 0; i < d.length; i++) {
+                        var t = i / c.sampleRate;
+                        d[i] = (Math.random() * 2 - 1) * Math.pow(1 - t / 0.18, 2);
+                    }
+                    var src = c.createBufferSource(); src.buffer = buf;
+                    var g = c.createGain(); g.gain.setValueAtTime(0.5, now);
+                    g.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+                    src.connect(g); g.connect(c.destination); src.start(now);
+                } catch(e){}
+            }
             function renderPdfPage(pageNum) {
                 if (!pdfDoc) return;
                 
@@ -849,6 +866,7 @@
                 prevBtn.addEventListener('click', function() {
                     if (pdfDoc && (window._pdfRtl ? pdfCurrentPage < pdfTotalPages : pdfCurrentPage > 1)) {
                         pdfCurrentPage = window._pdfRtl ? pdfCurrentPage + 1 : pdfCurrentPage - 1;
+                        playPageTurnSound();
                         renderPdfPage(pdfCurrentPage);
                     }
                 });
@@ -856,6 +874,7 @@
                 nextBtn.addEventListener('click', function() {
                     if (pdfDoc && (window._pdfRtl ? pdfCurrentPage > 1 : pdfCurrentPage < pdfTotalPages)) {
                         pdfCurrentPage = window._pdfRtl ? pdfCurrentPage - 1 : pdfCurrentPage + 1;
+                        playPageTurnSound();
                         renderPdfPage(pdfCurrentPage);
                     }
                 });
@@ -863,6 +882,41 @@
                 // Dokunarak sağa/sola kaydırma ile sayfa geçişi
                 let touchStartX = null, touchStartY = null;
                 const swipeContainer = document.getElementById('pdf-canvas-container');
+                // Koseden tutup sayfa cevirme: kenardan baslarsa ve surukleme yeterliyse cevir
+                swipeContainer.addEventListener('touchstart', function(e) {
+                    var _rc = swipeContainer.getBoundingClientRect();
+                    var _x = e.touches[0].clientX - _rc.left;
+                    window._pdfCornerSide = (_x < 70) ? 'left' : ((_x > _rc.width - 70) ? 'right' : null);
+                });
+                swipeContainer.addEventListener('touchmove', function(e) {
+                    if (window._pdfCornerSide) {
+                        var _rc2 = swipeContainer.getBoundingClientRect();
+                        var _dx = e.touches[0].clientX - _rc2.left;
+                        var _frac = Math.max(0, Math.min(1, Math.abs(_dx - (window._pdfCornerSide === 'left' ? 0 : _rc2.width)) / (_rc2.width * 0.6)));
+                        // page fold preview transform on canvas
+                        var _cv = document.getElementById('pdf-canvas');
+                        if (_cv) _cv.style.transform = 'perspective(1200px) rotateY(' + (_frac * (window._pdfCornerSide === 'left' ? 1 : -1) * 40) + 'deg)';
+                    }
+                }, { passive: true });
+                swipeContainer.addEventListener('touchend', function(e) {
+                    var _side = window._pdfCornerSide; window._pdfCornerSide = null;
+                    var _cv2 = document.getElementById('pdf-canvas');
+                    if (_cv2) _cv2.style.transform = '';
+                    if (_side && e.changedTouches[0]) {
+                        var _rc3 = swipeContainer.getBoundingClientRect();
+                        var _dx2 = e.changedTouches[0].clientX - _rc3.left;
+                        var _dist = (_side === 'left') ? (_dx2 - 0) : (_rc3.width - _dx2);
+                        if (_dist > _rc3.width * 0.4 && pdfDoc) {
+                            if (window._pdfRtl) {
+                                if (_side === 'right' && pdfCurrentPage < pdfTotalPages) { pdfCurrentPage++; playPageTurnSound(); renderPdfPage(pdfCurrentPage); }
+                                else if (_side === 'left' && pdfCurrentPage > 1) { pdfCurrentPage--; playPageTurnSound(); renderPdfPage(pdfCurrentPage); }
+                            } else {
+                                if (_side === 'left' && pdfCurrentPage < pdfTotalPages) { pdfCurrentPage++; playPageTurnSound(); renderPdfPage(pdfCurrentPage); }
+                                else if (_side === 'right' && pdfCurrentPage > 1) { pdfCurrentPage--; playPageTurnSound(); renderPdfPage(pdfCurrentPage); }
+                            }
+                        }
+                    }
+                });
                 swipeContainer.addEventListener('touchstart', function(e) {
                     if (e.touches.length === 1) {
                         touchStartX = e.touches[0].clientX;
@@ -883,11 +937,11 @@
                     touchStartX = null; touchStartY = null;
                     if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return;
                     if (window._pdfRtl) {
-                        if (dx > 0 && pdfDoc && pdfCurrentPage < pdfTotalPages) { pdfCurrentPage++; renderPdfPage(pdfCurrentPage); }
-                        else if (dx < 0 && pdfDoc && pdfCurrentPage > 1) { pdfCurrentPage--; renderPdfPage(pdfCurrentPage); }
+                        if (dx > 0 && pdfDoc && pdfCurrentPage < pdfTotalPages) { pdfCurrentPage++; playPageTurnSound(); renderPdfPage(pdfCurrentPage); }
+                        else if (dx < 0 && pdfDoc && pdfCurrentPage > 1) { pdfCurrentPage--; playPageTurnSound(); renderPdfPage(pdfCurrentPage); }
                     } else {
-                        if (dx < 0 && pdfDoc && pdfCurrentPage < pdfTotalPages) { pdfCurrentPage++; renderPdfPage(pdfCurrentPage); }
-                        else if (dx > 0 && pdfDoc && pdfCurrentPage > 1) { pdfCurrentPage--; renderPdfPage(pdfCurrentPage); }
+                        if (dx < 0 && pdfDoc && pdfCurrentPage < pdfTotalPages) { pdfCurrentPage++; playPageTurnSound(); renderPdfPage(pdfCurrentPage); }
+                        else if (dx > 0 && pdfDoc && pdfCurrentPage > 1) { pdfCurrentPage--; playPageTurnSound(); renderPdfPage(pdfCurrentPage); }
                     }
                 }, { passive: true });
 
