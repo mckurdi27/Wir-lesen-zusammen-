@@ -2073,11 +2073,19 @@
                     }
                     let html = `<option value="all">👥 Tüm Üyeler</option>`;
                     members.forEach(m => {
-                        html += `<option value="${m.name}" ${m.name === selected ? 'selected' : ''}>${m.type === 'bireysel' ? '👤' : m.type === 'pasif' ? '⭐' : '👥'} ${m.name}${m.type === 'pasif' ? ' <span style="background:#bdc3c7;color:#fff;padding:1px 6px;border-radius:4px;font-size:10px;">PASİF</span>' : ''}${m.groups && m.groups.length ? ' (' + m.groups.map(g => g.replace(/_/g,' ').toUpperCase()).join(', ') + ')' : ''}</option>`;
+                        let _g2 = (m.groups && m.groups[0]) || '';
+                        let _val2 = (m.type === 'bireysel' || !_g2) ? m.name : m.name + '@' + _g2;
+                        html += `<option value="${_val2}" ${_val2 === selected ? 'selected' : ''}>${m.type === 'bireysel' ? '👤' : m.type === 'pasif' ? '⭐' : '👥'} ${m.name}${m.type === 'pasif' ? ' <span style="background:#bdc3c7;color:#fff;padding:1px 6px;border-radius:4px;font-size:10px;">PASİF</span>' : ''}${m.groups && m.groups.length ? ' (' + m.groups.map(g => g.replace(/_/g,' ').toUpperCase()).join(', ') + ')' : ''}</option>`;
                     });
                     return html;
                 }
 
+                function _resolveSelMember(memberName, groupName) {
+                    if (memberName && memberName.indexOf('@') > -1) {
+                        return { name: memberName.split('@')[0], grp: memberName.split('@')[1] };
+                    }
+                    return { name: memberName, grp: (groupName === 'all') ? null : groupName };
+                }
                 function getMemberDetailData(memberName, groupName = null, bookFilter = 'all') {
                     let result = {
                         name: memberName,
@@ -2313,7 +2321,9 @@
                     if (memberName === 'all') {
                         let allMemberStats = [];
                         allMembers.forEach(m => {
-                            let data = getMemberDetailData(m.name, groupName === 'all' ? null : groupName, analysisBooks.length ? analysisBooks : 'all');
+                            // Ayni isim farkli gruplarda ayri sayilsin: uyenin kendi grubunu gecir
+                            let _mg = (m.type === 'bireysel') ? null : (m.groups && m.groups[0]) || groupName;
+                            let data = getMemberDetailData(m.name, _mg, analysisBooks.length ? analysisBooks : 'all');
                             allMemberStats.push({
                                 name: m.name,
                                 type: m.type || 'grup',
@@ -2375,7 +2385,8 @@
                         return;
                     }
                     
-                    let data = getMemberDetailData(memberName, groupName === 'all' ? null : groupName, analysisBooks.length ? analysisBooks : 'all');
+                    let _sel = _resolveSelMember(memberName, groupName);
+                    let data = getMemberDetailData(_sel.name, _sel.grp, analysisBooks.length ? analysisBooks : 'all');
                     
                     if (data.books.length === 0) {
                         container.innerHTML = `<div style="text-align: center; color: #777; padding: 20px;">${memberName} adlı üyenin hiç hissesi bulunmuyor.</div>`;
@@ -2509,7 +2520,8 @@
 
                 function renderTab4(groupName = 'all', memberName = 'all') {
                     const container = document.getElementById('dtabs-4-content');
-                    let data = getMemberDetailData(memberName, groupName === 'all' ? null : groupName, analysisBooks.length ? analysisBooks : 'all');
+                    let _sel = _resolveSelMember(memberName, groupName);
+                    let data = getMemberDetailData(_sel.name, _sel.grp, analysisBooks.length ? analysisBooks : 'all');
                     
                     if (data.books.length === 0) {
                         container.innerHTML = `<div style="text-align: center; color: #777; padding: 20px;">${memberName === 'all' ? 'Bu grupta' : memberName} adlı üyenin hiç hissesi bulunmuyor.</div>`;
@@ -2562,7 +2574,8 @@
 
                 function renderTab5(groupName = 'all', memberName = 'all') {
                     const container = document.getElementById('dtabs-5-content');
-                    let data = getMemberDetailData(memberName, groupName === 'all' ? null : groupName, analysisBooks.length ? analysisBooks : 'all');
+                    let _sel = _resolveSelMember(memberName, groupName);
+                    let data = getMemberDetailData(_sel.name, _sel.grp, analysisBooks.length ? analysisBooks : 'all');
                     
                     if (data.readingLogs.length === 0) {
                         container.innerHTML = `<div style="text-align: center; color: #777; padding: 20px;">Henüz okuma kaydı bulunmuyor.</div>`;
