@@ -4480,6 +4480,7 @@ document.addEventListener('click', function (e) {
     del: function (table, q) { return api("/" + table + (q ? q : ""), { method: "DELETE" }); },
     upsert: function (table, rows) { return api("/" + table + "?on_conflict=key", { method: "POST", headers: { "Prefer": "resolution=merge-duplicates" }, body: JSON.stringify(rows) }); }
   };
+  window.rest = rest;
 
   function enqueue(fn) {
     _queue = _queue.then(fn).catch(function (e) { console.warn("kuyruk hata:", e); });
