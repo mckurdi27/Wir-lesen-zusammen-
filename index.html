@@ -4402,7 +4402,12 @@ document.addEventListener('click', function (e) {
   }, 50);
   setTimeout(function () { doInit(); }, 500); // güvence: interval kaçarsa
   // v8: gerçek zamanlı polling — iki tarayıcı da açıkken birbirini görsün
-  setInterval(function () { if (!_myPush) pullAll().then(refreshUI); }, 3000);
+  setInterval(function () {
+    if (!_myPush) pullAll().then(function () {
+      // Polling: veriyi guncelle ama admin panel HTML'ini yeniden cizme (acilir liste secimleri kaybolmasin)
+      try { if (typeof loadGroupData === 'function') loadGroupData(); if (typeof updateUserInterface === 'function') updateUserInterface(); if (typeof updateAutocompleteLists === 'function') updateAutocompleteLists(); } catch(e){}
+    });
+  }, 3000);
 
 })();
 
