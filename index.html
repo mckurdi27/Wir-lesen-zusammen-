@@ -3754,26 +3754,38 @@ var _cg = selVal || '';
                     document.querySelectorAll(".admin-edit-member").forEach(btn => {
                         btn.addEventListener("click", async (e) => {
                             let old = e.target.getAttribute("data-name");
+                            let curPw = (appData.passwords && appData.passwords[old]) || '';
                             let newName = prompt("Yeni ad:", old);
-                            if (newName?.trim() && newName.trim() !== old) {
-                                let clean = newName.trim();
+                            if (!newName || !newName.trim()) { showToast('\u274c Ad bo\u015f olamaz!', 'error'); return; }
+                            let clean = newName.trim();
+                            let newPw = prompt('\u015eifre' + (curPw ? ' (mevcut: '+curPw+')' : ''), curPw);
+                            if (newPw === null) return;
+                            let cleanPw = newPw.trim();
+                            let changed = false;
+                            if (clean !== old) {
                                 let idx = appData.members.indexOf(old);
                                 if (idx !== -1) {
                                     appData.members[idx] = clean;
                                     Object.keys(appData.bookPages).forEach(bId => {
-                                        appData.bookPages[bId].forEach(p => {
-                                            if (p.owner === old) p.owner = clean;
-                                        });
+                                        appData.bookPages[bId].forEach(pp => { if (pp.owner === old) pp.owner = clean; });
                                     });
                                     if (appData.readingLogs) {
-                                        appData.readingLogs.forEach(l => {
-                                            if (l.member === old) l.member = clean;
-                                        });
+                                        appData.readingLogs.forEach(ll => { if (ll.member === old) ll.member = clean; });
                                     }
-                                    saveGroupData();
-                                    await loadGroupData();
-                                    showToast(`✅ ${old} → ${clean}`, 'success');
+                                    if (!appData.passwords) appData.passwords = {};
+                                    if (appData.passwords[old] !== undefined) { appData.passwords[clean] = appData.passwords[old]; delete appData.passwords[old]; }
+                                    changed = true;
                                 }
+                            }
+                            if (cleanPw) {
+                                if (!appData.passwords) appData.passwords = {};
+                                appData.passwords[clean] = cleanPw;
+                                changed = true;
+                            }
+                            if (changed) {
+                                saveGroupData();
+                                await loadGroupData();
+                                showToast('\u2705 G\u00fcncellendi: ' + clean, 'success');
                             }
                         });
                     });
