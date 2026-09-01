@@ -2851,7 +2851,7 @@
                     </div>
                 `;
 
-                let booksEditHtml = appData.books.map(b => {
+                let booksEditHtml = (appData.books || []).map(b => {
                     let memberPages = {};
                     if (appData.bookPages && appData.bookPages[b.id]) {
                         appData.bookPages[b.id].forEach(p => {
@@ -3778,7 +3778,7 @@ var _cg = selVal || '';
                     });
                 }
 
-                document.getElementById("admin-toggle-btn-custom").addEventListener("click", () => triggerAdminToggle());
+
                 var _loginAdmin = document.getElementById("login-admin-btn");
                 if (_loginAdmin) _loginAdmin.addEventListener("click", () => triggerAdminToggle());
                 document.getElementById("send-admin-msg-btn").addEventListener("click", () => {
@@ -4374,6 +4374,9 @@ document.addEventListener('click', function (e) {
   function doInit() {
     // Sayfa açılışında: yalnızca Supabase'ten çek (push etme). Bayat local veri kaynağı ezmesin.
     pullAll().then(function () { refreshUI(); });
+    // Yönetici butonu bağlaması: renderAdminSectionAtBottom çökse de çalışsın
+    var _atb = document.getElementById("admin-toggle-btn-custom");
+    if (_atb && !_atb._sbBound) { _atb._sbBound = true; _atb.addEventListener("click", function(){ triggerAdminToggle(); }); }
     setTimeout(function () { _initDone = true; }, 1800); // restore penceresi bittikten sonra push aktif
     // Yönetici modunu hatırla: 'Beni hatırla' işaretliyse şifre sormadan aç
     try {
