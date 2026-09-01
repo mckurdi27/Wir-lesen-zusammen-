@@ -1297,11 +1297,14 @@
                     if (!loggedInMember) { panel.style.display='none'; return; }
                     panel.style.display = 'block';
                     // kart gir paneli hemen altina sabitle (admin/eserler araya girmesin)
-                    var _lp = document.getElementById('simple-login-panel');
-                    var _cardParent = panel.parentNode;
-                    if (_lp && _cardParent && panel !== _lp.nextSibling) {
-                        _cardParent.insertBefore(panel, _lp.nextSibling);
-                    }
+                    try {
+                        var _lp = document.getElementById('simple-login-panel');
+                        if (_lp) {
+                            var _loginParent = _lp.parentNode;
+                            if (_loginParent && _loginParent !== panel.parentNode) { _loginParent.appendChild(panel); }
+                            else if (_loginParent && panel !== _lp.nextSibling) { _loginParent.insertBefore(panel, _lp.nextSibling); }
+                        }
+                    } catch(e){}
                     const nameEl = document.getElementById('bt-member-name');
                     if (nameEl) nameEl.value = loggedInMember;
                     var _rEl = document.getElementById('bt-member-region');
