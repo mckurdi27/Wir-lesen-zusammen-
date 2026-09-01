@@ -48,8 +48,9 @@
             touch-action: manipulation;
             /* PDF sayfa cevirme gecis animasyonu */
             @keyframes pdfPageTurn {
-                from { transform: translateX(24px) scale(0.985); opacity: 0.35; }
-                to   { transform: none; opacity: 1; }
+                0%   { transform: perspective(1400px) translateX(30px) rotateY(-14deg); opacity: 0.3; transform-origin: left center; }
+                55%  { transform: perspective(1400px) translateX(6px) rotateY(-5deg); opacity: 0.85; transform-origin: left center; }
+                100% { transform: none; opacity: 1; transform-origin: center; }
             }
             #pdf-canvas.sb-page-turn { animation: pdfPageTurn 0.28s ease-out; }
             border-radius: 8px;
@@ -804,27 +805,16 @@
                 var m = { '0':'٠','1':'١','2':'٢','3':'٣','4':'٤','5':'٥','6':'٦','7':'٧','8':'٨','9':'٩' };
                 return String(n).replace(/[0-9]/g, function(d){ return m[d]; });
             }
-            var _pageAudioCtx = null;
+            var _pageFlipAudio = null;
             function playPageTurnSound() {
                 try {
-                    if (!_pageAudioCtx) { _pageAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-                    var c = _pageAudioCtx, now = c.currentTime, dur = 0.55;
-                    var buf = c.createBuffer(2, c.sampleRate * dur, c.sampleRate);
-                    for (var ch = 0; ch < 2; ch++) {
-                        var d = buf.getChannelData(ch);
-                        for (var i = 0; i < d.length; i++) {
-                            var t = i / c.sampleRate;
-                            // yumusak hisirti: sin giris/cikis, cok dusuk genlik
-                            var env = Math.sin(Math.PI * Math.min(t / dur, 1));
-                            d[i] = (Math.random() * 2 - 1) * env * 0.22;
-                        }
+                    if (!_pageFlipAudio) {
+                        _pageFlipAudio = new Audio('sound/page-flip.mp3');
+                        _pageFlipAudio.volume = 0.6;
                     }
-                    var src = c.createBufferSource(); src.buffer = buf;
-                    var filt = c.createBiquadFilter(); filt.type = 'lowpass'; filt.frequency.value = 900; filt.Q.value = 0.5;
-                    var g = c.createGain(); g.gain.setValueAtTime(0.0001, now);
-                    g.gain.exponentialRampToValueAtTime(0.3, now + 0.08);
-                    g.gain.exponentialRampToValueAtTime(0.001, now + dur);
-                    src.connect(filt); filt.connect(g); g.connect(c.destination); src.start(now);
+                    _pageFlipAudio.currentTime = 0;
+                    var pr = _pageFlipAudio.play();
+                    if (pr && pr.catch) pr.catch(function(){});
                 } catch(e){}
             }
             function renderPdfPage(pageNum) {
