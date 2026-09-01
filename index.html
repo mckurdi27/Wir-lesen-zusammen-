@@ -3081,8 +3081,17 @@
                             baseArray[i].takeDate = undefined;
                             baseArray[i].takeTime = undefined;
                         }
-                        saveGroupData();
-                        renderBooks();
+                        saveGroupData();                        // Supabase'ten de sil (upsert silmez, yoksa yenilenince geri gelir)
+                        try {
+                            if (typeof window.rest === 'function' && typeof window.api === 'function') {
+                                window.rest.select("members", "?select=id,name,group_key").then(function(allM){
+                                    var _mid = null;
+                                    (allM||[]).forEach(function(mm){ if (String(mm.group_key)===String(currentGroup) && mm.name===loggedInMember) _mid = mm.id; });
+                                    if (!_mid) return;
+                                    window.api('/shares?member_id=eq.'+_mid+'&book_id=eq.'+encodeURIComponent(bId)+'&unit_index=gte.'+start+'&unit_index=lt.'+end, { method: 'DELETE', headers: { 'Prefer': 'return=minimal' } }).catch(function(){});
+                                }).catch(function(){});
+                            }
+                        } catch(e){};
                         if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel();
                         showToast(`❌ Hisseden vazgeçildi.`, 'error');
                     });
