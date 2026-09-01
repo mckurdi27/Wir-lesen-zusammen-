@@ -945,19 +945,6 @@
                     }
                 });
                 
-                zoomInBtn.addEventListener('click', function() {
-                    if (pdfDoc) {
-                        pdfScale = Math.min(pdfScale + 0.2, 3);
-                        renderPdfPage(pdfCurrentPage);
-                    }
-                });
-                
-                zoomOutBtn.addEventListener('click', function() {
-                    if (pdfDoc) {
-                        pdfScale = Math.max(pdfScale - 0.2, 0.3);
-                        renderPdfPage(pdfCurrentPage);
-                    }
-                });
                 
                 fitBtn.addEventListener('click', function() {
                     if (pdfDoc) {
