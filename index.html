@@ -108,6 +108,13 @@
             #admin-bottom-section { padding: 10px !important; }
             .admin-section { padding: 10px !important; margin-bottom: 10px !important; }
             .admin-section table { width: 100%; table-layout: fixed; }
+            /* eser karti aksiyon butonlari: mobilde ortala + yari genislik */
+            .book-body .pdf-page-btn, .book-body .take-range-btn, .book-body .read-range-btn,
+            .book-body .unread-range-btn, .book-body .release-range-btn {
+                flex: 1 1 46% !important; max-width: 46% !important; text-align: center !important; }
+            .book-header .pdf-book-btn { flex: 1 1 46% !important; max-width: 46% !important; text-align: center !important; }
+            .book-header > div:last-child { width: 100% !important; justify-content: center !important; }
+            .book-body .book-item { padding: 8px 10px !important; }
             .admin-section th, .admin-section td { word-wrap: break-word; white-space: normal; }
         }
         @media (max-width: 480px) {
@@ -2645,7 +2652,7 @@
                         if (loggedInMember) {
                             if (st.statusType === "free") {
                                 actionButtons = `
-                                    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                                    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: center; width: 100%;">
                                         ${pdfBtn}
                                         <button class="take-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 10px 18px; background: #f39c12; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px; touch-action: manipulation;">Hisse Al</button>
                                     </div>
@@ -2653,7 +2660,7 @@
                             } else if (isOwner) {
                                 if (st.statusType === "taken") {
                                     actionButtons = `
-                                        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                                        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: center; width: 100%;">
                                             ${pdfBtn}
                                             <button class="read-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 10px 18px; background: #27ae60; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px; touch-action: manipulation;">✅ Okundu</button>
                                             <button class="release-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 10px 18px; background: #e74c3c; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px; touch-action: manipulation;">❌ Vazgeç</button>
@@ -2661,7 +2668,7 @@
                                     `;
                                 } else if (st.statusType === "read") {
                                     actionButtons = `
-                                        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                                        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: center; width: 100%;">
                                             ${pdfBtn}
                                             <button class="unread-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 10px 18px; background: #e67e22; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px; touch-action: manipulation;">↩️ Okunmadı</button>
                                             <button class="release-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 10px 18px; background: #e74c3c; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px; touch-action: manipulation;">❌ Vazgeç</button>
@@ -2669,10 +2676,10 @@
                                     `;
                                 }
                             } else {
-                                actionButtons = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">${pdfBtn}</div>`;
+                                actionButtons = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: center; width: 100%;">${pdfBtn}</div>`;
                             }
                         } else {
-                            actionButtons = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">${pdfBtn}</div>`;
+                            actionButtons = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: center; width: 100%;">${pdfBtn}</div>`;
                         }
 
                         return `
