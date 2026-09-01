@@ -513,6 +513,18 @@
                     <button id="bt-change-password" style="background:#27ae60; color:#fff; border:none; border-radius:8px; padding:8px 14px; cursor:pointer; font-weight:bold; font-size:13px; min-height:38px; margin-top:8px; width:100%;">Şifre Değiştir</button>
                 </div>
             </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; margin-bottom: 14px;">
+                <div>
+                    <label style="font-weight:bold; font-size:13px; display:block; margin-bottom:4px;">Bölge</label>
+                    <input type="text" id="bt-member-region" style="width:100%; padding:10px 12px; border-radius:6px; border:1px solid var(--border-color); background:var(--card-bg); font-size:14px; min-height:44px;">
+                    <button id="bt-change-region" style="background:#8e44ad; color:#fff; border:none; border-radius:8px; padding:8px 14px; cursor:pointer; font-weight:bold; font-size:13px; min-height:38px; margin-top:8px; width:100%;">Bölge Değiştir</button>
+                </div>
+                <div>
+                    <label style="font-weight:bold; font-size:13px; display:block; margin-bottom:4px;">Şehir</label>
+                    <input type="text" id="bt-member-city" style="width:100%; padding:10px 12px; border-radius:6px; border:1px solid var(--border-color); background:var(--card-bg); font-size:14px; min-height:44px;">
+                    <button id="bt-change-city" style="background:#16a085; color:#fff; border:none; border-radius:8px; padding:8px 14px; cursor:pointer; font-weight:bold; font-size:13px; min-height:38px; margin-top:8px; width:100%;">Şehir Değiştir</button>
+                </div>
+            </div>
             <div id="bt-member-books" style="overflow-x:auto;"></div>
         </div>
 
@@ -1281,6 +1293,9 @@
                     panel.style.display = 'block';
                     const nameEl = document.getElementById('bt-member-name');
                     if (nameEl) nameEl.value = loggedInMember;
+                    var _rEl = document.getElementById('bt-member-region');
+                    var _cEl = document.getElementById('bt-member-city');
+                    try { var _md = appData || {}; if (_rEl) _rEl.value = (_md.regions && _md.regions[loggedInMember]) || ''; if (_cEl) _cEl.value = (_md.cities && _md.cities[loggedInMember]) || ''; } catch(e){}
                     const booksEl = document.getElementById('bt-member-books');
                     if (!booksEl) return;
                     booksEl.innerHTML = '<div style="text-align:center; color:#777; padding:16px;">Y\u00fckleniyor\u2026</div>';
@@ -1338,6 +1353,26 @@
                 document.addEventListener('click', function(e) {
                     if (e.target && e.target.id === 'bt-change-name') {
                         // İsim değişikliği global işleyicide (Supabase kaynaklı) yapılır; burada çakışmayı önle.
+                        return;
+                    }
+                    if (e.target && e.target.id === 'bt-change-region') {
+                        var _v = (document.getElementById('bt-member-region') || {}).value ? document.getElementById('bt-member-region').value.trim() : '';
+                        if (!appData) appData = {};
+                        if (!appData.regions) appData.regions = {};
+                        appData.regions[loggedInMember] = _v;
+                        try { saveGroupData(); } catch(e){}
+                        if (loggedInMemberType !== 'grup') { try { var _bp=getBireyselPool(); if(!_bp.regions)_bp.regions={}; _bp.regions[loggedInMember]=_v; saveBireyselPool(_bp); } catch(e){} }
+                        showToast('Bölge kaydedildi.', 'success');
+                        return;
+                    }
+                    if (e.target && e.target.id === 'bt-change-city') {
+                        var _v = (document.getElementById('bt-member-city') || {}).value ? document.getElementById('bt-member-city').value.trim() : '';
+                        if (!appData) appData = {};
+                        if (!appData.cities) appData.cities = {};
+                        appData.cities[loggedInMember] = _v;
+                        try { saveGroupData(); } catch(e){}
+                        if (loggedInMemberType !== 'grup') { try { var _bp=getBireyselPool(); if(!_bp.cities)_bp.cities={}; _bp.cities[loggedInMember]=_v; saveBireyselPool(_bp); } catch(e){} }
+                        showToast('Şehir kaydedildi.', 'success');
                         return;
                     }
                     if (e.target && e.target.id === 'bt-change-password') {
