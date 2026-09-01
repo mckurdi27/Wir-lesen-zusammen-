@@ -509,9 +509,6 @@
 <!-- BÖLÜM 3 - YÖNETİCİ PANELİ (kart altı) -->
         <div class="login-admin-bar" id="admin-bar-host">
             <button id="admin-toggle-btn-custom" class="login-admin-toggle" title="Yönetici Modu">&#128272; Yönetici Modu</button>
-            <label style="font-size:12px; color:#555; display:flex; align-items:center; gap:5px; cursor:pointer; margin-left:10px;">
-                <input type="checkbox" id="admin-remember" style="cursor:pointer;"> Beni hatırla
-            </label>
         </div>
 
 <!-- BÖLÜM 6 - KİTAP LİSTESİ -->
@@ -3053,7 +3050,13 @@ window.infoSortTable = function infoSortTable(col) {
                 if (isAdmin) {
                     adminPanelHtml = `
                         <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid var(--gold-primary); padding: 18px; border-radius: 12px; margin-bottom: 20px;">
-                            <h3 style="color: var(--gold-dark); font-size: 17px; margin-bottom: 15px;">🛠️ Yönetici Kontrol Paneli</h3>
+                            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:15px;">
+                                <h3 style="color: var(--gold-dark); font-size: 17px; margin:0;">🛠️ Yönetici Kontrol Paneli</h3>
+                                <label style="font-size:13px; color:#555; display:flex; align-items:center; gap:6px; cursor:pointer; white-space:nowrap;">
+                                    <input type="checkbox" id="admin-remember" style="width:15px;height:15px;cursor:pointer;accent-color:#27ae60;" onchange="localStorage.setItem('hatim_admin_remember', this.checked?'1':'0');">
+                                    Beni hatırla
+                                </label>
+                            </div>
                             <div style="text-align:center; margin-bottom:16px;">
                                 <button id="admin-open-detailed-analysis" style="background:#8e44ad;color:#fff;border:none;padding:14px 20px;border-radius:8px;font-size:15px;font-weight:bold;min-height:50px;width:100%;cursor:pointer;margin-bottom:14px;">📊 Detaylı Analiz</button>
                                 
@@ -3069,6 +3072,9 @@ window.infoSortTable = function infoSortTable(col) {
 
                 bottomContainer.style.display = isAdmin ? '' : 'none';
                 bottomContainer.innerHTML = adminPanelHtml;
+                // 'Beni hatırla' kutusunun durumunu kayıtlı bayrağa göre yansıt
+                var _ar2 = document.getElementById('admin-remember');
+                if (_ar2) _ar2.checked = (localStorage.getItem('hatim_admin_remember') === '1');
                 // Yöneticiye mesaj bölümü: admin panelden ayrı, sayfanın en altında
                 let msgContainer = document.getElementById("admin-message-section");
                 if (!msgContainer) {
