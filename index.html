@@ -1468,6 +1468,40 @@
             }
 
             // GİRİŞ PANELİ İŞLEVLERİ
+            function _sbBuildCardHtml(rows, sumT, sumR, memberName) {
+                var totalPct = sumT>0 ? Math.round((sumR/sumT)*100) : 0;
+                var r = rows.map(function (b) {
+                    var pct = b.taken>0 ? Math.round((b.read/b.taken)*100) : 0;
+                    var durum = b.completed ? '\u2713 Tamamland\u0131' : (b.taken>0 ? (b.read>=b.taken ? 'Okundu' : (b.read>0?'Devam ediyor':'Al\u0131nd\u0131')) : 'Bo\u015f');
+                    return `<tr>
+                        <td style="padding:8px; border-bottom:1px solid var(--border-color); font-weight:bold;">${b.name}</td>
+                        <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${b.taken}</td>
+                        <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">-</td>
+                        <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${b.read}</td>
+                        <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">-</td>
+                        <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${pct}%</td>
+                        <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${durum}</td>
+                    </tr>`;
+                }).join('');
+                return `
+                    <div style="display:flex; gap:12px; margin-bottom:10px; flex-wrap:wrap;">
+                        <div style="background:rgba(212,175,55,0.12); padding:8px 14px; border-radius:8px; font-size:13px; font-weight:bold;">Toplam Al\u0131nan: ${sumT}</div>
+                        <div style="background:rgba(39,174,96,0.12); padding:8px 14px; border-radius:8px; font-size:13px; font-weight:bold;">Okunan: ${sumR}</div>
+                        <div style="background:rgba(142,68,173,0.12); padding:8px 14px; border-radius:8px; font-size:13px; font-weight:bold;">\u0130lerleme: %${totalPct}</div>
+                    </div>
+                    <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                        <thead><tr style="background:rgba(212,175,55,0.15);">
+                            <th style="padding:8px; text-align:left;">Eser</th>
+                            <th style="padding:8px;">Al\u0131nan Hisse</th>
+                            <th style="padding:8px;">Al\u0131nd\u0131\u011f\u0131 saat-g\u00fcn</th>
+                            <th style="padding:8px;">Okunan</th>
+                            <th style="padding:8px;">Okundu saat-g\u00fcn</th>
+                            <th style="padding:8px;">\u0130lerleme</th>
+                            <th style="padding:8px;">Durum</th>
+                        </tr></thead>
+                        <tbody>${r}</tbody>
+                    </table>`;
+            }
             function renderBireyselTakipPanel() {
                     const panel = document.getElementById('bireysel-takip-panel');
                     if (!panel) return;
@@ -1489,6 +1523,29 @@
                     try { var _md = appData || {}; if (_rEl) _rEl.value = (_md.regions && _md.regions[loggedInMember]) || ''; if (_cEl) _cEl.value = (_md.cities && _md.cities[loggedInMember]) || ''; } catch(e){}
                     const booksEl = document.getElementById('bt-member-books');
                     if (!booksEl) return;
+                    // Anl\u0131k g\u00fcncelleme: \u00f6nce yerel veriden senkron g\u00f6ster, sonra Supabase'ten tazele
+                    (function () {
+                        try {
+                            var _ad = appData || {};
+                            var _bp = _ad.bookPages || {};
+                            var _bk = _ad.books || [];
+                            var _rows = [];
+                            var _sumT = 0, _sumR = 0;
+                            Object.keys(_bp).forEach(function (bid) {
+                                var units = _bp[bid] || [];
+                                var taken = units.filter(function(u){ return u && u.owner === loggedInMember; });
+                                if (taken.length === 0) return;
+                                var read = taken.filter(function(u){ return u.isRead; }).length;
+                                _sumT += taken.length; _sumR += read;
+                                var b = null; for (var k=0;k<_bk.length;k++){ if(_bk[k].id===bid){ b=_bk[k]; break; } }
+                                _rows.push({ id: bid, name: b ? b.name : bid, taken: taken.length, read: read,
+                                    totalUnits: b ? (b.total_units||0) : 0, completed: read >= taken.length });
+                            });
+                            if (_rows.length) {
+                                booksEl.innerHTML = _sbBuildCardHtml(_rows, _sumT, _sumR, loggedInMember);
+                            }
+                        } catch(e){}
+                    })();
                     booksEl.innerHTML = '<div style="text-align:center; color:#777; padding:16px;">Y\u00fckleniyor\u2026</div>';
                     if (typeof window._sbMemberDetail !== 'function') { booksEl.innerHTML = '<div style="text-align:center; color:#e74c3c; padding:16px;">Senkron k\u00f6pr\u00fcs\u00fc haz\u0131r de\u011fil.</div>'; return; }
                     window._sbMemberDetail(loggedInMember, currentGroup).then(function (data) {
