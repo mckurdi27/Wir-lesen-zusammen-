@@ -2272,13 +2272,6 @@
                         if (typeof av === 'number' && typeof bv === 'number') return analysisSortDir==='az' ? av-bv : bv-av;
                         return analysisSortDir==='az' ? String(av).localeCompare(String(bv),'tr') : String(bv).localeCompare(String(av),'tr');
                       });
-                    
-                    data.books.sort((a, b) => {
-                        let av = analysisSortKey==='btotal' ? a.total : analysisSortKey==='btaken' ? a.taken : analysisSortKey==='bread' ? a.read : analysisSortKey==='bpercent' ? a.readPercent : analysisSortKey==='bstatus' ? (a.completed?1:0) : a.name;
-                        let bv = analysisSortKey==='btotal' ? b.total : analysisSortKey==='btaken' ? b.taken : analysisSortKey==='bread' ? b.read : analysisSortKey==='bpercent' ? b.readPercent : analysisSortKey==='bstatus' ? (b.completed?1:0) : b.name;
-                        if (typeof av==='number' && typeof bv==='number') return analysisSortDir==='az' ? av-bv : bv-av;
-                        return analysisSortDir==='az' ? String(av).localeCompare(String(bv),'tr') : String(bv).localeCompare(String(av),'tr');
-                    });
                     let html = `
                         <div style="overflow-x: auto;">
                             <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
