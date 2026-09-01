@@ -625,6 +625,8 @@
             let isAdmin = false;
             window._sbIsAdmin = function(){ return isAdmin; };
             window._sbSetAdmin = function(v){ isAdmin = !!v; };
+            window.renderAdminSectionAtBottom = (typeof renderAdminSectionAtBottom === 'function') ? renderAdminSectionAtBottom : function(){};
+            window.showToast = (typeof showToast === 'function') ? showToast : function(){};
             let appData = null;
             let loggedInMember = "";
             let loggedInMemberType = "";
@@ -4378,8 +4380,8 @@ document.addEventListener('click', function (e) {
       if (localStorage.getItem('hatim_admin_remember') === '1' && typeof window._sbIsAdmin==='function' && !window._sbIsAdmin()) {
         window._sbSetAdmin(true);
         setTimeout(function () {
-          renderAdminSectionAtBottom();
-          showToast('🔓 Yönetici modu açıldı.', 'info');
+          if (typeof window.renderAdminSectionAtBottom==='function') window.renderAdminSectionAtBottom();
+          if (typeof window.showToast==='function') window.showToast('🔓 Yönetici modu açıldı.', 'info');
         }, 400);
       }
       var _ar = document.getElementById('admin-remember');
