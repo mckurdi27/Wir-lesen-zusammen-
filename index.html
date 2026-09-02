@@ -2358,15 +2358,19 @@
                     if (memberName === 'all') {
                         let allMemberStats = [];
                         let _membersSrc = allMembers;
-                        // Grup filtresi: secili grup secildiyse yalnizca o gruptaki/bireysel uyeleri listele
+                        // Grup filtresi: secili grubun GERCEK uye listesi (groupStats.memberNames) ile eslesenleri al
                         if (groupName !== 'all') {
+                            var _grpNames = [];
+                            try { var _gs = (typeof groupStats !== 'undefined' && groupStats) ? groupStats.find(function(g){ return String(g.name) === String(groupName); }) : null; if (_gs && _gs.memberNames) _grpNames = _gs.memberNames.slice(); } catch(e){}
+                            if (groupName === '__bireysel__' || groupName === '') { _grpNames = (typeof getAllBireyselMemberNames === 'function') ? getAllBireyselMemberNames() : []; }
                             _membersSrc = allMembers.filter(function(m){
-                                if (groupName === '__bireysel__' || groupName === '') return (m.type === 'bireysel');
-                                return (m.type !== 'bireysel') && (m.groups || []).indexOf(groupName) > -1;
+                                var inG = _grpNames.indexOf(m.name) > -1;
+                                // Bireysel sectiyse yalniz bireysel; grup sectiyse o gruptakiler (type onemsiz, isim eslesmesi esas)
+                                if (groupName === '__bireysel__' || groupName === '') return inG || (m.type === 'bireysel');
+                                return inG;
                             });
                         }
                         _membersSrc.forEach(m => {
-                            // Ayni isim farkli gruplarda ayri sayilsin: uyenin kendi grubunu gecir
                             let _mg = (m.type === 'bireysel') ? null : (m.groups && m.groups[0]) || groupName;
                             let data = getMemberDetailData(m.name, _mg, analysisBooks.length ? analysisBooks : 'all');
                             allMemberStats.push({
