@@ -5071,8 +5071,14 @@ document.addEventListener('click', function (e) {
   // v8: gerçek zamanlı polling — iki tarayıcı da açıkken birbirini görsün
   setInterval(function () {
         if (!_myPush) pullAll().then(function () {
-      // Polling: yalnizca veriyi tazele (silent) - UI HTML'ini yeniden CIZME (parlama/scroll kaymasi/isim geri alma engellenir)
+      // Polling: veriyi tazele (silent) - acik kartin scroll konumu korunur
       try { if (typeof loadGroupData === 'function') window.loadGroupData(false, true); } catch(e){}
+      // Normal sayfadaki eser listesini canli guncelle (scroll korumali renderBooks); kart/form odaktayken dokunma
+      try {
+        var _ae = document.activeElement;
+        var _typing = _ae && _ae.tagName && ['INPUT','TEXTAREA','SELECT'].indexOf(_ae.tagName) > -1;
+        if (!_typing && typeof renderBooks === 'function') renderBooks();
+      } catch(e){}
     });
   }, 3000);
 
