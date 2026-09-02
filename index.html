@@ -1790,6 +1790,8 @@
                 } else {
                     const _btp = document.getElementById('bireysel-takip-panel');
                     if (_btp) _btp.style.display = 'none';
+                    // Admin grup modunda (uye secilmemis ama grup secilmis) grup kartini goster
+                    if (typeof renderGrupTakipPanel === 'function') renderGrupTakipPanel();
                     loginArea.style.display = 'block';
                     userArea.style.display = 'none';
                     bulkArea.style.display = 'none';
