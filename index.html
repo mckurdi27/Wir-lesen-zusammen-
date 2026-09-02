@@ -4959,16 +4959,21 @@ document.addEventListener('click', function (e) {
       var bh = (g && g.bookHatims) || {};
       var hist = (g && g.bookHistory) || {};
       var hRows = [], hrRows = [];
-      // Bir eserin HATMI yalnizca o eserden gercekten hisse alinmissa yazilir (owner dolu hisse).
-      // Hissesi olmayan eserler icin hayalet hatim kaydi olusturulmaz.
+      // Hatim, hisse esasli: bir eserden gercekten hisse verilmisse o eserin hatmi vardir.
+      // Hissesi olmayan eser icin hatim kaydi olusturulmaz (hayalet hatim yok).
       var pages = (g && g.bookPages) || {};
       function _hasShare(bid){
         var arr = pages[bid]; if(!arr) return false;
         for(var i=0;i<arr.length;i++){ if(arr[i] && arr[i].owner && String(arr[i].owner).trim()) return true; }
         return false;
       }
-      Object.keys(bh).forEach(function (bid) {
-        if (!_hasShare(bid)) return; // bu eserde hisse yok -> hatim kaydi yazma
+      // Hissesi olan tum eserler (bookHatims'te seed edilmemis olsa bile) hatim baslar
+      var shareBooks = [];
+      Object.keys(pages).forEach(function (bid) { if (_hasShare(bid)) shareBooks.push(bid); });
+      var bookSet = {};
+      shareBooks.forEach(function(bid){ bookSet[bid]=true; });
+      Object.keys(bh).forEach(function (bid) { if (_hasShare(bid)) bookSet[bid]=true; });
+      Object.keys(bookSet).forEach(function (bid) {
         var h = bh[bid] || {};
         hRows.push({ group_key: key, book_id: bid, hatim_no: (h.hatimNo != null ? h.hatimNo : 1), start_date: h.startDate || null, prayer_done: !!h.prayerDone });
       });
