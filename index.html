@@ -2642,41 +2642,117 @@
                 function renderTab6(groupName, memberName) {
                     var container = document.getElementById('dtabs-6-content');
                     if (!container) return;
-                    var rows = [];
+                    var started = [];
+                    var done = [];
                     try {
                         var gkList = Object.keys(localStorage).filter(function(k){ return k.indexOf('hatim_group_')===0; });
                         gkList.forEach(function(k){
                             var gKey = k.replace('hatim_group_','');
                             try {
-                                var gData = JSON.parse(origGetItem(k) || 'null');
-                                if (gData && gData.bookHistory) {
+                                var gData = JSON.parse(localStorage.getItem(k) || 'null');
+                                if (!gData) return;
+                                var bname = {};
+                                (gData.books || []).forEach(function(b){ if (b && b.id) bname[b.id] = b.name || b.id; });
+                                // 1) Baslayan / devam eden hatimler (bookHatims)
+                                if (gData.bookHatims) {
+                                    Object.keys(gData.bookHatims).forEach(function(bid){
+                                        var h = gData.bookHatims[bid] || {};
+                                        started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo || 1, baslangic: h.startDate || '' });
+                                    });
+                                }
+                                // 2) Tamamlanan hatimler (bookHistory)
+                                if (gData.bookHistory) {
                                     Object.keys(gData.bookHistory).forEach(function(bid){
                                         (gData.bookHistory[bid]||[]).forEach(function(hh){
-                                            rows.push({ grup: hh.grup||gKey, eser: hh.eser||bid, hatimNo: hh.hatimNo||1, baslangic: hh.baslangic||'', bitis: hh.bitis||'', tamamlandi: hh.tamamlandi||'' });
+                                            done.push({ grup: hh.grup || gKey, bid: bid, eser: hh.eser || bname[bid] || bid, hatimNo: hh.hatimNo || 1, baslangic: hh.baslangic || '', tamamlandi: hh.tamamlandi || '' });
                                         });
                                     });
                                 }
                             } catch(e){}
                         });
                     } catch(e){}
-                    rows.sort(function(a,b){ var ta=a.baslangic||'', tb=b.baslangic||''; return ta<tb?-1:ta>tb?1:0; });
-                    if (rows.length === 0) { container.innerHTML = '<div style="text-align:center;color:#777;padding:20px;">Henüz tamamlanan hatim yok.</div>'; return; }
-                    var html = '<div class="d-tab-scroll"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:rgba(142,68,173,0.1);">'
-                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Tamamlanan Hatim</th>'
-                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Grup</th>'
-                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Eser</th>'
-                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Başlangıç</th>'
-                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Tamamlanma</th></tr></thead><tbody>';
-                    rows.forEach(function(r, idx){
-                        html += '<tr style="background:' + (idx%2?'':'rgba(0,0,0,0.02)') + ';">'
-                            + '<td style="padding:8px;border:1px solid var(--border-color);">' + (idx+1) + '. Hatim</td>'
-                            + '<td style="padding:8px;border:1px solid var(--border-color);">' + r.grup + '</td>'
-                            + '<td style="padding:8px;border:1px solid var(--border-color);">' + r.eser + '</td>'
-                            + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.baslangic||'-') + '</td>'
-                            + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.tamamlandi||'-') + '</td></tr>';
-                    });
-                    html += '</tbody></table></div>';
+                    started.sort(function(a,b){ return (a.baslangic||'') < (b.baslangic||'') ? -1 : (a.baslangic||'') > (b.baslangic||'') ? 1 : 0; });
+                    done.sort(function(a,b){ var ta=a.baslangic||'', tb=b.baslangic||''; return ta<tb?-1:ta>tb?1:0; });
+                    if (started.length === 0 && done.length === 0) {
+                        container.innerHTML = '<div style="text-align:center;color:#777;padding:20px;">Hen\u00fcz kay\u0131tl\u0131 hatim yok.</div>';
+                        return;
+                    }
+                    var admin = false;
+                    try { admin = !!(window._sbIsAdmin && window._sbIsAdmin()); } catch(e){}
+                    var html = '';
+                    // ---- Baslayan / devam eden hatimler ----
+                    if (started.length) {
+                        html += '<div style="padding:8px 10px;font-weight:bold;font-size:13px;color:#27ae60;">\u25b6 Devam Eden / Ba\u015flayan Hatimler</div>';
+                        html += '<div class="d-tab-scroll" style="margin-bottom:14px;"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:rgba(39,174,96,0.12);">'
+                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Hatim</th>'
+                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Eser</th>'
+                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Grup</th>'
+                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Ba\u015flang\u0131\u00e7</th>'
+                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Durum</th>';
+                        if (admin) html += '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Y\u00f6net</th>';
+                        html += '</tr></thead><tbody>';
+                        started.forEach(function(r){
+                            html += '<tr style="background:#ffffff;">'
+                                + '<td style="padding:8px;border:1px solid var(--border-color);">' + r.hatimNo + '. Hatim</td>'
+                                + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.eser||'') + '</td>'
+                                + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.grup||'') + '</td>'
+                                + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.baslangic||'-') + '</td>'
+                                + '<td style="padding:8px;border:1px solid var(--border-color);">Devam ediyor</td>';
+                            if (admin) html += '<td style="padding:6px;border:1px solid var(--border-color);"><button class="tab6-btn" data-act="delStart" data-gkey="' + encodeURIComponent(r.grup) + '" data-bid="' + encodeURIComponent(r.bid) + '" style="background:#e74c3c;color:#fff;border:none;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;">Sil / S\u0131f\u0131rla</button></td>';
+                            html += '</tr>';
+                        });
+                        html += '</tbody></table></div>';
+                    }
+                    // ---- Tamamlanan hatimler ----
+                    if (done.length) {
+                        html += '<div style="padding:8px 10px;font-weight:bold;font-size:13px;color:#8e44ad;">\u2705 Tamamlanan Hatimler <span style="font-weight:normal;color:#888;font-size:11px;">(otomatik silinmez)</span></div>';
+                        html += '<div class="d-tab-scroll"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:rgba(142,68,173,0.1);">'
+                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Hatim</th>'
+                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Eser</th>'
+                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Grup</th>'
+                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Ba\u015flang\u0131\u00e7</th>'
+                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Tamamlanma</th>';
+                        if (admin) html += '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Y\u00f6net</th>';
+                        html += '</tr></thead><tbody>';
+                        done.forEach(function(r){
+                            html += '<tr style="background:#ffffff;">'
+                                + '<td style="padding:8px;border:1px solid var(--border-color);">' + r.hatimNo + '. Hatim</td>'
+                                + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.eser||'') + '</td>'
+                                + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.grup||'') + '</td>'
+                                + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.baslangic||'-') + '</td>'
+                                + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.tamamlandi||'-') + '</td>';
+                            if (admin) html += '<td style="padding:6px;border:1px solid var(--border-color);"><button class="tab6-btn" data-act="delDone" data-gkey="' + encodeURIComponent(r.grup) + '" data-bid="' + encodeURIComponent(r.bid) + '" data-hn="' + r.hatimNo + '" style="background:#e74c3c;color:#fff;border:none;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;">Sil</button></td>';
+                            html += '</tr>';
+                        });
+                        html += '</tbody></table></div>';
+                    }
                     container.innerHTML = html;
+                    // Bagla: admin islemleri
+                    container.querySelectorAll('.tab6-btn').forEach(function(btn){
+                        btn.addEventListener('click', function(){
+                            var act = btn.getAttribute('data-act');
+                            var gkey = decodeURIComponent(btn.getAttribute('data-gkey') || '');
+                            var bid = decodeURIComponent(btn.getAttribute('data-bid') || '');
+                            var hn = parseInt(btn.getAttribute('data-hn') || '0', 10);
+                            var key = 'hatim_group_' + gkey;
+                            try {
+                                var g = JSON.parse(localStorage.getItem(key) || 'null');
+                                if (!g) return;
+                                if (act === 'delStart') {
+                                    // Devam eden hatmi sifirla: bookHatims kaydini baslangica cek
+                                    if (g.bookHatims && g.bookHatims[bid]) { g.bookHatims[bid].hatimNo = 1; g.bookHatims[bid].prayerDone = false; }
+                                } else if (act === 'delDone') {
+                                    // Tamamlanan hatmi elle sil (yalnizca admin)
+                                    if (g.bookHistory && g.bookHistory[bid]) {
+                                        g.bookHistory[bid] = (g.bookHistory[bid]||[]).filter(function(x){ return !(parseInt(x.hatimNo||1,10) === hn); });
+                                        if (!g.bookHistory[bid].length) delete g.bookHistory[bid];
+                                    }
+                                }
+                                localStorage.setItem(key, JSON.stringify(g));
+                            } catch(e){}
+                            renderTab6();
+                        });
+                    });
                 }
 
                 modalOverlay.innerHTML = `
