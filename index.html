@@ -3794,6 +3794,10 @@ window.infoSortTable = function infoSortTable(col) {
                                     return Promise.all(del).catch(function(){});
                                 }).then(function () {
                                     return window.replaceShares(data.gData, _k);
+                                }).then(function () {
+                                    // Toplu atama da hatim kaydini Supabase'e yaz (hisse olan eserler icin)
+                                    if (typeof window.syncHatimToSB === 'function') { return window.syncHatimToSB(_k, data.gData); }
+                                    return undefined;
                                 }).catch(function(e){ console.warn('bulkSave supabase', e); });
                             }
                         } catch(e){ console.warn('bulkSave supabase', e); }
@@ -4984,6 +4988,7 @@ document.addEventListener('click', function (e) {
       return Promise.all(tasks);
     } catch (e) { return Promise.resolve(); }
   }
+  window.syncHatimToSB = syncHatimToSB;
 
   function replaceShares(g, groupKey) {
     return rest.select("members", "?select=id,name,group_key").then(function (allM) {
