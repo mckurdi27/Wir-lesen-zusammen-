@@ -2533,7 +2533,7 @@
                         </div>
                         `;
                     })()}
-                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <div style="display: flex; flex-direction: column; gap: 6px; max-height: 52vh; overflow: auto; padding-right: 4px;">
                             ${data.books.map((b, idx) => {
                                 let statusColor = b.completed ? '#27ae60' : b.readPercent >= 50 ? '#f39c12' : '#e74c3c';
                                 let statusText = b.completed ? '✅ Tamamlandı' : b.readPercent >= 50 ? '🔄 Devam Ediyor' : '⬇️ Yeni Başladı';
