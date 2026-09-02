@@ -4082,6 +4082,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                             window.bookSectionPages[id] = { type: 'manual', pages: {}, modes: {}, getPage: function(unitIndex){ return this.pages[unitIndex] || (unitIndex + 1); } };
                         }
                         window.bookSectionPages[id].pageSize = ppu;
+                        window.bookSectionPages[id].type = 'manual';
                         window.bookSectionPages[id].pages = pages20;
                         window.bookSectionPages[id].modes = (bookType === 'bab')
                             ? { 'yirmi_bab': pages20, 'on_bab': pages10, 'bes_bab': pages5, 'bab': pages1 }
