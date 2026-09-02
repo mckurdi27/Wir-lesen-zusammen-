@@ -3815,20 +3815,23 @@ window.infoSortTable = function infoSortTable(col) {
                             let assigned = 0;
                                                         let g = data.gData;
                             if (!g.bookPages) g.bookPages = {};
+                            // Toplu atama da tarih/saat yaz (hisse alim zamani)
+                            var bulkTakeNow = new Date().toLocaleDateString("tr-TR");
+                            var bulkTakeClock = new Date().toLocaleTimeString("tr-TR", {hour: '2-digit', minute:'2-digit'});
                             bookIds.forEach(bId => {
                                 let pages = g.bookPages[bId];
                                 if (!pages) return;
                                 if (data.type === "bireysel" || mode === "individual") {
                                     let m = data.mName;
-                                    pages.forEach(p => { if (!p.owner) { p.owner = m; p.isRead = false; assigned++; } });
+                                    pages.forEach(p => { if (!p.owner) { p.owner = m; p.isRead = false; p.takeDate = bulkTakeNow; p.takeTime = bulkTakeClock; assigned++; } });
                                 } else if (data.type === "group") {
                                     let members = g.members || [];
                                     if (!members.length) return;
                                     let idx = 0;
-                                    pages.forEach(p => { if (!p.owner) { p.owner = members[idx % members.length]; idx++; assigned++; } });
+                                    pages.forEach(p => { if (!p.owner) { p.owner = members[idx % members.length]; idx++; p.isRead = false; p.takeDate = bulkTakeNow; p.takeTime = bulkTakeClock; assigned++; } });
                                 } else {
                                     let m = data.mName;
-                                    pages.forEach(p => { if (!p.owner) { p.owner = m; p.isRead = false; assigned++; } });
+                                    pages.forEach(p => { if (!p.owner) { p.owner = m; p.isRead = false; p.takeDate = bulkTakeNow; p.takeTime = bulkTakeClock; assigned++; } });
                                 }
                             });
                             bulkSave(data);
