@@ -4755,9 +4755,10 @@ document.addEventListener('click', function (e) {
   window._sbRenameOwner = function (oldName, newName) {
     // Hisse sahipliklerini (owner) eski isimden yeni isme taşı: members adı güncellendiği için
     // shares.member_id referansları aynı kalır. Burada yalnızca cache'teki owner etiketlerini senkron tutarız.
-    return rest.select("members", "?select=id,name").then(function (allM) {
+    return rest.select("members", "?select=id,name,group_key").then(function (allM) {
       var target = null;
-      (allM || []).forEach(function (m) { if (m.name === oldName) target = m; });
+      (allM || []).forEach(function (m) { if (m.name === oldName && String(m.group_key || "") === String(currentGroup || "")) target = m; });
+      if (!target) { var same2 = (allM || []).filter(function (m) { return m.name === oldName; }); if (same2.length === 1) target = same2[0]; }
       if (target) {
         // owner bilgisi asıl olarak shares.member_id üzerinden çözülür, isim güncellendiğinde otomatik düzelir.
         return Promise.resolve({ ok: true });
