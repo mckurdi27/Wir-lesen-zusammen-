@@ -3140,7 +3140,23 @@ function renderTab6(groupName, memberName) {
                 modalOverlay.querySelector("#modal-excel-btn").addEventListener("click", function() {
                     try { exportAnalysisToExcel(); } catch(err) { alert('Excel oluşturulamadı: ' + err.message); }
                 });
-                modalOverlay.querySelector("#modal-print-btn").addEventListener("click", () => window.print());
+                modalOverlay.querySelector("#modal-print-btn").addEventListener("click", function(){
+                    // Yazdirma: tum 6 bolumu de render edip goster, sonra yazdir
+                    try {
+                        var grp = document.getElementById('analysis-group-select') ? document.getElementById('analysis-group-select').value : 'all';
+                        var mbr = document.getElementById('analysis-member-select') ? [].slice.call(document.getElementById('analysis-member-select').selectedOptions).map(function(o){return o.value;}).join(',') : 'all';
+                        var g2 = document.getElementById('analysis-group-select') ? document.getElementById('analysis-group-select').value : 'all';
+                        var m2 = document.getElementById('analysis-member-select') ? document.getElementById('analysis-member-select').value : 'all';
+                        try{ renderTab1(g2, m2); }catch(e){}
+                        try{ renderTab2(g2); }catch(e){}
+                        try{ renderTab3(g2, m2); }catch(e){}
+                        try{ renderTab4(g2, m2); }catch(e){}
+                        try{ renderTab5(g2, m2); }catch(e){}
+                        try{ renderTab6(g2, m2); }catch(e){}
+                        ['dtabs-1','dtabs-2','dtabs-3','dtabs-4','dtabs-5','dtabs-6'].forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display='block'; });
+                    } catch(e){}
+                    setTimeout(function(){ window.print(); }, 120);
+                });
                 modalOverlay.addEventListener("click", (e) => {
                     if (e.target === modalOverlay) modalOverlay.remove();
                 });
