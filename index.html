@@ -630,6 +630,12 @@
     <div id="toast" class="toast"></div>
 
     <script>
+        // --- script-top-level bildirimler: hem DOMContentLoaded hem dis isleyiciler erisir ---
+        let currentGroup = "";
+        let isAdmin = false;
+        let appData = null;
+        let loggedInMember = "";
+        let loggedInMemberType = "";
         document.addEventListener("DOMContentLoaded", async () => {
             // Tek/Grup seçimi - her koşulda çalışsın (event delegation, callback hatalarından etkilenmez)
             document.addEventListener('click', function(ev) {
@@ -688,16 +694,11 @@
                 container.appendChild(booksGrid);
             }
 
-            let currentGroup = "";
-            let isAdmin = false;
             window._sbIsAdmin = function(){ return isAdmin; };
             window._sbSetAdmin = function(v){ isAdmin = !!v; };
             window.renderAdminSectionAtBottom = (typeof renderAdminSectionAtBottom === 'function') ? renderAdminSectionAtBottom : function(){};
             window.showToast = (typeof showToast === 'function') ? showToast : function(){};
             window.triggerAdminToggle = (typeof triggerAdminToggle === 'function') ? triggerAdminToggle : function(){ alert('Y�netici modu y�klenemedi.'); };
-            let appData = null;
-            let loggedInMember = "";
-            let loggedInMemberType = "";
             let analysisSortKey = "name"; let analysisSortDir = "az"; let activeAnalysisTab = "dtabs-1";
             let analysisBooks = []; // empty = all
             let monthlyInspirationCache = {};
