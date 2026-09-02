@@ -2302,7 +2302,7 @@
                         return analysisSortDir==='az' ? String(av).localeCompare(String(bv),'tr') : String(bv).localeCompare(String(av),'tr');
                       });
                     let html = `
-                        <div style="overflow-x: auto;">
+                        <div class="d-tab-scroll">
                             <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                                 <thead>
                                     <tr style="background: rgba(212, 175, 55, 0.15);">
@@ -2368,7 +2368,7 @@
                         }
                         
                         let html = `
-                            <div style="overflow-x: auto;">
+                            <div class="d-tab-scroll">
                                 <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                                     <thead>
                                         <tr style="background: rgba(212, 175, 55, 0.15);">
@@ -2557,7 +2557,7 @@
                         return analysisSortDir==='az' ? String(av).localeCompare(String(bv),'tr') : String(bv).localeCompare(String(av),'tr');
                     });
                     let html = `
-                        <div style="overflow-x: auto;">
+                        <div class="d-tab-scroll">
                             <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                                 <thead>
                                     <tr style="background: rgba(212, 175, 55, 0.15);">
@@ -2611,7 +2611,7 @@
                         return analysisSortDir==='az' ? String(av).localeCompare(String(bv),'tr') : String(bv).localeCompare(String(av),'tr');
                     });
                     let html = `
-                        <div style="overflow-x: auto;">
+                        <div class="d-tab-scroll">
                             <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
                                 <thead>
                                     <tr style="background: rgba(212, 175, 55, 0.15);">
@@ -2661,7 +2661,7 @@
                     } catch(e){}
                     rows.sort(function(a,b){ var ta=a.baslangic||'', tb=b.baslangic||''; return ta<tb?-1:ta>tb?1:0; });
                     if (rows.length === 0) { container.innerHTML = '<div style="text-align:center;color:#777;padding:20px;">Henüz tamamlanan hatim yok.</div>'; return; }
-                    var html = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:rgba(142,68,173,0.1);">'
+                    var html = '<div class="d-tab-scroll"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:rgba(142,68,173,0.1);">'
                         + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Tamamlanan Hatim</th>'
                         + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Grup</th>'
                         + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Eser</th>'
@@ -2735,8 +2735,7 @@
                         .d-tab-content table { border-collapse: collapse; }
                         .d-tab-content { position: relative; }
                         .d-tab-content thead th { position: sticky; top: 0; z-index: 2; background: #fdf6e3; box-shadow: 0 1px 0 rgba(0,0,0,0.12); }
-                        .d-tab-content { max-height: 62vh; overflow: auto; }
-                        .d-tab-content table thead th { position: sticky; top: 0; }
+                        .d-tab-scroll { overflow: auto; max-height: 60vh; }
                         </style>
                         <div style="padding: 20px; overflow-y: auto; flex: 1; font-size: 14px;">
                             <div id="dtabs-1" class="d-tab-content"><div id="dtabs-1-content"></div></div>
