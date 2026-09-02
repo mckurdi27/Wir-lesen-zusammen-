@@ -2731,6 +2731,13 @@
                             <button class="d-tab-btn" data-target="dtabs-5" style="padding: 10px 16px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; white-space: nowrap;">📜 Okuma Günlüğü</button>
                             <button class="d-tab-btn" data-target="dtabs-6" style="padding: 10px 16px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; white-space: nowrap;">🏆 Hatim Sıralama</button>
                         </div>
+                        <style>
+                        .d-tab-content table { border-collapse: collapse; }
+                        .d-tab-content { position: relative; }
+                        .d-tab-content thead th { position: sticky; top: 0; z-index: 2; background: #fdf6e3; box-shadow: 0 1px 0 rgba(0,0,0,0.12); }
+                        .d-tab-content { max-height: 62vh; overflow: auto; }
+                        .d-tab-content table thead th { position: sticky; top: 0; }
+                        </style>
                         <div style="padding: 20px; overflow-y: auto; flex: 1; font-size: 14px;">
                             <div id="dtabs-1" class="d-tab-content"><div id="dtabs-1-content"></div></div>
                             <div id="dtabs-2" class="d-tab-content" style="display: none;"><div id="dtabs-2-content"></div></div>
