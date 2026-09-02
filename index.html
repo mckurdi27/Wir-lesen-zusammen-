@@ -598,6 +598,13 @@
             <div id="bt-member-books" style="overflow-x:auto;"></div>
         </div>
 
+        <!-- GRUP TAKIP KARTI: admin secili grupta, her uye icin eser tablosu -->
+        <div id="grup-takip-panel" style="display: none; margin-bottom: 20px; padding: 16px 20px; max-width:100%; box-sizing:border-box; overflow-x:hidden; background: var(--card-bg); border-radius: 12px; border: 2px solid #16a085; box-shadow: 0 4px 15px rgba(22,160,133,0.18);">
+            <h3 style="margin: 0 0 4px; color: #16a085; font-size: 18px;">&#128101; Grup Takip</h3>
+            <div id="gt-group-name" style="font-size:12px; color:#555; margin-bottom:12px;"></div>
+            <div id="gt-content" style="overflow-x:auto;"></div>
+        </div>
+
 <!-- BÖLÜM 3 - YÖNETİCİ PANELİ (kart altı) -->
 
 
@@ -1556,6 +1563,8 @@
             }
             function renderBireyselTakipPanel() {
                     const panel = document.getElementById('bireysel-takip-panel');
+                    const _gp1 = document.getElementById('grup-takip-panel');
+                    if (_gp1) _gp1.style.display='none';
                     if (!panel) return;
                     if (!loggedInMember) { panel.style.display='none'; return; }
                     panel.style.display = 'block';
@@ -1777,7 +1786,7 @@
                     }
                     
                     bulkArea.style.display = 'block';
-                    renderBireyselTakipPanel();
+                    renderBireyselTakipPanel(); if (typeof renderGrupTakipPanel === 'function') renderGrupTakipPanel();
                 } else {
                     const _btp = document.getElementById('bireysel-takip-panel');
                     if (_btp) _btp.style.display = 'none';
@@ -3403,7 +3412,7 @@ function renderTab6(groupName, memberName) {
                         });
                         saveGroupData();
                         renderBooks();
-                        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel();
+                        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel(); if (typeof renderGrupTakipPanel === 'function') renderGrupTakipPanel();
                         showToast(`✅ ${rangeName} hissesi alındı!`, 'success');
                     });
                 });
@@ -3442,7 +3451,7 @@ function renderTab6(groupName, memberName) {
                             }
                         } catch(e){}
                         renderBooks();
-                        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel();
+                        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel(); if (typeof renderGrupTakipPanel === 'function') renderGrupTakipPanel();
                         showToast(`✅ Bölüm okundu olarak işaretlendi!`, 'success');
                     });
                 });
@@ -3460,7 +3469,7 @@ function renderTab6(groupName, memberName) {
                         }
                         saveGroupData();
                         renderBooks();
-                        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel();
+                        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel(); if (typeof renderGrupTakipPanel === 'function') renderGrupTakipPanel();
                         showToast(`↩️ Bölüm okunmadı olarak işaretlendi.`, 'info');
                     });
                 });
@@ -3490,13 +3499,77 @@ function renderTab6(groupName, memberName) {
                                 }).catch(function(){});
                             }
                         } catch(e){};
-                        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel();
+                        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel(); if (typeof renderGrupTakipPanel === 'function') renderGrupTakipPanel();
                         showToast(`❌ Hisseden vazgeçildi.`, 'error');
                     });
                 });
             }
 
             // ADMIN PANELİ
+
+            function renderGrupTakipPanel() {
+                const panel = document.getElementById('grup-takip-panel');
+                const _bp2 = document.getElementById('bireysel-takip-panel');
+                if (_bp2) _bp2.style.display='none';
+                if (!panel) return;
+                const isAdm = (typeof window._sbIsAdmin === 'function') ? window._sbIsAdmin() : false;
+                if (!isAdm || !currentGroup) { panel.style.display = 'none'; return; }
+                panel.style.display = 'block';
+                const nameEl = document.getElementById('gt-group-name');
+                if (nameEl) nameEl.textContent = 'Grup: ' + currentGroup;
+                const cont = document.getElementById('gt-content');
+                if (!cont) return;
+                var _ad = appData || {};
+                var _bp = _ad.bookPages || {};
+                var _bk = _ad.books || [];
+                var memArr = _ad.members || [];
+                var mTypes = _ad.memberTypes || {};
+                // gruptaki gercek uyeler (pasif haric)
+                var active = memArr.filter(function(m){ return mTypes[m] !== 'pasif'; });
+                var html = '';
+                if (!active.length) { cont.innerHTML = '<div style="color:#777;font-size:13px;">Grupta uye yok.</div>'; return; }
+                active.forEach(function(member){
+                    var rows = []; var sumT = 0, sumR = 0;
+                    Object.keys(_bp).forEach(function(bid){
+                        var units = _bp[bid] || [];
+                        var taken = units.filter(function(u){ return u && u.owner === member; });
+                        if (!taken.length) return;
+                        var read = taken.filter(function(u){ return u.isRead; }).length;
+                        sumT += taken.length; sumR += read;
+                        var b = null; for (var k=0;k<_bk.length;k++){ if(_bk[k].id===bid){ b=_bk[k]; break; } }
+                        rows.push({ id: bid, name: b ? b.name : bid, taken: taken.length, read: read,
+                            totalUnits: b ? (b.total_units||0) : 0, completed: read >= taken.length });
+                    });
+                    var pct = sumT>0 ? Math.round((sumR/sumT)*100) : 0;
+                    html += '<div style="margin:10px 0;border:1px solid #d5dbdb;border-radius:8px;padding:8px;background:#f9f9f9;">'
+                        + '<div style="font-weight:bold;font-size:14px;color:#16a085;margin-bottom:4px;">&#128100; ' + member + '</div>'
+                        + '<div style="font-size:12px;color:#555;margin-bottom:6px;">Toplam ' + sumT + ' hisse, ' + sumR + ' okundu (' + pct + '%)</div>';
+                    if (!rows.length) { html += '<div style="color:#999;font-size:12px;">Henuz hisse alinmamis.</div>'; }
+                    else {
+                        html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">'
+                            + '<thead><tr style="background:#e8f6f3;">'
+                            + '<th style="padding:5px 8px;border:1px solid #d5dbdb;text-align:left;">Eser</th>'
+                            + '<th style="padding:5px 8px;border:1px solid #d5dbdb;text-align:center;">Alinan</th>'
+                            + '<th style="padding:5px 8px;border:1px solid #d5dbdb;text-align:center;">Okunan</th>'
+                            + '<th style="padding:5px 8px;border:1px solid #d5dbdb;text-align:center;">Durum</th>'
+                            + '</tr></thead><tbody>';
+                        rows.forEach(function(b){
+                            var bpct = b.taken>0 ? Math.round((b.read/b.taken)*100) : 0;
+                            var st = b.completed ? '<span style="color:#27ae60;">&#9989; Tamam</span>' : '<span style="color:#2980b9;">&#8987; Devam ('+bpct+'%)</span>';
+                            html += '<tr>'
+                                + '<td style="padding:5px 8px;border:1px solid #d5dbdb;">' + b.name + '</td>'
+                                + '<td style="padding:5px 8px;border:1px solid #d5dbdb;text-align:center;">' + b.taken + '</td>'
+                                + '<td style="padding:5px 8px;border:1px solid #d5dbdb;text-align:center;">' + b.read + '</td>'
+                                + '<td style="padding:5px 8px;border:1px solid #d5dbdb;text-align:center;">' + st + '</td>'
+                                + '</tr>';
+                        });
+                        html += '</tbody></table>';
+                    }
+                    html += '</div>';
+                });
+                cont.innerHTML = html;
+            }
+
             function renderAdminSectionAtBottom() {
                 let bottomContainer = document.getElementById("admin-bottom-section");
                 if (!bottomContainer) {
@@ -4885,7 +4958,7 @@ document.addEventListener('click', function (e) {
     if (typeof window._sbUpdatePassword === 'function') {
       window._sbUpdatePassword(loggedInMember, np, currentGroup).then(function () {
         showToast('✓ Şifre güncellendi', 'success');
-        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel();
+        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel(); if (typeof renderGrupTakipPanel === 'function') renderGrupTakipPanel();
       }).catch(function (err) { showToast('❌ Hata: ' + (err && err.message || ''), 'error'); });
     }
     return;
@@ -4924,7 +4997,7 @@ document.addEventListener('click', function (e) {
         if (currentGroup) localStorage.setItem('hatim_session_' + currentGroup, newName);
         showToast('✅ Üye adı \"' + newName + '\" olarak güncellendi.', 'success');
         if (typeof updateUserInterface === 'function') updateUserInterface();
-        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel();
+        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel(); if (typeof renderGrupTakipPanel === 'function') renderGrupTakipPanel();
       }).catch(function (err) { showToast('❌ Hata: ' + (err && err.message || ''), 'error'); });
     }
     return;
