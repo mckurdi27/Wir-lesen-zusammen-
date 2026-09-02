@@ -2610,6 +2610,45 @@
                     `;
                     container.innerHTML = html;
                 }
+                function renderTab6(groupName, memberName) {
+                    var container = document.getElementById('dtabs-6-content');
+                    if (!container) return;
+                    var rows = [];
+                    try {
+                        var gkList = Object.keys(localStorage).filter(function(k){ return k.indexOf('hatim_group_')===0; });
+                        gkList.forEach(function(k){
+                            var gKey = k.replace('hatim_group_','');
+                            try {
+                                var gData = JSON.parse(origGetItem(k) || 'null');
+                                if (gData && gData.bookHistory) {
+                                    Object.keys(gData.bookHistory).forEach(function(bid){
+                                        (gData.bookHistory[bid]||[]).forEach(function(hh){
+                                            rows.push({ grup: hh.grup||gKey, eser: hh.eser||bid, hatimNo: hh.hatimNo||1, baslangic: hh.baslangic||'', bitis: hh.bitis||'', tamamlandi: hh.tamamlandi||'' });
+                                        });
+                                    });
+                                }
+                            } catch(e){}
+                        });
+                    } catch(e){}
+                    rows.sort(function(a,b){ var ta=a.baslangic||'', tb=b.baslangic||''; return ta<tb?-1:ta>tb?1:0; });
+                    if (rows.length === 0) { container.innerHTML = '<div style="text-align:center;color:#777;padding:20px;">Henüz tamamlanan hatim yok.</div>'; return; }
+                    var html = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:rgba(142,68,173,0.1);">'
+                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Tamamlanan Hatim</th>'
+                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Grup</th>'
+                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Eser</th>'
+                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Başlangıç</th>'
+                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Tamamlanma</th></tr></thead><tbody>';
+                    rows.forEach(function(r, idx){
+                        html += '<tr style="background:' + (idx%2?'':'rgba(0,0,0,0.02)') + ';">'
+                            + '<td style="padding:8px;border:1px solid var(--border-color);">' + (idx+1) + '. Hatim</td>'
+                            + '<td style="padding:8px;border:1px solid var(--border-color);">' + r.grup + '</td>'
+                            + '<td style="padding:8px;border:1px solid var(--border-color);">' + r.eser + '</td>'
+                            + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.baslangic||'-') + '</td>'
+                            + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.tamamlandi||'-') + '</td></tr>';
+                    });
+                    html += '</tbody></table></div>';
+                    container.innerHTML = html;
+                }
 
                 modalOverlay.innerHTML = `
                     <div style="background: var(--card-bg); color: var(--text-main); width: 100%; max-width: 1100px; max-height: 95vh; border-radius: 16px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.4);">
@@ -2661,6 +2700,7 @@
                             <button class="d-tab-btn" data-target="dtabs-3" style="padding: 10px 16px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; white-space: nowrap;">👥 Üye Analizi</button>
                             <button class="d-tab-btn" data-target="dtabs-4" style="padding: 10px 16px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; white-space: nowrap;">📚 Eser Detay</button>
                             <button class="d-tab-btn" data-target="dtabs-5" style="padding: 10px 16px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; white-space: nowrap;">📜 Okuma Günlüğü</button>
+                            <button class="d-tab-btn" data-target="dtabs-6" style="padding: 10px 16px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; white-space: nowrap;">🏆 Hatim Sıralama</button>
                         </div>
                         <div style="padding: 20px; overflow-y: auto; flex: 1; font-size: 14px;">
                             <div id="dtabs-1" class="d-tab-content"><div id="dtabs-1-content"></div></div>
@@ -2668,6 +2708,7 @@
                             <div id="dtabs-3" class="d-tab-content" style="display: none;"><div id="dtabs-3-content"></div></div>
                             <div id="dtabs-4" class="d-tab-content" style="display: none;"><div id="dtabs-4-content"></div></div>
                             <div id="dtabs-5" class="d-tab-content" style="display: none;"><div id="dtabs-5-content"></div></div>
+                            <div id="dtabs-6" class="d-tab-content" style="display: none;"><div id="dtabs-6-content"></div></div>
                         </div>
                     </div>
                 `;
@@ -2752,6 +2793,7 @@
                             case 'dtabs-3': renderTab3(group, member); break;
                             case 'dtabs-4': renderTab4(group, member); break;
                             case 'dtabs-5': renderTab5(group, member); break;
+                            case 'dtabs-6': renderTab6(group, member); break;
                         }
                     }
                 }
@@ -2806,6 +2848,7 @@
                             case 'dtabs-3': renderTab3(group, member); break;
                             case 'dtabs-4': renderTab4(group, member); break;
                             case 'dtabs-5': renderTab5(group, member); break;
+                            case 'dtabs-6': renderTab6(group, member); break;
                         }
                     });
                 });
@@ -3043,6 +3086,25 @@
                             baseArray[i].readTime = time;
                         }
                         saveGroupData();
+                        // Hatim tamamlandiysa kaydet (grup bazli)
+                        try {
+                            if (appData && appData.bookPages && appData.bookPages[bId]) {
+                                var _bp2 = appData.bookPages[bId];
+                                var _tamam = _bp2.length > 0 && _bp2.every(function(pp){ return pp.owner && pp.isRead; });
+                                if (_tamam) {
+                                    if (!appData.bookHistory) appData.bookHistory = {};
+                                    if (!appData.bookHistory[bId]) appData.bookHistory[bId] = [];
+                                    var _b = (appData.books||[]).find(function(x){ return x.id===bId; });
+                                    var _h = appData.bookHatims && appData.bookHatims[bId];
+                                    var _hn = _h ? (_h.hatimNo||1) : 1;
+                                    var _var = appData.bookHistory[bId].some(function(hh){ return hh.grup===currentGroup && hh.hatimNo===_hn; });
+                                    if (!_var) {
+                                        appData.bookHistory[bId].push({ grup: currentGroup, eser: _b?(_b.name||bId):bId, hatimNo: _hn, baslangic: _h?(_h.startDate||''):'', bitis: now, tamamlandi: new Date().toISOString() });
+                                        saveGroupData();
+                                    }
+                                }
+                            }
+                        } catch(e){}
                         renderBooks();
                         if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel();
                         showToast(`✅ Bölüm okundu olarak işaretlendi!`, 'success');
