@@ -4449,7 +4449,7 @@ var _cg = selVal || '';
                 });
 
                 // Kalici kitap-sayfa eslemesini geri yukle (modal ile eklenen/düzenlenen eserler icin)
-                try { var _bsp = JSON.parse(localStorage.getItem(`hatim_bookpages_${currentGroup}`) || "null"); if (_bsp) { Object.keys(_bsp).forEach(function (k) { if (k && _bsp[k] && _bsp[k].type === "manual") { window.bookSectionPages[k] = _bsp[k]; } }); } } catch(e){}
+                try { var _bsp = JSON.parse(localStorage.getItem('hatim_bookpages') || "null"); if (_bsp) { Object.keys(_bsp).forEach(function (k) { if (k && _bsp[k] && _bsp[k].type === "manual") { window.bookSectionPages[k] = _bsp[k]; } }); } } catch(e){}
                 window.rebuildBookModesDefs();
                 window.saveGroupData();
                 await renderDailyInspiration();
@@ -4566,7 +4566,7 @@ renderBooks();
             
             function saveGroupData() {
                 localStorage.setItem(`hatim_group_${currentGroup}`, JSON.stringify(appData));
-                try { localStorage.setItem(`hatim_bookpages_${currentGroup}`, JSON.stringify(window.bookSectionPages || {})); } catch(e){}
+                try { localStorage.setItem('hatim_bookpages', JSON.stringify(window.bookSectionPages || {})); } catch(e){}
             } window.saveGroupData = saveGroupData;
 
             await window.loadGroupData();
