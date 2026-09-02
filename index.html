@@ -4955,7 +4955,16 @@ document.addEventListener('click', function (e) {
       var bh = (g && g.bookHatims) || {};
       var hist = (g && g.bookHistory) || {};
       var hRows = [], hrRows = [];
+      // Bir eserin HATMI yalnizca o eserden gercekten hisse alinmissa yazilir (owner dolu hisse).
+      // Hissesi olmayan eserler icin hayalet hatim kaydi olusturulmaz.
+      var pages = (g && g.bookPages) || {};
+      function _hasShare(bid){
+        var arr = pages[bid]; if(!arr) return false;
+        for(var i=0;i<arr.length;i++){ if(arr[i] && arr[i].owner && String(arr[i].owner).trim()) return true; }
+        return false;
+      }
       Object.keys(bh).forEach(function (bid) {
+        if (!_hasShare(bid)) return; // bu eserde hisse yok -> hatim kaydi yazma
         var h = bh[bid] || {};
         hRows.push({ group_key: key, book_id: bid, hatim_no: (h.hatimNo != null ? h.hatimNo : 1), start_date: h.startDate || null, prayer_done: !!h.prayerDone });
       });
