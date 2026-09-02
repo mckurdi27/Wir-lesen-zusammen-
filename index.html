@@ -2685,6 +2685,7 @@
                         var gkList = Object.keys(localStorage).filter(function(k){ return k.indexOf('hatim_group_')===0; });
                         gkList.forEach(function(k){
                             var gKey = k.replace('hatim_group_','');
+                            if (!gKey) return; // bos-anahtarli hayalet grubu gosterme
                             try {
                                 var gData = JSON.parse(localStorage.getItem(k) || 'null');
                                 if (!gData) return;
@@ -4947,6 +4948,7 @@ document.addEventListener('click', function (e) {
   // Hatim dongusunu Supabase tablolarina yaz (book_hatims + book_history)
   function syncHatimToSB(key, g) {
     try {
+      if (!key || !String(key).trim()) return Promise.resolve(); // hayalet bos gruba asla yazma
       var bh = (g && g.bookHatims) || {};
       var hist = (g && g.bookHistory) || {};
       var hRows = [], hrRows = [];
@@ -5035,6 +5037,7 @@ document.addEventListener('click', function (e) {
           var g; try { g = JSON.parse(raw); } catch (e) { continue; }
           if (!g) continue;
           var gkey = k.replace("hatim_group_", "");
+          if (!gkey) continue; // bos-anahtarli hayalet grubu push etme
           if (isIndividualGroup(g, gkey)) continue;
           tasks.push(pushGroup(gkey, g));
         }
@@ -5051,7 +5054,7 @@ document.addEventListener('click', function (e) {
         var groups = res[0] || [], members = res[1] || [], shares = res[2] || [], books = res[3] || [], bhRows = res[4] || [], histRows = res[5] || [];
         var bookDef = (books && books.length) ? books.map(function (x) { return { id: x.id, total_units: x.total_units }; }) : [];
         var bookFull = (books && books.length) ? books.map(function (x) { return { id: x.id, name: x.name, totalUnits: x.total_units, type: x.type || "page", defaultMode: x.default_mode || "yirmi_sayfa" }; }) : [];
-        var byKey = {}; groups.forEach(function (g) { byKey[g.key] = g; });
+        var byKey = {}; groups.forEach(function (g) { if (g.key == null || !String(g.key).trim()) return; byKey[g.key] = g; }); // bos-anahtarli hayalet grubu yok say
         var bhByGroup = {}, histByGroup = {};
         bhRows.forEach(function (r) { if (!r || r.group_key == null) return; (bhByGroup[r.group_key] = bhByGroup[r.group_key] || {})[r.book_id] = { hatimNo: (r.hatim_no != null ? r.hatim_no : 1), startDate: r.start_date || "", prayerDone: !!r.prayer_done }; });
         histRows.forEach(function (r) { if (!r || r.group_key == null) return; var gk2 = r.group_key; (histByGroup[gk2] = histByGroup[gk2] || {})[r.book_id] = (histByGroup[gk2][r.book_id] || []); histByGroup[gk2][r.book_id].push({ grup: gk2, eser: r.eser || r.book_id || "", hatimNo: (r.hatim_no != null ? r.hatim_no : 1), baslangic: r.baslangic || "", bitis: r.bitis || "", tamamlandi: r.tamamlandi || "" }); });
