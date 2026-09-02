@@ -4734,7 +4734,7 @@ document.addEventListener('click', function (e) {
     });
   };
   window._sbUpdatePassword = function (name, newPwd) {
-    return rest.select("members", "?select=id,name").then(function (allM) {
+    return rest.select("members", "?select=id,name,group_key").then(function (allM) {
       var target = null;
       (allM || []).forEach(function (m) { if (m.name === name) target = m; });
       if (!target) throw new Error("\u00dcye bulunamad\u0131: " + name);
@@ -4742,7 +4742,7 @@ document.addEventListener('click', function (e) {
     });
   };
   window._sbUpdateName = function (oldName, newName) {
-    return rest.select("members", "?select=id,name").then(function (allM) {
+    return rest.select("members", "?select=id,name,group_key").then(function (allM) {
       var target = null;
       // Ayni isim birden fazla grupta olabilir: secili gruba gore esle
       (allM || []).forEach(function (m) { if (m.name === oldName && String(m.group_key || "") === String(currentGroup || "")) target = m; });
