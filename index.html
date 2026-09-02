@@ -2360,15 +2360,25 @@
                         let _membersSrc = allMembers;
                         // Grup filtresi: secili grubun GERCEK uye listesi (groupStats.memberNames) ile eslesenleri al
                         if (groupName !== 'all') {
-                            var _grpNames = [];
-                            try { var _gs = (typeof groupStats !== 'undefined' && groupStats) ? groupStats.find(function(g){ return String(g.name) === String(groupName); }) : null; if (_gs && _gs.memberNames) _grpNames = _gs.memberNames.slice(); } catch(e){}
-                            if (groupName === '__bireysel__' || groupName === '') { _grpNames = (typeof getAllBireyselMemberNames === 'function') ? getAllBireyselMemberNames() : []; }
-                            _membersSrc = allMembers.filter(function(m){
-                                var inG = _grpNames.indexOf(m.name) > -1;
-                                // Bireysel sectiyse yalniz bireysel; grup sectiyse o gruptakiler (type onemsiz, isim eslesmesi esas)
-                                if (groupName === '__bireysel__' || groupName === '') return inG || (m.type === 'bireysel');
-                                return inG;
-                            });
+                            // Bireysel sectiyse: yalniz tipi bireysel olanlar
+                            if (groupName === '__bireysel__' || groupName === '') {
+                                _membersSrc = allMembers.filter(function(m){ return String(m.type) === 'bireysel'; });
+                            } else {
+                                // Grup sectiyse: uyenin groups alani secili grubu icermeli (isim degil GRUP esasi -
+                                // ayni isim farkli gruplarda olabilir, isimle eslesme yanlis uyeleri getirir)
+                                _membersSrc = allMembers.filter(function(m){
+                                    var gs = m.groups || [];
+                                    return gs.indexOf(groupName) > -1;
+                                });
+                                // Guvence: secili grubun gercek uyeleriyle de esle (grup tipi grup olsa da)
+                                if (!_membersSrc.length) {
+                                    try {
+                                        var _gs = (typeof groupStats !== 'undefined' && groupStats) ? groupStats.find(function(g){ return String(g.name) === String(groupName); }) : null;
+                                        var _grpNames = (_gs && _gs.memberNames) ? _gs.memberNames : [];
+                                        _membersSrc = allMembers.filter(function(m){ return _grpNames.indexOf(m.name) > -1; });
+                                    } catch(e){}
+                                }
+                            }
                         }
                         _membersSrc.forEach(m => {
                             let _mg = (m.type === 'bireysel') ? null : (m.groups && m.groups[0]) || groupName;
