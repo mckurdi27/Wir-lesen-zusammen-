@@ -3049,14 +3049,22 @@ function renderTab6(groupName, memberName) {
                         
                         const group = document.getElementById('analysis-group-select').value;
                         const member = document.getElementById('analysis-member-select').value;
-                        switch(target) {
+                        var _pt6 = (typeof pullAll === 'function') ? pullAll() : Promise.resolve();
+                        _pt6.then(function(){ if (activeAnalysisTab === target) { switch(target) {
                             case 'dtabs-1': renderTab1(group, member); break;
                             case 'dtabs-2': renderTab2(group); break;
                             case 'dtabs-3': renderTab3(group, member); break;
                             case 'dtabs-4': renderTab4(group, member); break;
                             case 'dtabs-5': renderTab5(group, member); break;
                             case 'dtabs-6': renderTab6(group, member); break;
-                        }
+                        } } }).catch(function(){ if (activeAnalysisTab === target) { switch(target) {
+                            case 'dtabs-1': renderTab1(group, member); break;
+                            case 'dtabs-2': renderTab2(group); break;
+                            case 'dtabs-3': renderTab3(group, member); break;
+                            case 'dtabs-4': renderTab4(group, member); break;
+                            case 'dtabs-5': renderTab5(group, member); break;
+                            case 'dtabs-6': renderTab6(group, member); break;
+                        } } });
                     });
                 });
 
