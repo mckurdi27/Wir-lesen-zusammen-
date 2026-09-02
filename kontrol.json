@@ -1,0 +1,20 @@
+KONTROL RAPORU
+==============
+[k5] Durum:  | Aciklama: isim değiştiriyorum,uncaucght hastası veriyor
+[k8] Durum: CALISMIYOR | Aciklama: kaydedildi diyor ama kaydetmiyor
+[k18] Durum: CALISMIYOR | Aciklama: hisseden vazgeçildi diyor ama silmiyor
+
+Not defteri:
+buradaki amacımız bir eserin grup olarak tamamlanması ve gruplar arasındaki karşılaştırılma yapmak
+grup tek yada çok üyeden oluşur
+grupların bir esere ne zaman başladığı, ne kadar okuduğu ,ne zaman tamamlandığı karşılaştırılır
+ayrıca üye bazında da karşılaştırılma yapar
+
+şimdi hatimlerin karışmaması için
+her gurubun eser hatim sıralaması ayrı tutulur
+analiz bölümünde 6. bir bölüm olmalı
+bu bölümdeki tabloda sadece 
+1. sütun tüm tamamlanan hatimler başlama zamanına göre kaydedilir ,eserler sırasına göre kuran,cevsen...
+2. sütun zaman sırasına göre eser hatmine başlayan grup ,eserler sırasına göre kuran,cevsen..
+
+tamalanan hatimler ve sıralamaları bu listeye göre olacak ancak admin elle düzeltme yada silme yapmadığı müddetçe otomatik silinmez
