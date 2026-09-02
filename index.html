@@ -2901,6 +2901,18 @@ function renderTab6(groupName, memberName) {
                                 <button id="modal-excel-btn" style="background: #27ae60; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px;">📊 Excel</button>
                                 <button id="modal-print-btn" style="background: #2980b9; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px;">🖨️ Yazdır</button>
                                 <button id="modal-close-btn" style="background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px;">✕ Kapat</button>
+
+                            </div>
+                        </div>
+                        <div style="padding: 8px 20px; background: #fff8e6; border-bottom: 1px solid #e6d5a8;">
+                            <div style="font-size:12px; font-weight:bold; color:#8a6d3b; margin-bottom:5px;">\ud83d\udd27 Yazd\u0131r\u0131lacak B\u00f6l\u00fcmler</div>
+                            <div style="display:flex; flex-wrap:wrap; gap:8px; font-size:12px;">
+                                <label style="display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" class="dsec" value="1" checked> Genel \u00d6zet</label>
+                                <label style="display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" class="dsec" value="2" checked> Grup S\u0131ralama</label>
+                                <label style="display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" class="dsec" value="3" checked> \u00dcye Analizi</label>
+                                <label style="display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" class="dsec" value="4" checked> Eser Detay</label>
+                                <label style="display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" class="dsec" value="5" checked> Okuma G\u00fcnl\u00fc\u011f\u00fc</label>
+                                <label style="display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" class="dsec" value="6" checked> Hatim S\u0131ralama</label>
                             </div>
                         </div>
                         <div style="padding: 12px 20px; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border-color);">
@@ -3151,14 +3163,20 @@ function renderTab6(groupName, memberName) {
                         var head = '<html><head><meta charset="utf-8"><title>Detayl\u0131 Analiz</title><style>body{font-family:Arial,sans-serif;font-size:12px;color:#222;margin:10px;} h2{font-size:15px;margin:18px 0 6px;border-bottom:2px solid #c9a227;padding-bottom:3px;} table{border-collapse:collapse;width:100%;margin-bottom:8px;} th,td{border:1px solid #ccc;padding:4px 6px;text-align:left;font-size:11px;} th{background:#f3e9c8;font-weight:bold;} .cap{font-size:12px;color:#555;margin:2px 0 4px;}</style></head><body>';
                         var body = '<h1 style="text-align:center;">Detayl\u0131 Analiz</h1>';
                         var labels = {1:'GENEL \u00d6ZET',2:'GRUP SIRALAMA',3:'\u00dcYE ANAL\u0130Z\u0130',4:'ESER DETAY',5:'OKUMA G\u00dcNL\u00dc\u011e\u00dc',6:'HAT\u0130M SIRALAMA'};
-                        // 1-6 render edip gecici div'e koy, tablo HTML'lerini ayikla
+                        // Yalnizca secili bolumleri render edip yazdir
+                        var sel = Array.prototype.slice.call(modalOverlay.querySelectorAll('.dsec')).filter(function(cb){ return cb.checked; }).map(function(cb){ return parseInt(cb.value,10); });
+                        if(!sel.length) sel = [1,2,3,4,5,6];
                         var tmpDiv = document.createElement('div');
-                        for(var ti=1; ti<=6; ti++){
+                        var added = false;
+                        sel.forEach(function(ti){
                             try{ if(ti===1) renderTab1(g2,m2); else if(ti===2) renderTab2(g2); else if(ti===3) renderTab3(g2,m2); else if(ti===4) renderTab4(g2,m2); else if(ti===5) renderTab5(g2,m2); else renderTab6(g2,m2); }catch(e){}
                             var cid='dtabs-'+ti+'-content'; var ct=document.getElementById(cid);
-                            if(ct){ body += '<h2>'+(labels[ti]||('B\u00f6l\u00fcm '+ti))+'</h2>' + ct.innerHTML; }
-                            body += '<div style="page-break-after:always;"></div>';
-                        }
+                            if(ct){
+                                body += '<h2>'+(labels[ti]||('B\u00f6l\u00fcm '+ti))+'</h2>' + ct.innerHTML;
+                                body += '<div style="page-break-after:always;"></div>';
+                                added = true;
+                            }
+                        });
                         pw.document.write(head+body+'</body></html>');
                         pw.document.close();
                         setTimeout(function(){ pw.print(); }, 250);
