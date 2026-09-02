@@ -2735,7 +2735,7 @@
                             + '<th data-k="baslangic" class="t6-th" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="S\u0131rala">Ba\u015flang\u0131\u00e7 \u21c5</th>'
                             + '<th data-k="durum" class="t6-th" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="S\u0131rala">Durum \u21c5</th>';
                         if (admin) html += '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Y\u00f6net</th>';
-                        html += '</tr></thead><tbody>';
+                        html += '</tr></thead><tbody id="tab6-start-tb">';
                         started.forEach(function(r){
                             html += '<tr style="background:#ffffff;" data-toplam="' + (r.globalNo||'') + '" data-grupno="' + (r.hatimNo||'') + '" data-eser="' + (r.eser||'') + '" data-grup="' + (r.grup||'') + '" data-baslangic="' + (r.baslangic||'') + '" data-durum="Devam ediyor" data-search="' + ((r.eser||'')+' '+(r.grup||'')+' '+(r.hatimNo||'')+' devam ediyor') + '">'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);font-weight:bold;">' + (r.globalNo||'-') + '</td>'
@@ -2761,7 +2761,7 @@
                             + '<th data-k="baslangic" class="t6-th" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="S\u0131rala">Ba\u015flang\u0131\u00e7 \u21c5</th>'
                             + '<th data-k="tamamlanma" class="t6-th" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="S\u0131rala">Tamamlanma \u21c5</th>';
                         if (admin) html += '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Y\u00f6net</th>';
-                        html += '</tr></thead><tbody>';
+                        html += '</tr></thead><tbody id="tab6-done-tb">';
                         done.forEach(function(r){
                             html += '<tr style="background:#ffffff;" data-toplam="' + (r.globalNo||'') + '" data-grupno="' + (r.hatimNo||'') + '" data-eser="' + (r.eser||'') + '" data-grup="' + (r.grup||'') + '" data-baslangic="' + (r.baslangic||'') + '" data-tamamlanma="' + (r.tamamlandi||'') + '" data-search="' + ((r.eser||'')+' '+(r.grup||'')+' '+(r.hatimNo||'')+' tamamlandi') + '">'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);font-weight:bold;">' + (r.globalNo||'-') + '</td>'
