@@ -1,3 +1,26 @@
+
+<!--
+=====================================================================
+  ANA KURAL - HER AGENT OKUMALI (bu bir kurallardır, birimler arasi)
+=====================================================================
+  1) Bu uygulamadaki veri kaynagi CANLI (Supabase) verileridir.
+     Sayfadaki bilgiler anlik degisebilir; ayni anda birden fazla
+     uye/yonetici giris yapip veri degistirebilir.
+  2) ASLA yalnizca localStorage/cache verisini dogru kabul etme.
+     Sayfa acilirken ve 3 saniyelik polling ile veriler Supabase'ten
+     taze cekilip ekrana yansitilir. Analiz acilmadan once de Supabase'ten
+     cekilir.
+  3) Bir degisiklik yaptiginda (hisse al/oku/sil/isim degisikligi vb.)
+     veriyi BOTH (hem Supabase'e REST ile hem de localStorage cache'ine)
+     yaz; ancak goruntuleme/analiz her zaman Supabase'ten gelen guncel
+     veriye dayanmalidir.
+  4) Yeni agent sohbetinde: "veriler bayat/eski" sikayeti gelirse once
+     Supabase'teki gercek veriyi kontrol et, localStorage'i senkronla.
+  5) Eser PDF sayfa/bab eslemesi (bookSectionPages) global localStorage
+     anahtarinda ('hatim_bookpages') saklanir - grup bazli degil.
+=====================================================================
+-->
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -2334,7 +2357,15 @@
                     
                     if (memberName === 'all') {
                         let allMemberStats = [];
-                        allMembers.forEach(m => {
+                        let _membersSrc = allMembers;
+                        // Grup filtresi: secili grup secildiyse yalnizca o gruptaki/bireysel uyeleri listele
+                        if (groupName !== 'all') {
+                            _membersSrc = allMembers.filter(function(m){
+                                if (groupName === '__bireysel__' || groupName === '') return (m.type === 'bireysel');
+                                return (m.type !== 'bireysel') && (m.groups || []).indexOf(groupName) > -1;
+                            });
+                        }
+                        _membersSrc.forEach(m => {
                             // Ayni isim farkli gruplarda ayri sayilsin: uyenin kendi grubunu gecir
                             let _mg = (m.type === 'bireysel') ? null : (m.groups && m.groups[0]) || groupName;
                             let data = getMemberDetailData(m.name, _mg, analysisBooks.length ? analysisBooks : 'all');
