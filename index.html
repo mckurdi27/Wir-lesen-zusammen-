@@ -582,7 +582,32 @@
         <div id="books-grid"></div>
 
         <!-- BÖLÜM 7 - NAMAZ VAKİTLERİ -->
-        <script>
+            <!-- ESER YÖNETİMİ MODAL -->
+    <div id="book-edit-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center;">
+        <div style="background:#fff; width:92%; max-width:460px; max-height:90vh; overflow-y:auto; border-radius:12px; padding:16px; box-sizing:border-box;">
+            <h3 id="book-modal-title" style="margin:0 0 12px; color:#27ae60; font-size:16px;">📚 Yeni Eser Ekle</h3>
+            <input type="hidden" id="book-modal-id">
+            <label style="font-size:12px; color:#555; display:block;">Eser adı</label>
+            <input type="text" id="book-modal-name" style="width:100%; padding:8px; margin-bottom:10px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;">
+            <div style="display:flex; gap:8px; margin-bottom:10px;">
+                <div style="flex:1;"><label style="font-size:12px; color:#555; display:block;">Birim sayısı</label><input type="number" id="book-modal-units" min="1" value="100" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;"></div>
+                <div style="flex:1;"><label style="font-size:12px; color:#555; display:block;">Birim başına sayfa</label><input type="number" id="book-modal-ppu" min="1" value="1" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;"></div>
+            </div>
+            <div style="display:flex; gap:8px; margin-bottom:10px;">
+                <div style="flex:1;"><label style="font-size:12px; color:#555; display:block;">Başlangıç sayfası</label><input type="number" id="book-modal-start" min="1" value="1" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;"></div>
+                <div style="flex:1;"><label style="font-size:12px; color:#555; display:block;">Toplam sayfa</label><input type="number" id="book-modal-total" min="1" value="100" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;"></div>
+            </div>
+            <label style="font-size:12px; color:#555; display:block;">PDF yolu</label>
+            <input type="text" id="book-modal-pdf" placeholder="pdf/ornek.pdf" style="width:100%; padding:8px; margin-bottom:10px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;">
+            <label style="font-size:12px; color:#555; display:block;">PDF sayfa numaraları (her satır: birim:sayfa)</label>
+            <textarea id="book-modal-pages" rows="4" style="width:100%; padding:8px; margin-bottom:12px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; font-size:11px;"></textarea>
+            <div style="display:flex; gap:8px; justify-content:flex-end;">
+                <button id="book-modal-cancel" style="background:#95a5a6; color:#fff; border:none; padding:8px 16px; border-radius:6px; cursor:pointer;">İptal</button>
+                <button id="book-modal-save" style="background:#27ae60; color:#fff; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:bold;">Kaydet</button>
+            </div>
+        </div>
+    </div>
+<script>
         async function fetchPrayerTimes() {
             const city = document.getElementById('citySelect').value;
             const resultDiv = document.getElementById('prayerTimesResult');
@@ -749,7 +774,8 @@
   "dua_mecmuasi": { type:'range', startPage:1, pageSize:1, getPage: function(unitIndex){ return unitIndex + 1; } },
   "dilekce_tr": { type:'range', startPage:1, pageSize:1, getPage: function(unitIndex){ return unitIndex + 1; } },
   "dilekce_ar": { type:'range', startPage:1, pageSize:1, getPage: function(unitIndex){ return unitIndex + 1; } }
-};
+};            window.bookSectionPages = bookSectionPages;
+
 
             // ============================================================
             // PDF.JS OKUYUCU FONKSİYONLARI
@@ -1375,7 +1401,7 @@
                         bookModesDefs[b.id] = b.type === "bab" ? createBabModes(b.totalUnits) : createPageModes(b.totalUnits);
                     });
                 }
-            }
+            } window.rebuildBookModesDefs = rebuildBookModesDefs;
 
             // GRUP VE KULLANICI YÖNETİMİ
             function getAllGroupKeys() {
@@ -2937,8 +2963,8 @@
                         let actionButtons = "";
 
                         let pageNumber = 1;
-                        if (bookSectionPages[book.id] && bookSectionPages[book.id].getPage) {
-                            pageNumber = bookSectionPages[book.id].getPage(pi.start, book.currentMode, index);
+                        if (window.bookSectionPages[book.id] && window.bookSectionPages[book.id].getPage) {
+                            pageNumber = window.bookSectionPages[book.id].getPage(pi.start, book.currentMode, index);
                         } else {
                             pageNumber = pi.start + 1;
                         }
@@ -3823,72 +3849,13 @@ window.infoSortTable = function infoSortTable(col) {
                         });
                     }
 document.getElementById("admin-add-book-btn").addEventListener("click", () => {
-                        let bName = prompt("Eser adı:");
-                        if (!bName?.trim()) return;
-                        let units = parseInt(prompt("Toplam birim sayısı:", "100"));
-                        if (isNaN(units) || units <= 0) { showToast('Geçersiz sayı!', 'error'); return; }
-                        let type = prompt("Birim türü (sayfa/bab):", "sayfa");
-                        let bType = type?.toLowerCase() === "bab" ? "bab" : "page";
-                        let pdf = prompt("PDF yolu (boş bırakabilirsiniz):", "") || "";
-                        let id = "book_" + Date.now();
-                        appData.books.push({ id, name: bName.trim(), totalUnits: units, type: bType, defaultMode: bType === "bab" ? "yirmi_bab" : "yirmi_sayfa", currentMode: bType === "bab" ? "yirmi_bab" : "yirmi_sayfa", pdf });
-                        rebuildBookModesDefs();
-                        appData.bookPages[id] = Array(units).fill(null).map(() => ({ owner: "", isRead: false }));
-                        appData.bookHatims[id] = { hatimNo: 1, startDate: new Date().toLocaleDateString("tr-TR"), prayerDone: false };
-                        appData.bookHistory[id] = [];
-                        bookSectionPages[id] = {
-                            type: "manual",
-                            pages: {},
-                            getPage: function(unitIndex) {
-                                return this.pages[unitIndex] || (unitIndex + 1);
-                            }
-                        };
-                        for (let i = 0; i < units; i++) {
-                            bookSectionPages[id].pages[i] = i + 1;
-                        }
-                        saveGroupData();
-                        loadGroupData();
-                        showToast('✅ Yeni eser eklendi!', 'success');
+                        if (typeof window.openBookModal === 'function') { window.openBookModal(null); }
                     });
 
                     document.querySelectorAll(".admin-edit-book").forEach(btn => {
                         btn.addEventListener("click", () => {
                             let id = btn.getAttribute("data-id");
-                            let book = appData.books.find(b => b.id === id);
-                            if (!book) return;
-                            let newName = prompt("Yeni ad:", book.name);
-                            if (newName === null) return;
-                            let newUnits = parseInt(prompt("Yeni birim sayısı:", book.totalUnits));
-                            if (!isNaN(newUnits) && newUnits > 0) {
-                                book.name = newName.trim();
-                                book.totalUnits = newUnits;
-                                if (!appData.bookPages[id]) {
-                                    appData.bookPages[id] = Array(newUnits).fill(null).map(() => ({ owner: "", isRead: false }));
-                                } else if (appData.bookPages[id].length < newUnits) {
-                                    while (appData.bookPages[id].length < newUnits) {
-                                        appData.bookPages[id].push({ owner: "", isRead: false });
-                                    }
-                                } else {
-                                    appData.bookPages[id] = appData.bookPages[id].slice(0, newUnits);
-                                }
-                                if (!bookSectionPages[id]) {
-                                    bookSectionPages[id] = {
-                                        type: "manual",
-                                        pages: {},
-                                        getPage: function(unitIndex) {
-                                            return this.pages[unitIndex] || (unitIndex + 1);
-                                        }
-                                    };
-                                }
-                                for (let i = 0; i < newUnits; i++) {
-                                    if (!bookSectionPages[id].pages[i]) {
-                                        bookSectionPages[id].pages[i] = i + 1;
-                                    }
-                                }
-                                saveGroupData();
-                                loadGroupData();
-                                showToast('✅ Eser güncellendi!', 'success');
-                            }
+                            if (typeof window.openBookModal === 'function') { window.openBookModal(id); }
                         });
                     });
 
@@ -3908,7 +3875,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                                 delete appData.bookPages[id];
                                 delete appData.bookHatims[id];
                                 delete appData.bookHistory[id];
-                                delete bookSectionPages[id];
+                                delete window.bookSectionPages[id];
                                 saveGroupData();
                                 loadGroupData();
                                 showToast('🗑️ Eser silindi.', 'info');
@@ -3916,14 +3883,151 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         });
                     });
 
+
+                    // ===== ESER YÖNETİMİ MODAL MANTIĞI =====
+                    window.openBookModal = function(editId) {
+                        let m = document.getElementById('book-edit-modal');
+                        if (!m) return;
+                        let mId = document.getElementById('book-modal-id');
+                        let mName = document.getElementById('book-modal-name');
+                        let mUnits = document.getElementById('book-modal-units');
+                        let mPpu = document.getElementById('book-modal-ppu');
+                        let mStart = document.getElementById('book-modal-start');
+                        let mTotal = document.getElementById('book-modal-total');
+                        let mPdf = document.getElementById('book-modal-pdf');
+                        let mPages = document.getElementById('book-modal-pages');
+                        let mTitle = document.getElementById('book-modal-title');
+                        // varsayilan
+                        mId.value = '';
+                        mName.value = '';
+                        mUnits.value = '100';
+                        mPpu.value = '1';
+                        mStart.value = '1';
+                        mTotal.value = '100';
+                        mPdf.value = '';
+                        mPages.value = '';
+                        mTitle.textContent = '📚 Yeni Eser Ekle';
+                        if (editId) {
+                            let book = appData.books.find(b => b.id === editId);
+                            if (!book) return;
+                            mId.value = editId;
+                            mTitle.textContent = '📚 Eser Düzenle: ' + book.name;
+                            mName.value = book.name || '';
+                            mUnits.value = book.totalUnits || 100;
+                            mPdf.value = book.pdf || '';
+                            // mevcut sayfa haritasi
+                            let sp = window.bookSectionPages[editId];
+                            let startPage = 1, ppu = 1;
+                            if (sp && sp.pages) {
+                                let keys = Object.keys(sp.pages).map(Number).sort((a,b)=>a-b);
+                                if (keys.length) { startPage = sp.pages[keys[0]] || 1; }
+                            }
+                            if (sp && sp.pageSize) ppu = sp.pageSize;
+                            mStart.value = startPage;
+                            mPpu.value = ppu;
+                            mTotal.value = (book.totalUnits || 100) * (ppu || 1);
+                            // sayfa satirlari: birim:sayfa
+                            let lines = [];
+                            if (sp && sp.pages) {
+                                for (let k in sp.pages) {
+                                    if (sp.pages[k]) lines.push((parseInt(k)+1) + ':' + sp.pages[k]);
+                                }
+                            }
+                            mPages.value = lines.join('\n');
+                        }
+                        m.style.display = 'flex';
+                        if (mName && !editId) mName.focus();
+                    };
+                    function closeBookModal() {
+                        let m = document.getElementById('book-edit-modal');
+                        if (m) m.style.display = 'none';
+                    }
+                    let _bkc = document.getElementById('book-modal-cancel');
+                    if (_bkc && !_bkc._sb) { _bkc._sb = true; _bkc.addEventListener('click', closeBookModal); }
+                    let _bks = document.getElementById('book-modal-save');
+                    if (_bks && !_bks._sb) { _bks._sb = true; _bks.addEventListener('click', function() {
+                        let m = document.getElementById('book-edit-modal');
+                        if (!m) return;
+                        let mId = document.getElementById('book-modal-id');
+                        let mName = document.getElementById('book-modal-name');
+                        let mUnits = document.getElementById('book-modal-units');
+                        let mPpu = document.getElementById('book-modal-ppu');
+                        let mStart = document.getElementById('book-modal-start');
+                        let mTotal = document.getElementById('book-modal-total');
+                        let mPdf = document.getElementById('book-modal-pdf');
+                        let mPages = document.getElementById('book-modal-pages');
+                        let name = (mName.value || '').trim();
+                        if (!name) { showToast('❌ Eser adı boş olamaz', 'error'); return; }
+                        let units = parseInt(mUnits.value) || 0;
+                        if (units <= 0) { showToast('❌ Birim sayısı geçersiz', 'error'); return; }
+                        let ppu = parseInt(mPpu.value) || 1;
+                        if (ppu <= 0) ppu = 1;
+                        let startPg = parseInt(mStart.value) || 1;
+                        if (startPg <= 0) startPg = 1;
+                        let pdf = (mPdf.value || '').trim();
+                        let editId = mId.value;
+                        let id;
+                        if (editId) {
+                            id = editId;
+                            let book = appData.books.find(b => b.id === id);
+                            if (!book) return;
+                            book.name = name;
+                            book.totalUnits = units;
+                            if (pdf) book.pdf = pdf;
+                        } else {
+                            id = 'book_' + Date.now();
+                            appData.books.push({ id: id, name: name, totalUnits: units, type: 'page', defaultMode: 'yirmi_sayfa', currentMode: 'yirmi_sayfa', pdf: pdf });
+                            window.rebuildBookModesDefs();
+                            appData.bookPages[id] = Array(units).fill(null).map(() => ({ owner: '', isRead: false }));
+                            appData.bookHatims[id] = { hatimNo: 1, startDate: new Date().toLocaleDateString('tr-TR'), prayerDone: false };
+                            appData.bookHistory[id] = [];
+                        }
+                        // birim-sayfa haritasi: once temiz sonra satirlardan doldur
+                        let pagesMap = {};
+                        let rawLines = (mPages.value || '').split(/\n|,/).map(x=>x.trim()).filter(Boolean);
+                        rawLines.forEach(function(line) {
+                            let parts = line.split(':');
+                            if (parts.length === 2) {
+                                let ui = parseInt(parts[0]) - 1;
+                                let pg = parseInt(parts[1]);
+                                if (!isNaN(ui) && ui >= 0 && !isNaN(pg) && pg > 0) pagesMap[ui] = pg;
+                            }
+                        });
+                        // otomatik doldur: baslangic + birim*ppu
+                        let seenMax = 0;
+                        for (let k in pagesMap) if (parseInt(k) > seenMax) seenMax = parseInt(k);
+                        for (let i = 0; i < units; i++) {
+                            if (pagesMap[i] === undefined) pagesMap[i] = startPg + i * ppu;
+                        }
+                        if (!window.bookSectionPages[id]) {
+                            window.bookSectionPages[id] = { type: 'manual', pages: {}, getPage: function(unitIndex){ return this.pages[unitIndex] || (unitIndex + 1); } };
+                        }
+                        window.bookSectionPages[id].pageSize = ppu;
+                        window.bookSectionPages[id].pages = pagesMap;
+                        // bookPages boyutunu units'e uyarla
+                        if (appData.bookPages[id]) {
+                            while (appData.bookPages[id].length < units) appData.bookPages[id].push({ owner: '', isRead: false });
+                            appData.bookPages[id] = appData.bookPages[id].slice(0, units);
+                        } else {
+                            appData.bookPages[id] = Array(units).fill(null).map(() => ({ owner: '', isRead: false }));
+                        }
+                        window.saveGroupData();
+                        window.loadGroupData();
+                        closeBookModal();
+                        showToast(editId ? '✅ Eser güncellendi!' : '✅ Yeni eser eklendi!', 'success');
+                    }); }
+                    window.closeBookModal = closeBookModal;
+                    let _bme = document.getElementById('book-edit-modal');
+                    if (_bme) { _bme.addEventListener('click', function(ev){ if (ev.target === _bme) closeBookModal(); }); }
+                    // ===== /ESER YÖNETİMİ MODAL MANTIĞI =====
                     if (!window._adminSelBound) { window._adminSelBound = true;
                     document.addEventListener("change", async (e) => {
                         if (!e.target || e.target.id !== "admin-group-select") return;
                         let v = e.target.value;
-                        if (v.startsWith("gm:")) { let p = v.split(':'); currentGroup = p[1]; loggedInMember = decodeURIComponent(p[2]||""); loggedInMemberType = "grup"; await loadGroupData(true); updateUserInterface(); renderAdminSectionAtBottom(); const _sel=document.getElementById("admin-group-select"); if(_sel) _sel.value=v; }
-                        else if (v.startsWith("g:")) { currentGroup = v.slice(2); loggedInMember = ""; loggedInMemberType = ""; await loadGroupData(true); updateUserInterface(); renderAdminSectionAtBottom(); const _sel=document.getElementById("admin-group-select"); if(_sel) _sel.value=v; }
-                        else if (v === "__bireysel__" || v === "") { currentGroup = v === "__bireysel__" ? "" : v; await loadGroupData(); }
-                        else { currentGroup = ""; loggedInMember = v; loggedInMemberType = "bireysel"; await loadGroupData(true); updateUserInterface(); renderAdminSectionAtBottom(); }
+                        if (v.startsWith("gm:")) { let p = v.split(':'); currentGroup = p[1]; loggedInMember = decodeURIComponent(p[2]||""); loggedInMemberType = "grup"; await window.loadGroupData(true); updateUserInterface(); renderAdminSectionAtBottom(); const _sel=document.getElementById("admin-group-select"); if(_sel) _sel.value=v; }
+                        else if (v.startsWith("g:")) { currentGroup = v.slice(2); loggedInMember = ""; loggedInMemberType = ""; await window.loadGroupData(true); updateUserInterface(); renderAdminSectionAtBottom(); const _sel=document.getElementById("admin-group-select"); if(_sel) _sel.value=v; }
+                        else if (v === "__bireysel__" || v === "") { currentGroup = v === "__bireysel__" ? "" : v; await window.loadGroupData(); }
+                        else { currentGroup = ""; loggedInMember = v; loggedInMemberType = "bireysel"; await window.loadGroupData(true); updateUserInterface(); renderAdminSectionAtBottom(); }
                     });
                 }
 
@@ -3942,11 +4046,11 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                                 history[b.id] = [];
                             });
                             appData = { members: [], memberTypes: {}, password: pwd.trim(), books, bookPages: pages, bookHatims: hatims, bookHistory: history, readingLogs: [] };
-                            saveGroupData();
+                            window.saveGroupData();
                             // Supabase'e de yaz (tek doğruluk kaynağı)
                             var _api = (typeof window.api === 'function') ? window.api : null;
                             if (_api) { try { await _api("/groups", { method: "POST", body: JSON.stringify({ key: key, name: name.trim(), password: pwd.trim() }) }); } catch(e){ console.warn('grup ekle', e); } }
-                            await loadGroupData();
+                            await window.loadGroupData();
                             showToast('✅ Yeni grup oluşturuldu!', 'success');
                         }
                     });
@@ -3972,7 +4076,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                             try { await _api2("/groups?key=eq." + _oldEnc, { method: "DELETE" }); } catch(e){ console.warn('eski grup sil', e); }
                         }
                         currentGroup = key;
-                        await loadGroupData();
+                        await window.loadGroupData();
                         await pullAll();
                         refreshUI();
                         renderAdminSectionAtBottom();
@@ -3994,7 +4098,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                             localStorage.removeItem(`hatim_group_${currentGroup}`);
                             let keys = getAllGroupKeysForAdmin();
                             currentGroup = keys[0] || "";
-                            await loadGroupData();
+                            await window.loadGroupData();
                             await pullAll();
                             refreshUI();
                             showToast('🗑️ Grup silindi.', 'info');
@@ -4005,8 +4109,8 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         let pwd = prompt("Yeni şifre (boş bırakırsanız kaldırılır):", appData.password || "");
                         if (pwd !== null) {
                             appData.password = pwd.trim();
-                            saveGroupData();
-                            loadGroupData();
+                            window.saveGroupData();
+                            window.loadGroupData();
                             showToast(appData.password ? '🔒 Şifre tanımlandı!' : '🔓 Şifre kaldırıldı!', 'info');
                         }
                     });
@@ -4053,7 +4157,7 @@ var _cg = selVal || '';
                             else if (_cg.startsWith('__bireysel__')) { _cg = ''; }
                             if (!_cg) { showToast('Önce bir grup seçin.', 'info'); return; }
                             currentGroup = _cg;
-                            await loadGroupData();
+                            await window.loadGroupData();
                             let gpw = prompt("Grup üyesi şifresi:");
                             if (!gpw || !gpw.trim()) { showToast('❌ Şifre gerekli!', 'error'); return; }
                             if (!appData.members.includes(clean)) {
@@ -4063,8 +4167,8 @@ var _cg = selVal || '';
                                 if (appData.passiveMembers) { appData.passiveMembers = appData.passiveMembers.filter(p => p !== clean); }
                                 if (!appData.passwords) appData.passwords = {};
                                 appData.passwords[clean] = gpw.trim();
-                                saveGroupData();
-                                await loadGroupData();
+                                window.saveGroupData();
+                                await window.loadGroupData();
                                 showToast(`✅ ${clean} eklendi!`, 'success');
                             } else {
                                 showToast('Bu üye zaten var.', 'error');
@@ -4102,8 +4206,8 @@ var _cg = selVal || '';
                                     appData.memberTypes[name] = 'pasif';
                                     appData.members = appData.members.filter(m => m !== name);
                                     try { if (typeof window.api === 'function') await window.api("/members?name=eq." + encodeURIComponent(name) + "&group_key=eq." + encodeURIComponent(currentGroup), { method: "DELETE" }); } catch(e){}
-                                    saveGroupData();
-                                    await loadGroupData();
+                                    window.saveGroupData();
+                                    await window.loadGroupData();
                                     await pullAll();
                                     refreshUI();
                                     showToast(`ℹ️ ${name} pasif üye yapıldı (tamamlanmış eserleri korundu).`, 'info');
@@ -4115,8 +4219,8 @@ var _cg = selVal || '';
                                         });
                                     });
                                     try { if (typeof window.api === 'function') await window.api("/members?name=eq." + encodeURIComponent(name) + "&group_key=eq." + encodeURIComponent(currentGroup), { method: "DELETE" }); } catch(e){}
-                                    saveGroupData();
-                                    await loadGroupData();
+                                    window.saveGroupData();
+                                    await window.loadGroupData();
                                     await pullAll();
                                     refreshUI();
                                     showToast(`❌ ${name} çıkartıldı.`, 'info');
@@ -4137,7 +4241,7 @@ var _cg = selVal || '';
                                 // ayrıca bu üyenin grup anahtarını (okuma verisi) temizle
                                 let bKey = "hatim_group_" + name.toLowerCase();
                                 if (localStorage.getItem(bKey)) localStorage.removeItem(bKey);
-                                await loadGroupData();
+                                await window.loadGroupData();
                                 showToast(`❌ ${name} bireysel üye silindi.`, 'info');
                             }
                         });
@@ -4175,8 +4279,8 @@ var _cg = selVal || '';
                                 changed = true;
                             }
                             if (changed) {
-                                saveGroupData();
-                                await loadGroupData();
+                                window.saveGroupData();
+                                await window.loadGroupData();
                                 showToast('\u2705 G\u00fcncellendi: ' + clean, 'success');
                             }
                         });
@@ -4261,15 +4365,15 @@ var _cg = selVal || '';
                     if (!appData.bookHistory[b.id]) appData.bookHistory[b.id] = [];
                 });
 
-                rebuildBookModesDefs();
-                saveGroupData();
+                window.rebuildBookModesDefs();
+                window.saveGroupData();
                 await renderDailyInspiration();
                 renderBooks();
                 
                 renderAdminSectionAtBottom();
                 updateAutocompleteLists();
                 updateUserInterface();
-            }
+            } window.loadGroupData = loadGroupData;
 
             async function triggerAdminToggle() {
                 if (isAdmin) {
@@ -4364,8 +4468,8 @@ renderBooks();
                     if (!appData.bookHistory[b.id]) appData.bookHistory[b.id] = [];
                 });
 
-                rebuildBookModesDefs();
-                saveGroupData();
+                window.rebuildBookModesDefs();
+                window.saveGroupData();
                 await renderDailyInspiration();
                 renderBooks();
                 
@@ -4377,9 +4481,9 @@ renderBooks();
             
             function saveGroupData() {
                 localStorage.setItem(`hatim_group_${currentGroup}`, JSON.stringify(appData));
-            }
+            } window.saveGroupData = saveGroupData;
 
-            await loadGroupData();
+            await window.loadGroupData();
         });
     
 // Kişisel kart buton işleyicileri (document delegasyonu — render sonrası da çalışır)
@@ -4422,7 +4526,7 @@ document.addEventListener('click', function (e) {
           if (loggedInMemberType === 'grup' && appData) {
             if (appData.passwords && appData.passwords[oldName]) { appData.passwords[newName] = appData.passwords[oldName]; delete appData.passwords[oldName]; }
             if (appData.members) { var ix = appData.members.indexOf(oldName); if (ix !== -1) appData.members[ix] = newName; }
-            saveGroupData();
+            window.saveGroupData();
           } else {
             var _bp = getBireyselPool();
             if (_bp.passwords && _bp.passwords[oldName]) { _bp.passwords[newName] = _bp.passwords[oldName]; delete _bp.passwords[oldName]; }
@@ -4785,7 +4889,7 @@ document.addEventListener('click', function (e) {
   };
 
   function refreshUI() {
-    try { if (typeof loadGroupData === "function") loadGroupData(); if (typeof updateUserInterface === "function") updateUserInterface(); if (typeof renderAdminSectionAtBottom === "function") renderAdminSectionAtBottom(); if (typeof updateAutocompleteLists === "function") updateAutocompleteLists(); } catch (e) {}
+    try { if (typeof loadGroupData === "function") window.loadGroupData(); if (typeof updateUserInterface === "function") updateUserInterface(); if (typeof renderAdminSectionAtBottom === "function") renderAdminSectionAtBottom(); if (typeof updateAutocompleteLists === "function") updateAutocompleteLists(); } catch (e) {}
   }
 
   function doInit() {
@@ -4819,7 +4923,7 @@ document.addEventListener('click', function (e) {
   setInterval(function () {
     if (!_myPush) pullAll().then(function () {
       // Polling: veriyi guncelle ama admin panel HTML'ini yeniden cizme (acilir liste secimleri kaybolmasin)
-      try { if (typeof loadGroupData === 'function') loadGroupData(); if (typeof updateUserInterface === 'function') updateUserInterface(); if (typeof updateAutocompleteLists === 'function') updateAutocompleteLists(); } catch(e){}
+      try { if (typeof loadGroupData === 'function') window.loadGroupData(); if (typeof updateUserInterface === 'function') updateUserInterface(); if (typeof updateAutocompleteLists === 'function') updateAutocompleteLists(); } catch(e){}
     });
   }, 3000);
 
