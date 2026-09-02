@@ -4901,6 +4901,34 @@ document.addEventListener('click', function (e) {
     });
   }
 
+
+  // Hatim dongusunu Supabase tablolarina yaz (book_hatims + book_history)
+  function syncHatimToSB(key, g) {
+    try {
+      var bh = (g && g.bookHatims) || {};
+      var hist = (g && g.bookHistory) || {};
+      var hRows = [], hrRows = [];
+      Object.keys(bh).forEach(function (bid) {
+        var h = bh[bid] || {};
+        hRows.push({ group_key: key, book_id: bid, hatim_no: (h.hatimNo != null ? h.hatimNo : 1), start_date: h.startDate || null, prayer_done: !!h.prayerDone });
+      });
+      Object.keys(hist).forEach(function (bid) {
+        var arr = hist[bid] || [];
+        arr.forEach(function (hh) {
+          if (!hh) return;
+          hrRows.push({ group_key: key, book_id: bid, eser: hh.eser || "", hatim_no: (hh.hatimNo != null ? hh.hatimNo : 1), baslangic: hh.baslangic || "", bitis: hh.bitis || "", tamamlandi: hh.tamamlandi || null });
+        });
+      });
+      var tasks = [];
+      // once bu grubun eski hatim kayitlarini sil (dogruluk icin yeniden yaz)
+      tasks.push(api("/book_hatims?group_key=eq." + encodeURIComponent(key), { method: "DELETE", headers: { "Prefer": "return=minimal" } }));
+      tasks.push(api("/book_history?group_key=eq." + encodeURIComponent(key), { method: "DELETE", headers: { "Prefer": "return=minimal" } }));
+      if (hRows.length) tasks.push(api("/book_hatims", { method: "POST", headers: { "Prefer": "resolution=merge-duplicates" }, body: JSON.stringify(hRows) }));
+      if (hrRows.length) tasks.push(api("/book_history", { method: "POST", body: JSON.stringify(hrRows) }));
+      return Promise.all(tasks);
+    } catch (e) { return Promise.resolve(); }
+  }
+
   function replaceShares(g, groupKey) {
     return rest.select("members", "?select=id,name,group_key").then(function (allM) {
       var nameId = {};
@@ -4929,7 +4957,7 @@ document.addEventListener('click', function (e) {
         .then(function () {
           var memArr = (g && g.members) || [];
           var allNames = Array.from(new Set(memArr.concat(ownersOf(g))));
-          return replaceMembers(allNames, key, (g && g.passwords) || {}).then(function () { return replaceShares(g, key); });
+          return replaceMembers(allNames, key, (g && g.passwords) || {}).then(function () { return replaceShares(g, key); }).then(function () { return syncHatimToSB(key, g); });
         });
     }).then(function () { setTimeout(function () { _myPush = false; }, 1200); });
   }
@@ -4942,7 +4970,7 @@ document.addEventListener('click', function (e) {
       if (!allNames.length && key) allNames.push(key);
       var gk = key || "bireysel";
       return rest.upsert("groups", [{ key: gk, name: (g && g.name) || String(gk).replace(/_/g, " "), password: (g && g.password) || "" }])
-        .then(function () { return replaceMembers(allNames, gk, (g && g.passwords) || {}).then(function () { return replaceShares(g, gk); }); });
+        .then(function () { return replaceMembers(allNames, gk, (g && g.passwords) || {}).then(function () { return replaceShares(g, gk); }).then(function () { return syncHatimToSB(gk, g); }); });
     }).then(function () { setTimeout(function () { _myPush = false; }, 1200); });
   }
 
@@ -4976,17 +5004,20 @@ document.addEventListener('click', function (e) {
   function pullAll() {
     if (_pulling) return Promise.resolve();
     _pulling = true;
-    return Promise.all([rest.select("groups"), rest.select("members"), rest.select("shares", "?select=member_id,book_id,unit_index,is_read,read_date,read_time,take_date,take_time"), rest.select("books", "?select=id,name,total_units,type,default_mode,sort_order")])
+    return Promise.all([rest.select("groups"), rest.select("members"), rest.select("shares", "?select=member_id,book_id,unit_index,is_read,read_date,read_time,take_date,take_time"), rest.select("books", "?select=id,name,total_units,type,default_mode,sort_order"), rest.select("book_hatims"), rest.select("book_history")])
       .then(function (res) {
-        var groups = res[0] || [], members = res[1] || [], shares = res[2] || [], books = res[3] || [];
+        var groups = res[0] || [], members = res[1] || [], shares = res[2] || [], books = res[3] || [], bhRows = res[4] || [], histRows = res[5] || [];
         var bookDef = (books && books.length) ? books.map(function (x) { return { id: x.id, total_units: x.total_units }; }) : [];
         var bookFull = (books && books.length) ? books.map(function (x) { return { id: x.id, name: x.name, totalUnits: x.total_units, type: x.type || "page", defaultMode: x.default_mode || "yirmi_sayfa" }; }) : [];
         var byKey = {}; groups.forEach(function (g) { byKey[g.key] = g; });
+        var bhByGroup = {}, histByGroup = {};
+        bhRows.forEach(function (r) { if (!r || r.group_key == null) return; (bhByGroup[r.group_key] = bhByGroup[r.group_key] || {})[r.book_id] = { hatimNo: (r.hatim_no != null ? r.hatim_no : 1), startDate: r.start_date || "", prayerDone: !!r.prayer_done }; });
+        histRows.forEach(function (r) { if (!r || r.group_key == null) return; var gk2 = r.group_key; (histByGroup[gk2] = histByGroup[gk2] || {})[r.book_id] = (histByGroup[gk2][r.book_id] || []); histByGroup[gk2][r.book_id].push({ grup: gk2, eser: r.eser || r.book_id || "", hatimNo: (r.hatim_no != null ? r.hatim_no : 1), baslangic: r.baslangic || "", bitis: r.bitis || "", tamamlandi: r.tamamlandi || "" }); });
         var poolNames = new Set(), poolPass = {}, poolTypes = {};
         members.forEach(function (m) { if (!m.group_key) { poolNames.add(m.name); poolPass[m.name] = m.password; poolTypes[m.name] = m.type || "bireysel"; } });
         Object.keys(byKey).forEach(function (gk) {
           var gm = members.filter(function (m) { return m.group_key === gk; });
-          var g = { members: gm.map(function (m) { return m.name; }), memberTypes: {}, passwords: {}, password: byKey[gk].password || "", books: bookFull, bookPages: {}, bookHatims: {}, bookHistory: {}, readingLogs: [] };
+          var g = { members: gm.map(function (m) { return m.name; }), memberTypes: {}, passwords: {}, password: byKey[gk].password || "", books: bookFull, bookPages: {}, bookHatims: bhByGroup[gk] || {}, bookHistory: histByGroup[gk] || {}, readingLogs: [] };
           // Bolge/sehir localStorage'dan korunur (Supabase'te kolon yok)
           try { var _prev = JSON.parse(origGetItem("hatim_group_" + gk) || "null"); if (_prev) { if (_prev.regions) g.regions = _prev.regions; if (_prev.cities) g.cities = _prev.cities; if (_prev.books && _prev.books.length) g.books = _prev.books; if (_prev.bookSectionPages) g.bookSectionPages = _prev.bookSectionPages; } } catch(e){}
           gm.forEach(function (m) { g.memberTypes[m.name] = m.type || "grup"; g.passwords[m.name] = m.password || ""; });
