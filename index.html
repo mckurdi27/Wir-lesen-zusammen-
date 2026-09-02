@@ -4389,7 +4389,7 @@ var _cg = selVal || '';
             }
             function saveBireyselPool(p) { localStorage.setItem('hatim_bireysel_pool', JSON.stringify(p)); }
 
-            async function loadGroupData(skipSession) {
+            async function loadGroupData(skipSession, silent) {
                 const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
                 appData = savedData ? JSON.parse(savedData) : { members: [], password: "" };
 
@@ -4452,12 +4452,7 @@ var _cg = selVal || '';
                 try { var _bsp = JSON.parse(localStorage.getItem('hatim_bookpages') || "null"); if (_bsp) { Object.keys(_bsp).forEach(function (k) { if (k && _bsp[k] && _bsp[k].type === "manual") { window.bookSectionPages[k] = _bsp[k]; } }); } } catch(e){}
                 window.rebuildBookModesDefs();
                 window.saveGroupData();
-                await renderDailyInspiration();
-                renderBooks();
-                
-                renderAdminSectionAtBottom();
-                updateAutocompleteLists();
-                updateUserInterface();
+                if (!silent) { await renderDailyInspiration(); renderBooks(); renderAdminSectionAtBottom(); updateAutocompleteLists(); updateUserInterface(); }
             } window.loadGroupData = loadGroupData;
 
             async function triggerAdminToggle() {
@@ -5010,17 +5005,9 @@ document.addEventListener('click', function (e) {
   setTimeout(function () { doInit(); }, 500); // güvence: interval kaçarsa
   // v8: gerçek zamanlı polling — iki tarayıcı da açıkken birbirini görsün
   setInterval(function () {
-    if (!_myPush) pullAll().then(function () {
-      // Polling: veriyi guncelle ama admin panel HTML'ini yeniden cizme (acilir liste secimleri kaybolmasin)
-      try {
-        if (typeof loadGroupData === 'function') window.loadGroupData();
-        // Kullanici bir input/select/textarea uzerinde yazarken veya admin acikken UI HTML'ini yeniden CIZME
-        // (isim/sifre yazimi geri alinir, scroll sifirlanir). Veri tazeleme yeterli.
-        var _ae = document.activeElement;
-        var _typing = _ae && _ae.tagName && ['INPUT','TEXTAREA','SELECT'].indexOf(_ae.tagName) > -1;
-        if (!_typing) { if (typeof updateUserInterface === 'function') updateUserInterface(); if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel(); }
-        if (typeof updateAutocompleteLists === 'function') updateAutocompleteLists();
-      } catch(e){}
+        if (!_myPush) pullAll().then(function () {
+      // Polling: yalnizca veriyi tazele (silent) - UI HTML'ini yeniden CIZME (parlama/scroll kaymasi/isim geri alma engellenir)
+      try { if (typeof loadGroupData === 'function') window.loadGroupData(false, true); } catch(e){}
     });
   }, 3000);
 
