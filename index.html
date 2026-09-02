@@ -5012,7 +5012,15 @@ document.addEventListener('click', function (e) {
   setInterval(function () {
     if (!_myPush) pullAll().then(function () {
       // Polling: veriyi guncelle ama admin panel HTML'ini yeniden cizme (acilir liste secimleri kaybolmasin)
-      try { if (typeof loadGroupData === 'function') window.loadGroupData(); if (typeof updateUserInterface === 'function') updateUserInterface(); if (typeof updateAutocompleteLists === 'function') updateAutocompleteLists(); } catch(e){}
+      try {
+        if (typeof loadGroupData === 'function') window.loadGroupData();
+        // Kullanici bir input/select/textarea uzerinde yazarken veya admin acikken UI HTML'ini yeniden CIZME
+        // (isim/sifre yazimi geri alinir, scroll sifirlanir). Veri tazeleme yeterli.
+        var _ae = document.activeElement;
+        var _typing = _ae && _ae.tagName && ['INPUT','TEXTAREA','SELECT'].indexOf(_ae.tagName) > -1;
+        if (!_typing) { if (typeof updateUserInterface === 'function') updateUserInterface(); if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel(); }
+        if (typeof updateAutocompleteLists === 'function') updateAutocompleteLists();
+      } catch(e){}
     });
   }, 3000);
 
