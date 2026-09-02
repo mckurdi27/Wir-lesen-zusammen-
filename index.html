@@ -3018,12 +3018,40 @@ function renderTab6(groupName, memberName) {
                         });
                         try { const p = JSON.parse(localStorage.getItem('hatim_bireysel_pool')||'null'); if (p && p.passwords) Object.keys(p.passwords).forEach(pp=>sifre.push([pp, p.passwords[pp], 'Bireysel'])); } catch(e){}
 
+                        // 6) GRUP SIRALAMA (Tab2)
+                        let gsirala = [['S\u0131ra','Grup','\u00dcye','Al\u0131nan','Okunan','\u0130lerleme %']];
+                        try {
+                            let _gs = [...groupStats].sort(function(a,b){ return (b.taken||0)-(a.taken||0); });
+                            _gs.forEach(function(g,ix){ gsirala.push([ix+1, String(g.name||'').replace(/_/g,' ').toUpperCase(), g.members||0, g.taken||0, g.read||0, g.takenPercent||0]); });
+                        } catch(e){}
+
+                        // 7) HATIM SIRALAMA (Tab6)
+                        let hatim = [['Toplam','Grup Hatim','Eser','Grup Ad\u0131','Ba\u015flang\u0131\u00e7','Durum']];
+                        try {
+                            let st2=[], dn2=[];
+                            Object.keys(localStorage).filter(function(k){ return k.indexOf('hatim_group_')===0; }).forEach(function(k){
+                                let gK = k.replace('hatim_group_',''); if(!gK) return;
+                                try {
+                                    let gD = JSON.parse(localStorage.getItem(k)||'null'); if(!gD) return;
+                                    let bn={}; (gD.books||[]).forEach(function(b){ if(b&&b.id) bn[b.id]=b.name||b.id; });
+                                    if(gD.bookHatims) Object.keys(gD.bookHatims).forEach(function(bid){ let h=gD.bookHatims[bid]||{}; st2.push({g:gK,bid:bid,eser:bn[bid]||bid,no:h.hatimNo||1,bas:h.startDate||'',kind:'start'}); });
+                                    if(gD.bookHistory) Object.keys(gD.bookHistory).forEach(function(bid){ (gD.bookHistory[bid]||[]).forEach(function(hh){ dn2.push({g:hh.grup||gK,bid:bid,eser:hh.eser||bn[bid]||bid,no:hh.hatimNo||1,bas:hh.baslangic||'',kind:'done'}); }); });
+                                } catch(e){}
+                            });
+                            let _al = st2.concat(dn2);
+                            _al.sort(function(a,b){ let ea=a.eser||'',eb=b.eser||'',ta=a.bas||'',tb=b.bas||''; return ea<eb?-1:ea>eb?1:(ta<tb?-1:ta>tb?1:0); });
+                            let _bc={}; _al.forEach(function(r){ let b=r.eser||''; if(!_bc[b])_bc[b]=0; _bc[b]++; r.gn=_bc[b]; });
+                            _al.forEach(function(r){ hatim.push([r.gn, r.no+'. Hatim', r.eser, r.g, r.bas||'-', r.kind==='start'?'Devam ediyor':'Tamamland\u0131']); });
+                        } catch(e){}
+
                         const wb = XLSX.utils.book_new();
                         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ozet), 'Özet');
                         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(veri), 'Üye Analizi');
                         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(eser), 'Eser Detay');
                         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(gunluk), 'Okuma Günlüğü');
                         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sifre), 'Şifreler');
+                        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(gsirala), 'Grup S\u0131ralama');
+                        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(hatim), 'Hatim S\u0131ralama');
                         XLSX.writeFile(wb, 'Hatim_Analiz.xlsx');
                     } catch(err) { alert('Excel oluşturulamadı: ' + err.message); }
                 }
