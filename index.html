@@ -2708,13 +2708,14 @@
                             } catch(e){}
                         });
                     } catch(e){}
-                    // Global (Toplam) hatim sirasi: devam eden + tamamlanan tum hatimler baslangica gore tek sirada
+                    // Toplam (global) hatim sirasi, ESER BAZLI: her eserin tum hatimleri (devam eden+tamamlanan)
+                    // baslangic kronolojisine gore kendi icinde numaralanir (hangi grup ilk aldiyse 1, sonraki 2, ...)
                     var _all = [];
                     started.forEach(function(r){ r.kind='start'; _all.push(r); });
                     done.forEach(function(r){ r.kind='done'; _all.push(r); });
-                    _all.sort(function(a,b){ var ta=a.baslangic||'', tb=b.baslangic||''; return ta<tb?-1:ta>tb?1:0; });
-                    var _globalCounter = 0;
-                    _all.forEach(function(r){ _globalCounter++; r.globalNo = _globalCounter; });
+                    _all.sort(function(a,b){ var ea=a.eser||'', eb=b.eser||'', ta=a.baslangic||'', tb=b.baslangic||''; return ea<eb?-1:ea>eb?1:(ta<tb?-1:ta>tb?1:0); });
+                    var _bookCounter = {};
+                    _all.forEach(function(r){ var b=r.eser||''; if(!_bookCounter[b]) _bookCounter[b]=0; _bookCounter[b]++; r.globalNo=_bookCounter[b]; });
                     if (started.length === 0 && done.length === 0) {
                         container.innerHTML = '<div style="text-align:center;color:#777;padding:20px;">Hen\u00fcz kay\u0131tl\u0131 hatim yok.</div>';
                         return;
