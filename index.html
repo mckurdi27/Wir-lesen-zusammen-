@@ -4939,7 +4939,10 @@ document.addEventListener('click', function (e) {
       // Secili grup eslesmezse, tek kayit varsa onu al
       if (!target) { var same = (allM || []).filter(function (m) { return m.name === oldName; }); if (same.length === 1) target = same[0]; }
       if (!target) throw new Error("\u00dcye bulunamad\u0131: " + oldName);
-      return api("/members?id=eq." + target.id, { method: "PATCH", headers: { "Prefer": "return=representation" }, body: JSON.stringify({ name: newName }) });
+      var _body = { name: newName };
+      // Bireysel uyeler kendi adiyla group_key'e sahiptir; ad degisince grup anahtarini da tasi (yoksa yeni uye gibi gorunur)
+      if (String(target.group_key || "").toLowerCase().trim() === String(oldName).toLowerCase().trim()) { _body.group_key = String(newName).toLowerCase().trim(); }
+      return api("/members?id=eq." + target.id, { method: "PATCH", headers: { "Prefer": "return=representation" }, body: JSON.stringify(_body) });
     });
   };
   window._sbRenameOwner = function (oldName, newName, group) {
