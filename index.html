@@ -2205,84 +2205,67 @@
 
                 function renderTab1(groupName = 'all', memberName = 'all') {
                     const container = document.getElementById('dtabs-1-content');
+                    if (!container) return;
                     groupStats.sort((a, b) => {
-                        let av = analysisSortKey==='members' ? a.members : analysisSortKey==='taken' ? a.taken : analysisSortKey==='read' ? a.read : analysisSortKey==='progress' ? a.takenPercent : a.name;
-                        let bv = analysisSortKey==='members' ? b.members : analysisSortKey==='taken' ? b.taken : analysisSortKey==='read' ? b.read : analysisSortKey==='progress' ? b.takenPercent : b.name;
+                        let av = analysisSortKey==='members' ? a.members : analysisSortKey==='taken' ? a.taken : analysisSortKey==='read' ? a.read : (a.takenPercent||0);
+                        let bv = analysisSortKey==='members' ? b.members : analysisSortKey==='taken' ? b.taken : analysisSortKey==='read' ? b.read : (b.takenPercent||0);
                         if (typeof av==='number' && typeof bv==='number') return analysisSortDir==='az' ? av-bv : bv-av;
                         return analysisSortDir==='az' ? String(av).localeCompare(String(bv),'tr') : String(bv).localeCompare(String(av),'tr');
                     });
-                    let html = '';
-                    
+                    // collect rows: groups (+ optionally filtered) and individuals
+                    var rows = [];
                     if (groupName === 'all') {
-                        groupStats.forEach(g => {
-                            let memberDisplay = g.memberNames.join(', ');
-                            html += `
-                                <div style="padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg);">
-                                    <div style="font-weight: bold; font-size: 16px; color: #2980b9;">📁 ${g.name.replace(/_/g, ' ').toUpperCase()}</div>
-                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 4px; margin-top: 4px; font-size: 14px;">
-                                        <div>👥 Üye: ${g.members} ${g.members > 0 ? `(${memberDisplay})` : ''}</div>
-                                        <div>📚 Alınan: ${g.taken} / ${g.books}</div>
-                                        <div>📖 Okunan: ${g.read} / ${g.books}</div>
-                                        <div>📊 İlerleme: %${g.takenPercent}</div>
-                                    </div>
-                                    <div style="margin-top: 6px; background: #e9ecef; border-radius: 10px; height: 6px; overflow: hidden;">
-                                        <div style="background: ${g.takenPercent >= 80 ? '#27ae60' : g.takenPercent >= 50 ? '#f39c12' : '#e74c3c'}; width: ${g.takenPercent}%; height: 100%; border-radius: 10px;"></div>
-                                    </div>
-                                </div>
-                            `;
-                        });
+                        groupStats.forEach(function(g){ rows.push({ ad:g.name.replace(/_/g,' '), tip:'grup', ikon:'\uD83D\uDC65', gruplar:g.members, alinan:g.taken, okunan:g.read, toplam:g.books, pct:(g.takenPercent||0), memberNames:(g.memberNames||[]).join(', ') }); });
                     } else {
-                        let g = groupStats.find(gs => gs.name === groupName);
-                        if (g) {
-                            let memberDisplay = memberName === 'all' ? g.memberNames.join(', ') : memberName;
-                            html += `
-                                <div style="padding: 12px 16px; border-radius: 8px; border: 1px solid var(--gold-primary); background: rgba(212, 175, 55, 0.08);">
-                                    <div style="font-weight: bold; font-size: 16px; color: var(--gold-dark);">📁 ${g.name.replace(/_/g, ' ').toUpperCase()}</div>
-                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 4px; margin-top: 4px; font-size: 14px;">
-                                        <div>👥 Üye: ${g.members} ${g.members > 0 ? `(${memberDisplay})` : ''}</div>
-                                        <div>📚 Alınan: ${g.taken} / ${g.books}</div>
-                                        <div>📖 Okunan: ${g.read} / ${g.books}</div>
-                                        <div>📊 İlerleme: %${g.takenPercent}</div>
-                                    </div>
-                                    <div style="margin-top: 6px; background: #e9ecef; border-radius: 10px; height: 6px; overflow: hidden;">
-                                        <div style="background: ${g.takenPercent >= 80 ? '#27ae60' : g.takenPercent >= 50 ? '#f39c12' : '#e74c3c'}; width: ${g.takenPercent}%; height: 100%; border-radius: 10px;"></div>
-                                    </div>
-                                </div>
-                            `;
-                        }
+                        var g2 = groupStats.find(function(gs){ return gs.name === groupName; });
+                        if (g2) rows.push({ ad:g2.name.replace(/_/g,' '), tip:'grup', ikon:'\uD83D\uDC65', gruplar:g2.members, alinan:g2.taken, okunan:g2.read, toplam:g2.books, pct:(g2.takenPercent||0), memberNames:(g2.memberNames||[]).join(', ') });
                     }
-                    
-                    
-                    // Bireysel uyeler de Genel Ozete eklensin
+                    // Bireysel uyeler (grup filtresi bireysel/tek ise dahil)
                     try {
-                        let _bp = getBireyselPool();
-                        (_bp.members || []).forEach(bm => {
-                            let bData = null;
-                            try { bData = JSON.parse(localStorage.getItem('hatim_group_' + bm.toLowerCase()) || 'null'); } catch(e){}
-                            let bBooks = 0, bTaken = 0, bRead = 0;
-                            if (bData && bData.books && bData.bookPages) {
-                                bData.books.forEach(b => {
-                                    bBooks += b.totalUnits;
-                                    if (bData.bookPages[b.id]) bData.bookPages[b.id].forEach(pp => { if (pp.owner) bTaken++; if (pp.isRead) bRead++; });
-                                });
-                            }
-                            let bPct = bBooks > 0 ? Math.round((bTaken / bBooks) * 100) : 0;
-                            html += `
-                                <div style="padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(39,174,96,0.06);">
-                                    <div style="font-weight: bold; font-size: 16px; color: #27ae60;">👤 ${bm}</div>
-                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 4px; margin-top: 4px; font-size: 14px;">
-                                        <div>👤 Bireysel</div>
-                                        <div>📚 Alinan: ${bTaken} / ${bBooks}</div>
-                                        <div>📖 Okunan: ${bRead} / ${bBooks}</div>
-                                        <div>📊 Ilerleme: %${bPct}</div>
-                                    </div>
-                                    <div style="margin-top: 6px; background: #e9ecef; border-radius: 10px; height: 6px; overflow: hidden;">
-                                        <div style="background: ${bPct >= 80 ? '#27ae60' : bPct >= 50 ? '#f39c12' : '#e74c3c'}; width: ${bPct}%; height: 100%;"></div>
-                                    </div>
-                                </div>`;
-                        });
+                        var _bp = getBireyselPool();
+                        var _showAllBireysel = (groupName === 'all');
+                        if (groupName === '__bireysel__' || groupName === '' || _showAllBireysel) {
+                            (_bp.members || []).forEach(function(bm){
+                                if (memberName !== 'all' && memberName !== bm) return;
+                                var bd = null;
+                                try { bd = JSON.parse(localStorage.getItem('hatim_group_' + bm.toLowerCase()) || 'null'); } catch(err){}
+                                var bTop=0, bAl=0, bOk=0;
+                                if (bd && bd.books && bd.bookPages) {
+                                    bd.books.forEach(function(b){
+                                        bTop += (b.totalUnits||0);
+                                        if (bd.bookPages[b.id]) { bd.bookPages[b.id].forEach(function(pp){ if (pp.owner) bAl++; if (pp.isRead || pp.readTime) bOk++; }); }
+                                    });
+                                }
+                                rows.push({ ad:bm, tip:'bireysel', ikon:'\uD83D\uDC64', gruplar:'1', alinan:bAl, okunan:bOk, toplam:bTop, pct:(bTop>0?Math.round((bAl/bTop)*100):0), memberNames:'' });
+                            });
+                        }
                     } catch(err) {}
-
+                    if (rows.length === 0) {
+                        container.innerHTML = '<div class="d-tab-scroll"><div style="text-align:center;color:#777;padding:20px;">Bu grupta kay\u0131tl\u0131 \u00fcye yok.</div></div>';
+                        return;
+                    }
+                    var html = '<div class="d-tab-scroll"><table style="width:100%;border-collapse:collapse;font-size:13px;">'
+                        + '<thead><tr style="background:#f1f3f5;">'
+                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">\u0130sim</th>'
+                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Tip</th>'
+                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">\u00dcye</th>'
+                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Al\u0131nan</th>'
+                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Okunan</th>'
+                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">\u0130lerleme</th>'
+                        + '</tr></thead><tbody>';
+                    rows.forEach(function(r){
+                        var barColor = r.pct>=80?'#27ae60':r.pct>=50?'#f39c12':'#e74c3c';
+                        var nm = r.memberNames ? ('<span style="font-size:11px;color:#888;">'+r.memberNames+'</span>') : '';
+                        html += '<tr style="background:#fff;">'
+                            + '<td style="padding:8px;border:1px solid var(--border-color);">'+r.ikon+' '+r.ad+(nm?'<div>'+nm+'</div>':'')+'</td>'
+                            + '<td style="padding:8px;border:1px solid var(--border-color);">'+(r.tip==='grup'?'Grup':'Bireysel')+'</td>'
+                            + '<td style="padding:8px;border:1px solid var(--border-color);">'+r.gruplar+'</td>'
+                            + '<td style="padding:8px;border:1px solid var(--border-color);">'+r.alinan+' / '+r.toplam+'</td>'
+                            + '<td style="padding:8px;border:1px solid var(--border-color);">'+r.okunan+' / '+r.toplam+'</td>'
+                            + '<td style="padding:8px;border:1px solid var(--border-color);"><div style="display:flex;align-items:center;gap:6px;"><div style="width:60px;background:#e9ecef;border-radius:6px;height:8px;overflow:hidden;"><div style="width:'+r.pct+'%;height:8px;background:'+barColor+';"></div></div><span>'+r.pct+'%</span></div></td>'
+                            + '</tr>';
+                    });
+                    html += '</tbody></table></div>';
                     container.innerHTML = html;
                 }
 
