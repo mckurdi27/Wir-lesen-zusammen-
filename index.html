@@ -2726,17 +2726,18 @@
                     // ---- Baslayan / devam eden hatimler ----
                     if (started.length) {
                         html += '<div style="padding:8px 10px;font-weight:bold;font-size:13px;color:#27ae60;">\u25b6 Devam Eden / Ba\u015flayan Hatimler</div>';
-                        html += '<div class="d-tab-scroll" style="margin-bottom:14px;"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:rgba(39,174,96,0.12);">'
-                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Toplam</th>'
-                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Grup</th>'
-                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Eser</th>'
-                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Grup Ad\u0131</th>'
-                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Ba\u015flang\u0131\u00e7</th>'
-                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Durum</th>';
+                        html += '<div style="margin-bottom:6px;"><input id="tab6-start-input" type="text" placeholder="Ara: eser / grup ad\\u0131 / grup no..." style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-color);border-radius:6px;font-size:13px;"></div>';
+                        html += '<div class="d-tab-scroll" style="margin-bottom:14px;"><table id="tab6-start-tbl" style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:rgba(39,174,96,0.12);">'
+                            + '<th data-k="toplam" class="t6-th" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="S\u0131rala">Toplam \u21c5</th>'
+                            + '<th data-k="grupNo" class="t6-th" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="S\u0131rala">Grup \u21c5</th>'
+                            + '<th data-k="eser" class="t6-th" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="S\u0131rala">Eser \u21c5</th>'
+                            + '<th data-k="grup" class="t6-th" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="S\u0131rala">Grup Ad\u0131 \u21c5</th>'
+                            + '<th data-k="baslangic" class="t6-th" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="S\u0131rala">Ba\u015flang\u0131\u00e7 \u21c5</th>'
+                            + '<th data-k="durum" class="t6-th" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="S\u0131rala">Durum \u21c5</th>';
                         if (admin) html += '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Y\u00f6net</th>';
                         html += '</tr></thead><tbody>';
                         started.forEach(function(r){
-                            html += '<tr style="background:#ffffff;">'
+                            html += '<tr style="background:#ffffff;" data-toplam="' + (r.globalNo||'') + '" data-grupno="' + (r.hatimNo||'') + '" data-eser="' + (r.eser||'') + '" data-grup="' + (r.grup||'') + '" data-baslangic="' + (r.baslangic||'') + '" data-durum="Devam ediyor" data-search="' + ((r.eser||'')+' '+(r.grup||'')+' '+(r.hatimNo||'')+' devam ediyor') + '">'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);font-weight:bold;">' + (r.globalNo||'-') + '</td>'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);">' + r.hatimNo + '. Hatim</td>'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.eser||'') + '</td>'
@@ -2751,17 +2752,18 @@
                     // ---- Tamamlanan hatimler ----
                     if (done.length) {
                         html += '<div style="padding:8px 10px;font-weight:bold;font-size:13px;color:#8e44ad;">\u2705 Tamamlanan Hatimler <span style="font-weight:normal;color:#888;font-size:11px;">(otomatik silinmez)</span></div>';
-                        html += '<div class="d-tab-scroll"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:rgba(142,68,173,0.1);">'
-                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Toplam</th>'
-                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Grup</th>'
-                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Eser</th>'
-                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Grup Ad\u0131</th>'
-                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Ba\u015flang\u0131\u00e7</th>'
-                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Tamamlanma</th>';
+                        html += '<div style="margin-bottom:6px;"><input id="tab6-done-input" type="text" placeholder="Ara: eser / grup ad\\u0131 / grup no..." style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border-color);border-radius:6px;font-size:13px;"></div>';
+                        html += '<div class="d-tab-scroll"><table id="tab6-done-tbl" style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:rgba(142,68,173,0.1);">'
+                            + '<th data-k="toplam" class="t6-th" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="S\u0131rala">Toplam \u21c5</th>'
+                            + '<th data-k="grupNo" class="t6-th" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="S\u0131rala">Grup \u21c5</th>'
+                            + '<th data-k="eser" class="t6-th" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="S\u0131rala">Eser \u21c5</th>'
+                            + '<th data-k="grup" class="t6-th" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="S\u0131rala">Grup Ad\u0131 \u21c5</th>'
+                            + '<th data-k="baslangic" class="t6-th" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="S\u0131rala">Ba\u015flang\u0131\u00e7 \u21c5</th>'
+                            + '<th data-k="tamamlanma" class="t6-th" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="S\u0131rala">Tamamlanma \u21c5</th>';
                         if (admin) html += '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Y\u00f6net</th>';
                         html += '</tr></thead><tbody>';
                         done.forEach(function(r){
-                            html += '<tr style="background:#ffffff;">'
+                            html += '<tr style="background:#ffffff;" data-toplam="' + (r.globalNo||'') + '" data-grupno="' + (r.hatimNo||'') + '" data-eser="' + (r.eser||'') + '" data-grup="' + (r.grup||'') + '" data-baslangic="' + (r.baslangic||'') + '" data-tamamlanma="' + (r.tamamlandi||'') + '" data-search="' + ((r.eser||'')+' '+(r.grup||'')+' '+(r.hatimNo||'')+' tamamlandi') + '">'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);font-weight:bold;">' + (r.globalNo||'-') + '</td>'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);">' + r.hatimNo + '. Hatim</td>'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.eser||'') + '</td>'
@@ -2798,6 +2800,46 @@
                                 localStorage.setItem(key, JSON.stringify(g));
                             } catch(e){}
                             renderTab6();
+                        });
+                    });
+                    // ---- Tab6 filtre: arama kutusu + sutun siralamasi ----
+                    function tab6_sortRows(tbodyId, val, key, dir){
+                        var tb=document.getElementById(tbodyId); if(!tb) return;
+                        var rows=[].slice.call(tb.rows);
+                        rows.forEach(function(tr){ tr.style.display=''; });
+                        if(val){ var q=String(val).toLowerCase();
+                            rows.forEach(function(tr){
+                                var txt=(tr.getAttribute('data-search')||'').toLowerCase();
+                                tr.style.display = txt.indexOf(q)>-1 ? '' : 'none';
+                            });
+                        }
+                        if(key){ rows=[].slice.call(tb.rows).filter(function(tr){ return tr.style.display!=='none'; });
+                            var numkeys={toplam:1,grupNo:1};
+                            rows.sort(function(a,b){
+                                var av=a.getAttribute('data-'+key)||'', bv=b.getAttribute('data-'+key)||'';
+                                if(numkeys[key]){ av=parseFloat(av)||0; bv=parseFloat(bv)||0; return dir==='az'?av-bv:bv-av; }
+                                av=String(av).toLowerCase(); bv=String(bv).toLowerCase();
+                                return dir==='az'?(av<bv?-1:av>bv?1:0):(av<bv?1:av>bv?-1:0);
+                            });
+                            rows.forEach(function(tr){ tb.appendChild(tr); });
+                        }
+                    }
+                    var t6s={}, t6k={}, t6d={};
+                    function tab6_bind(id, tbId){
+                        var inp=document.getElementById(id); if(!inp) return;
+                        inp.addEventListener('input', function(){ t6s[id]=this.value; tab6_sortRows(tbId, t6s[id], t6k[id], t6d[id]); });
+                    }
+                    tab6_bind('tab6-start-input','tab6-start-tb');
+                    tab6_bind('tab6-done-input','tab6-done-tb');
+                    container.querySelectorAll('.t6-th').forEach(function(th){
+                        th.addEventListener('click', function(){
+                            var tbl=th.closest('table');
+                            var tbId=tbl ? tbl.querySelector('tbody').id : '';
+                            var inpId = (tbId==='tab6-start-tb') ? 'tab6-start-input' : 'tab6-done-input';
+                            var key=th.getAttribute('data-k')||'';
+                            var dir=(t6k[inpId]===key)?((t6d[inpId]==='az')?'za':'az'):'az';
+                            t6k[inpId]=key; t6d[inpId]=dir;
+                            tab6_sortRows(tbId, t6s[inpId], key, dir);
                         });
                     });
                 }
