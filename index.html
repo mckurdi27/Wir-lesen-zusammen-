@@ -2186,17 +2186,19 @@
                                                     readDate: p.readDate || null,
                                                     range: `${idx+1}. bölüm`
                                                 });
-                                                if (p.isRead) {
-                                                    read++;
-                                                    result.readingLogs.push({
-                                                        date: p.readDate || 'Tarih yok',
-                                                        time: p.readTime || '--:--',
-                                                        bookName: b.name,
-                                                        unit: idx + 1,
-                                                        range: `${idx+1}. bölüm`,
-                                                        group: gKey
-                                                    });
-                                                }
+                                                if (p.isRead) { read++; }
+                                                // Okuma Gunlugu: hisse alininca tek satir olusur; okununca Okunma bilgisi dolar
+                                                result.readingLogs.push({
+                                                    bookName: b.name,
+                                                    unit: idx + 1,
+                                                    range: `${idx+1}. bölüm`,
+                                                    group: gKey,
+                                                    takeDate: p.takeDate || null,
+                                                    takeTime: p.takeTime || null,
+                                                    isRead: !!p.isRead,
+                                                    readDate: p.isRead ? (p.readDate || null) : null,
+                                                    readTime: p.isRead ? (p.readTime || null) : null
+                                                });
                                             }
                                         });
                                     }
@@ -2635,48 +2637,52 @@
                     const container = document.getElementById('dtabs-5-content');
                     let _sel = _resolveSelMember(memberName, groupName);
                     let data = getMemberDetailData(_sel.name, _sel.grp, analysisBooks.length ? analysisBooks : 'all');
-                    
-                    if (data.readingLogs.length === 0) {
-                        container.innerHTML = `<div style="text-align: center; color: #777; padding: 20px;">Henüz okuma kaydı bulunmuyor.</div>`;
+
+                    if (!data.readingLogs || data.readingLogs.length === 0) {
+                        container.innerHTML = `<div style="text-align: center; color: #777; padding: 20px;">Hen\u00fcz kay\u0131t bulunmuyor.</div>`;
                         return;
                     }
-                    
-                    const sortedLogs = [...data.readingLogs].sort((a, b) => {
-                        let av = analysisSortKey==='lmember' ? a.member||'' : analysisSortKey==='lbook' ? a.bookName||'' : analysisSortKey==='lunit' ? Number(a.unit||0) : analysisSortKey==='lstatus' ? 1 : (a.date||'');
-                        let bv = analysisSortKey==='lmember' ? b.member||'' : analysisSortKey==='lbook' ? b.bookName||'' : analysisSortKey==='lunit' ? Number(b.unit||0) : analysisSortKey==='lstatus' ? 1 : (b.date||'');
+
+                    const sortedLogs = [...data.readingLogs].sort((a2, b2) => {
+                        let av = analysisSortKey==='lmember' ? a2.group||a2.member||'' : analysisSortKey==='lbook' ? a2.bookName||'' : analysisSortKey==='lunit' ? Number(a2.unit||0) : analysisSortKey==='ldurum' ? (a2.isRead?'2':'1') : analysisSortKey==='lread' ? (a2.readDate||'') : (a2.takeDate||'');
+                        let bv = analysisSortKey==='lmember' ? b2.group||b2.member||'' : analysisSortKey==='lbook' ? b2.bookName||'' : analysisSortKey==='lunit' ? Number(b2.unit||0) : analysisSortKey==='ldurum' ? (b2.isRead?'2':'1') : analysisSortKey==='lread' ? (b2.readDate||'') : (b2.takeDate||'');
                         if (typeof av==='number' && typeof bv==='number') return analysisSortDir==='az' ? av-bv : bv-av;
                         return analysisSortDir==='az' ? String(av).localeCompare(String(bv),'tr') : String(bv).localeCompare(String(av),'tr');
                     });
+
+                    function fmt(d, t){ return (d&&d!=='Tarih yok') ? (d + (t&&t!=='--:--' ? ' '+t : '')) : '--'; }
+
                     let html = `
                         <div class="d-tab-scroll">
                             <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
                                 <thead>
                                     <tr style="background: rgba(212, 175, 55, 0.15);">
-                                        <th data-sortkey="ldate" title="Sırala" style="cursor:pointer; padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Tarih ⇅</th>
-                                        <th data-sortkey="lmember" title="Sırala" style="cursor:pointer; padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Üye ⇅</th>
-                                        <th data-sortkey="lbook" title="Sırala" style="cursor:pointer; padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser ⇅</th>
-                                        <th data-sortkey="lunit" title="Sırala" style="cursor:pointer; padding: 8px 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Bölüm ⇅</th>
-                                        <th data-sortkey="lstatus" title="Sırala" style="cursor:pointer; padding: 8px 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Durum ⇅</th>
+                                        <th data-sortkey="ltake" title="S\u0131rala" style="cursor:pointer; padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Al\u0131nma \u21c5</th>
+                                        <th data-sortkey="lread" title="S\u0131rala" style="cursor:pointer; padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Okunma \u21c5</th>
+                                        <th data-sortkey="lbook" title="S\u0131rala" style="cursor:pointer; padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Eser \u21c5</th>
+                                        <th data-sortkey="lunit" title="S\u0131rala" style="cursor:pointer; padding: 8px 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">B\u00f6l\u00fcm \u21c5</th>
+                                        <th data-sortkey="lmember" title="S\u0131rala" style="cursor:pointer; padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--gold-primary);">Grup / \u00dcye \u21c5</th>
+                                        <th data-sortkey="ldurum" title="S\u0131rala" style="cursor:pointer; padding: 8px 10px; text-align: center; border-bottom: 2px solid var(--gold-primary);">Durum \u21c5</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     ${sortedLogs.map(log => `
-                                        <tr>
-                                            <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-size: 11px;">${log.date}</td>
-                                            <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${log.member || memberName}</td>
+                                        <tr style="background: ${log.isRead ? 'rgba(39,174,96,0.05)' : 'rgba(255,193,7,0.06)'};">
+                                            <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-size: 11px;">${fmt(log.takeDate, log.takeTime)}</td>
+                                            <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-size: 11px; color: ${log.isRead ? '#27ae60' : '#999'};">${log.isRead ? fmt(log.readDate, log.readTime) : '--'}</td>
                                             <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color);">${log.bookName}</td>
-                                            <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${log.unit}. bölüm</td>
-                                            <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); text-align: center; color: #27ae60; font-weight: bold;">✅ Okundu</td>
+                                            <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${log.unit}. b\u00f6l\u00fcm</td>
+                                            <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">${log.member || memberName}${log.group && log.group!==memberName ? ' <span style="color:#888;font-weight:normal;">('+log.group+')</span>' : ''}</td>
+                                            <td style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); text-align: center; font-weight: bold; color: ${log.isRead ? '#27ae60' : '#e67e22'};">${log.isRead ? '\u2705 Okundu' : '\u23f3 Al\u0131nd\u0131'}</td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
                             </table>
-                            ${sortedLogs.length > 50 ? `<p style="text-align: center; color: #777; font-size: 12px; margin-top: 8px;">... ve ${sortedLogs.length - 50} kayıt daha</p>` : ''}
                         </div>
                     `;
                     container.innerHTML = html;
                 }
-                function renderTab6(groupName, memberName) {
+function renderTab6(groupName, memberName) {
                     var container = document.getElementById('dtabs-6-content');
                     if (!container) return;
                     var started = [];
