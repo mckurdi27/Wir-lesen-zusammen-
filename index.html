@@ -2708,8 +2708,13 @@
                             } catch(e){}
                         });
                     } catch(e){}
-                    started.sort(function(a,b){ return (a.baslangic||'') < (b.baslangic||'') ? -1 : (a.baslangic||'') > (b.baslangic||'') ? 1 : 0; });
-                    done.sort(function(a,b){ var ta=a.baslangic||'', tb=b.baslangic||''; return ta<tb?-1:ta>tb?1:0; });
+                    // Global (Toplam) hatim sirasi: devam eden + tamamlanan tum hatimler baslangica gore tek sirada
+                    var _all = [];
+                    started.forEach(function(r){ r.kind='start'; _all.push(r); });
+                    done.forEach(function(r){ r.kind='done'; _all.push(r); });
+                    _all.sort(function(a,b){ var ta=a.baslangic||'', tb=b.baslangic||''; return ta<tb?-1:ta>tb?1:0; });
+                    var _globalCounter = 0;
+                    _all.forEach(function(r){ _globalCounter++; r.globalNo = _globalCounter; });
                     if (started.length === 0 && done.length === 0) {
                         container.innerHTML = '<div style="text-align:center;color:#777;padding:20px;">Hen\u00fcz kay\u0131tl\u0131 hatim yok.</div>';
                         return;
@@ -2721,15 +2726,17 @@
                     if (started.length) {
                         html += '<div style="padding:8px 10px;font-weight:bold;font-size:13px;color:#27ae60;">\u25b6 Devam Eden / Ba\u015flayan Hatimler</div>';
                         html += '<div class="d-tab-scroll" style="margin-bottom:14px;"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:rgba(39,174,96,0.12);">'
-                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Hatim</th>'
-                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Eser</th>'
+                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Toplam</th>'
                             + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Grup</th>'
+                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Eser</th>'
+                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Grup Ad\u0131</th>'
                             + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Ba\u015flang\u0131\u00e7</th>'
                             + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Durum</th>';
                         if (admin) html += '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Y\u00f6net</th>';
                         html += '</tr></thead><tbody>';
                         started.forEach(function(r){
                             html += '<tr style="background:#ffffff;">'
+                                + '<td style="padding:8px;border:1px solid var(--border-color);font-weight:bold;">' + (r.globalNo||'-') + '</td>'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);">' + r.hatimNo + '. Hatim</td>'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.eser||'') + '</td>'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.grup||'') + '</td>'
@@ -2744,15 +2751,17 @@
                     if (done.length) {
                         html += '<div style="padding:8px 10px;font-weight:bold;font-size:13px;color:#8e44ad;">\u2705 Tamamlanan Hatimler <span style="font-weight:normal;color:#888;font-size:11px;">(otomatik silinmez)</span></div>';
                         html += '<div class="d-tab-scroll"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:rgba(142,68,173,0.1);">'
-                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Hatim</th>'
-                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Eser</th>'
+                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Toplam</th>'
                             + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Grup</th>'
+                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Eser</th>'
+                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Grup Ad\u0131</th>'
                             + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Ba\u015flang\u0131\u00e7</th>'
                             + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Tamamlanma</th>';
                         if (admin) html += '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Y\u00f6net</th>';
                         html += '</tr></thead><tbody>';
                         done.forEach(function(r){
                             html += '<tr style="background:#ffffff;">'
+                                + '<td style="padding:8px;border:1px solid var(--border-color);font-weight:bold;">' + (r.globalNo||'-') + '</td>'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);">' + r.hatimNo + '. Hatim</td>'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.eser||'') + '</td>'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.grup||'') + '</td>'
