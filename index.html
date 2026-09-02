@@ -601,18 +601,8 @@
             <label style="font-size:12px; color:#555; display:block;">PDF yolu</label>
             <input type="text" id="book-modal-pdf" placeholder="pdf/ornek.pdf" style="width:100%; padding:8px; margin-bottom:10px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;">
             <label style="font-size:12px; color:#555; display:block;">PDF sayfa numaraları (her satır: birim:sayfa)</label>
-            <div style="display:flex; gap:4px; margin-bottom:4px; flex-wrap:wrap;">
-                <label style="font-size:11px; color:#27ae60; font-weight:bold;">20'lik</label>
-                <label style="font-size:11px; color:#2980b9; font-weight:bold;">10'luk</label>
-                <label style="font-size:11px; color:#8e44ad; font-weight:bold;">5'lik</label>
-                <label style="font-size:11px; color:#e67e22; font-weight:bold;">1'lik</label>
-            </div>
-            <div style="display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap;">
-                <textarea id="book-modal-pages20" rows="3" placeholder="20'lik (birim:sayfa)" style="flex:1; min-width:110px; padding:6px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; font-size:11px;"></textarea>
-                <textarea id="book-modal-pages10" rows="3" placeholder="10'luk (birim:sayfa)" style="flex:1; min-width:110px; padding:6px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; font-size:11px;"></textarea>
-                <textarea id="book-modal-pages5" rows="3" placeholder="5'lik (birim:sayfa)" style="flex:1; min-width:110px; padding:6px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; font-size:11px;"></textarea>
-                <textarea id="book-modal-pages1" rows="3" placeholder="1'lik (birim:sayfa)" style="flex:1; min-width:110px; padding:6px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; font-size:11px;"></textarea>
-            </div>
+                        <div style="margin-bottom:6px;"><label style="font-size:11px; color:#27ae60; font-weight:bold;">PDF sayfa eşlemesi — bloklara sayfa numarası yazın</label></div>
+            <div id="book-modal-table" style="max-height:280px; overflow:auto; border:1px solid #ccc; border-radius:6px; margin-bottom:10px; padding:6px; background:#fff;"></div>
             <div style="display:flex; gap:8px; justify-content:flex-end;">
                 <button id="book-modal-cancel" style="background:#95a5a6; color:#fff; border:none; padding:8px 16px; border-radius:6px; cursor:pointer;">İptal</button>
                 <button id="book-modal-save" style="background:#27ae60; color:#fff; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:bold;">Kaydet</button>
@@ -3910,6 +3900,31 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
 
 
                     // ===== ESER YÖNETİMİ MODAL MANTIĞI =====
+                    function _buildBookTable(units) {
+                        let mTable = document.getElementById('book-modal-table');
+                        if (!mTable) return;
+                        units = units || 0;
+                        if (units <= 0) { mTable.innerHTML = ''; return; }
+                        let h = '<table style="width:100%; border-collapse:collapse; font-size:11px;">';
+                        h += '<thead><tr>';
+                        h += '<th style="border:1px solid #ccc; padding:4px; background:#eafaf1; color:#27ae60;">1\'lik</th><th style="border:1px solid #ccc; padding:4px; background:#f0f8ff; color:#2980b9;">sayfa</th>';
+                        h += '<th style="border:1px solid #ccc; padding:4px; background:#f5eef8; color:#8e44ad;">5\'lik</th><th style="border:1px solid #ccc; padding:4px;">sayfa</th>';
+                        h += '<th style="border:1px solid #ccc; padding:4px; background:#fdf2e9; color:#e67e22;">10\'luk</th><th style="border:1px solid #ccc; padding:4px;">sayfa</th>';
+                        h += '<th style="border:1px solid #ccc; padding:4px;">20\'lik</th><th style="border:1px solid #ccc; padding:4px;">sayfa</th>';
+                        h += '</tr></thead><tbody>';
+                        for (let r = 0; r < units; r++) {
+                            h += '<tr>';
+                            [1,5,10,20].forEach(function(st){
+                                let blk = (r+1)*st;
+                                let cell = (blk <= units) ? blk : '';
+                                h += '<td style="border:1px solid #eee; padding:3px; text-align:center;">' + cell + '</td>';
+                                h += '<td style="border:1px solid #eee; padding:2px;"><input data-mode="' + st + '" data-row="' + r + '" type="number" min="1" style="width:44px; padding:2px; border:1px solid #ccc; border-radius:4px; font-size:11px; box-sizing:border-box;"></td>';
+                            });
+                            h += '</tr>';
+                        }
+                        h += '</tbody></table>';
+                        mTable.innerHTML = h;
+                    }
                     window.openBookModal = function(editId) {
                         let m = document.getElementById('book-edit-modal');
                         if (!m) return;
@@ -3921,10 +3936,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         let mStart = document.getElementById('book-modal-start');
                         let mTotal = document.getElementById('book-modal-total');
                         let mPdf = document.getElementById('book-modal-pdf');
-                        let mPages20 = document.getElementById('book-modal-pages20');
-                        let mPages10 = document.getElementById('book-modal-pages10');
-                        let mPages5 = document.getElementById('book-modal-pages5');
-                        let mPages1 = document.getElementById('book-modal-pages1');
+                        let mTable = document.getElementById('book-modal-table');
                         let mTitle = document.getElementById('book-modal-title');
                         // varsayilan
                         mId.value = '';
@@ -3934,10 +3946,9 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         mStart.value = '1';
                         mTotal.value = '100';
                         mPdf.value = '';
-                        mPages20.value = '';
-                        mPages10.value = '';
-                        mPages5.value = '';
-                        mPages1.value = '';
+                        if (mTable) mTable.innerHTML = '';
+                        _buildBookTable(parseInt(mUnits.value) || 0);
+                        if (mUnits && !mUnits._sb) { mUnits._sb = true; mUnits.addEventListener('input', function(){ _buildBookTable(parseInt(mUnits.value) || 0); }); }
                         mTitle.textContent = '📚 Yeni Eser Ekle';
                         if (editId) {
                             let book = appData.books.find(b => b.id === editId);
@@ -3966,16 +3977,25 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                                 if (sp2 && sp2.babs) { for (let b in sp2.babs) { let idx = parseInt(b) - 1; if (idx >= 0) m[idx] = sp2.babs[b]; } }
                                 return Object.keys(m).length ? m : null;
                             }
-                            function _fillLines(modMap, ta) {
-                                let ls = [];
-                                if (modMap) { for (let k in modMap) { if (modMap[k]) ls.push((parseInt(k)+1) + ':' + modMap[k]); } }
-                                ta.value = ls.join('\n');
-                            }
                             let _babsMap = _babsToMap(sp);
-                            _fillLines((sp && sp.modes && sp.modes['yirmi_sayfa']) || _babsMap, mPages20);
-                            _fillLines((sp && sp.modes && sp.modes['on_sayfa']) || _babsMap, mPages10);
-                            _fillLines((sp && sp.modes && sp.modes['bes_sayfa']) || _babsMap, mPages5);
-                            _fillLines((sp && sp.modes && sp.modes['bir_sayfa']) || _babsMap, mPages1);
+                            let _bk = book.type;
+                            function _fillTable(maps) {
+                                if (!mTable) return;
+                                mTable.querySelectorAll('input').forEach(function(inp){
+                                    let mode = inp.getAttribute('data-mode');
+                                    let row = parseInt(inp.getAttribute('data-row'));
+                                    let step = parseInt(mode);
+                                    let map = maps[mode] || {};
+                                    let u = row * step;
+                                    let v = map[u];
+                                    if (v != null) inp.value = v;
+                                });
+                            }
+                            let _m1 = (sp && sp.modes && (sp.modes['bir_sayfa'] || sp.modes['bir_bab'])) || _babsMap || {};
+                            let _m5 = (sp && sp.modes && (sp.modes['bes_sayfa'] || sp.modes['bes_bab'])) || _babsMap || {};
+                            let _m10 = (sp && sp.modes && (sp.modes['on_sayfa'] || sp.modes['on_bab'])) || _babsMap || {};
+                            let _m20 = (sp && sp.modes && (sp.modes['yirmi_sayfa'] || sp.modes['yirmi_bab'])) || _babsMap || {};
+                            _fillTable({ '1':_m1, '5':_m5, '10':_m10, '20':_m20 });
                         }
                         m.style.display = 'flex';
                         if (mName && !editId) mName.focus();
@@ -3998,10 +4018,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         let mStart = document.getElementById('book-modal-start');
                         let mTotal = document.getElementById('book-modal-total');
                         let mPdf = document.getElementById('book-modal-pdf');
-                        let mPages20 = document.getElementById('book-modal-pages20');
-                        let mPages10 = document.getElementById('book-modal-pages10');
-                        let mPages5 = document.getElementById('book-modal-pages5');
-                        let mPages1 = document.getElementById('book-modal-pages1');
+                        let mTable = document.getElementById('book-modal-table');
                         let name = (mName.value || '').trim();
                         if (!name) { showToast('❌ Eser adı boş olamaz', 'error'); return; }
                         let units = parseInt(mUnits.value) || 0;
@@ -4046,10 +4063,21 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                             return map;
                         }
                         let baseFill = function(i) { return startPg + i * ppu; };
-                        let pages20 = _parsePagesTa(mPages20, baseFill);
-                        let pages10 = _parsePagesTa(mPages10, baseFill);
-                        let pages5  = _parsePagesTa(mPages5, baseFill);
-                        let pages1  = _parsePagesTa(mPages1, baseFill);
+                        let pages1 = {}, pages5 = {}, pages10 = {}, pages20 = {};
+                        if (mTable) {
+                            mTable.querySelectorAll('input').forEach(function(inp){
+                                let mode = parseInt(inp.getAttribute('data-mode') || '0');
+                                let row = parseInt(inp.getAttribute('data-row') || '0');
+                                let pg = parseInt(inp.value);
+                                if (!pg || pg <= 0) return;
+                                let map = mode===1 ? pages1 : mode===5 ? pages5 : mode===10 ? pages10 : pages20;
+                                for (let u = row*mode; u < Math.min((row+1)*mode, units); u++) map[u] = pg;
+                            });
+                        }
+                        for (let i = 0; i < units; i++) { if (pages1[i] === undefined) pages1[i] = baseFill(i); }
+                        for (let i = 0; i < units; i++) { if (pages5[i] === undefined) pages5[i] = baseFill(i); }
+                        for (let i = 0; i < units; i++) { if (pages10[i] === undefined) pages10[i] = baseFill(i); }
+                        for (let i = 0; i < units; i++) { if (pages20[i] === undefined) pages20[i] = baseFill(i); }
                         if (!window.bookSectionPages[id]) {
                             window.bookSectionPages[id] = { type: 'manual', pages: {}, modes: {}, getPage: function(unitIndex){ return this.pages[unitIndex] || (unitIndex + 1); } };
                         }
