@@ -3083,7 +3083,7 @@
                         }
                         saveGroupData();                        // Supabase'ten de sil (upsert silmez, yoksa yenilenince geri gelir)
                         try {
-                            if (typeof window.rest === 'function' && typeof window.api === 'function') {
+                            if (window.rest && typeof window.rest.select === 'function' && typeof window.api === 'function') {
                                 window.rest.select("members", "?select=id,name,group_key").then(function(allM){
                                     var _mid = null;
                                     (allM||[]).forEach(function(mm){ if (String(mm.group_key)===String(currentGroup) && mm.name===loggedInMember) _mid = mm.id; });
@@ -4462,6 +4462,7 @@ document.addEventListener('click', function (e) {
   var _initDone = false; // açılış restore'u sırasında bayat local veri Supabase'e push edilmesin
   var _queue = Promise.resolve();
   var origSetItem = localStorage.setItem.bind(localStorage);
+  var origGetItem = localStorage.getItem.bind(localStorage);
 
   // ---------- REST yardımcıları (fetch tabanlı) ----------
   function api(path, opts) {
@@ -4611,6 +4612,8 @@ document.addEventListener('click', function (e) {
         Object.keys(byKey).forEach(function (gk) {
           var gm = members.filter(function (m) { return m.group_key === gk; });
           var g = { members: gm.map(function (m) { return m.name; }), memberTypes: {}, passwords: {}, password: byKey[gk].password || "", books: bookFull, bookPages: {}, bookHatims: {}, bookHistory: {}, readingLogs: [] };
+          // Bolge/sehir localStorage'dan korunur (Supabase'te kolon yok)
+          try { var _prev = JSON.parse(origGetItem("hatim_group_" + gk) || "null"); if (_prev) { if (_prev.regions) g.regions = _prev.regions; if (_prev.cities) g.cities = _prev.cities; } } catch(e){}
           gm.forEach(function (m) { g.memberTypes[m.name] = m.type || "grup"; g.passwords[m.name] = m.password || ""; });
           bookDef.forEach(function (b) { g.bookPages[b.id] = Array(b.total_units).fill(null).map(function () { return { owner: "", isRead: false }; }); });
           var mIdName = {}; gm.forEach(function (m) { mIdName[m.id] = m.name; });
@@ -4618,6 +4621,7 @@ document.addEventListener('click', function (e) {
           try { origSetItem("hatim_group_" + gk, JSON.stringify(g)); } catch (e) {}
         });
         var pool = { members: Array.from(poolNames), memberTypes: poolTypes, passwords: poolPass };
+        try { var _pp = JSON.parse(origGetItem("hatim_bireysel_pool") || "null"); if (_pp) { if (_pp.regions) pool.regions = _pp.regions; if (_pp.cities) pool.cities = _pp.cities; } } catch(e){}
         try { origSetItem("hatim_bireysel_pool", JSON.stringify(pool)); } catch (e) {}
         // Supabase'te artık olmayan eski grup anahtarlarını localStorage'dan temizle (çift görünüm/çakışma önleme)
         try {
