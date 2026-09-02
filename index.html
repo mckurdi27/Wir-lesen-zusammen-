@@ -2240,19 +2240,28 @@
                             });
                         }
                     } catch(err) {}
+                    rows.sort(function(a,b){
+                        var av, bv;
+                        if (analysisSortKey==='name'){ av=(a.ad||'').toLowerCase(); bv=(b.ad||'').toLowerCase(); return analysisSortDir==='az' ? (av<bv?-1:av>bv?1:0) : (av>bv?-1:av<bv?1:0); }
+                        av = a['members']===undefined?parseInt(a.gruplar||0,10):a['members']; bv = b['members']===undefined?parseInt(b.gruplar||0,10):b['members'];
+                        if (analysisSortKey==='taken'){ av=a.alinan||0; bv=b.alinan||0; }
+                        if (analysisSortKey==='read'){ av=a.okunan||0; bv=b.okunan||0; }
+                        if (analysisSortKey==='pct'){ av=a.pct||0; bv=b.pct||0; }
+                        return analysisSortDir==='az' ? av-bv : bv-av;
+                    });
                     if (rows.length === 0) {
                         container.innerHTML = '<div class="d-tab-scroll"><div style="text-align:center;color:#777;padding:20px;">Bu grupta kay\u0131tl\u0131 \u00fcye yok.</div></div>';
                         return;
                     }
                     var html = '<div class="d-tab-scroll"><table style="width:100%;border-collapse:collapse;font-size:13px;">'
                         + '<thead><tr style="background:#f1f3f5;">'
-                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">\u0130sim</th>'
+                        + '<th data-sortkey="name" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="Sırala">İsim &#8693;</th>'
                         + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Tip</th>'
-                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">\u00dcye</th>'
-                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Al\u0131nan</th>'
-                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Okunan</th>'
-                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">\u0130lerleme</th>'
-                        + '</tr></thead><tbody>';
+                        + '<th data-sortkey="members" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="Sırala">Üye &#8693;</th>'
+                        + '<th data-sortkey="taken" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="Sırala">Alınan &#8693;</th>'
+                        + '<th data-sortkey="read" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="Sırala">Okunan &#8693;</th>'
+                        + '<th data-sortkey="pct" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="Sırala">İlerleme &#8693;</th>'
+                        + '</tr></thead>'
                     rows.forEach(function(r){
                         var barColor = r.pct>=80?'#27ae60':r.pct>=50?'#f39c12':'#e74c3c';
                         var nm = r.memberNames ? ('<span style="font-size:11px;color:#888;">'+r.memberNames+'</span>') : '';
