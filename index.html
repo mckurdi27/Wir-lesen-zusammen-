@@ -3991,7 +3991,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                                     if (v != null) inp.value = v;
                                 });
                             }
-                            let _m1 = (sp && sp.modes && (sp.modes['bir_sayfa'] || sp.modes['bir_bab'])) || _babsMap || {};
+                            let _m1 = (sp && sp.modes && (sp.modes['bir_sayfa'] || sp.modes['bab'])) || _babsMap || {};
                             let _m5 = (sp && sp.modes && (sp.modes['bes_sayfa'] || sp.modes['bes_bab'])) || _babsMap || {};
                             let _m10 = (sp && sp.modes && (sp.modes['on_sayfa'] || sp.modes['on_bab'])) || _babsMap || {};
                             let _m20 = (sp && sp.modes && (sp.modes['yirmi_sayfa'] || sp.modes['yirmi_bab'])) || _babsMap || {};
@@ -4084,7 +4084,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         window.bookSectionPages[id].pageSize = ppu;
                         window.bookSectionPages[id].pages = pages20;
                         window.bookSectionPages[id].modes = (bookType === 'bab')
-                            ? { 'yirmi_bab': pages20, 'on_bab': pages10, 'bes_bab': pages5, 'bir_bab': pages1 }
+                            ? { 'yirmi_bab': pages20, 'on_bab': pages10, 'bes_bab': pages5, 'bab': pages1 }
                             : { 'yirmi_sayfa': pages20, 'on_sayfa': pages10, 'bes_sayfa': pages5, 'bir_sayfa': pages1 };
                         // bookPages boyutunu units'e uyarla
                         if (appData.bookPages[id]) {
