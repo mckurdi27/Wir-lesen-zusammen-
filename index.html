@@ -591,6 +591,7 @@
             <input type="text" id="book-modal-name" style="width:100%; padding:8px; margin-bottom:10px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;">
             <div style="display:flex; gap:8px; margin-bottom:10px;">
                 <div style="flex:1;"><label style="font-size:12px; color:#555; display:block;">Birim sayısı</label><input type="number" id="book-modal-units" min="1" value="100" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;"></div>
+                <div style="flex:1;"><label style="font-size:12px; color:#555; display:block;">Eser tipi</label><select id="book-modal-type" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; font-size:12px;"><option value="page">Sayfa</option><option value="bab">Bab</option></select></div>
                 <div style="flex:1;"><label style="font-size:12px; color:#555; display:block;">Birim başına sayfa</label><input type="number" id="book-modal-ppu" min="1" value="1" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;"></div>
             </div>
             <div style="display:flex; gap:8px; margin-bottom:10px;">
@@ -3904,6 +3905,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         if (!m) return;
                         let mId = document.getElementById('book-modal-id');
                         let mName = document.getElementById('book-modal-name');
+                        let mType = document.getElementById('book-modal-type');
                         let mUnits = document.getElementById('book-modal-units');
                         let mPpu = document.getElementById('book-modal-ppu');
                         let mStart = document.getElementById('book-modal-start');
@@ -3934,6 +3936,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                             mTitle.textContent = '📚 Eser Düzenle: ' + book.name;
                             mName.value = book.name || '';
                             mUnits.value = book.totalUnits || 100;
+                            if (mType) mType.value = (book.type === 'bab') ? 'bab' : 'page';
                             mPdf.value = book.pdf || '';
                             // mevcut sayfa haritasi (mod bazli)
                             let sp = window.bookSectionPages[editId];
@@ -3947,15 +3950,22 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                             mPpu.value = ppu;
                             mTotal.value = (book.totalUnits || 100) * (ppu || 1);
                             // modlara gore satirlar: birim:sayfa
+                            // Statik bab kitaplari (Tevhidname vb.) 'babs' kullanir (1-bazli babNo:sayfa)
+                            function _babsToMap(sp2) {
+                                let m = {};
+                                if (sp2 && sp2.babs) { for (let b in sp2.babs) { let idx = parseInt(b) - 1; if (idx >= 0) m[idx] = sp2.babs[b]; } }
+                                return Object.keys(m).length ? m : null;
+                            }
                             function _fillLines(modMap, ta) {
                                 let ls = [];
                                 if (modMap) { for (let k in modMap) { if (modMap[k]) ls.push((parseInt(k)+1) + ':' + modMap[k]); } }
                                 ta.value = ls.join('\n');
                             }
-                            _fillLines(sp && sp.modes && sp.modes['yirmi_sayfa'], mPages20);
-                            _fillLines(sp && sp.modes && sp.modes['on_sayfa'], mPages10);
-                            _fillLines(sp && sp.modes && sp.modes['bes_sayfa'], mPages5);
-                            _fillLines(sp && sp.modes && sp.modes['bir_sayfa'], mPages1);
+                            let _babsMap = _babsToMap(sp);
+                            _fillLines((sp && sp.modes && sp.modes['yirmi_sayfa']) || _babsMap, mPages20);
+                            _fillLines((sp && sp.modes && sp.modes['on_sayfa']) || _babsMap, mPages10);
+                            _fillLines((sp && sp.modes && sp.modes['bes_sayfa']) || _babsMap, mPages5);
+                            _fillLines((sp && sp.modes && sp.modes['bir_sayfa']) || _babsMap, mPages1);
                         }
                         m.style.display = 'flex';
                         if (mName && !editId) mName.focus();
@@ -3972,6 +3982,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         if (!m) return;
                         let mId = document.getElementById('book-modal-id');
                         let mName = document.getElementById('book-modal-name');
+                        let mType = document.getElementById('book-modal-type');
                         let mUnits = document.getElementById('book-modal-units');
                         let mPpu = document.getElementById('book-modal-ppu');
                         let mStart = document.getElementById('book-modal-start');
@@ -3990,6 +4001,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         let startPg = parseInt(mStart.value) || 1;
                         if (startPg <= 0) startPg = 1;
                         let pdf = (mPdf.value || '').trim();
+                        let bookType = (mType && mType.value === 'bab') ? 'bab' : 'page';
                         let editId = mId.value;
                         let id;
                         if (editId) {
@@ -3998,10 +4010,11 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                             if (!book) return;
                             book.name = name;
                             book.totalUnits = units;
+                            if (book.type !== 'bab') book.type = bookType;
                             if (pdf) book.pdf = pdf;
                         } else {
                             id = 'book_' + Date.now();
-                            appData.books.push({ id: id, name: name, totalUnits: units, type: 'page', defaultMode: 'yirmi_sayfa', currentMode: 'yirmi_sayfa', pdf: pdf });
+                            appData.books.push({ id: id, name: name, totalUnits: units, type: bookType, defaultMode: (bookType === 'bab' ? 'on_bab' : 'yirmi_sayfa'), currentMode: (bookType === 'bab' ? 'on_bab' : 'yirmi_sayfa'), pdf: pdf });
                             window.rebuildBookModesDefs();
                             appData.bookPages[id] = Array(units).fill(null).map(() => ({ owner: '', isRead: false }));
                             appData.bookHatims[id] = { hatimNo: 1, startDate: new Date().toLocaleDateString('tr-TR'), prayerDone: false };
@@ -4032,7 +4045,9 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         }
                         window.bookSectionPages[id].pageSize = ppu;
                         window.bookSectionPages[id].pages = pages20;
-                        window.bookSectionPages[id].modes = { 'yirmi_sayfa': pages20, 'on_sayfa': pages10, 'bes_sayfa': pages5, 'bir_sayfa': pages1 };
+                        window.bookSectionPages[id].modes = (bookType === 'bab')
+                            ? { 'yirmi_bab': pages20, 'on_bab': pages10, 'bes_bab': pages5, 'bir_bab': pages1 }
+                            : { 'yirmi_sayfa': pages20, 'on_sayfa': pages10, 'bes_sayfa': pages5, 'bir_sayfa': pages1 };
                         // bookPages boyutunu units'e uyarla
                         if (appData.bookPages[id]) {
                             while (appData.bookPages[id].length < units) appData.bookPages[id].push({ owner: '', isRead: false });
