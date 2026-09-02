@@ -2928,6 +2928,11 @@
             // renderBooks
             function renderBooks() {
                 const openBookIds = Array.from(document.querySelectorAll(".book-card.open")).map(el => el.getAttribute("data-book-id"));
+                const _scrollCache = {};
+                document.querySelectorAll(".book-card.open").forEach(function(cd){
+                    const _sc = cd.querySelector(".book-body-scroller");
+                    if (_sc) _scrollCache[cd.getAttribute("data-book-id")] = _sc.scrollTop;
+                });
                 booksGrid.innerHTML = "";
 
                 appData.books.forEach((book) => {
@@ -3045,11 +3050,15 @@
                         </div>
                         <div class="book-body" style="display: ${isOpen ? 'block' : 'none'};">
                             <div style="margin-bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">${modeButtonsHtml}</div>
-                            <div style="max-height: 400px; overflow-y: auto; padding-right: 4px;">${itemsHtml}</div>
+                            <div class="book-body-scroller" data-scroll-book="${book.id}" style="max-height: 400px; overflow-y: auto; padding-right: 4px;">${itemsHtml}</div>
                         </div>
                     `;
 
                     booksGrid.appendChild(card);
+                    if (_scrollCache[book.id] && isOpen) {
+                        const sc2 = card.querySelector(".book-body-scroller");
+                        if (sc2) { requestAnimationFrame(function(){ sc2.scrollTop = _scrollCache[book.id]; }); }
+                    }
                 });
 
                 document.querySelectorAll(".book-header").forEach(header => {
@@ -3096,9 +3105,10 @@
                         let takeClock = new Date().toLocaleTimeString("tr-TR", {hour: '2-digit', minute:'2-digit'});
                         for (let i = start; i < end; i++) { baseArray[i].owner = loggedInMember; baseArray[i].isRead = false; baseArray[i].takeDate = takeNow; baseArray[i].takeTime = takeClock; }
                         if (!appData.readingLogs) appData.readingLogs = [];
-                        let defModes = bookModesDefs[bId];
-                        let modeObj = Object.values(defModes).find(m => m.getItems().some(item => item.start === start && item.end === end));
-                        let rangeName = modeObj ? modeObj.getItems().find(item => item.start === start && item.end === end).name : `${start+1}-${end}`;
+                        let defModes = (typeof bookModesDefs !== 'undefined' && bookModesDefs) ? bookModesDefs[bId] : null;
+                        let modeObj = null;
+                        if (defModes) { try { modeObj = Object.values(defModes).find(m => m.getItems().some(item => item.start === start && item.end === end)); } catch(err) { modeObj = null; } }
+                        let rangeName = (modeObj && modeObj.getItems().find(item => item.start === start && item.end === end)) ? modeObj.getItems().find(item => item.start === start && item.end === end).name : `${start+1}-${end}`;
                         appData.readingLogs.push({
                             date: new Date().toLocaleDateString("tr-TR") + " " + new Date().toLocaleTimeString("tr-TR", {hour: '2-digit', minute:'2-digit'}),
                             timestamp: Date.now(),
