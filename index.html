@@ -2394,7 +2394,7 @@
                         });
                         allMemberStats.sort((a, b) => {
                         let av = analysisSortKey==='taken' ? a.taken : analysisSortKey==='read' ? a.read : analysisSortKey==='percent' ? a.percent : analysisSortKey==='type' ? (a.type==='grup'?'Grup':'Bireysel') : analysisSortKey==='groups' ? (a.groups||[]).join(',') : a.name;
-                        let bv = analysisSortKey==='taken' ? b.taken : analysisSortKey==='read' ? b.read : analysisSortKey==='percent' ? b.percent : analysisSortKey==='type' ? (b.type==='grup'?'Grup':'Bireysel') : analysisSortKey==='groups' ? String(b.groups||[]).join(',') : b.name;
+                        let bv = analysisSortKey==='taken' ? b.taken : analysisSortKey==='read' ? b.read : analysisSortKey==='percent' ? b.percent : analysisSortKey==='type' ? (b.type==='grup'?'Grup':'Bireysel') : analysisSortKey==='groups' ? (b.groups||[]).join(',') : b.name;
                         if (typeof av === 'number' && typeof bv === 'number') return analysisSortDir==='az' ? av-bv : bv-av;
                         return analysisSortDir==='az' ? String(av).localeCompare(String(bv),'tr') : String(bv).localeCompare(String(av),'tr');
                       });
