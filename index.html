@@ -4491,7 +4491,7 @@ renderBooks();
             }
             function saveBireyselPool(p) { localStorage.setItem('hatim_bireysel_pool', JSON.stringify(p)); }
 
-            async function loadGroupData() {
+            async function loadGroupData(skipSession, silent) {
                 const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
                 appData = savedData ? JSON.parse(savedData) : { members: [], password: "" };
 
@@ -4550,12 +4550,12 @@ renderBooks();
 
                 window.rebuildBookModesDefs();
                 window.saveGroupData();
-                await renderDailyInspiration();
-                renderBooks();
-                
-                renderAdminSectionAtBottom();
-                updateAutocompleteLists();
-                updateUserInterface();
+                if (!silent) { await renderDailyInspiration(); renderBooks(); renderAdminSectionAtBottom(); updateAutocompleteLists(); updateUserInterface(); }
+
+
+
+
+
             }
 
             
