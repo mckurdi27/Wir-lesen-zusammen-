@@ -2355,8 +2355,47 @@
                 }
 
                 function renderTab3(groupName = 'all', memberName = 'all') {
-                    const container = document.getElementById('dtabs-3-content');
                     
+
+                    const container = document.getElementById('dtabs-3-content');
+
+// ---- COKLU UYE KARSILASTIRMA ----
+                    try {
+                        var _msel = document.getElementById('analysis-member-select');
+                        var _selOpts = _msel ? [].slice.call(_msel.selectedOptions) : [];
+                        if (_selOpts.length >= 2) {
+                            var _cmpMembers = _selOpts.map(function(o){ return o.value; });
+                            // her uye icin detay
+                            var _cmpData = _cmpMembers.map(function(v){
+                                var rs = _resolveSelMember(v, groupName);
+                                var dd = getMemberDetailData(rs.name, rs.grp, analysisBooks.length ? analysisBooks : 'all');
+                                return { label: (dd.type==='bireysel'?'\ud83d\udc64 ':'\ud83d\udc65 ')+v, taken: dd.totalTaken, read: dd.totalRead, books: dd.books, pct: dd.totalTaken>0?Math.round((dd.totalRead/dd.totalTaken)*100):0 };
+                            });
+                            // eser birlesimi (sadece herhangi birinde hisse olan)
+                            var _bookMap = {};
+                            _cmpData.forEach(function(d){ d.books.forEach(function(b){ _bookMap[b.name]=1; }); });
+                            var _bookNames = Object.keys(_bookMap).sort(function(a,b){ return (b==='Kuran'||b==='Kur\u2019\u00e2n'||b==='Kur-an')?-1:1; });
+                            // uye basina eser->{taken,read} haritasi
+                            var _each = _cmpData.map(function(d){
+                                var h={}; d.books.forEach(function(b){ h[b.name]={t: b.taken, r: b.read, tot: b.total}; }); return h;
+                            });
+                            var _rows='';
+                            _bookNames.forEach(function(bn){
+                                var cells='';
+                                for(var qi=0; qi<_cmpData.length; qi++){ var e=_each[qi][bn]; cells += '<td style="padding:9px;border-bottom:1px solid var(--border-color);text-align:center;">' + (e? (e.t+' <span style="color:#999;font-size:11px;">/ '+e.tot+'</span><br><span style="color:#27ae60;font-weight:bold;">'+e.r+' okundu</span>') : '<span style="color:#ccc;">--</span>') + '</td>'; }
+                                _rows += '<tr><td style="padding:9px;border-bottom:1px solid var(--border-color);font-weight:bold;">'+bn+'</td>'+cells+'</tr>';
+                            });
+                            var _sumCells='';
+                            _cmpData.forEach(function(d){ _sumCells += '<td style="padding:9px;border-bottom:1px solid var(--border-color);text-align:center;font-weight:bold;">Al\u0131nan: '+d.taken+'<br><span style="color:#27ae60;">Okunan: '+d.read+'</span><br><span style="background:'+(d.pct>=80?'#27ae60':d.pct>=50?'#f39c12':'#e74c3c')+';color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;">%'+d.pct+'</span></td>'; });
+                            container.innerHTML = '<div style="font-weight:bold;font-size:15px;margin-bottom:8px;">\ud83d\udd0d \u00dcye Kar\u015f\u0131la\u015ft\u0131rmas\u0131</div>'
+                                + '<div class="d-tab-scroll"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:rgba(212,175,55,0.15);"><th style="padding:10px;text-align:left;border-bottom:2px solid var(--gold-primary);">Eser</th>'
+                                + _cmpData.map(function(d){ return '<th style="padding:10px;text-align:center;border-bottom:2px solid var(--gold-primary);font-weight:bold;">'+d.label+'</th>'; }).join('')
+                                + '</tr></thead><tbody>'+_rows
+                                + '<tr style="background:rgba(212,175,55,0.06);"><td style="padding:9px;font-weight:bold;">Toplam</td>'+_sumCells+'</tr>'
+                                + '</tbody></table></div>';
+                            return;
+                        }
+                    } catch(e) { console.warn('compare', e); }                    
                     if (memberName === 'all') {
                         let allMemberStats = [];
                         let _membersSrc = allMembers;
@@ -2877,7 +2916,7 @@ function renderTab6(groupName, memberName) {
                             <div style="flex: 1; min-width: 150px;">
                                 <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">👤 Üye Seç:</label>
                                 <div style="font-size:11px; color:#888; margin-bottom:3px;">Analiz edilecek üyeyi seçin</div>
-                                <select id="analysis-member-select" style="width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 14px; min-height: 44px;">
+                                <select id="analysis-member-select" multiple size="6" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px;">
                                     ${getMemberSelectHtml()}
                                 </select>
                             </div>
