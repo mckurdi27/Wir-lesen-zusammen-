@@ -141,7 +141,8 @@ button{font-family:inherit;cursor:pointer}
 
 <script>
 /* pdf/ klasöründeki kitaplar — A.pdf boş olduğu için listede yok */
-const BOOKS=[
+/* pdf/ klasöründeki kitaplar — her açılışta GitHub API'den otomatik listelenir */
+const FALLBACK_BOOKS=[
   {f:"pdf/Ashabı Bedr ve Şühedayı Uhud.pdf", i:"🕌"},
   {f:"pdf/Bir Kırık Dilekçe Ar.pdf", i:"🤲"},
   {f:"pdf/Bir Kırık Dilekçe Tr.pdf", i:"🤲"},
@@ -153,6 +154,17 @@ const BOOKS=[
   {f:"pdf/Kuran-ı Kerim.pdf", i:"📗"},
   {f:"pdf/Tevhidname Mealli.pdf", i:"📔"},
 ];
+const classify=nm=>{nm=(nm||'').toLowerCase();
+  if(nm.includes('kuran'))return '📗';
+  if(nm.includes('cevşen'))return '📿';
+  if(/cevşen|celcel/.test(nm))return '🕋';
+  if(nm.includes('bedr')||nm.includes('şüheda'))return '🕌';
+  if(/dalail/.test(nm))return '🌸';
+  if(/dua/.test(nm))return '🕋';
+  if(nm.includes('dilekçe'))return '🤲';
+  if(nm.includes('tevhid'))return '📔';
+  return '📖';};
+let BOOKS=FALLBACK_BOOKS.slice();
 const bname=f=>f.split('/').pop().replace(/\.pdf$/i,'');
 pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 const $=id=>document.getElementById(id);
@@ -304,6 +316,21 @@ async function openBook(k){const bk=BOOKS[k];
   }catch(e){console.error(e);alert('PDF açılamadı: '+bname(bk.f));$('shelf').classList.remove('hidden');}
   finally{$('load').classList.remove('on');} }
 
+
+/* pdf/ içeriğini GitHub API ile çek — sonradan eklenen eserler otomatik gelir */
+function loadPdfList(){
+  fetch('https://api.github.com/repos/mckurdi27/Wir-lesen-zusammen-/contents/pdf/')
+    .then(r=>r.ok?r.json():Promise.reject(r.status))
+    .then(js=>{
+      if(!Array.isArray(js))return;
+      const list=js.filter(x=>x.type==='file'&&/\.pdf$/i.test(x.name)&&!/^A\.pdf$/i.test(x.name))
+        .map(x=>({f:'pdf/'+x.name,i:classify(x.name)}));
+      if(list.length)BOOKS=list;
+      buildShelf();
+    })
+    .catch(()=>buildShelf());
+}
+
 function buildShelf(){const g=$('grid');g.innerHTML='';
   BOOKS.forEach((bk,i)=>{const c=document.createElement('div');c.className='bk';
     const cv=document.createElement('div');cv.className='cv';cv.textContent=bk.i;
@@ -334,9 +361,13 @@ let tx=0,ty=0;
 document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
 document.addEventListener('touchend',e=>{if(!$('reader').classList.contains('on'))return;
   const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
-  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){dx<0?next():prev();}},{passive:true});
+  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){
+    /* RTL açıkken ileri gitmek soldan sağa kaydırmaktır (Arapça kitap sağdan okunur) */
+    const fwd = rtl ? dx>0 : dx<0;
+    fwd?next():prev();
+  }},{passive:true});
 
-buildShelf();
+loadPdfList();
 </script>
 </body>
 </html>
