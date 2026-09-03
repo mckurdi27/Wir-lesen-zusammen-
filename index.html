@@ -1607,8 +1607,7 @@
                             }
                         } catch(e){}
                     })();
-                    booksEl.innerHTML = '<div style="text-align:center; color:#777; padding:16px;">Y\u00fckleniyor\u2026</div>';
-                    if (typeof window._sbMemberDetail !== 'function') { booksEl.innerHTML = '<div style="text-align:center; color:#e74c3c; padding:16px;">Senkron k\u00f6pr\u00fcs\u00fc haz\u0131r de\u011fil.</div>'; return; }
+                    if (typeof window._sbMemberDetail !== 'function') { return; }
                     window._sbMemberDetail(loggedInMember, currentGroup).then(function (data) {
                         var pwdEl = document.getElementById('bt-member-password');
                         if (pwdEl) pwdEl.value = data.password || '';
