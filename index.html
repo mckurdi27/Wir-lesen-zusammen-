@@ -3518,7 +3518,8 @@ function renderTab6(groupName, memberName) {
                     if (_cc) _cc.innerHTML = '<div style="padding:8px;background:#fff3cd;color:#856404;font-size:12px;border:1px solid #ffeeba;border-radius:6px;">DBG: ' + _st + '</div>';
                     console.log('[grupKarti-dbg]', _st);
                     var _hide = (!_adm || !currentGroup || loggedInMember);
-                    if (_hide) { _pnl.style.display='none'; return; }
+                    
+                    _pnl.style.display = 'block'; _pnl.style.border='2px dashed #e67e22'; return;
                     _pnl.style.display='block';
                 } catch(er) { console.log('[grup-dbg-hata]', er); }
 
