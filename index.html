@@ -1564,10 +1564,10 @@
             function renderBireyselTakipPanel() {
                     const panel = document.getElementById('bireysel-takip-panel');
                     const _gp1 = document.getElementById('grup-takip-panel');
-                    if (_gp1) _gp1.style.display='none';
                     if (!panel) return;
                     if (!loggedInMember) { panel.style.display='none'; return; }
                     panel.style.display = 'block';
+                    if (_gp1) _gp1.style.display='none';
                     // kart gir paneli hemen altina sabitle (admin/eserler araya girmesin)
                     try {
                         var _lp = document.getElementById('simple-login-panel');
@@ -3512,11 +3512,12 @@ function renderTab6(groupName, memberName) {
             function renderGrupTakipPanel() {
                 const panel = document.getElementById('grup-takip-panel');
                 const _bp2 = document.getElementById('bireysel-takip-panel');
-                if (_bp2) _bp2.style.display='none';
                 if (!panel) return;
                 const isAdm = (typeof window._sbIsAdmin === 'function') ? window._sbIsAdmin() : false;
-                if (!isAdm || !currentGroup) { panel.style.display = 'none'; return; }
+                // Grup kartini yalnizca bir UYE secilmemisken (saf grup secimi) goster
+                if (!isAdm || !currentGroup || loggedInMember) { panel.style.display = 'none'; return; }
                 panel.style.display = 'block';
+                if (_bp2) _bp2.style.display='none';
                 const nameEl = document.getElementById('gt-group-name');
                 if (nameEl) nameEl.textContent = 'Grup: ' + currentGroup;
                 const cont = document.getElementById('gt-content');
