@@ -3586,7 +3586,7 @@ window.renderGrupTakipPanel = renderGrupTakipPanel;
                 if (!bottomContainer) {
                     bottomContainer = document.createElement("div");
                     bottomContainer.id = "admin-bottom-section";
-                    container.appendChild(bottomContainer);
+                    document.body.appendChild(bottomContainer);
                 }
                 bottomContainer.style.cssText = "margin: 20px 0; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--card-bg);";
 
