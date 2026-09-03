@@ -279,11 +279,11 @@ function doFlip(fwd){
     /* dönen sayfa */
     if(spread){
       if(fwd){
-        if(rtl) b.appendChild(turnEl(cur,'R','right center',150));   // RTL: sağ sayfa sağ kenarından döner
-        else    b.appendChild(turnEl(cur+1,'R','left center',-150));
+        if(rtl) b.appendChild(turnEl(cur+1,false,'right center',150));  // RTL: sol sayfa içe döner
+        else    b.appendChild(turnEl(cur+1,true ,'left center',-150));  // LTR: sağ sayfa döner
       }else{
-        if(rtl) b.appendChild(turnEl(cur,'L','left center',-150));
-        else    b.appendChild(turnEl(cur,'L','right center',150));
+        if(rtl) b.appendChild(turnEl(cur,true ,'left center',-150));    // RTL: sağ sayfa geri döner
+        else    b.appendChild(turnEl(cur,false,'right center',150));    // LTR: sol sayfa geri döner
       }
     }else{
       if(fwd) b.appendChild(turnEl(cur,false, rtl?'right center':'left center', rtl?150:-150));
