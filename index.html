@@ -440,12 +440,6 @@
     <div class="container">
         <!-- BÖLÜM 4 - ÜST BAŞLIK VE GÖRSEL ALANI -->
         <div id="main-title-ornate-section" style="margin-bottom: 20px; padding: 10px 15px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border: 2px solid #d4af37; border-top: 6px solid #8a6d3b; border-radius: 12px; box-shadow: 0 4px 15px rgba(138, 109, 59, 0.2);">
-            <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
-                <button id="app-fs-btn" onclick="toggleAppFullscreen()" title="Tam ekran" style="display:flex; align-items:center; gap:8px; background:linear-gradient(135deg,#d4af37,#b8860b); color:#fff; border:none; padding:6px 14px; border-radius:8px; cursor:pointer; font-size:14px; font-weight:bold; box-shadow:0 2px 6px rgba(138,109,59,0.4);">
-                    <img src="icon-192.png" alt="" style="width:24px;height:24px;border-radius:5px;">
-                    <span id="app-fs-label">&#x26F6; Uygulamay&#x131; Tam Ekran A&#xE7;</span>
-                </button>
-            </div>
             <script>
             function toggleAppFullscreen(){
                 var el = document.documentElement;
@@ -543,6 +537,12 @@
         </div>
 
         <!-- BÖLÜM 5 - GİRİŞ PANELİ -->
+        <div style="display:flex; justify-content:center; margin:0 0 14px;">
+            <button id="app-fs-btn" onclick="toggleAppFullscreen()" title="Tam ekran" style="display:flex; align-items:center; gap:10px; background:transparent; border:2px solid #d4af37; color:#8a6d3b; padding:6px 18px; border-radius:30px; cursor:pointer; font-size:14px; font-weight:bold; box-shadow:0 1px 4px rgba(138,109,59,0.25);">
+                <img src="icon-192.png" alt="" style="width:30px;height:30px;border-radius:6px;">
+                <span id="app-fs-label">&#x26F6; Uygulamay&#x131; Tam Ekran A&#xE7;</span>
+            </button>
+        </div>
         <div id="simple-login-panel" class="login-panel">
             <div id="user-active-area" style="display: none;" class="user-active">
                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
