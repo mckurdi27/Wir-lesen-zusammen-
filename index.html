@@ -4185,11 +4185,17 @@ window.infoSortTable = function infoSortTable(col) {
                                     let pre = (mine > 0) ? 'checked' : '';
                                     let dis = (hasOwner && mine === 0) ? 'disabled' : '';
                                     let stBadge = allRead ? '<span style="background:#27ae60;color:#fff;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:bold;">✓</span>' : hasOwner ? '<span style="background:#f39c12;color:#333;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:bold;">■</span>' : '<span style="background:#e9ecef;color:#777;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:bold;">○</span>';
-                                    return `<label style="display:flex; align-items:center; gap:8px; padding:6px; border:1px solid var(--border-color); border-radius:6px; margin-bottom:4px; background:${bg}; color:${fg}; cursor:${dis?'not-allowed':'pointer'};">
-                                        <input type="checkbox" class="bv-unit" ${pre} ${dis} data-start="${it.start}" data-end="${it.end}">
-                                        <span style="font-size:12px; font-weight:bold;">${it.start+1}-${it.end}</span>
-                                        ${ownerNames.length ? `<span style="font-size:12px; font-weight:bold; margin-left:6px;">${ownerNames.join(', ')}</span>` : ''}
-                                    </label>`;
+                                    return `<div style="display:flex; align-items:center; gap:8px; padding:6px; border:1px solid var(--border-color); border-radius:6px; margin-bottom:4px; background:${bg}; color:${fg};">
+                                        <label style="display:flex; align-items:center; gap:8px; flex:1; min-width:0; cursor:${dis?'not-allowed':'pointer'};">
+                                            <input type="checkbox" class="bv-unit" ${pre} ${dis} data-start="${it.start}" data-end="${it.end}">
+                                            <span style="font-size:12px; font-weight:bold;">${it.start+1}-${it.end}</span>
+                                            ${ownerNames.length ? `<span style="font-size:12px; font-weight:bold; margin-left:6px;">${ownerNames.join(', ')}</span>` : ''}
+                                        </label>
+                                        ${mine>0 ? `<label title="Okundu i\u015faretle" style="display:flex; align-items:center; gap:4px; cursor:pointer; white-space:nowrap; font-size:11px;">
+                                            <input type="checkbox" class="bv-read" data-start="${it.start}" data-end="${it.end}" ${chunk.length && chunk.every(p=>p.owner===selN && p.isRead)?'checked':''}>
+                                            <span>Okundu</span>
+                                        </label>` : '<span style="width:62px;"></span>'}
+                                    </div>`;
                                 }).join('');
                             }
                             let memberSel = document.getElementById('bv-member');
@@ -4227,6 +4233,20 @@ window.infoSortTable = function infoSortTable(col) {
                                     let en = parseInt(cb.getAttribute('data-end'));
                                     for (let i = s; i < en; i++) {
                                         tpages[i].owner = m; tpages[i].isRead = tpages[i].isRead || false; cnt++;
+                                    }
+                                });
+                                // Okundu kutulari: bu secili bloklari okundu isaretle (tarih/saat ile)
+                                let nowD = new Date().toLocaleDateString('tr-TR');
+                                let nowT = new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+                                panel.querySelectorAll('.bv-read:checked').forEach(cb => {
+                                    let s = parseInt(cb.getAttribute('data-start'));
+                                    let en = parseInt(cb.getAttribute('data-end'));
+                                    for (let i = s; i < en; i++) {
+                                        if (tpages[i] && tpages[i].owner === m) {
+                                            tpages[i].isRead = true;
+                                            tpages[i].readDate = nowD;
+                                            tpages[i].readTime = nowT;
+                                        }
                                     }
                                 });
                                 if (cnt > 0) { bulkSave(targetData); showToast('✅ ' + cnt + ' hisse ' + m + ' üyesine atandı.', 'success'); renderUnits(); }
