@@ -133,7 +133,7 @@ button{font-family:inherit;cursor:pointer}
     <button class="c g" id="lastB" title="Son">»</button>
     <div style="flex:1"></div>
     <button class="c s tx" id="viewB" title="Tek sayfa / çift sayfa">Çift</button>
-    <button class="c s tx" id="rtlB" title="Okuma yönü: soldan sağa / sağdan sola">RTL: Kapalı</button>
+    <button class="c s tx" id="rtlB" title="Okuma yönü: soldan sağa / sağdan sola">✕</button>
     <button class="c s" id="zinB" title="Yakınlaştır">+</button>
     <button class="c s" id="zoutB" title="Uzaklaştır">−</button>
   </div>
@@ -275,7 +275,7 @@ function doFlip(fwd){
 function updateUI(){$('pageIn').value=cur;$('tot').textContent=total;
   $('viewB').textContent=spread?'Çift':'Tek';
   $('viewB').classList.toggle('on',spread);
-  $('rtlB').textContent=rtl?'RTL: Açık':'RTL: Kapalı';
+  $('rtlB').textContent=rtl?'من اليمين لليسار':'✕';
   $('rtlB').classList.toggle('on',rtl);
   const sp=sidePages();const ps=$('rtitle').querySelector('.ps');
   if(spread){ps.textContent=(rtl?'RTL · ':'')+'Sayfa '+cur+'–'+(cur+1<=total?cur+1:cur)+' / '+total;}
