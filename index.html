@@ -484,6 +484,7 @@
 
                     <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: nowrap;">
                         <button id="pdf-rtl-btn" title="Arapca sayfa: sagdan sola" style="background:#bdc3c7;color:#2c3e50;border:2px solid #7f8c8d;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;min-height:28px;">&#10005; العربية</button>
+                        <button id="pdf-fs-btn" title="Tam ekran" style="background:#27ae60;color:#fff;border:none;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;min-height:28px;">&#x26F6; Tam Ekran</button>
                         <button id="pdf-land-btn" title="Yatay mod: buyuk yazi icin dik kaydir" style="background:#bdc3c7;color:#2c3e50;border:2px solid #7f8c8d;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;min-height:28px;">&#10005; Yatay</button>
                     </div>
                 </div>
@@ -952,6 +953,32 @@
                     pdfDoc = null;
                 });
                 
+
+                var _fsBtn = document.getElementById('pdf-fs-btn');
+                _fsBtn.addEventListener('click', function(e){
+                    e.stopPropagation();
+                    var el = modal;
+                    if (document.fullscreenElement || document.webkitFullscreenElement) {
+                        if (document.exitFullscreen) document.exitFullscreen();
+                        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                        _fsBtn.textContent = '\u26F6 Tam Ekran';
+                    } else {
+                        if (el.requestFullscreen) el.requestFullscreen();
+                        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+                        _fsBtn.textContent = '\u2715 Tam Ekran';
+                    }
+                });
+                document.addEventListener('fullscreenchange', function(){
+                    if(!document.fullscreenElement && !document.webkitFullscreenElement && _fsBtn){
+                        _fsBtn.textContent = '\u26F6 Tam Ekran';
+                    }
+                });
+                document.addEventListener('webkitfullscreenchange', function(){
+                    if(!document.fullscreenElement && !document.webkitFullscreenElement && _fsBtn){
+                        _fsBtn.textContent = '\u26F6 Tam Ekran';
+                    }
+                });
+
                 modal.addEventListener('click', function(e) {
                     if (e.target === modal) {
                         modal.style.display = 'none';
