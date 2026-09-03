@@ -538,10 +538,14 @@
 
         <!-- BÖLÜM 5 - GİRİŞ PANELİ -->
         <div style="display:flex; justify-content:center; margin:0 0 14px;">
-            <button id="app-fs-btn" onclick="toggleAppFullscreen()" title="Tam ekran" style="display:flex; align-items:center; gap:12px; background:transparent; border:2px dashed #d4af37; color:#8a6d3b; padding:8px 14px; border-radius:0; cursor:pointer; box-shadow:0 1px 4px rgba(138,109,59,0.2);">
-                <img src="icon-192.png" alt="Tam ekran" style="width:54px;height:54px;border-radius:50%;display:block;object-fit:cover;">
-                <span id="app-fs-label" style="font-size:16px;font-weight:bold;white-space:nowrap;">&#x26F6; Uygulamay&#x131; Tam Ekran A&#xE7;</span>
-                <img src="icon-192.png" alt="Tam ekran" style="width:54px;height:54px;border-radius:50%;display:block;object-fit:cover;">
+            <button id="app-fs-btn" onclick="toggleAppFullscreen()" title="Tam ekran" style="position:relative; display:flex; align-items:center; gap:8px; background:transparent; border:none; color:#8a6d3b; padding:12px 24px; cursor:pointer; font-size:16px; font-weight:bold; white-space:nowrap;">
+                <span style="position:absolute; top:0; left:0; width:16px; height:16px; border-top:2px dashed #d4af37; border-left:2px dashed #d4af37;"></span>
+                <span style="position:absolute; top:0; right:0; width:16px; height:16px; border-top:2px dashed #d4af37; border-right:2px dashed #d4af37;"></span>
+                <span style="position:absolute; bottom:0; left:0; width:16px; height:16px; border-bottom:2px dashed #d4af37; border-left:2px dashed #d4af37;"></span>
+                <span style="position:absolute; bottom:0; right:0; width:16px; height:16px; border-bottom:2px dashed #d4af37; border-right:2px dashed #d4af37;"></span>
+                <img src="fs-icon.png" alt="" style="height:24px;width:auto;display:inline-block;">
+                <span id="app-fs-label">&#x26F6; Uygulamay&#x131; Tam Ekran A&#xE7;</span>
+                <img src="fs-icon.png" alt="" style="height:24px;width:auto;display:inline-block;">
             </button>
         </div>
         <div id="simple-login-panel" class="login-panel">
