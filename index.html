@@ -451,7 +451,7 @@
                 var fsEl = document.fullscreenElement || document.webkitFullscreenElement;
                 var lbl = document.getElementById('app-fs-label');
                 if(!lbl) return;
-                lbl.innerHTML = fsEl ? '\u2715 Tam Ekrandan \u00C7\u0131k' : '\u26F6 Tam Ekran<br>A\u00E7';
+                lbl.textContent = fsEl ? '\u2715 Tam Ekrandan \u00C7\u0131k' : '\u26F6 Uygulamay\u0131 Tam Ekran A\u00E7';
             }
             document.addEventListener('fullscreenchange', syncAppFsLabel);
             document.addEventListener('webkitfullscreenchange', syncAppFsLabel);
@@ -538,9 +538,9 @@
 
         <!-- BÖLÜM 5 - GİRİŞ PANELİ -->
         <div style="display:flex; justify-content:center; margin:0 0 14px;">
-            <button id="app-fs-btn" onclick="toggleAppFullscreen()" title="Tam ekran" style="display:flex; align-items:center; gap:10px; background:transparent; border:2px solid #d4af37; color:#8a6d3b; padding:4px 12px; border-radius:12px; cursor:pointer; box-shadow:0 1px 4px rgba(138,109,59,0.25);">
-                <img src="icon-192.png" alt="" style="width:46px;height:46px;border-radius:8px;display:block;">
-                <span id="app-fs-label" style="font-size:12px;font-weight:bold;line-height:1.15;text-align:left;">&#x26F6; Tam Ekran<br>A&#xE7;</span>
+            <button id="app-fs-btn" onclick="toggleAppFullscreen()" title="Tam ekran" style="display:flex; align-items:center; gap:14px; background:transparent; border:2px solid #d4af37; color:#8a6d3b; padding:6px 16px; border-radius:14px; cursor:pointer; box-shadow:0 1px 4px rgba(138,109,59,0.25);">
+                <img src="icon-192.png" alt="" style="width:80px;height:80px;border-radius:12px;display:block;">
+                <span id="app-fs-label" style="font-size:16px;font-weight:bold;white-space:nowrap;">&#x26F6; Uygulamay&#x131; Tam Ekran A&#xE7;</span>
             </button>
         </div>
         <div id="simple-login-panel" class="login-panel">
