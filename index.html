@@ -3515,8 +3515,8 @@ const panel = document.getElementById('grup-takip-panel');
                 const _bp2 = document.getElementById('bireysel-takip-panel');
                 if (!panel) return;
                 const isAdm = (typeof window._sbIsAdmin === 'function') ? window._sbIsAdmin() : false;
-                // Grup kartini yalnizca bir UYE secilmemisken (saf grup secimi) goster
-                if (!isAdm || !currentGroup || loggedInMember) { panel.style.display = 'none'; return; }
+                // Grup kartini grup secilmis ve UYE secilmemisse goster (admin veya grup girisi fark etmez)
+                if (!currentGroup || loggedInMember) { panel.style.display = 'none'; return; }
                 panel.style.display = 'block';
                 if (_bp2) _bp2.style.display='none';
                 const nameEl = document.getElementById('gt-group-name');
