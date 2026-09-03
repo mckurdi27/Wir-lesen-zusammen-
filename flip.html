@@ -73,7 +73,7 @@ button{font-family:inherit;cursor:pointer}
     linear-gradient(118deg,transparent 40%,rgba(0,0,0,.10) 46%,rgba(0,0,0,.34) 52%,rgba(255,255,255,.42) 56%,rgba(0,0,0,.30) 60%,transparent 68%),
     linear-gradient(to right,rgba(0,0,0,.18),transparent 30%);
   filter:blur(2px)}
-.turn.curl::after{animation:curlSweep .72s cubic-bezier(.4,.1,.35,1) forwards}
+.turn.curl::after{animation:curlSweep .4s cubic-bezier(.4,.1,.35,1) forwards}
 .turn img,.turn>canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .turn img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .turn .pg{position:absolute;bottom:4px;left:0;right:0;text-align:center;font-size:11px;color:#9a8c76;pointer-events:none;z-index:2;font-weight:600}
@@ -255,12 +255,12 @@ function turnEl(n,isRight,origin,rotDeg){
   addPageImg(t,n);
   const mid=rotDeg*.55;
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    t.style.transition='transform .34s cubic-bezier(.42,.1,.62,.95)';
+    t.style.transition='transform .16s cubic-bezier(.42,.1,.6,.95)';
     t.style.transformOrigin=origin;
     t.style.transform='perspective(1100px) rotateX('+(rotDeg>0?-8:8)+'deg) rotateY('+mid+'deg) skewY('+(rotDeg>0?-2.5:2.5)+'deg)';
     t.classList.add('curl');
     requestAnimationFrame(()=>{
-      t.style.transition='transform .5s cubic-bezier(.34,.05,.42,1)';
+      t.style.transition='transform .3s cubic-bezier(.34,.05,.4,1)';
       t.style.transform='perspective(1300px) rotateX(0deg) rotateY('+rotDeg+'deg) skewY(0deg)';
     });
   }));
@@ -289,7 +289,7 @@ function doFlip(fwd){
       if(fwd) b.appendChild(turnEl(cur,false, rtl?'right center':'left center', rtl?150:-150));
       else    b.appendChild(turnEl(cur,false, rtl?'left center':'right center', rtl?-150:150));
     }
-    setTimeout(done,800);
+    setTimeout(done,460);
   });
 }
 
