@@ -3512,6 +3512,12 @@ function renderTab6(groupName, memberName) {
 
             function renderGrupTakipPanel() {
 const panel = document.getElementById('grup-takip-panel');
+                // Giris panelindeki 'Grup ismi' alanini secili grup adiyla doldur (panel bos kalmasin)
+                try { var _gn = document.getElementById('login-group-name'); if (_gn && currentGroup) _gn.value = currentGroup; } catch(e){}
+                try { var _gt = document.getElementById('login-user-type'); if (_gt) _gt.value = 'grup'; } catch(e){}
+                try { var _tb = document.getElementById('login-type-grup'); if (_tb) _tb.classList.add('active'); } catch(e){}
+                try { var _ta = document.getElementById('login-type-tek'); if (_ta) _ta.classList.remove('active'); } catch(e){}
+
                 const _bp2 = document.getElementById('bireysel-takip-panel');
                 if (!panel) return;
                 const isAdm = (typeof window._sbIsAdmin === 'function') ? window._sbIsAdmin() : false;
