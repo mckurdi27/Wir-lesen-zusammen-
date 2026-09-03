@@ -65,10 +65,15 @@ button{font-family:inherit;cursor:pointer}
 .turn{position:absolute;top:0;z-index:6;background:var(--pg);overflow:hidden;
   backface-visibility:hidden;-webkit-backface-visibility:hidden;will-change:transform;
   box-shadow:0 6px 34px var(--shadl)}
-.turn::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;
-  background:linear-gradient(105deg,transparent 42%,rgba(0,0,0,.16) 55%,transparent 66%);
-  transition:opacity .1s}
-.turn.curl::after{opacity:1}
+@keyframes curlSweep{0%{opacity:0;transform:translateX(-46%)}
+  18%{opacity:.85}45%{opacity:.95}70%{opacity:.6}
+  100%{opacity:0;transform:translateX(56%)}}
+.turn::after{content:"";position:absolute;inset:-12% -20%;pointer-events:none;opacity:0;
+  background:
+    linear-gradient(118deg,transparent 40%,rgba(0,0,0,.10) 46%,rgba(0,0,0,.34) 52%,rgba(255,255,255,.42) 56%,rgba(0,0,0,.30) 60%,transparent 68%),
+    linear-gradient(to right,rgba(0,0,0,.18),transparent 30%);
+  filter:blur(2px)}
+.turn.curl::after{animation:curlSweep .72s cubic-bezier(.4,.1,.35,1) forwards}
 .turn img,.turn>canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .turn img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .turn .pg{position:absolute;bottom:4px;left:0;right:0;text-align:center;font-size:11px;color:#9a8c76;pointer-events:none;z-index:2;font-weight:600}
@@ -250,13 +255,13 @@ function turnEl(n,isRight,origin,rotDeg){
   addPageImg(t,n);
   const mid=rotDeg*.55;
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    t.style.transition='transform .34s cubic-bezier(.4,.1,.6,.95)';
+    t.style.transition='transform .34s cubic-bezier(.42,.1,.62,.95)';
     t.style.transformOrigin=origin;
-    t.style.transform='perspective(1500px) rotateX('+(rotDeg>0?-3:3)+'deg) rotateY('+mid+'deg)';
+    t.style.transform='perspective(1100px) rotateX('+(rotDeg>0?-8:8)+'deg) rotateY('+mid+'deg) skewY('+(rotDeg>0?-2.5:2.5)+'deg)';
     t.classList.add('curl');
     requestAnimationFrame(()=>{
-      t.style.transition='transform .52s cubic-bezier(.35,.05,.4,1)';
-      t.style.transform='perspective(1500px) rotateX(0deg) rotateY('+rotDeg+'deg)';
+      t.style.transition='transform .5s cubic-bezier(.34,.05,.42,1)';
+      t.style.transform='perspective(1300px) rotateX(0deg) rotateY('+rotDeg+'deg) skewY(0deg)';
     });
   }));
   return t;}
