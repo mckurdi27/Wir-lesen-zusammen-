@@ -248,7 +248,7 @@ function pageEl(n,isRight){const d=document.createElement('div');d.className='le
   d.style.left=isRight?(lw+gap)+'px':'0px';
   if(n>=1&&n<=total){const m=document.createElement('div');m.className='pg';m.textContent=n;d.appendChild(m);}
   addPageImg(d,n);return d;}
-function paint(){const b=$('book');clearB();const sp=sidePages();
+function paint(){const w=$('stageWrap');if(w)w.scrollTop=0;const b=$('book');clearB();const sp=sidePages();
   if(!spread){b.appendChild(pageEl(cur,false));}
   else{b.appendChild(pageEl(sp.l,false));if(sp.r>=1&&sp.r<=total)b.appendChild(pageEl(sp.r,true));}}
 

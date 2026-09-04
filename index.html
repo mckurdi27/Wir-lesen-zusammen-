@@ -930,6 +930,7 @@
             }
             function renderPdfPage(pageNum) {
                 if (!pdfDoc) return;
+                var _cc0=document.getElementById('pdf-canvas-container'); if(_cc0){_cc0.scrollTop=0;_cc0.scrollLeft=0;}
                 var _rt = document.getElementById('pdf-canvas');
                 if (_rt) { _rt.classList.remove('sb-page-turn'); void _rt.offsetWidth; _rt.classList.add('sb-page-turn'); }
                 // Flipbook: mevcut sayfayi yakala ve cevir (yeni sayfa alttan belirir)
