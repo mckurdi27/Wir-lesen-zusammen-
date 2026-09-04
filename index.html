@@ -3167,10 +3167,9 @@ function renderTab6(groupName, memberName) {
                 
                 tabBtns.forEach(btn => {
                     btn.addEventListener("click", (e) => {
-                        tabBtns.forEach(b => { b.style.background = "var(--card-bg)"; b.style.color = "var(--text-main)"; });
+                        tabBtns.forEach(b => b.classList.remove('active'));
                         tabContents.forEach(c => c.style.display = "none");
-                        e.currentTarget.style.background = "var(--gold-primary)";
-                        e.currentTarget.style.color = "#fff";
+                        e.currentTarget.classList.add('active');
                         const target = e.currentTarget.getAttribute("data-target");
                         activeAnalysisTab = target;
                         document.getElementById(target).style.display = "block";
