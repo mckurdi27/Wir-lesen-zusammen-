@@ -511,7 +511,7 @@
                     <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: nowrap;">
                         <button id="pdf-rtl-btn" title="Arapca sayfa: sagdan sola" style="background:#bdc3c7;color:#2c3e50;border:2px solid #7f8c8d;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;min-height:28px;">&#10005; العربية</button>
                         <button id="pdf-fs-btn" title="Tam ekran" style="background:#27ae60;color:#fff;border:none;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;min-height:28px;">&#x26F6; Tam Ekran</button>
-                        <button id="pdf-land-btn" title="Yatay mod: buyuk yazi icin dik kaydir" style="background:#bdc3c7;color:#2c3e50;border:2px solid #7f8c8d;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;min-height:28px;">&#10005; Yatay</button>
+                        
                     </div>
                 </div>
                 <!-- Canvas - Tam Ekran -->
@@ -1134,7 +1134,6 @@
                 // RTL (Arapca sagdan-sola) ve Yatay mod butonlari
                 window._pdfRtl = false; window._pdfLand = false;
                 var _rtl = document.getElementById('pdf-rtl-btn');
-                var _land = document.getElementById('pdf-land-btn');
                 if (_rtl) _rtl.addEventListener('click', function(){
                     window._pdfRtl = !window._pdfRtl;
                     var _c = document.getElementById('pdf-canvas-container');
@@ -1144,31 +1143,7 @@
                     this.style.border = window._pdfRtl ? '2px solid #6c3483' : '2px solid #7f8c8d';
                     this.innerHTML = (window._pdfRtl ? '' : '&#10005; ') + '\u0627\u0644\u0639\u0631\u0628\u064a\u0629';
                 });
-                if (_land) _land.addEventListener('click', function(){
-                    window._pdfLand = !window._pdfLand;
-                    if (window._pdfLand) {
-                        var _cc = document.getElementById('pdf-canvas-container');
-                        pdfScale = Math.max(_cc.clientWidth / 300, 1.6);
-                        renderPdfPage(pdfCurrentPage);
-                        this.style.background = '#16a085';
-                        this.style.color = '#fff';
-                        this.style.border = '2px solid #0e6655';
-                        this.innerHTML = 'Yatay';
-                        var _hd = document.querySelector('#pdf-reader-modal > div:first-child');
-                        if (_hd) _hd.style.display = 'none';
-                        var _tb = document.querySelector('.pdf-toolbar');
-                        if (_tb) _tb.style.display = 'none';
-                    } else {
-                        this.style.background = '#bdc3c7';
-                        this.style.color = '#2c3e50';
-                        this.style.border = '2px solid #7f8c8d';
-                        this.innerHTML = '&#10005; Yatay';
-                        var _hd2 = document.querySelector('#pdf-reader-modal > div:first-child');
-                        if (_hd2) _hd2.style.display = '';
-                        var _tb2 = document.querySelector('.pdf-toolbar');
-                        if (_tb2) _tb2.style.display = '';
-                    }
-                });
+                
                 window.addEventListener('resize', function() {
                     if (!pdfDoc || modal.style.display !== 'flex') return;
                     if (window._pdfLand) return;
