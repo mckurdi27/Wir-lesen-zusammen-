@@ -77,8 +77,9 @@ button{font-family:inherit;cursor:pointer}
 .turn img,.turn>canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .turn img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .turn .pg{position:absolute;bottom:4px;left:0;right:0;text-align:center;font-size:11px;color:#9a8c76;pointer-events:none;z-index:2;font-weight:600}
-#rctl{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:8px;padding:8px;flex-wrap:wrap;
-  background:var(--panel);border-top:1px solid var(--panelb)}
+#rctl{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px;background:var(--panel);border-top:1px solid var(--panelb)}
+  .rctl-row{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;flex-wrap:wrap}
+  #rctl-tools .pc{margin:0}
 .c{margin:0;min-width:46px;height:46px;border-radius:11px;border:1px solid var(--panelb);background:var(--card);
   color:var(--text);font-size:19px;box-shadow:0 2px 6px var(--shadow);display:flex;align-items:center;justify-content:center;white-space:nowrap}
 .c:hover{transform:translateY(-1px)}.c:active{transform:scale(.95)}
@@ -142,16 +143,19 @@ button{font-family:inherit;cursor:pointer}
     <div id="stage"><div id="book"></div></div>
   </div>
   <div id="rctl">
-    <button class="c g" id="firstB" title="İlk">«</button>
-    <button class="c g" id="prevB" title="Önceki">‹</button>
-    <div class="pc"><input id="pageIn" inputmode="numeric"><span>/</span><span id="tot">…</span></div>
-    <button class="c g" id="nextB" title="Sonraki">›</button>
-    <button class="c g" id="lastB" title="Son">»</button>
-    <div style="flex:1"></div>
-    <button class="c s tx" id="viewB" title="Tek sayfa / çift sayfa">Çift</button>
-    <button class="c s tx" id="rtlB" title="Okuma yönü: soldan sağa / sağdan sola"><span class="rtl-t">العربية</span></button>
-    <button class="c s" id="zinB" title="Yakınlaştır">+</button>
-    <button class="c s" id="zoutB" title="Uzaklaştır">−</button>
+    <div class="rctl-row" id="rctl-nav">
+      <button class="c g" id="firstB" title="İlk">«</button>
+      <button class="c g" id="prevB" title="Önceki">‹</button>
+      <div class="pc"><input id="pageIn" inputmode="numeric"><span>/</span><span id="tot">…</span></div>
+      <button class="c g" id="nextB" title="Sonraki">›</button>
+      <button class="c g" id="lastB" title="Son">»</button>
+    </div>
+    <div class="rctl-row" id="rctl-tools">
+      <button class="c s tx" id="viewB" title="Tek sayfa / çift sayfa">Çift</button>
+      <button class="c s tx" id="rtlB" title="Okuma yönü: soldan sağa / sağdan sola"><span class="rtl-t">العربية</span></button>
+      <button class="c s" id="zinB" title="Yakınlaştır">+</button>
+      <button class="c s" id="zoutB" title="Uzaklaştır">−</button>
+    </div>
   </div>
 </div>
 
