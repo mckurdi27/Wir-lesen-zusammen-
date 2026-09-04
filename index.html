@@ -3095,7 +3095,7 @@ function renderTab6(groupName, memberName) {
                                 try {
                                     let gD = JSON.parse(localStorage.getItem(k)||'null'); if(!gD) return;
                                     let bn={}; (gD.books||[]).forEach(function(b){ if(b&&b.id) bn[b.id]=b.name||b.id; });
-                                    if(gD.bookHatims) Object.keys(gD.bookHatims).forEach(function(bid){ let h=gD.bookHatims[bid]||{}; st2.push({g:gK,bid:bid,eser:bn[bid]||bid,no:h.hatimNo||1,bas:h.startDate||'',kind:'start'}); });
+                                    if(gD.bookHatims) Object.keys(gD.bookHatims).forEach(function(bid){ let arr2=(gD.bookPages||{})[bid]; let hs2=false; if(arr2){for(let j=0;j<arr2.length;j++){if(arr2[j]&&arr2[j].owner&&String(arr2[j].owner).trim()){hs2=true;break;}}} if(!hs2)return; let h=gD.bookHatims[bid]||{}; st2.push({g:gK,bid:bid,eser:bn[bid]||bid,no:h.hatimNo||1,bas:h.startDate||'',kind:'start'}); });
                                     if(gD.bookHistory) Object.keys(gD.bookHistory).forEach(function(bid){ (gD.bookHistory[bid]||[]).forEach(function(hh){ dn2.push({g:hh.grup||gK,bid:bid,eser:hh.eser||bn[bid]||bid,no:hh.hatimNo||1,bas:hh.baslangic||'',kind:'done'}); }); });
                                 } catch(e){}
                             });
