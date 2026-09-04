@@ -2138,11 +2138,15 @@
                     overflow-y: auto;
                 `;
 
-                function _gSelList(){ var s=document.getElementById('analysis-group-select'); if(!s) return []; var v=[]; for(var _i=0;_i<s.options.length;_i++){ if(s.options[_i].selected) v.push(s.options[_i].value); } return v; }
-function _gScope(){ var v=_gSelList(); if(v.indexOf('all')>=0) return null; return v; }
-function _gIn(gp,gn){ if(!gp||gp==='all'||gp===''||gp==='__bireysel__') return true; var arr=String(gp).split('|'); return arr.indexOf(gn)>=0; }
-function getGroupSelectHtml(selected) { var sel=(Array.isArray(selected)?selected:(selected&&selected!=='all'?[selected]:[])); var allSel=(sel.length===0||sel.indexOf('all')>=0); let h='<option value="all"'+(allSel?' selected':'')+'>\ud83d\udcc1 T\u00fcm Gruplar</option>'; groupStats.forEach(g=>{ h+='<option value="'+g.name+'"'+(sel.indexOf(g.name)>=0?' selected':'')+'>\ud83d\udcc1 '+g.name.replace(/_/g,' ').toUpperCase()+' (\u200b'+g.members+' ki\u015fi)</option>'; }); return h; }
-function getBookSelectHtml(selected = 'all') {
+                function getGroupSelectHtml(selected = 'all') {
+                    let html = `<option value="all">📁 Tüm Gruplar</option>`;
+                    groupStats.forEach(g => {
+                        html += `<option value="${g.name}" ${g.name === selected ? 'selected' : ''}>📁 ${g.name.replace(/_/g, ' ').toUpperCase()} (​${g.members} kişi)</option>`;
+                    });
+                    return html;
+                }
+
+                function getBookSelectHtml(selected = 'all') {
                     let bookNames = [];
                     allGroupKeys.forEach(gk => {
                         let raw = localStorage.getItem(`hatim_group_${gk}`);
@@ -2158,20 +2162,18 @@ function getBookSelectHtml(selected = 'all') {
                     return h;
                 }
 
-                function getMemberSelectHtml(groupName, selected) {
+                function getMemberSelectHtml(groupName = 'all', selected = 'all') {
                     let members = [];
-                    if (groupName == null || groupName === 'all') {
+                    if (groupName === 'all') {
                         members = allMembers;
                     } else {
-                        var gArr = Array.isArray(groupName) ? groupName : String(groupName).split('|');
-                        var mm = [];
-                        gArr.forEach(function(gN){
-                            let group = groupStats.find(g => g.name === gN);
-                            if (group) { (group.memberNames||[]).forEach(function(mn){ mm.push({name: mn, groups:[gN]}); }); }
-                        });
-                        var seen={}; members=[];
-                        mm.forEach(function(m){ if(!seen[m.name]){ seen[m.name]=1; members.push(m); } });
-                    }members.forEach(m => {
+                        let group = groupStats.find(g => g.name === groupName);
+                        if (group) {
+                            members = group.memberNames.map(m => ({ name: m, groups: [groupName] }));
+                        }
+                    }
+                    let html = `<option value="all">👥 Tüm Üyeler</option>`;
+                    members.forEach(m => {
                         let _g2 = (m.groups && m.groups[0]) || '';
                         let _val2 = (m.type === 'bireysel' || !_g2) ? m.name : m.name + '@' + _g2;
                         html += `<option value="${_val2}" ${_val2 === selected ? 'selected' : ''}>${m.type === 'bireysel' ? '👤' : m.type === 'pasif' ? '⭐' : '👥'} ${m.name}${m.type === 'pasif' ? ' <span style="background:#bdc3c7;color:#fff;padding:1px 6px;border-radius:4px;font-size:10px;">PASİF</span>' : ''}${m.groups && m.groups.length ? ' (' + m.groups.map(g => g.replace(/_/g,' ').toUpperCase()).join(', ') + ')' : ''}</option>`;
@@ -2183,7 +2185,7 @@ function getBookSelectHtml(selected = 'all') {
                     if (memberName && memberName.indexOf('@') > -1) {
                         return { name: memberName.split('@')[0], grp: memberName.split('@')[1] };
                     }
-                    var _gmv=String(groupName||''); if(groupName==='all'||_gmv.indexOf('|')>=0){ return { name: memberName, grp: null }; } return { name: memberName, grp: groupName };
+                    return { name: memberName, grp: (groupName === 'all') ? null : groupName };
                 }
                 function getMemberDetailData(memberName, groupName = null, bookFilter = 'all') {
                     let result = {
@@ -2289,9 +2291,8 @@ function getBookSelectHtml(selected = 'all') {
                     if (groupName === 'all') {
                         groupStats.forEach(function(g){ rows.push({ ad:g.name.replace(/_/g,' '), tip:'grup', ikon:'\uD83D\uDC65', gruplar:g.members, alinan:g.taken, okunan:g.read, toplam:g.books, pct:(g.takenPercent||0), memberNames:(g.memberNames||[]).join(', ') }); });
                     } else {
-                        var _glArr = String(groupName).split('|');
-                        var _sel = groupStats.filter(function(gs){ return _glArr.indexOf(gs.name)>=0; });
-                        _sel.forEach(function(g2){ if(g2) rows.push({ ad:g2.name.replace(/_/g,' '), tip:'grup', ikon:'\\uD83D\\uDC65', gruplar:g2.members, alinan:g2.taken, okunan:g2.read, toplam:g2.books, pct:(g2.takenPercent||0), memberNames:(g2.memberNames||[]).join(', ') }); });
+                        var g2 = groupStats.find(function(gs){ return gs.name === groupName; });
+                        if (g2) rows.push({ ad:g2.name.replace(/_/g,' '), tip:'grup', ikon:'\uD83D\uDC65', gruplar:g2.members, alinan:g2.taken, okunan:g2.read, toplam:g2.books, pct:(g2.takenPercent||0), memberNames:(g2.memberNames||[]).join(', ') });
                     }
                     // Bireysel uyeler (grup filtresi bireysel/tek ise dahil)
                     try {
@@ -2381,7 +2382,7 @@ function getBookSelectHtml(selected = 'all') {
                                 </thead>
                                 <tbody>
                                     ${stats.map((g, idx) => `
-                                        <tr style="${_gIn(groupName, g.name) || groupName === 'all' ? '' : 'opacity:0.5;'} ${g.name === currentGroup ? 'background: rgba(212, 175, 55, 0.1); font-weight: bold;' : ''}">
+                                        <tr style="${g.name === groupName || groupName === 'all' ? '' : 'opacity:0.5;'} ${g.name === currentGroup ? 'background: rgba(212, 175, 55, 0.1); font-weight: bold;' : ''}">
                                             <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${idx + 1}</td>
                                             <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">${idx === 0 ? '🥇 ' : idx === 1 ? '🥈 ' : idx === 2 ? '🥉 ' : ''}${g.name.replace(/_/g, ' ').toUpperCase()}</td>
                                             <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${g.members}</td>
@@ -2457,9 +2458,7 @@ function getBookSelectHtml(selected = 'all') {
                                 // ayni isim farkli gruplarda olabilir, isimle eslesme yanlis uyeleri getirir)
                                 _membersSrc = allMembers.filter(function(m){
                                     var gs = m.groups || [];
-                                    var _gg = String(groupName).split('|');
-                                    for(var _z=0;_z<gs.length;_z++){ if(_gg.indexOf(gs[_z])>=0) return true; }
-                                    return false;
+                                    return gs.indexOf(groupName) > -1;
                                 });
                                 // Guvence: secili grubun gercek uyeleriyle de esle (grup tipi grup olsa da)
                                 if (!_membersSrc.length) {
@@ -2568,7 +2567,7 @@ function getBookSelectHtml(selected = 'all') {
                         if (groupMems.length > 0) {
                             let sum = 0;
                             groupMems.forEach(gm => {
-                                const dd = getMemberDetailData(gm.name, (groupName==='all'||String(groupName).indexOf('|')>=0) ? null : groupName);
+                                const dd = getMemberDetailData(gm.name, groupName === 'all' ? null : groupName);
                                 sum += dd.totalTaken > 0 ? (dd.totalRead / dd.totalTaken) * 100 : 0;
                             });
                             groupAvg = Math.round(sum / groupMems.length);
@@ -2973,7 +2972,7 @@ function renderTab6(groupName, memberName) {
                             <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                             <div style="flex: 1; min-width: 150px;">
                                 <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">📁 Grup Seç:</label>
-                                <select id="analysis-group-select" multiple size="1" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px;">
+                                <select id="analysis-group-select" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px;">
                                     ${getGroupSelectHtml()}
                                 </select>
                             </div>
@@ -3118,8 +3117,7 @@ function renderTab6(groupName, memberName) {
                     } catch(err) { alert('Excel oluşturulamadı: ' + err.message); }
                 }
                 function updateAllTabs() {
-                    var _sc=_gScope();
-                    const group = (_sc===null||!_sc.length)?'all':_sc.join('|');
+                    const group = document.getElementById('analysis-group-select').value;
                     const member = document.getElementById('analysis-member-select').value;
                     
                     const target = activeAnalysisTab;
@@ -3145,12 +3143,11 @@ function renderTab6(groupName, memberName) {
                 });
 
                 document.getElementById('analysis-group-select').addEventListener('change', function() {
-                    const scope=_gScope();
+                    const group = this.value;
                     const memberSelect = document.getElementById('analysis-member-select');
-                    memberSelect.innerHTML = getMemberSelectHtml(scope===null?'all':scope);
+                    memberSelect.innerHTML = getMemberSelectHtml(group);
                     const sg = document.getElementById('analysis-selected-group-name');
-                    var lbl=(scope===null)?'Tüm Gruplar':(scope&&scope.length?scope.map(function(x){return x.replace(/_/g,' ').toUpperCase();}).join(', '):'Grup Seç');
-                    if (sg) sg.textContent = lbl + (loggedInMember ? ' — ' + loggedInMember : '');
+                    if (sg) sg.textContent = group === 'all' ? 'Tüm Gruplar' : group.replace(/_/g, ' ').toUpperCase() + (loggedInMember ? ' — ' + loggedInMember : '');
                     updateAllTabs();
                 });
 
