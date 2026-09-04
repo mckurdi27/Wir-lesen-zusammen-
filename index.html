@@ -2785,9 +2785,12 @@ function renderTab6(groupName, memberName) {
                                 if (!gData) return;
                                 var bname = {};
                                 (gData.books || []).forEach(function(b){ if (b && b.id) bname[b.id] = b.name || b.id; });
-                                // 1) Baslayan / devam eden hatimler (bookHatims)
+                                // 1) Baslayan / devam eden hatimler (bookHatims) - yalniz hissesi olan eserler
+                                function _sbHasShare(bid2){ var arr=(gData.bookPages||{})[bid2]; if(!arr)return false;
+                                  for(var i=0;i<arr.length;i++){ if(arr[i]&&arr[i].owner&&String(arr[i].owner).trim()) return true; } return false; }
                                 if (gData.bookHatims) {
                                     Object.keys(gData.bookHatims).forEach(function(bid){
+                                        if(!_sbHasShare(bid)) return; // hissesiz hayalet hatim gosterme
                                         var h = gData.bookHatims[bid] || {};
                                         started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo || 1, baslangic: h.startDate || '' });
                                     });
