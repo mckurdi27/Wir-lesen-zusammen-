@@ -378,7 +378,7 @@ $('pageIn').addEventListener('change',()=>{let v=parseInt($('pageIn').value,10);
 $('pageIn').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur();});
 $('fullB').onclick=()=>{if(document.fullscreenElement)document.exitFullscreen();
   else if(document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>{});};
-window.addEventListener('resize',()=>{if(pdf&&!anim){layout();paint();}});
+let _rz=null;function relayout(){if(_rz)clearTimeout(_rz);_rz=setTimeout(()=>{if(pdf&&!anim){layout();paint();updateUI();}},150);}window.addEventListener('resize',relayout);window.addEventListener('orientationchange',relayout);
 document.addEventListener('keydown',e=>{if(!$('reader').classList.contains('on'))return;
   if(e.key==='ArrowRight'||e.key==='PageDown'){e.preventDefault();next();}
   else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev();}
