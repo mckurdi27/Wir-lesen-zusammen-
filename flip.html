@@ -55,8 +55,8 @@ button{font-family:inherit;cursor:pointer}
 #rtop{display:flex;align-items:center;gap:10px;padding:7px 12px;border-bottom:1px solid var(--panelb);background:var(--panel)}
 #rtitle{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
 #rtitle .ps{color:var(--muted);font-weight:400;font-size:12px;margin-left:6px}
-#stageWrap{flex:1;position:relative;display:flex;align-items:center;justify-content:center;padding:8px;overflow:hidden}
-#stage{position:relative;perspective:2600px}
+#stageWrap{flex:1;position:relative;display:flex;overflow:auto;padding:8px;overscroll-behavior:contain}
+#stage{margin:auto;position:relative;perspective:2600px}
 #book{position:relative;width:100%;height:100%;transform-style:preserve-3d}
 .leaf{position:absolute;top:0;background:var(--pg);overflow:hidden;box-shadow:0 2px 18px var(--shadl)}
 .leaf img,.leaf>canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
