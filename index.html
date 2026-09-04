@@ -2134,7 +2134,7 @@
                 modalOverlay.style.cssText = `
                     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
                     background: rgba(0, 0, 0, 0.7); z-index: 999999;
-                    display: flex; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;
+                    display: flex; justify-content: center; align-items: flex-start; padding: 15px; box-sizing: border-box;
                     overflow-y: auto;
                 `;
 
@@ -2943,7 +2943,7 @@ function renderTab6(groupName, memberName) {
                 }
 
                 modalOverlay.innerHTML = `
-                    <div style="background: var(--card-bg); color: var(--text-main); width: 100%; max-width: 1100px; max-height: 95vh; border-radius: 16px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.4);">
+                    <div style="background: var(--card-bg); color: var(--text-main); width: 100%; max-width: 1100px; max-height: 96vh; border-radius: 16px; border: 2px solid var(--gold-primary); display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.4);">
                         <div style="padding: 16px 20px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border-bottom: 2px solid var(--gold-primary); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
                             <div>
                                 <h2 style="margin: 0; font-size: 20px; color: #8a6d3b;">📊 Detaylı Analiz Paneli</h2>
