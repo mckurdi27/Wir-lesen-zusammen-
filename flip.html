@@ -315,7 +315,7 @@ function first(){if(anim)return;cur=1;paint();updateUI();}
 function last(){if(anim)return;
   cur = spread ? (total%2===1? total : Math.max(1,total-1)) : total;
   paint();updateUI();}
-function setZoom(d){zoom=Math.max(.45,Math.min(2.5,zoom+d));if(pdf){layout();paint();}}
+function setZoom(d){zoom=Math.max(.45,Math.min(5,zoom+d));if(pdf){layout();paint();}}
 function toggleView(){if(anim||!pdf)return;spread=!spread;cur=Math.min(cur,total);layout();paint();updateUI();}
 function toggleRtl(){if(anim||!pdf)return;rtl=!rtl;paint();updateUI();}
 
