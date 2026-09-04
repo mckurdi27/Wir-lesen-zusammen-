@@ -2203,7 +2203,7 @@
                     else {
                       for (var li = 0; li < localStorage.length; li++) {
                         var lk = localStorage.key(li);
-                        if (lk && lk.indexOf("hatim_group_") === 0 && lk !== "hatim_bireysel_pool") groups.push(lk.replace("hatim_group_", ""));
+                        if (lk && lk.indexOf("hatim_group_") === 0 && lk !== "hatim_bireysel_pool"){ var _gk=lk.replace("hatim_group_",""); if(_gk && String(_gk).trim()) groups.push(_gk); }
                       }
                     }
                     if (!groupName && memberName) { let ownKey = memberName.toLowerCase(); if (ownKey && !groups.includes(ownKey)) groups.push(ownKey); }
