@@ -2809,8 +2809,8 @@ function renderTab6(groupName, memberName) {
                     // Toplam (global) hatim sirasi, ESER BAZLI: her eserin tum hatimleri (devam eden+tamamlanan)
                     // baslangic kronolojisine gore kendi icinde numaralanir (hangi grup ilk aldiyse 1, sonraki 2, ...)
                     var _all = [];
-                    started.forEach(function(r){ r.kind='start'; _all.push(r); });
-                    done.forEach(function(r){ r.kind='done'; _all.push(r); });
+                    started.sort(function(a,b){return String(a.baslangic||'').localeCompare(String(b.baslangic||''));}); started.forEach(function(r){ r.kind='start'; _all.push(r); });
+                    done.sort(function(a,b){return String(a.tamamlandi||a.baslangic||'').localeCompare(String(b.tamamlandi||b.baslangic||''));}); done.forEach(function(r){ r.kind='done'; _all.push(r); });
                     _all.sort(function(a,b){ var ea=a.eser||'', eb=b.eser||'', ta=a.baslangic||'', tb=b.baslangic||''; return ea<eb?-1:ea>eb?1:(ta<tb?-1:ta>tb?1:0); });
                     var _bookCounter = {};
                     _all.forEach(function(r){ var b=r.eser||''; if(!_bookCounter[b]) _bookCounter[b]=0; _bookCounter[b]++; r.globalNo=_bookCounter[b]; });
@@ -2836,7 +2836,7 @@ function renderTab6(groupName, memberName) {
                         html += '</tr></thead><tbody id="tab6-start-tb">';
                         started.forEach(function(r){
                             html += '<tr style="background:#ffffff;" data-toplam="' + (r.globalNo||'') + '" data-grupno="' + (r.hatimNo||'') + '" data-eser="' + (r.eser||'') + '" data-grup="' + (r.grup||'') + '" data-baslangic="' + (r.baslangic||'') + '" data-durum="Devam ediyor" data-search="' + ((r.eser||'')+' '+(r.grup||'')+' '+(r.hatimNo||'')+' devam ediyor') + '">'
-                                + '<td style="padding:8px;border:1px solid var(--border-color);font-weight:bold;">' + (r.globalNo||'-') + '</td>'
+                                + '<td style="padding:8px;border:1px solid var(--border-color);font-weight:bold;">' + (r.eser||'') + ' ' + (r.globalNo||'1') + '. Hatmi</td>'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);">' + r.hatimNo + '. Hatim</td>'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.eser||'') + '</td>'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.grup||'') + '</td>'
@@ -2862,7 +2862,7 @@ function renderTab6(groupName, memberName) {
                         html += '</tr></thead><tbody id="tab6-done-tb">';
                         done.forEach(function(r){
                             html += '<tr style="background:#ffffff;" data-toplam="' + (r.globalNo||'') + '" data-grupno="' + (r.hatimNo||'') + '" data-eser="' + (r.eser||'') + '" data-grup="' + (r.grup||'') + '" data-baslangic="' + (r.baslangic||'') + '" data-tamamlanma="' + (r.tamamlandi||'') + '" data-search="' + ((r.eser||'')+' '+(r.grup||'')+' '+(r.hatimNo||'')+' tamamlandi') + '">'
-                                + '<td style="padding:8px;border:1px solid var(--border-color);font-weight:bold;">' + (r.globalNo||'-') + '</td>'
+                                + '<td style="padding:8px;border:1px solid var(--border-color);font-weight:bold;">' + (r.eser||'') + ' ' + (r.globalNo||'1') + '. Hatmi</td>'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);">' + r.hatimNo + '. Hatim</td>'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.eser||'') + '</td>'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.grup||'') + '</td>'
