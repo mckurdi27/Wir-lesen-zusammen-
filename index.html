@@ -554,6 +554,7 @@
                         <span id="active-user-name" class="name">-</span>
                         <span id="active-user-group" class="login-user-group"></span>
                     </div>
+                    <div id="group-members-line" style="display:none; width:100%; font-size:12px; color:var(--muted);"></div>
                 </div>
                 <button id="logout-btn" class="logout-btn">&#128682; Çıkış Yap</button>
             </div>
@@ -1814,6 +1815,7 @@
                     
                     const groupName = currentGroup.replace(/_/g, ' ').toUpperCase();
                     activeGroup.textContent = `📍 ${groupName}`;
+                    (function(){ const _gm=document.getElementById('group-members-line'); if(!_gm) return; try{ const _gr=JSON.parse(localStorage.getItem('hatim_group_'+String(currentGroup).toLowerCase())||'null'); let _arr=(_gr&&_gr.members&&Array.isArray(_gr.members))?_gr.members.filter(function(x){return x&&String(x).trim()&&x!==loggedInMember;}):[]; if(_arr.length){ _gm.style.display='block'; _gm.textContent='Gruptakiler: '+_arr.join(', '); } else { _gm.style.display='none'; _gm.textContent=''; } }catch(_er){ _gm.style.display='none'; } })();
                     
                     if (loggedInMemberType === 'grup') {
                         userIcon.textContent = '👥';
@@ -1826,6 +1828,7 @@
                     bulkArea.style.display = 'block';
                     renderBireyselTakipPanel(); if (typeof renderGrupTakipPanel === 'function') renderGrupTakipPanel();
                 } else {
+                    const _gml2=document.getElementById('group-members-line'); if(_gml2){_gml2.style.display='none';_gml2.textContent='';}
                     const _btp = document.getElementById('bireysel-takip-panel');
                     if (_btp) _btp.style.display = 'none';
                     // Admin grup modunda (uye secilmemis ama grup secilmis) grup kartini goster
