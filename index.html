@@ -2969,21 +2969,18 @@ function renderTab6(groupName, memberName) {
                             <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                             <div style="flex: 1; min-width: 150px;">
                                 <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">📁 Grup Seç:</label>
-                                <div style="font-size:11px; color:#888; margin-bottom:3px;">Grup veya BİREYSEL seçin</div>
                                 <select id="analysis-group-select" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px;">
                                     ${getGroupSelectHtml()}
                                 </select>
                             </div>
                             <div style="flex: 1; min-width: 150px;">
                                 <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">👤 Üye Seç:</label>
-                                <div style="font-size:11px; color:#888; margin-bottom:3px;">Analiz edilecek üyeyi seçin</div>
                                 <select id="analysis-member-select" multiple size="1" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px;">
                                     ${getMemberSelectHtml()}
                                 </select>
                             </div>
                             <div style="flex: 1; min-width: 150px;">
                                 <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">📚 Kitap Seç:</label>
-                                <div style="font-size:11px; color:#888; margin-bottom:3px;">Tümü veya tek bir kitap</div>
                                 <select id="analysis-book-select" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px;">
                                     <option value="all">📚 Tüm Kitaplar</option>
                                     ${getBookSelectHtml()}
