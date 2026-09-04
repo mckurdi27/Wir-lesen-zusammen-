@@ -10,6 +10,8 @@
   "theme_color": "#d4af37",
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "fs-icon.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "fs-icon.png", "sizes": "512x5122", "type": "image/png", "purpose": "maskable" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
