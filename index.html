@@ -2074,7 +2074,7 @@
                     if (!gDataRaw) return;
                     let gData = JSON.parse(gDataRaw);
                     let allGMembers = gData.members || [];
-                    let memberNames = (gData.memberTypes) ? allGMembers.filter(m => (gData.memberTypes[m] || "grup") === "grup") : allGMembers;
+                    let memberNames = (gData.memberTypes) ? allGMembers.filter(m => { const _t = gData.memberTypes[m] || "grup"; return _t === "grup" || _t === "bireysel"; }) : allGMembers;
                     let memberCount = memberNames.length;
                     let groupBooks = 0, groupTaken = 0, groupRead = 0;
                     
