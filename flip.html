@@ -361,11 +361,11 @@ function loadPdfList(){
 
 function buildShelf(){const g=$('grid');g.innerHTML='';
   BOOKS.forEach((bk,i)=>{const c=document.createElement('div');c.className='bk';
-    const cv=document.createElement('div');cv.className='cv';cv.textContent=bk.i;
+    const cv=document.createElement('div');cv.className='cv';cv.style.background='none';cv.style.boxShadow='3px 4px 10px var(--shadow)';const canvas=document.createElement('canvas');canvas.style.width='100%';canvas.style.height='100%';canvas.style.objectFit='cover';canvas.style.borderRadius='5px';cv.appendChild(canvas);
     const bn=document.createElement('div');bn.className='bn';bn.textContent=bname(bk.f);
     const bm=document.createElement('div');bm.className='bm';bm.textContent='…';
     c.appendChild(cv);c.appendChild(bn);c.appendChild(bm);c.onclick=()=>openBook(i);g.appendChild(c);
-    pdfjsLib.getDocument(bk.f).promise.then(p=>{if(bm.isConnected)bm.textContent=p.numPages+' sayfa';})
+    pdfjsLib.getDocument(bk.f).promise.then(p=>{if(bm.isConnected)bm.textContent=p.numPages+' sayfa'; p.getPage(1).then(page=>{const viewport = page.getViewport({scale: 0.5});canvas.width=viewport.width;canvas.height=viewport.height;page.render({canvasContext: canvas.getContext('2d'), viewport: viewport});});}).catch(e=>console.log(e));
       .catch(()=>{if(bm.isConnected)bm.textContent='—';});
   });}
 
