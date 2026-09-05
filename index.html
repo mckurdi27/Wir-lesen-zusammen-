@@ -3617,6 +3617,9 @@ const panel = document.getElementById('grup-takip-panel');
                 cont.innerHTML = html;
             }
 window.renderGrupTakipPanel = renderGrupTakipPanel;
+window._grpGizli = function _grpGizli(gk){ if(!gk) return false; try{ var _d=JSON.parse(localStorage.getItem('hatim_group_'+gk)||'null'); if(!_d) return false; return _d.dropdownVisible===false; }catch(e){ return false; } };
+            window.infoGizleToggle = function infoGizleToggle(gk, checked){ if(!gk) return; try{ var _d=JSON.parse(localStorage.getItem('hatim_group_'+gk)||'{}'); _d.dropdownVisible = !checked; localStorage.setItem('hatim_group_'+gk, JSON.stringify(_d)); }catch(e){} updateAutocompleteLists(); try{ renderAdminSectionAtBottom(); }catch(e2){} };
+
 
             function renderAdminSectionAtBottom() {
                 let bottomContainer = document.getElementById("admin-bottom-section");
@@ -3674,7 +3677,7 @@ window.renderGrupTakipPanel = renderGrupTakipPanel;
                             <button id="admin-edit-group" style="background: #f39c12; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">✏️ Düzenle</button>
                             <button id="admin-delete-group" style="background: #e74c3c; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">🗑️ Sil</button>
                             <button id="admin-set-password" style="background: #8e44ad; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">🔑 Şifre</button>
-                            <button id="admin-toggle-vis" style="background: #16a085; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">👁️ ${(appData && typeof appData.dropdownVisible==='boolean') ? (appData.dropdownVisible ? 'Gizle' : 'Göster') : 'Göster'}</button>
+                            
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
                             <span style="font-weight: bold; font-size: 13px;">👤 Gruptaki Üyeler:</span>
@@ -3744,7 +3747,7 @@ window.renderGrupTakipPanel = renderGrupTakipPanel;
                         let gPw = d.password || '';
                         let gTip = (d.members || []).length === 1 ? 'tek' : 'grup';
                         // Grup satırı: 1=grup adı, 2=isim(yok), 3=şifre(yok), 4=grup şifresi, 5=tip
-                        _infoRows.push([gName, '', '', gPw || '(şifresiz)', gTip, (d.regions && d.regions[gName]) || '', (d.cities && d.cities[gName]) || '']);
+                        _infoRows.push([gName, '', '', gPw || '(şifresiz)', gTip, (d.regions && d.regions[gName]) || '', (d.cities && d.cities[gName]) || '', gKey]);
                         (d.members || []).forEach(mm => {
                             let mpw = (d.passwords && d.passwords[mm]) ? d.passwords[mm] : '';
                             // Üye: 1=hangi grup, 2=isim, 3=üye şifresi, 4=grup şifresi, 5=tip
@@ -3777,6 +3780,7 @@ window.renderGrupTakipPanel = renderGrupTakipPanel;
                     let isMember = (r[1] !== '');
                     return `<tr${isMember ? '' : ' style="background:rgba(142,68,173,0.06); font-weight:bold;"'}>
                         <td style="padding:8px; border:1px solid var(--border-color); text-align:center;">${(idx||0)+1}</td>
+                        <td style="padding:8px; border:1px solid var(--border-color); text-align:center;">${isMember ? '' : '<input type="checkbox" style="width:18px;height:18px;cursor:pointer;"' + (window._grpGizli&&window._grpGizli(r[7])?' checked':'') + ' onchange="infoGizleToggle(\'' + (r[7]||'') + '\', this.checked)">'}</td>
                         <td style="padding:8px; border:1px solid var(--border-color);">${isMember ? (r[4] === 'tek' ? '👤 ' : '👥 ') + r[0] : '🗂️ ' + r[0]}</td>
                         <td style="padding:8px; border:1px solid var(--border-color); font-weight:${isMember ? 'bold' : 'normal'};">${isMember ? r[1] : '—'}</td>
                         <td style="padding:8px; border:1px solid var(--border-color); color:#8e44ad;">${isMember ? (r[2] || '(şifresiz)') : '—'}</td>
@@ -3791,6 +3795,7 @@ window.renderGrupTakipPanel = renderGrupTakipPanel;
                         <thead style="position:sticky; top:0; z-index:2; background:#fff;">
                             <tr style="background:rgba(142,68,173,0.1);">
                                 <th style="padding:8px; text-align:center; border:1px solid var(--border-color); width:44px;">Sıra</th>
+                                <th style="padding:8px; text-align:center; border:1px solid var(--border-color); width:70px; background:#fdedec; color:#c0392b;">Gizle</th>
                                 <th onclick="infoSortTable(1)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">1. Grup ⇅</th>
                                 <th onclick="infoSortTable(2)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">2. İsim ⇅</th>
                                 <th onclick="infoSortTable(3)" style="cursor:pointer; padding:8px; text-align:left; border:1px solid var(--border-color);">3. Şifre ⇅</th>
@@ -4641,18 +4646,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         }
                     });
 
-                    document.getElementById("admin-toggle-vis").addEventListener("click", () => {
-                        if (typeof currentGroup === 'undefined' || !currentGroup) { showToast("\u00d6nce bir grup se\u00e7in.", "info"); return; }
-                        let _gd = {}; try { _gd = JSON.parse(localStorage.getItem(`hatim_group_${currentGroup}`) || '{}'); } catch(e){}
-                        let _cur = (typeof _gd.dropdownVisible === 'boolean') ? _gd.dropdownVisible : (!_gd.password || String(_gd.password||'').trim() === '');
-                        _gd.dropdownVisible = !_cur;
-                        localStorage.setItem(`hatim_group_${currentGroup}`, JSON.stringify(_gd));
-                        showToast(_gd.dropdownVisible ? "Grup art\u0131k kay\u0131t dropdown'\u0131nda g\u00f6r\u00fcn\u00fcr." : "Grup art\u0131k kay\u0131t dropdown'\u0131nda g\u00f6r\u00fcnmez.", 'info');
-                        updateAutocompleteLists();
-                        try { renderAdminSectionAtBottom(); } catch(e){}
-                    });
-
-document.getElementById("admin-add-member").addEventListener("click", async () => {
+                    document.getElementById("admin-add-member").addEventListener("click", async () => {
                         let sel0 = document.getElementById("admin-group-select");
                         let selVal0 = sel0 ? sel0.value : "";
                         let base = (selVal0 && selVal0 !== "") ? ` (${selVal0.replace(/_/g,' ').toUpperCase()})` : '';
