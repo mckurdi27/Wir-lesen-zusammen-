@@ -2297,12 +2297,14 @@
                         return analysisSortDir==='az' ? String(av).localeCompare(String(bv),'tr') : String(bv).localeCompare(String(av),'tr');
                     });
                     // collect rows: groups (+ optionally filtered) and individuals
-                    var rows = [];
+                    
+                    function isBireyselGrup(_g){ var _mn = _g.memberNames||[]; if (_mn.length!==1) return false; var _d=_g.data||{}, _mt=_d.memberTypes||{}; return (_mt[_mn[0]]||'grup')==='bireysel'; }
+var rows = [];
                     if (groupName === 'all') {
-                        groupStats.forEach(function(g){ rows.push({ ad:g.name.replace(/_/g,' '), tip:'grup', ikon:'\uD83D\uDC65', gruplar:g.members, alinan:g.taken, okunan:g.read, toplam:g.books, pct:(g.takenPercent||0), memberNames:(g.memberNames||[]).join(', ') }); });
+                        groupStats.forEach(function(g){ var _gb = isBireyselGrup(g); rows.push({ ad:g.name.replace(/_/g,' '), tip:(_gb?'bireysel':'grup'), ikon:(_gb?'\uD83D\uDC64':'\uD83D\uDC65'), gruplar:g.members, alinan:g.taken, okunan:g.read, toplam:g.books, pct:(g.takenPercent||0), memberNames:(g.memberNames||[]).join(', ') }); });
                     } else {
                         var g2 = groupStats.find(function(gs){ return gs.name === groupName; });
-                        if (g2) rows.push({ ad:g2.name.replace(/_/g,' '), tip:'grup', ikon:'\uD83D\uDC65', gruplar:g2.members, alinan:g2.taken, okunan:g2.read, toplam:g2.books, pct:(g2.takenPercent||0), memberNames:(g2.memberNames||[]).join(', ') });
+                        if (g2) { var _gb2 = isBireyselGrup(g2); rows.push({ ad:g2.name.replace(/_/g,' '), tip:(_gb2?'bireysel':'grup'), ikon:(_gb2?'\uD83D\uDC64':'\uD83D\uDC65'), gruplar:g2.members, alinan:g2.taken, okunan:g2.read, toplam:g2.books, pct:(g2.takenPercent||0), memberNames:(g2.memberNames||[]).join(', ') }); }
                     }
                     // Bireysel uyeler (grup filtresi bireysel/tek ise dahil)
                     try {
