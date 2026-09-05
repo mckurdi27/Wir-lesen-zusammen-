@@ -4955,13 +4955,7 @@ renderBooks();
                 showToast(isAdmin ? '🔓 Yönetici modu açıldı!' : '🔐 Yönetici modu kapandı.', 'info');
             }
 
-            function getBireyselPool() {
-                let p = JSON.parse(localStorage.getItem('hatim_bireysel_pool') || 'null');
-                if (!p || !p.members) p = { members: [], memberTypes: {} };
-                if (!p.memberTypes) p.memberTypes = {};
-                if (!p.passwords) p.passwords = {};
-                return p;
-            }
+            function getBireyselPool() { return { members: [], memberTypes: {}, passwords: {} }; }
             function saveBireyselPool(p) { localStorage.setItem('hatim_bireysel_pool', JSON.stringify(p)); }
 
             async function loadGroupData(skipSession, silent) {
