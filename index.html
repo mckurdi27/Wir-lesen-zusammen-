@@ -2299,7 +2299,7 @@
                     });
                     // collect rows: groups (+ optionally filtered) and individuals
                     
-                    function isBireyselGrup(_g){ var _mn = _g.memberNames||[]; if (_mn.length!==1) return false; var _d=_g.data||{}, _mt=_d.memberTypes||{}; return (_mt[_mn[0]]||'grup')==='bireysel'; }
+                    function isBireyselGrup(_g){ var _mn = _g.memberNames||[]; return _mn.length===1; }
 var rows = [];
                     var _gsel = (typeof selGroupsArr!=='undefined' && selGroupsArr.length && selGroupsArr[0]!=='all') ? selGroupsArr : ['all'];
                     var _pick = (groupName==='all') ? ['all'] : _gsel;
@@ -2419,6 +2419,7 @@ var rows = [];
                 }
 
                 function renderTab3(groupName = 'all', memberName = 'all') {
+                    function _mi(_mm){ if(_mm.type==='bireysel') return true; var _g0=_mm.groups&&_mm.groups[0]; if(!_g0) return false; try{ var _d=JSON.parse(localStorage.getItem('hatim_group_'+_g0)); return !!(_d&&_d.members&&_d.members.length===1);}catch(e){ return false; } }
                     
 
                     const container = document.getElementById('dtabs-3-content');
@@ -2524,9 +2525,9 @@ var rows = [];
                                             <tr style="${idx === 0 ? 'background: rgba(255, 215, 0, 0.1);' : ''}">
                                                 <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center;">${idx + 1}</td>
                                                 <td style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: ${idx === 0 ? 'bold' : 'normal'};">
-                                                    ${idx === 0 ? '🥇 ' : idx === 1 ? '🥈 ' : idx === 2 ? '🥉 ' : ''}${m.type === 'bireysel' ? '👤' : '👥'} ${m.name}${m.groups.length ? ' <span style="opacity:.6;font-size:11px;">(' + m.groups.map(g => g.replace(/_/g,' ').toUpperCase()).join(', ') + ')</span>' : ''}
+                                                    ${idx === 0 ? '🥇 ' : idx === 1 ? '🥈 ' : idx === 2 ? '🥉 ' : ''}${_mi(m) ? '👤' : '👥'} ${m.name}${m.groups.length ? ' <span style="opacity:.6;font-size:11px;">(' + m.groups.map(g => g.replace(/_/g,' ').toUpperCase()).join(', ') + ')</span>' : ''}
                                                 </td>
-                                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; font-size: 12px;">${m.type === 'bireysel' ? '\ud83d\udc64 Bireysel' : '\ud83d\udc65 Grup'}</td>
+                                                <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; font-size: 12px;">${_mi(m) ? '\ud83d\udc64 Bireysel' : '\ud83d\udc65 Grup'}</td>
                                                 <td style="padding: 10px; border-bottom: 1px solid var(--border-color); text-align: center; font-size: 11px;">
                                                     ${m.groups.map(g => g.replace(/_/g, ' ').toUpperCase()).join(', ')}
                                                 </td>
