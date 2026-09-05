@@ -1557,7 +1557,8 @@
                         if (data) {
                             try {
                                 const parsed = JSON.parse(data);
-                                if (!parsed.password || parsed.password.trim() === '') {
+                                var _vis = (typeof parsed.dropdownVisible === 'boolean') ? parsed.dropdownVisible : (!parsed.password || String(parsed.password).trim() === '');
+                                    if (_vis) {
                                     freeGroups.push(gKey.replace(/_/g, ' ').toUpperCase());
                                 }
                             } catch(e) {}
@@ -3673,6 +3674,7 @@ window.renderGrupTakipPanel = renderGrupTakipPanel;
                             <button id="admin-edit-group" style="background: #f39c12; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">✏️ Düzenle</button>
                             <button id="admin-delete-group" style="background: #e74c3c; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">🗑️ Sil</button>
                             <button id="admin-set-password" style="background: #8e44ad; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">🔑 Şifre</button>
+                            <button id="admin-toggle-vis" style="background: #16a085; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">👁️ ${(appData && typeof appData.dropdownVisible==='boolean') ? (appData.dropdownVisible ? 'Gizle' : 'Göster') : 'Göster'}</button>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
                             <span style="font-weight: bold; font-size: 13px;">👤 Gruptaki Üyeler:</span>
@@ -4569,7 +4571,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                                 hatims[b.id] = { hatimNo: 1, startDate: today, prayerDone: false };
                                 history[b.id] = [];
                             });
-                            appData = { members: [], memberTypes: {}, password: pwd.trim(), books, bookPages: pages, bookHatims: hatims, bookHistory: history, readingLogs: [] };
+                            appData = { members: [], memberTypes: {}, password: pwd.trim(), dropdownVisible: (String(pwd||'').trim() === ''), books, bookPages: pages, bookHatims: hatims, bookHistory: history, readingLogs: [] };
                             window.saveGroupData();
                             // Supabase'e de yaz (tek doğruluk kaynağı)
                             var _api = (typeof window.api === 'function') ? window.api : null;
@@ -4639,7 +4641,18 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         }
                     });
 
-                    document.getElementById("admin-add-member").addEventListener("click", async () => {
+                    document.getElementById("admin-toggle-vis").addEventListener("click", () => {
+                        if (typeof currentGroup === 'undefined' || !currentGroup) { showToast("\u00d6nce bir grup se\u00e7in.", "info"); return; }
+                        let _gd = {}; try { _gd = JSON.parse(localStorage.getItem(`hatim_group_${currentGroup}`) || '{}'); } catch(e){}
+                        let _cur = (typeof _gd.dropdownVisible === 'boolean') ? _gd.dropdownVisible : (!_gd.password || String(_gd.password||'').trim() === '');
+                        _gd.dropdownVisible = !_cur;
+                        localStorage.setItem(`hatim_group_${currentGroup}`, JSON.stringify(_gd));
+                        showToast(_gd.dropdownVisible ? "Grup art\u0131k kay\u0131t dropdown'\u0131nda g\u00f6r\u00fcn\u00fcr." : "Grup art\u0131k kay\u0131t dropdown'\u0131nda g\u00f6r\u00fcnmez.", 'info');
+                        updateAutocompleteLists();
+                        try { renderAdminSectionAtBottom(); } catch(e){}
+                    });
+
+document.getElementById("admin-add-member").addEventListener("click", async () => {
                         let sel0 = document.getElementById("admin-group-select");
                         let selVal0 = sel0 ? sel0.value : "";
                         let base = (selVal0 && selVal0 !== "") ? ` (${selVal0.replace(/_/g,' ').toUpperCase()})` : '';
