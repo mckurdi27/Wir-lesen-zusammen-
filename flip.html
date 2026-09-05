@@ -365,8 +365,7 @@ function buildShelf(){const g=$('grid');g.innerHTML='';
     const bn=document.createElement('div');bn.className='bn';bn.textContent=bname(bk.f);
     const bm=document.createElement('div');bm.className='bm';bm.textContent='…';
     c.appendChild(cv);c.appendChild(bn);c.appendChild(bm);c.onclick=()=>openBook(i);g.appendChild(c);
-    pdfjsLib.getDocument(bk.f).promise.then(p=>{if(bm.isConnected)bm.textContent=p.numPages+' sayfa'; p.getPage(1).then(page=>{const viewport = page.getViewport({scale: 0.5});canvas.width=viewport.width;canvas.height=viewport.height;page.render({canvasContext: canvas.getContext('2d'), viewport: viewport});});}).catch(e=>console.log(e));
-      .catch(()=>{if(bm.isConnected)bm.textContent='—';});
+    pdfjsLib.getDocument(bk.f).promise.then(p=>{if(bm.isConnected)bm.textContent=p.numPages+' sayfa';return p.getPage(1);}).then(page=>{const viewport = page.getViewport({scale: 0.5});canvas.width=viewport.width;canvas.height=viewport.height;return page.render({canvasContext: canvas.getContext('2d'), viewport: viewport});}).catch(()=>{if(bm.isConnected)bm.textContent='—';});
   });}
 
 $('nextB').onclick=next;$('prevB').onclick=prev;$('firstB').onclick=first;$('lastB').onclick=last;
