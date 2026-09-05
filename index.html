@@ -1990,40 +1990,8 @@
                             showToast('❌ Grup verisi okunamadı.', 'error');
                         }
                     } else {
-                        const todayStr = new Date().toLocaleDateString("tr-TR");
-                        const freshBooks = JSON.parse(JSON.stringify(defaultBooksTemplate));
-                        const freshPages = {};
-                        const freshHatims = {};
-                        const freshHistory = {};
-                        freshBooks.forEach(defBook => {
-                            freshPages[defBook.id] = Array(defBook.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
-                            freshHatims[defBook.id] = { hatimNo: 1, startDate: todayStr, prayerDone: false };
-                            freshHistory[defBook.id] = [];
-                        });
-                        const newGroupData = {
-                            members: [userName],
-                            memberTypes: { [userName]: 'grup' },
-                            passwords: userPassword ? { [userName]: userPassword } : {},
-                            password: groupPassword || "",
-                            books: freshBooks,
-                            bookPages: freshPages,
-                            bookHatims: freshHatims,
-                            bookHistory: freshHistory,
-                            readingLogs: [],
-                            regions: loginRegion ? { [userName]: loginRegion } : {},
-                            cities: loginCity ? { [userName]: loginCity } : {}
-                        };
-                        localStorage.setItem(`hatim_group_${groupKey}`, JSON.stringify(newGroupData));
-                        currentGroup = groupKey;
-                        loggedInMember = userName;
-                        loggedInMemberType = "grup";
-                        localStorage.setItem('hatim_member_type_' + userName, "grup");
-                        localStorage.setItem(`hatim_session_${groupKey}`, userName);
-                            if (document.getElementById('login-remember') && document.getElementById('login-remember').checked) { localStorage.setItem('hatim_remember_user', userName); localStorage.setItem('hatim_remember_pass', userPassword || ''); localStorage.setItem('hatim_remember_group', groupName || ''); localStorage.setItem('hatim_remember_group_pass', groupPassword || ''); localStorage.setItem('hatim_remember_type', 'grup'); }
-                        localStorage.setItem(`hatim_session_type_${groupKey}`, "grup");
-                        showToast(`✅ "${groupKey.replace(/_/g, ' ').toUpperCase()}" grubu oluşturuldu!`, 'success');
-                        updateUserInterface();
-                        loadGroupData();
+                        showToast('\u274c "' + groupName + '" grubu bulunamad\u0131. Mevcut bir grubu se\u00e7in veya Tek \u00fcye olarak kaydolun.', 'error');
+                        return;
                     }
                 });
             }
