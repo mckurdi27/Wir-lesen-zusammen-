@@ -137,6 +137,30 @@ button{font-family:inherit;cursor:pointer}
 @media(max-width:520px){.c{min-width:44px;height:44px}.c.tx{font-size:12px;padding:0 8px}}
 
 @media (orientation: landscape){#rctl{flex-direction:row;flex-wrap:wrap}#rctl .rctl-row{width:auto;flex:1 1 auto;flex-wrap:nowrap}.c{padding:0 10px}}
+
+.sep{border:none;border-top:2px solid var(--gold1);margin:18px 6px 6px}
+.der-h2{margin:8px 10px 4px;font-size:17px;color:var(--gold-d)}
+#dershelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;padding:8px 12px 20px}
+.der-empty{grid-column:1/-1;color:var(--muted);font-size:13px;padding:8px}
+.der{background:var(--card);border:1px solid var(--cardb);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:7px;box-shadow:0 2px 8px var(--shadow)}
+.der .dt{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.der .dm{font-size:11px;color:var(--muted)}
+.der .dr{display:flex;gap:6px}
+.der .db{flex:1;border:none;border-radius:7px;padding:7px;font-size:12px;cursor:pointer;font-weight:600}
+.db-go{background:var(--gold1);color:#fff}
+.db-del{background:#c0392b;color:#fff}
+.dersel{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0}
+.derpg{border:1px solid var(--cardb);border-radius:6px;background:var(--card);cursor:pointer;padding:5px 8px;font-size:12px}
+
+#derbox{position:fixed;inset:0;z-index:9;background:var(--bg);display:none;flex-direction:column}
+#derbox.on{display:flex}
+.derhd{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--panelb);background:var(--panel)}
+.derhd #derT{flex:1;font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.derhd .dbx{background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-main)}
+.derbody{flex:1;display:flex;align-items:center;justify-content:center;overflow:auto;padding:10px}
+.derbody img{max-width:100%;max-height:100%;object-fit:contain;box-shadow:0 4px 20px var(--shadl)}
+.derft{display:flex;align-items:center;justify-content:center;gap:14px;padding:10px;border-top:1px solid var(--panelb)}
+.derft .c{min-width:44px}
 </style>
 </head>
 <body>
@@ -156,6 +180,9 @@ button{font-family:inherit;cursor:pointer}
   </div>
   <div id="hint">pdf/ klasöründeki eserler listelenir. Kitaba dokunup açın.</div>
   <div id="grid"></div>
+  <hr class="sep">
+  <h2 class="der-h2">📖 Derlemelerim</h2>
+  <div id="dershelf"><div class="der-empty">Henüz derleme yok. Bir eseri açıp +Derle ile sayfa ekle.</div></div>
 </div>
 
 <div id="reader">
@@ -164,6 +191,8 @@ button{font-family:inherit;cursor:pointer}
     <div id="rtitle"></div>
     <button class="ib" id="sndB2" title="Sayfa sesi aç/kapat">🔊</button>
     <button class="ib c s" id="stripB" title="Sayfa şeridi">☰</button>
+    <button class="ib" id="addB" title="Bu sayfayı derlemene ekle">➕ Derle</button>
+    <button class="ib" id="printB" title="Yazdır / PDF">🖨</button>
     <button class="ib back" id="homeB2" title="Ana sayfaya dön (index.html)">Anasayfa</button>
   </div>
   <div id="stageWrap">
@@ -187,6 +216,15 @@ button{font-family:inherit;cursor:pointer}
   </div>
 </div>
 
+<!-- DERLEME OKUYUCU -->
+<div id="derbox">
+  <div class="derhd"><button class="dbx" id="derClose">✕</button><span id="derT"></span>
+    <button class="ib" id="derPrint" title="Yazdır / PDF">🖨</button></div>
+  <div class="derbody"><img id="derImg" alt=""></div>
+  <div class="derft"><button class="c g" id="derPrev">‹</button>
+    <span id="derCnt"></span>
+    <button class="c g" id="derNext">›</button></div>
+</div>
 <script>
 /* pdf/ klasöründeki kitaplar — A.pdf boş olduğu için listede yok */
 /* pdf/ klasöründeki kitaplar — her açılışta GitHub API'den otomatik listelenir */
@@ -369,7 +407,7 @@ const toggleStrip=()=>$('strip').classList.toggle('on');
 function goHome(){location.href='index.html';}
 
 /* --- kitap aç --- */
-async function openBook(k){const bk=BOOKS[k];
+async function openBook(k){const bk=BOOKS[k];curFile=bk.f;
   $('load').classList.add('on');$('shelf').classList.add('hidden');
   pdf=null;cache={};total=0;cur=1;anim=false;rtl=false;try{
     pdf=await pdfjsLib.getDocument(bk.f).promise;total=pdf.numPages;await baseP();
@@ -402,6 +440,117 @@ function buildShelf(){const g=$('grid');g.innerHTML='';
     c.appendChild(cv);c.appendChild(bn);c.appendChild(bm);c.onclick=()=>openBook(i);g.appendChild(c);
     pdfjsLib.getDocument(bk.f).promise.then(p=>{if(bm.isConnected)bm.textContent=p.numPages+' sayfa';return p.getPage(1);}).then(page=>{const viewport = page.getViewport({scale: 0.5});canvas.width=viewport.width;canvas.height=viewport.height;return page.render({canvasContext: canvas.getContext('2d'), viewport: viewport});}).catch(()=>{if(bm.isConnected)bm.textContent='—';});
   });}
+
+
+
+/* ================= DERLEMELERIM (kişisel, localStorage) ================= */
+const DER_KEY='flipDerlemeler';
+function loadDers(){try{return JSON.parse(localStorage.getItem(DER_KEY)||'{}')}catch(e){return {}}}
+function saveDers(d){localStorage.setItem(DER_KEY,JSON.stringify(d))}
+
+function derlePage(){
+  if(!pdf||!curFile){showToast2('Önce bir eser aç.');return}
+  const d=loadDers();
+  const mine=Object.keys(d).filter(function(n){return d[n].f===curFile;});
+  let nm=null;
+  if(!mine.length){
+    nm=(prompt('Yeni derleme adı (boş = Derleme) :')||'').trim();
+    if(!nm)nm='Derleme';
+    if(d[nm]){showToast2('Bu ad zaten var.');return}
+    d[nm]={f:curFile,p:[cur]};
+  } else {
+    const pr=(prompt('Sayfa '+cur+' eklenecek derleme? (boş = yeni)\n\nMevcut: '+mine.join(', '))||'').trim();
+    if(!pr){nm=(prompt('Yeni derleme adı:')||'').trim();if(!nm)nm='Derleme';if(d[nm]){showToast2('Zaten var.');return}d[nm]={f:curFile,p:[cur]};}
+    else{
+      nm=pr;if(!d[nm]){showToast2('Derleme bulunamadı.');return}
+      if(d[nm].f!==curFile){showToast2('Bu derleme başka esere ait.');return}
+      if(d[nm].p.indexOf(cur)>-1){showToast2('Sayfa zaten derlemede.');return}
+      d[nm].p.push(cur);d[nm].p.sort(function(a,b){return a-b;});
+    }
+  }
+  saveDers(d);renderDershelf();showToast2('Sayfa '+cur+' derlemeye eklendi.');
+}
+
+function delDer(nm){if(!confirm('“'+nm+'” derlemesi silinsin mi?'))return;const d=loadDers();delete d[nm];saveDers(d);renderDershelf();}
+
+let derDoc=null,derPages=null,derIdx=0,derName='',derF=null;
+function renderDerPage(){
+  const img=$('derImg');if(!img)return;
+  const n=derPages[derIdx];
+  img.removeAttribute('src');
+  if(!derDoc)return;
+  derDoc.getPage(n).then(function(p){
+    const vp=p.getViewport({scale:1.5});const c=document.createElement('canvas');
+    c.width=vp.width;c.height=vp.height;
+    p.render({canvasContext:c.getContext('2d'),viewport:vp}).promise.then(function(){
+      img.src=c.toDataURL('image/jpeg',.92);
+    }).catch(function(){img.removeAttribute('src');});
+  }).catch(function(){img.removeAttribute('src');});
+  $('derCnt').textContent='Kaynak sayfa '+n+' · '+(derIdx+1)+'/'+derPages.length;
+}
+function derNext(){if(derIdx<derPages.length-1){derIdx++;renderDerPage();}}
+function derPrev(){if(derIdx>0){derIdx--;renderDerPage();}}
+function openDer(nm){
+  const d=loadDers();const der=d[nm];if(!der)return;
+  if(!der.p.length){showToast2('Boş derleme.');return}
+  derPages=der.p.slice();derIdx=0;derName=nm;derF=der.f;derDoc=null;
+  $('derT').textContent=nm+' — '+bname(der.f);
+  $('derbox').classList.add('on');$('derImg').removeAttribute('src');
+  pdfjsLib.getDocument(der.f).promise.then(function(doc){derDoc=doc;renderDerPage();}).catch(function(){showToast2('Kaynak PDF açılamadı.');});
+}
+function closeDer(){derDoc=null;derPages=null;derIdx=0;$('derbox').classList.remove('on');$('derImg').removeAttribute('src');}
+function derAct(kind,i){const nm=_derKeys[i];if(nm===undefined)return;if(kind===0)openDer(nm);else if(kind===1)printDer(nm);else delDer(nm);}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function renderDershelf(){
+  const h=$('dershelf');if(!h)return;
+  const d=loadDers();const names=Object.keys(d);
+  _derKeys=names;
+  if(!names.length){h.innerHTML='<div class="der-empty">Henüz derleme yok. Bir eseri açıp + Derle ile sayfa ekle.</div>';return;}
+  h.innerHTML=names.map(function(nm,i){
+    const der=d[nm];
+    return '<div class="der">'
+     +'<div class="dt">'+esc(nm)+'</div>'
+     +'<div class="dm">'+der.p.length+' sayfa · '+esc(bname(der.f))+'</div>'
+     +'<div class="dr">'
+     +'<button class="db db-go" onclick="derAct(0,'+i+')">Oku</button>'
+     +'<button class="db db-go" onclick="derAct(1,'+i+')">🖨</button>'
+     +'<button class="db db-del" onclick="derAct(2,'+i+')">Sil</button>'
+     +'</div></div>';
+  }).join('');
+}
+function showToast2(m){try{if(typeof showToast==='function')showToast(m);else alert(m);}catch(e){alert(m)}}
+
+function printDer(nm){const d=loadDers();const der=d[nm];if(!der)return;printPages(der.f,der.p,nm);}
+function printBook(){if(!pdf||!curFile)return;const all=[];for(let i=1;i<=total;i++)all.push(i);printPages(curFile,all,bname(curFile));}
+async function printPages(f,pages,title){
+  const w=window.open('','_blank');if(!w)return;
+  w.document.write('<html><head><title>'+title+'</title><style>body{margin:0}img{width:100%;display:block;page-break-after:always}@media print{@page{margin:0}}</style></head><body></body></html>');
+  w.document.close();
+  let doc;try{doc=await pdfjsLib.getDocument(f).promise;}catch(e){w.close();return;}
+  for(const n of pages){
+    try{
+      const p=await doc.getPage(n);
+      const vp=p.getViewport({scale:2});
+      const c=w.document.createElement('canvas');c.width=vp.width;c.height=vp.height;
+      await p.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
+      const img=w.document.createElement('img');img.src=c.toDataURL('image/jpeg',.92);
+      w.document.body.appendChild(img);
+    }catch(e){}
+  }
+  const tryPrint=function(){try{w.focus();w.print();}catch(e){}};
+  let done=0;const chk=setInterval(function(){
+    const imgs=[].slice.call(w.document.images);
+    const ready=imgs.every(function(im){return im.complete&&im.naturalWidth>0;});
+    done++;if(ready||done>40||!imgs.length){clearInterval(chk);setTimeout(tryPrint,300);}
+  },250);
+  setTimeout(function(){clearInterval(chk);tryPrint();},9000);
+}
+
+$('addB').onclick=derlePage;$('printB').onclick=printBook;
+$('derClose').onclick=closeDer;$('derNext').onclick=derNext;$('derPrev').onclick=derPrev;
+$('derPrint').onclick=function(){if(derPages&&derF)printPages(derF,derPages,derName);};
+renderDershelf();
 
 $('nextB').onclick=next;$('prevB').onclick=prev;$('firstB').onclick=first;$('lastB').onclick=last;
 $('backB').onclick=()=>{$('reader').classList.remove('on');$('shelf').classList.remove('hidden');};
