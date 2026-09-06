@@ -172,7 +172,8 @@ button{font-family:inherit;cursor:pointer}
 
 #bkBookmark.on{background:#c0392b!important;color:#fff!important;border-color:#c0392b}
 #addCurB{background:#1e8a4c!important;color:#fff!important;font-weight:700;padding:6px 14px;border-radius:20px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
-</style>
+
+.bmkm{position:absolute;top:-2px;right:-2px;width:20px;height:22px;background:#c0392b;color:#fff;font-size:11px;line-height:22px;text-align:center;border-radius:0 8px 0 8px;z-index:8;box-shadow:0 2px 5px rgba(0,0,0,.3);pointer-events:none}</style>
 </head>
 <body>
 <div id="load"><div class="sp"></div><div class="lt">Kitap açılıyor…</div></div>
@@ -332,6 +333,7 @@ function pageEl(n,isRight){const d=document.createElement('div');d.className='le
   d.style.width=lw+'px';d.style.height=lh+'px';
   d.style.left=isRight?(lw+gap)+'px':'0px';
   if(n>=1&&n<=total){const m=document.createElement('div');m.className='pg';m.textContent=n;d.appendChild(m);}
+  try{var _bm=bmLoad();if(_bm&&_bm.f===curFile&&_bm.p===n){var r=document.createElement('div');r.className='bmkm';r.textContent='❤';d.appendChild(r);}}catch(e){}
   addPageImg(d,n);return d;}
 function paint(){const w=$('stageWrap');if(w)w.scrollTop=0;const b=$('book');clearB();const sp=sidePages();
   if(!spread){b.appendChild(pageEl(cur,false));}
@@ -644,6 +646,11 @@ $( 'derReload').onclick=function(){derReloadPage();};
 $('derPrint').onclick=function(){if(derPages&&derF)printPages(derF,derPages,derName);};
 renderDershelf();
 
+var _lpT=null;
+$('book').addEventListener('pointerdown',function(ev){var leaf=ev.target.closest('.leaf');if(!leaf)return;var pn=parseInt(leaf.getAttribute('data-pg'),10);if(!pn)return;
+  _lpT=setTimeout(function(){_lpT=null;var o=bmLoad()||{};if(o.f===curFile&&o.p===pn){delete o.f;delete o.p;}else{o.f=curFile;o.p=pn;}bmSave(o);showToast2(o.p?('Ayra\u00e7: sayfa '+o.p):'Ayra\u00e7 kald\u0131r\u0131ld\u0131.');paint();},550);});
+$('book').addEventListener('pointerup',function(ev){if(_lpT){clearTimeout(_lpT);_lpT=null;}});
+$('book').addEventListener('pointercancel',function(){if(_lpT){clearTimeout(_lpT);_lpT=null;}});
 $('book').addEventListener('click',function(ev){
   var leaf=ev.target.closest('.leaf');if(!leaf)return;
   var pn=parseInt(leaf.getAttribute('data-pg'),10);if(!pn||anim)return;
