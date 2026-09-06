@@ -152,7 +152,7 @@ button{font-family:inherit;cursor:pointer}
 .dersel{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0}
 .derpg{border:1px solid var(--cardb);border-radius:6px;background:var(--card);cursor:pointer;padding:5px 8px;font-size:12px}
 
-#derbox{position:fixed;inset:0;z-index:9;background:var(--bg);display:none;flex-direction:column}
+#derbox{position:fixed;inset:0;z-index:9999;background:var(--bg);display:none;flex-direction:column;visibility:visible}
 #derbox.on{display:flex}
 .derhd{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--panelb);background:var(--panel)}
 .derhd #derT{flex:1;font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -161,6 +161,15 @@ button{font-family:inherit;cursor:pointer}
 .derbody img{max-width:100%;max-height:100%;object-fit:contain;box-shadow:0 4px 20px var(--shadl)}
 .derft{display:flex;align-items:center;justify-content:center;gap:14px;padding:10px;border-top:1px solid var(--panelb)}
 .derft .c{min-width:44px}
+
+.der-btn{width:auto!important;padding:0 14px;gap:6px;border:none!important;background:#1e8a4c!important;color:#fff!important;font-size:13px!important;font-weight:700;white-space:nowrap}
+.der-btn:hover{filter:brightness(1.08)}
+
+.leaf{position:relative}
+.rib{position:absolute;top:0;width:24px;height:32px;background:#e23636;z-index:22;box-shadow:0 2px 6px rgba(0,0,0,.35);color:#fff;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;border-radius:0 0 5px 5px;pointer-events:none}
+.leaf.rt .rib{right:5px}
+.leaf.lf .rib{left:5px}
+.leaf.ribbed{box-shadow:0 0 0 3px #e23636 inset!important}
 </style>
 </head>
 <body>
@@ -191,8 +200,8 @@ button{font-family:inherit;cursor:pointer}
     <div id="rtitle"></div>
     <button class="ib" id="sndB2" title="Sayfa sesi aç/kapat">🔊</button>
     <button class="ib c s" id="stripB" title="Sayfa şeridi">☰</button>
-    <button class="ib" id="addB" title="Bu sayfayı derlemene ekle">➕ Derle</button>
-    <button class="ib" id="printB" title="Yazdır / PDF">🖨</button>
+    <button class="ib der-btn" id="addB" title="Bu sayfayı derlemene ekle">➕ Derle</button>
+    <button class="ib der-btn" id="printB" title="Yazdır / PDF">🖨</button>
     <button class="ib back" id="homeB2" title="Ana sayfaya dön (index.html)">Anasayfa</button>
   </div>
   <div id="stageWrap">
@@ -220,7 +229,7 @@ button{font-family:inherit;cursor:pointer}
 <div id="derbox">
   <div class="derhd"><button class="dbx" id="derClose">✕</button><span id="derT"></span>
     <button class="ib" id="derPrint" title="Yazdır / PDF">🖨</button></div>
-  <div class="derbody"><img id="derImg" alt=""></div>
+  <div class="derbody"><div id="derLoad" style="display:none;color:#555;font-size:15px;padding:20px">Derleme yükleniyor…</div><img id="derImg" alt="" style="display:none"></div>
   <div class="derft"><button class="c g" id="derPrev">‹</button>
     <span id="derCnt"></span>
     <button class="c g" id="derNext">›</button></div>
@@ -312,7 +321,7 @@ function sidePages(){
 }
 
 /* statik sayfa elemanı */
-function pageEl(n,isRight){const d=document.createElement('div');d.className='leaf '+(isRight?'rt':'lf');
+function pageEl(n,isRight){const d=document.createElement('div');d.className='leaf '+(isRight?'rt':'lf');d.setAttribute('data-pg',n);
   d.style.width=lw+'px';d.style.height=lh+'px';
   d.style.left=isRight?(lw+gap)+'px':'0px';
   if(n>=1&&n<=total){const m=document.createElement('div');m.className='pg';m.textContent=n;d.appendChild(m);}
@@ -384,9 +393,9 @@ function updateUI(){$('pageIn').value=cur;$('tot').textContent=total;
   buildStrip();}
 async function nav(fwd){if(anim||!pdf)return;
   const ok=fwd?canFwd():canPrev();if(!ok)return;
-  anim=true;playSound();try{await doFlip(fwd);}catch(e){}cur=fwd?fwdTarget():prevTarget();paint();anim=false;updateUI();}
+  anim=true;playSound();try{await doFlip(fwd);}catch(e){}cur=fwd?fwdTarget():prevTarget();paint();anim=false;updateUI();markCurrentRib();}
 const next=()=>nav(true),prev=()=>nav(false);
-function first(){if(anim)return;cur=1;paint();updateUI();}
+function first(){if(anim)return;cur=1;paint();updateUI();markCurrentRib();}
 function last(){if(anim)return;
   cur = spread ? (total%2===1? total : Math.max(1,total-1)) : total;
   paint();updateUI();}
@@ -413,7 +422,7 @@ async function openBook(k){const bk=BOOKS[k];curFile=bk.f;
     pdf=await pdfjsLib.getDocument(bk.f).promise;total=pdf.numPages;await baseP();
     spread=total>1;
     $('rtitle').innerHTML=bk.i+' '+bname(bk.f)+'<span class="ps"></span>';
-    $('reader').classList.add('on');layout();paint();updateUI();
+    $('reader').classList.add('on');layout();paint();updateUI();markCurrentRib();
   }catch(e){console.error(e);alert('PDF açılamadı: '+bname(bk.f));$('shelf').classList.remove('hidden');}
   finally{$('load').classList.remove('on');} }
 
@@ -445,40 +454,62 @@ function buildShelf(){const g=$('grid');g.innerHTML='';
 
 /* ================= DERLEMELERIM (kişisel, localStorage) ================= */
 const DER_KEY='flipDerlemeler';
+let curRib=new Set();
 function loadDers(){try{return JSON.parse(localStorage.getItem(DER_KEY)||'{}')}catch(e){return {}}}
 function saveDers(d){localStorage.setItem(DER_KEY,JSON.stringify(d))}
 
+function ribKeyFor(n){return curFile+'|'+n;}
+function toggleRib(n){
+  if(!pdf||!curFile||anim)return;var k=ribKeyFor(n);
+  if(curRib.has(k))curRib.delete(k);else curRib.add(k);
+  paint();markRibs();
+}
+function markRibs(){
+  document.querySelectorAll('#book .leaf').forEach(function(el){
+    var pn=parseInt(el.getAttribute('data-pg'),10);if(!pn)return;
+    var on=curRib.has(ribKeyFor(pn));
+    el.classList.toggle('ribbed',on);
+    var rb=null,ch=el.children;for(var i=0;i<ch.length;i++){if(ch[i].className==='rib')rb=ch[i];}
+    if(!rb){rb=document.createElement('div');rb.className='rib';rb.textContent='#';el.appendChild(rb);}
+    rb.style.display=on?'flex':'none';
+  });
+}
+function markCurrentRib(){if(!pdf||!curFile)return;markRibs();}
+
 function derlePage(){
   if(!pdf||!curFile){showToast2('Önce bir eser aç.');return}
-  const d=loadDers();
-  const mine=Object.keys(d).filter(function(n){return d[n].f===curFile;});
-  let nm=null;
-  if(!mine.length){
-    nm=(prompt('Yeni derleme adı (boş = Derleme) :')||'').trim();
-    if(!nm)nm='Derleme';
-    if(d[nm]){showToast2('Bu ad zaten var.');return}
-    d[nm]={f:curFile,p:[cur]};
-  } else {
-    const pr=(prompt('Sayfa '+cur+' eklenecek derleme? (boş = yeni)\n\nMevcut: '+mine.join(', '))||'').trim();
-    if(!pr){nm=(prompt('Yeni derleme adı:')||'').trim();if(!nm)nm='Derleme';if(d[nm]){showToast2('Zaten var.');return}d[nm]={f:curFile,p:[cur]};}
-    else{
-      nm=pr;if(!d[nm]){showToast2('Derleme bulunamadı.');return}
+  var picked=[];var sep=curFile+'|';
+  curRib.forEach(function(k){if(k.indexOf(sep)===0){var pg=parseInt(k.slice(sep.length),10);if(pg>=1&&pg<=total&&picked.indexOf(pg)<0)picked.push(pg);}});
+  if(!picked.length){showToast2('Sayfaları kurdela ile işaretle (sayfaya tıkla), sonra Derle de.');return;}
+  picked.sort(function(a,b){return a-b;});
+  var d=loadDers();var mine=Object.keys(d).filter(function(n){return d[n].f===curFile;});
+  var nm=null;
+  if(!mine.length){nm=(prompt('Yeni derleme adı (boş = Derleme):')||'').trim();if(!nm)nm='Derleme';if(d[nm]){showToast2('Bu ad zaten var.');return}d[nm]={f:curFile,p:picked.slice()};}
+  else{
+    var pr=(prompt(picked.length+' sayfa eklenecek derleme? (boş = yeni)\n\nMevcut: '+mine.join(', '))||'').trim();
+    if(!pr){nm=(prompt('Yeni derleme adı:')||'').trim();if(!nm)nm='Derleme';if(d[nm]){showToast2('Zaten var.');return}d[nm]={f:curFile,p:picked.slice()};}
+    else{nm=pr;if(!d[nm]){showToast2('Derleme bulunamadı.');return}
       if(d[nm].f!==curFile){showToast2('Bu derleme başka esere ait.');return}
-      if(d[nm].p.indexOf(cur)>-1){showToast2('Sayfa zaten derlemede.');return}
-      d[nm].p.push(cur);d[nm].p.sort(function(a,b){return a-b;});
+      picked.forEach(function(pg){if(d[nm].p.indexOf(pg)<0)d[nm].p.push(pg);});
+      d[nm].p.sort(function(a,b){return a-b;});
     }
   }
-  saveDers(d);renderDershelf();showToast2('Sayfa '+cur+' derlemeye eklendi.');
+  saveDers(d);renderDershelf();
+  curRib=new Set();markCurrentRib();
+  showToast2(picked.length+' sayfa derlemeye eklendi.');
 }
+
 
 function delDer(nm){if(!confirm('“'+nm+'” derlemesi silinsin mi?'))return;const d=loadDers();delete d[nm];saveDers(d);renderDershelf();}
 
 let derDoc=null,derPages=null,derIdx=0,derName='',derF=null;
 function renderDerPage(){
   const img=$('derImg');if(!img)return;
+  const L=$('derLoad');
   const n=derPages[derIdx];
   img.removeAttribute('src');
-  if(!derDoc)return;
+  if(!derDoc){if(L)L.style.display='none';return}
+  if(L)L.style.display='none';if(img)img.style.display='block';
   derDoc.getPage(n).then(function(p){
     const vp=p.getViewport({scale:1.5});const c=document.createElement('canvas');
     c.width=vp.width;c.height=vp.height;
@@ -495,10 +526,11 @@ function openDer(nm){
   if(!der.p.length){showToast2('Boş derleme.');return}
   derPages=der.p.slice();derIdx=0;derName=nm;derF=der.f;derDoc=null;
   $('derT').textContent=nm+' — '+bname(der.f);
-  $('derbox').classList.add('on');$('derImg').removeAttribute('src');
-  pdfjsLib.getDocument(der.f).promise.then(function(doc){derDoc=doc;renderDerPage();}).catch(function(){showToast2('Kaynak PDF açılamadı.');});
+  $('derbox').classList.add('on');
+  const L=$('derLoad'),I=$('derImg');if(L)L.style.display='block';if(I)I.style.display='none';
+  pdfjsLib.getDocument(der.f).promise.then(function(doc){derDoc=doc;renderDerPage();}).catch(function(){if(L)L.style.display='none';showToast2('Kaynak PDF açılamadı.');});
 }
-function closeDer(){derDoc=null;derPages=null;derIdx=0;$('derbox').classList.remove('on');$('derImg').removeAttribute('src');}
+function closeDer(){derDoc=null;derPages=null;derIdx=0;$('derbox').classList.remove('on');var L=$('derLoad'),I=$('derImg');if(L)L.style.display='none';if(I){I.style.display='none';I.removeAttribute('src');}}
 function derAct(kind,i){const nm=_derKeys[i];if(nm===undefined)return;if(kind===0)openDer(nm);else if(kind===1)printDer(nm);else delDer(nm);}
 
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -552,6 +584,11 @@ $('derClose').onclick=closeDer;$('derNext').onclick=derNext;$('derPrev').onclick
 $('derPrint').onclick=function(){if(derPages&&derF)printPages(derF,derPages,derName);};
 renderDershelf();
 
+$('book').addEventListener('click',function(ev){
+  var leaf=ev.target.closest('.leaf');if(!leaf)return;
+  var pn=parseInt(leaf.getAttribute('data-pg'),10);if(!pn||anim)return;
+  toggleRib(pn);
+});
 $('nextB').onclick=next;$('prevB').onclick=prev;$('firstB').onclick=first;$('lastB').onclick=last;
 $('backB').onclick=()=>{$('reader').classList.remove('on');$('shelf').classList.remove('hidden');};
 $('homeB').onclick=goHome;$('homeB2').onclick=goHome;
