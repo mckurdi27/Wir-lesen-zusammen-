@@ -58,8 +58,8 @@ button{font-family:inherit;cursor:pointer}
 #stageWrap{flex:1;position:relative;display:flex;overflow:auto;padding:8px;overscroll-behavior:contain}
 #stage{margin:auto;position:relative;perspective:2600px}
 #book{position:relative;width:100%;height:100%;transform-style:preserve-3d}
-.leaf{position:absolute;top:0;background:var(--pg);overflow:hidden;box-shadow:0 2px 18px var(--shadl)}
-.leaf img,.leaf>canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.leaf{position:absolute;top:0;background:#efe8d9;overflow:hidden;box-shadow:0 2px 18px var(--shadl);display:flex;align-items:center;justify-content:center}
+.leaf img,.leaf>canvas{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;flex:0 0 auto}
 .pg{position:absolute;bottom:4px;left:0;right:0;text-align:center;font-size:11px;color:#9a8c76;pointer-events:none;z-index:2;font-weight:600}
 /* çevrilen sayfa: ön yüzü yalnız; dönünce saklanır, hedef altta görünür */
 .turn{position:absolute;top:0;z-index:6;will-change:transform;
@@ -188,10 +188,10 @@ button{font-family:inherit;cursor:pointer}
     </div>
   </div>
   <div id="hint">pdf/ klasöründeki eserler listelenir. Kitaba dokunup açın.</div>
-  <div id="grid"></div>
+  <h2 class="der-h2"><span>📖</span> Derlemelerim</h2>
+  <div id="dershelf"></div>
   <hr class="sep">
-  <h2 class="der-h2">📖 Derlemelerim</h2>
-  <div id="dershelf"><div class="der-empty">Henüz derleme yok. Bir eseri açıp +Derle ile sayfa ekle.</div></div>
+  <div id="grid"></div></div>
 </div>
 
 <div id="reader">
