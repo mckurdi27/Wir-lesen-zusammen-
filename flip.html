@@ -216,7 +216,7 @@ let BOOKS=FALLBACK_BOOKS.slice();
 const bname=f=>f.split('/').pop().replace(/\.pdf$/i,'');
 pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 const $=id=>document.getElementById(id);
-let pdf=null,cur=1,total=0,openTok=0;
+let pdf=null,total=0,cur=1,spread=true,zoom=1,anim=false,cache={};
 let rtl=false;
 
 /* --- tema --- */
@@ -240,8 +240,6 @@ function pg(n){if(n<1||n>total)return Promise.reject('range');
   return pdf.getPage(n).then(p=>{const vp=p.getViewport({scale:1.7});const c=document.createElement('canvas');
     c.width=Math.ceil(vp.width);c.height=Math.ceil(vp.height);
     return p.render({canvasContext:c.getContext('2d'),viewport:vp}).promise.then(()=>(cache[n]=c));});}
-function prefetch(f,to){for(let i=f;i<=to;i++){if(i>=1&&i<=total&&!cache[i]){try{pg(i);}catch(e){}}}}
-
 function addPageImg(el,n){if(n<1||n>total)return;
   pg(n).then(c=>{if(!el.isConnected)return;const im=document.createElement('img');
     im.src=c.toDataURL('image/jpeg',.9);el.appendChild(im);}).catch(()=>{});}
@@ -343,7 +341,7 @@ function updateUI(){$('pageIn').value=cur;$('tot').textContent=total;
   buildStrip();}
 async function nav(fwd){if(anim||!pdf)return;
   const ok=fwd?canFwd():canPrev();if(!ok)return;
-  anim=true;playSound();try{await doFlip(fwd);}catch(e){}cur=fwd?fwdTarget():prevTarget();paint();anim=false;updateUI();prefetch(Math.max(1,cur-step()-1),Math.min(total,cur+step()+3));}
+  anim=true;playSound();try{await doFlip(fwd);}catch(e){}cur=fwd?fwdTarget():prevTarget();paint();anim=false;updateUI();}
 const next=()=>nav(true),prev=()=>nav(false);
 function first(){if(anim)return;cur=1;paint();updateUI();}
 function last(){if(anim)return;
@@ -367,13 +365,12 @@ function goHome(){location.href='index.html';}
 
 /* --- kitap aç --- */
 async function openBook(k){const bk=BOOKS[k];
-  const tok=++openTok;
   $('load').classList.add('on');$('shelf').classList.add('hidden');
   pdf=null;cache={};total=0;cur=1;anim=false;rtl=false;try{
-    pdf=await pdfjsLib.getDocument(bk.f).promise;if(tok!==openTok)return;total=pdf.numPages;await baseP();if(tok!==openTok)return;
+    pdf=await pdfjsLib.getDocument(bk.f).promise;total=pdf.numPages;await baseP();
     spread=total>1;
     $('rtitle').innerHTML=bk.i+' '+bname(bk.f)+'<span class="ps"></span>';
-    $('reader').classList.add('on');layout();paint();updateUI();prefetch(Math.max(1,cur-step()),Math.min(total,cur+step()+2));
+    $('reader').classList.add('on');layout();paint();updateUI();
   }catch(e){console.error(e);alert('PDF açılamadı: '+bname(bk.f));$('shelf').classList.remove('hidden');}
   finally{$('load').classList.remove('on');} }
 
