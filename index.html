@@ -1520,42 +1520,39 @@
 
             // AUTCOMPLETE LİSTELERİ (İKONLU)
             function updateAutocompleteLists() {
-                const allMembers = new Map();
-                const allGroups = getAllGroupKeys();
-                
-                allGroups.forEach(gKey => {
-                    const data = localStorage.getItem(`hatim_group_${gKey}`);
-                    if (data) {
-                        try {
-                            const parsed = JSON.parse(data);
-                            if (parsed.members) {
-                                const isGroup = parsed.members.length > 1;
-                                parsed.members.forEach(m => {
-                                    if (allMembers.has(m)) {
-                                        if (isGroup) {
-                                            allMembers.set(m, '👥');
-                                        }
-                                    } else {
-                                        allMembers.set(m, isGroup ? '👥' : '👤');
-                                    }
-                                });
-                            }
-                        } catch(e) {}
-                    }
-                });
-                
-                const nameList = document.getElementById('user-name-list');
-                if (nameList) {
-                    nameList.innerHTML = Array.from(allMembers.entries()).map(([name, icon]) => 
-                        `<option value="${name}">${icon} ${name}</option>`
-                    ).join('');
+    const allMembers = new Map();
+    const allGroups = getAllGroupKeys();
+    allGroups.forEach(gKey => {
+        const data = localStorage.getItem(`hatim_group_${gKey}`);
+        if (data) {
+            try {
+                const parsed = JSON.parse(data);
+                if (parsed.members) {
+                    const isGroup = parsed.members.length > 1;
+                    parsed.members.forEach(m => {
+                        if (allMembers.has(m)) {
+                            if (isGroup) { allMembers.set(m, '👥'); }
+                        } else {
+                            allMembers.set(m, isGroup ? '👥' : '👤');
+                        }
+                    });
                 }
-                
-                window._grpDdItems = [];
-function _buildGrpDd(filter){
-  var _in=document.getElementById('login-group-name');
+            } catch(e) {}
+        }
+    });
+    const nameList = document.getElementById('user-name-list');
+    if (nameList) {
+        nameList.innerHTML = Array.from(allMembers.entries()).map(([name, icon]) =>
+            `<option value="${name}">${icon} ${name}</option>`
+        ).join('');
+    }
+    if (window._refreshGrpDd) window._refreshGrpDd();
+}
+
+window._grpDdItems = [];
+window._buildGrpDd = function(filter){
   var _dd=document.getElementById('login-group-dd');
-  if(!_in||!_dd) return;
+  if(!_dd) return;
   var free=[];
   getAllGroupKeys().forEach(function(gKey){
     try{
@@ -1568,28 +1565,26 @@ function _buildGrpDd(filter){
   window._grpDdItems=free;
   if(!free.length){ _dd.style.display='none'; return; }
   _dd.innerHTML = free.map(function(o){
-    return '<div data-gk="'+o.k+'" style="padding:8px 10px; cursor:pointer; font-size:14px; border-bottom:1px solid #eee; white-space:nowrap;">\ud83d\udcc1 '+o.label+'</div>';
+    return '<div data-gk="'+o.k+'" style="padding:8px 10px; cursor:pointer; font-size:14px; border-bottom:1px solid #eee; white-space:nowrap;">📁 '+o.label+'</div>';
   }).join('');
   _dd.style.display='block';
-}
+};
+window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-name'); window._buildGrpDd(_in?_in.value:''); };
 (function(){
   var _in=document.getElementById('login-group-name');
   var _dd=document.getElementById('login-group-dd');
   if(!_in||!_dd) return;
-  _in.addEventListener('click', function(){ _buildGrpDd(this.value); });
-  _in.addEventListener('focus', function(){ _buildGrpDd(this.value); });
-  _in.addEventListener('input', function(){ _buildGrpDd(this.value); });
+  _in.addEventListener('click', function(){ window._buildGrpDd(this.value); });
+  _in.addEventListener('focus', function(){ window._buildGrpDd(this.value); });
+  _in.addEventListener('input', function(){ window._buildGrpDd(this.value); });
   _in.addEventListener('keydown', function(e){ if(e.key==='Escape') _dd.style.display='none'; });
   _in.addEventListener('blur', function(){ setTimeout(function(){ if(_dd) _dd.style.display='none'; },150); });
   _dd.addEventListener('mousedown', function(ev){
     ev.preventDefault();
     var t=ev.target.closest ? ev.target.closest('[data-gk]') : null;
-    if(t){
-      _in.value=t.getAttribute('data-gk').replace(/_/g,' ').toUpperCase();
-      _dd.style.display='none';
-    }
+    if(t){ _in.value=t.getAttribute('data-gk').replace(/_/g,' ').toUpperCase(); _dd.style.display='none'; }
   });
-  _buildGrpDd('');
+  window._buildGrpDd('');
 })();
 // GİRİŞ PANELİ İŞLEVLERİ
             function _sbBuildCardHtml(rows, sumT, sumR, memberName) {
