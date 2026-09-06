@@ -86,8 +86,8 @@ button{font-family:inherit;cursor:pointer}
 /* --- gerçekçi kitap hissi: sayfa kalınlığı, omurga gölgesi ve dönüş gölgesi --- */
 .leaf{box-shadow:0 3px 14px var(--shadl), inset 0 0 0 1px rgba(120,110,90,.08)}
 /* iç (omurga) kenar koyuluğu - sol sayfa sağ içte, sağ sayfa sol içte */
-.leaf.lf{box-shadow:inset -10px 0 14px -10px rgba(0,0,0,.45), 0 3px 14px var(--shadl)}
-.leaf.rt{box-shadow:inset 10px 0 14px -10px rgba(0,0,0,.45), 0 3px 14px var(--shadl)}
+.leaf.lf{box-shadow:inset -1px 0 0 rgba(60,45,20,.28), 0 3px 14px var(--shadl)}
+.leaf.rt{box-shadow:inset 1px 0 0 rgba(60,45,20,.28), 0 3px 14px var(--shadl)}
 /* dönen yaprağın menteşe kenarına kalınlık çizgisi */
 .turn::before{content:"";position:absolute;top:-2px;bottom:-2px;width:6px;z-index:3;
   background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.12) 40%,rgba(0,0,0,.12) 60%,rgba(0,0,0,.38));
@@ -249,7 +249,7 @@ let pw=1,ph=1;
 function baseP(){return pdf.getPage(1).then(p=>{const vp=p.getViewport({scale:1});pw=vp.width;ph=vp.height;});}
 let lw=0,lh=0,gap=0;
 function layout(){const w=$('stageWrap');const aw=w.clientWidth-20,ah=w.clientHeight-16;
-  const ratio=ph/pw,per=spread?2:1;gap=spread?Math.max(6,Math.min(22,aw*.05)):0;
+  const ratio=ph/pw,per=spread?2:1;gap=spread?Math.max(0,Math.min(3,aw*.004)):0;
   let wd=(aw-gap)/per,ht=wd*ratio;if(ht>ah){ht=ah;wd=ht/ratio;}wd*=zoom;ht*=zoom;lw=wd;lh=ht;
   $('stage').style.width=((per*wd)+gap)+'px';$('stage').style.height=ht+'px';}
 const clearB=()=>{const b=$('book');while(b.firstChild)b.removeChild(b.firstChild);};
