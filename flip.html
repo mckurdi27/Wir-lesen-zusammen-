@@ -62,9 +62,13 @@ button{font-family:inherit;cursor:pointer}
 .leaf img,.leaf>canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .pg{position:absolute;bottom:4px;left:0;right:0;text-align:center;font-size:11px;color:#9a8c76;pointer-events:none;z-index:2;font-weight:600}
 /* çevrilen sayfa: ön yüzü yalnız; dönünce saklanır, hedef altta görünür */
-.turn{position:absolute;top:0;z-index:6;overflow:hidden;will-change:transform;
+.turn{position:absolute;top:0;z-index:6;will-change:transform;
+  transform-style:preserve-3d;-webkit-transform-style:preserve-3d;
+  box-shadow:0 6px 22px var(--shadl)}
+.turn .face{position:absolute;inset:0;overflow:hidden;background:var(--pg);
   backface-visibility:hidden;-webkit-backface-visibility:hidden;
-  box-shadow:0 6px 22px var(--shadl);background:var(--pg)}
+  box-shadow:inset 0 0 0 1px rgba(120,110,90,.05)}
+.turn .face.back{transform:rotateY(180deg);background:var(--pg)}
 .turn .face{position:absolute;inset:0;overflow:hidden;background:var(--pg)}
 @keyframes curlSweep{0%{opacity:0;transform:translateX(-46%)}
   18%{opacity:.85}45%{opacity:.95}70%{opacity:.6}
@@ -275,7 +279,7 @@ function paint(){const w=$('stageWrap');if(w)w.scrollTop=0;const b=$('book');cle
   else{b.appendChild(pageEl(sp.l,false));if(sp.r>=1&&sp.r<=total)b.appendChild(pageEl(sp.r,true));}}
 
 /* --- çevirme: üstte dönen tek sayfa; hedef pencere altta hazır --- */
-function turnEl(n,isRight,origin,rotDeg){
+function turnEl(n,isRight,origin,rotDeg,reveal){
   const t=document.createElement('div');t.className='turn';
   t.style.width=lw+'px';t.style.height=lh+'px';
   t.style.left=isRight?(lw+gap)+'px':'0px';
@@ -285,15 +289,18 @@ function turnEl(n,isRight,origin,rotDeg){
   const front=document.createElement('div');front.className='face front';
   if(n>=1&&n<=total){const m=document.createElement('div');m.className='pg';m.textContent=n;front.appendChild(m);}
   addPageImg(front,n);
-  t.appendChild(front);
+  const back=document.createElement('div');back.className='face back';
+  if(reveal>=1&&reveal<=total){const m2=document.createElement('div');m2.className='pg';m2.textContent=reveal;back.appendChild(m2);}
+  addPageImg(back,reveal);
+  t.appendChild(front);t.appendChild(back);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    t.style.transition='transform .12s cubic-bezier(.4,.1,.6,.9)';
+    t.style.transition='transform .1s cubic-bezier(.4,.1,.6,.9)';
     t.style.transformOrigin=origin;
-    t.style.transform='perspective(1100px) rotateX('+(rotDeg>0?-6:6)+'deg) rotateY('+(rotDeg*.5)+'deg)';
+    t.style.transform='perspective(1200px) rotateY('+(rotDeg*.42)+'deg)';
     fold.classList.add('go');
     requestAnimationFrame(()=>{
-      t.style.transition='transform .18s cubic-bezier(.3,.05,.35,1)';
-      t.style.transform='perspective(1300px) rotateX(0deg) rotateY('+rotDeg+'deg)';
+      t.style.transition='transform .16s cubic-bezier(.32,.05,.3,1)';
+      t.style.transform='perspective(1300px) rotateY('+rotDeg+'deg)';
     });
   }));
   return t;}
@@ -311,15 +318,15 @@ function doFlip(fwd){
     /* dönen sayfa */
     if(spread){
       if(fwd){
-        if(rtl) b.appendChild(turnEl(cur+1,false,'right center',150));  // RTL: sol sayfa içe döner
-        else    b.appendChild(turnEl(cur+1,true ,'left center',-150));  // LTR: sağ sayfa döner
+        if(rtl) b.appendChild(turnEl(cur+1,false,'right center',150,sp.r));  // RTL: sol sayfa içe döner
+        else    b.appendChild(turnEl(cur+1,true ,'left center',-150,sp.l));  // LTR: sağ sayfa döner
       }else{
-        if(rtl) b.appendChild(turnEl(cur,true ,'left center',-150));    // RTL: sağ sayfa geri döner
-        else    b.appendChild(turnEl(cur,false,'right center',150));    // LTR: sol sayfa geri döner
+        if(rtl) b.appendChild(turnEl(cur,true ,'left center',-150,sp.l));    // RTL: sağ sayfa geri döner
+        else    b.appendChild(turnEl(cur,false,'right center',150,sp.r));    // LTR: sol sayfa geri döner
       }
     }else{
-      if(fwd) b.appendChild(turnEl(cur,false, rtl?'right center':'left center', rtl?150:-150));
-      else    b.appendChild(turnEl(cur,false, rtl?'left center':'right center', rtl?-150:150));
+      if(fwd) b.appendChild(turnEl(cur,false, rtl?'right center':'left center', rtl?150:-150, sp.c));
+      else    b.appendChild(turnEl(cur,false, rtl?'left center':'right center', rtl?-150:150, sp.c));
     }
     setTimeout(done,320);
   });
