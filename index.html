@@ -579,9 +579,10 @@
                         <button type="button" id="login-type-grup" class="login-type-btn">&#128101; Grup</button>
                     </div>
                     <div class="login-field">
-                        <select id="login-group-name" class="login-input login-select" style="width:100%;">
-                            <option value="">Grup seçin...</option>
-                        </select>
+                        <div style="position:relative; width:100%;">
+                            <input type="text" id="login-group-name" class="login-input" placeholder="Grup seçin veya adını yazın" autocomplete="off" style="width:100%;">
+                            <div id="login-group-dd" style="position:absolute; top:100%; left:0; right:0; z-index:9999; max-height:210px; overflow:auto; background:#fff; border:1px solid #b5a642; border-radius:6px; display:none; box-shadow:0 4px 12px rgba(0,0,0,.15);"></div>
+                        </div>
                     </div>
                     <div class="login-field">
                         <input type="password" id="login-group-password" placeholder="Grup şifresi" class="login-input">
@@ -1550,26 +1551,47 @@
                     ).join('');
                 }
                 
-                const groupList = document.getElementById('login-group-name');
-                if (groupList) {
-                    const freeGroups = [];
-                    allGroups.forEach(gKey => {
-                        const data = localStorage.getItem(`hatim_group_${gKey}`);
-                        if (data) {
-                            try {
-                                const parsed = JSON.parse(data);
-                                var _vis = (typeof parsed.dropdownVisible === 'boolean') ? parsed.dropdownVisible : (!parsed.password || String(parsed.password).trim() === '');
-                                    if (_vis) {
-                                    freeGroups.push(gKey.replace(/_/g, ' ').toUpperCase());
-                                }
-                            } catch(e) {}
-                        }
-                    });
-                    groupList.innerHTML = freeGroups.map(g => `<option value="${g}">📁 ${g}</option>`).join('');
-                }
-            }
-
-            // GİRİŞ PANELİ İŞLEVLERİ
+                window._grpDdItems = [];
+function _buildGrpDd(filter){
+  var _in=document.getElementById('login-group-name');
+  var _dd=document.getElementById('login-group-dd');
+  if(!_in||!_dd) return;
+  var free=[];
+  getAllGroupKeys().forEach(function(gKey){
+    try{
+      var _d=JSON.parse(localStorage.getItem('hatim_group_'+gKey));
+      var _vis=(typeof _d.dropdownVisible==='boolean')?_d.dropdownVisible:(!_d.password||String(_d.password).trim()==='');
+      if(_vis) free.push({k:gKey, label:gKey.replace(/_/g,' ').toUpperCase()});
+    }catch(e){}
+  });
+  if(filter && String(filter).trim()!==''){ free=free.filter(function(o){return o.label.indexOf(String(filter).trim().toUpperCase())>-1;}); }
+  window._grpDdItems=free;
+  if(!free.length){ _dd.style.display='none'; return; }
+  _dd.innerHTML = free.map(function(o){
+    return '<div data-gk="'+o.k+'" style="padding:8px 10px; cursor:pointer; font-size:14px; border-bottom:1px solid #eee; white-space:nowrap;">\ud83d\udcc1 '+o.label+'</div>';
+  }).join('');
+  _dd.style.display='block';
+}
+(function(){
+  var _in=document.getElementById('login-group-name');
+  var _dd=document.getElementById('login-group-dd');
+  if(!_in||!_dd) return;
+  _in.addEventListener('click', function(){ _buildGrpDd(this.value); });
+  _in.addEventListener('focus', function(){ _buildGrpDd(this.value); });
+  _in.addEventListener('input', function(){ _buildGrpDd(this.value); });
+  _in.addEventListener('keydown', function(e){ if(e.key==='Escape') _dd.style.display='none'; });
+  _in.addEventListener('blur', function(){ setTimeout(function(){ if(_dd) _dd.style.display='none'; },150); });
+  _dd.addEventListener('mousedown', function(ev){
+    ev.preventDefault();
+    var t=ev.target.closest ? ev.target.closest('[data-gk]') : null;
+    if(t){
+      _in.value=t.getAttribute('data-gk').replace(/_/g,' ').toUpperCase();
+      _dd.style.display='none';
+    }
+  });
+  _buildGrpDd('');
+})();
+// GİRİŞ PANELİ İŞLEVLERİ
             function _sbBuildCardHtml(rows, sumT, sumR, memberName) {
                 var totalPct = sumT>0 ? Math.round((sumR/sumT)*100) : 0;
                 var r = rows.map(function (b) {
