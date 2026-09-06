@@ -216,7 +216,7 @@ let BOOKS=FALLBACK_BOOKS.slice();
 const bname=f=>f.split('/').pop().replace(/\.pdf$/i,'');
 pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 const $=id=>document.getElementById(id);
-let pdf=null,total=0,cur=1,spread=true,zoom=1,anim=false,cache={};
+let pdf=null,cur=1,total=0,openTok=0;
 let rtl=false;
 
 /* --- tema --- */
@@ -367,9 +367,10 @@ function goHome(){location.href='index.html';}
 
 /* --- kitap aç --- */
 async function openBook(k){const bk=BOOKS[k];
+  const tok=++openTok;
   $('load').classList.add('on');$('shelf').classList.add('hidden');
   pdf=null;cache={};total=0;cur=1;anim=false;rtl=false;try{
-    pdf=await pdfjsLib.getDocument(bk.f).promise;total=pdf.numPages;await baseP();
+    pdf=await pdfjsLib.getDocument(bk.f).promise;if(tok!==openTok)return;total=pdf.numPages;await baseP();if(tok!==openTok)return;
     spread=total>1;
     $('rtitle').innerHTML=bk.i+' '+bname(bk.f)+'<span class="ps"></span>';
     $('reader').classList.add('on');layout();paint();updateUI();prefetch(Math.max(1,cur-step()),Math.min(total,cur+step()+2));
