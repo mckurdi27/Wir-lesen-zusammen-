@@ -579,8 +579,9 @@
                         <button type="button" id="login-type-grup" class="login-type-btn">&#128101; Grup</button>
                     </div>
                     <div class="login-field">
-                        <input type="text" id="login-group-name" list="group-name-list" placeholder="Grup adını yazın" class="login-input">
-                        <datalist id="group-name-list"></datalist>
+                        <select id="login-group-name" class="login-input login-select" style="width:100%;">
+                            <option value="">Grup seçin...</option>
+                        </select>
                     </div>
                     <div class="login-field">
                         <input type="password" id="login-group-password" placeholder="Grup şifresi" class="login-input">
@@ -1549,7 +1550,7 @@
                     ).join('');
                 }
                 
-                const groupList = document.getElementById('group-name-list');
+                const groupList = document.getElementById('login-group-name');
                 if (groupList) {
                     const freeGroups = [];
                     allGroups.forEach(gKey => {
