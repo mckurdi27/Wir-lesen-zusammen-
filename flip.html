@@ -98,8 +98,8 @@ button{font-family:inherit;cursor:pointer}
   background:linear-gradient(90deg,rgba(30,20,5,.0),rgba(30,20,5,.40));
   opacity:0}
 .foldsh.r{right:0;background:linear-gradient(270deg,rgba(30,20,5,.0),rgba(30,20,5,.40))}
-.foldsh.go{animation:foldShadow .3s cubic-bezier(.4,.1,.3,1) forwards}
-@keyframes foldShadow{0%{opacity:0}30%{opacity:.85}100%{opacity:.22}}
+.foldsh.go{animation:foldShadow .22s cubic-bezier(.4,.1,.3,1) forwards}
+@keyframes foldShadow{0%{opacity:0}25%{opacity:.8}55%{opacity:.55}100%{opacity:0}}
 /* açılışta sayfa hafif kalkar */
 .turn.fl{transition:transform .34s cubic-bezier(.3,.7,.3,1)}
 
@@ -294,15 +294,12 @@ function turnEl(n,isRight,origin,rotDeg,reveal){
   addPageImg(back,reveal);
   t.appendChild(front);t.appendChild(back);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    t.style.transition='transform .1s cubic-bezier(.4,.1,.6,.9)';
-    t.style.transformOrigin=origin;
-    t.style.transform='perspective(1200px) rotateY('+(rotDeg*.42)+'deg)';
     fold.classList.add('go');
-    requestAnimationFrame(()=>{
-      t.style.transition='transform .16s cubic-bezier(.32,.05,.3,1)';
-      t.style.transform='perspective(1300px) rotateY('+rotDeg+'deg)';
-    });
+    t.style.transition='transform .22s cubic-bezier(.28,.06,.3,1)';
+    t.style.transformOrigin=origin;
+    t.style.transform='perspective(1300px) rotateY('+rotDeg+'deg)';
   }));
+  t._flipMs=240;
   return t;}
 
 function doFlip(fwd){
@@ -328,7 +325,7 @@ function doFlip(fwd){
       if(fwd) b.appendChild(turnEl(cur,false, rtl?'right center':'left center', rtl?150:-150, sp.c));
       else    b.appendChild(turnEl(cur,false, rtl?'left center':'right center', rtl?-150:150, sp.c));
     }
-    setTimeout(done,320);
+    setTimeout(done,240);
   });
 }
 
