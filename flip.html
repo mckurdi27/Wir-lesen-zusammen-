@@ -237,9 +237,14 @@ function playSound(){if(muted||!snd)return;
 /* --- pdf render --- */
 function pg(n){if(n<1||n>total)return Promise.reject('range');
   if(cache[n])return Promise.resolve(cache[n]);
-  return pdf.getPage(n).then(p=>{const vp=p.getViewport({scale:1.7});const c=document.createElement('canvas');
+  return pdf.getPage(n).then(p=>{let sc=1.35;
+    const pw=p.view[2]-p.view[0];if(pw>1500)sc=Math.min(sc,1300/pw);if(sc<0.7)sc=0.7;
+    const vp=p.getViewport({scale:sc});const c=document.createElement('canvas');
     c.width=Math.ceil(vp.width);c.height=Math.ceil(vp.height);
-    return p.render({canvasContext:c.getContext('2d'),viewport:vp}).promise.then(()=>(cache[n]=c));});}
+    return p.render({canvasContext:c.getContext('2d'),viewport:vp}).promise.then(()=>(cache[n]=c)).catch(()=>{
+      const vp2=p.getViewport({scale:0.85});c.width=Math.ceil(vp2.width);c.height=Math.ceil(vp2.height);
+      return p.render({canvasContext:c.getContext('2d'),viewport:vp2}).promise.then(()=>(cache[n]=c));
+    });});}
 function addPageImg(el,n){if(n<1||n>total)return;
   pg(n).then(c=>{if(!el.isConnected)return;const im=document.createElement('img');
     im.src=c.toDataURL('image/jpeg',.9);el.appendChild(im);}).catch(()=>{});}
