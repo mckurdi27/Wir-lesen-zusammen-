@@ -62,9 +62,14 @@ button{font-family:inherit;cursor:pointer}
 .leaf img,.leaf>canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .pg{position:absolute;bottom:4px;left:0;right:0;text-align:center;font-size:11px;color:#9a8c76;pointer-events:none;z-index:2;font-weight:600}
 /* çevrilen sayfa: ön yüzü yalnız; dönünce saklanır, hedef altta görünür */
-.turn{position:absolute;top:0;z-index:6;background:var(--pg);overflow:hidden;
-  backface-visibility:hidden;-webkit-backface-visibility:hidden;will-change:transform;
+.turn{position:absolute;top:0;z-index:6;background:transparent;
+  transform-style:preserve-3d;-webkit-transform-style:preserve-3d;will-change:transform;
   box-shadow:0 6px 34px var(--shadl)}
+.turn .face{position:absolute;inset:0;overflow:hidden;background:var(--pg);
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:inset 0 0 0 1px rgba(120,110,90,.06)}
+.turn .face.front{transform:rotateY(0deg)}
+.turn .face.back{transform:rotateY(180deg);
+  background:linear-gradient(160deg,#fdfaf2 0%,#f4ecd9 55%,#efe4cb 100%)}
 @keyframes curlSweep{0%{opacity:0;transform:translateX(-46%)}
   18%{opacity:.85}45%{opacity:.95}70%{opacity:.6}
   100%{opacity:0;transform:translateX(56%)}}
@@ -74,9 +79,10 @@ button{font-family:inherit;cursor:pointer}
     linear-gradient(to right,rgba(0,0,0,.18),transparent 30%);
   filter:blur(2px)}
 .turn.curl::after{animation:curlSweep .4s cubic-bezier(.4,.1,.35,1) forwards}
-.turn img,.turn>canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.turn img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .turn img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .turn .pg{position:absolute;bottom:4px;left:0;right:0;text-align:center;font-size:11px;color:#9a8c76;pointer-events:none;z-index:2;font-weight:600}
+.turn .face.back .pg{transform:rotateY(180deg)}
 /* --- gerçekçi kitap hissi: sayfa kalınlığı, omurga gölgesi ve dönüş gölgesi --- */
 .leaf{box-shadow:0 3px 14px var(--shadl), inset 0 0 0 1px rgba(120,110,90,.08)}
 /* iç (omurga) kenar koyuluğu - sol sayfa sağ içte, sağ sayfa sol içte */
@@ -280,8 +286,12 @@ function turnEl(n,isRight,origin,rotDeg){
   t.classList.add(origin.indexOf('left')===0?'hingeL':'hingeR');
   const fold=document.createElement('div');fold.className='foldsh'+(rotDeg<0?' r':'');
   t.appendChild(fold);
-  if(n>=1&&n<=total){const m=document.createElement('div');m.className='pg';m.textContent=n;t.appendChild(m);}
-  addPageImg(t,n);
+  const front=document.createElement('div');front.className='face front';
+  if(n>=1&&n<=total){const m=document.createElement('div');m.className='pg';m.textContent=n;front.appendChild(m);}
+  addPageImg(front,n);
+  const back=document.createElement('div');back.className='face back';
+  if(n-1>=1){const m2=document.createElement('div');m2.className='pg';m2.textContent=n-1;back.appendChild(m2);}
+  t.appendChild(front);t.appendChild(back);
   const mid=rotDeg*.55;
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     t.style.transition='transform .16s cubic-bezier(.42,.1,.6,.95)';
