@@ -601,7 +601,7 @@ function printDer(nm){const d=loadDers();const der=d[nm];if(!der)return;printPag
 function printBook(){if(!pdf||!curFile)return;const all=[];for(let i=1;i<=total;i++)all.push(i);printPages(curFile,all,bname(curFile));}
 async function printPages(f,pages,title){
   const w=window.open('','_blank');if(!w)return;
-  w.document.write('<html><head><title>'+title+'</title><style>body{margin:0}img{width:100%;display:block;page-break-after:always}@media print{@page{margin:0}}</style></head><body></body></html>');
+  w.document.write('<html><head><meta charset="UTF-8"><title>'+esc(title)+'</title><style>body{margin:0}img{width:100%;display:block;page-break-after:always}@media print{@page{margin:0}}</style></head><body></body></html>');
   w.document.close();
   let doc;try{doc=await pdfjsLib.getDocument(f).promise;}catch(e){w.close();return;}
   for(const n of pages){
