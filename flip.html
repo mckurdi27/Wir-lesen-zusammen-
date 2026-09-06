@@ -442,7 +442,7 @@ async function openBook(k){const bk=BOOKS[k];curFile=bk.f;
     pdf=await pdfjsLib.getDocument(bk.f).promise;total=pdf.numPages;await baseP();
     spread=total>1;
     $('rtitle').innerHTML=bk.i+' '+bname(bk.f)+'<span class="ps"></span>';
-    $('reader').classList.add('on');layout();paint();updateUI();markCurrentRib();var dbt=document.getElementById('addCurB');if(dbt)dbt.style.display='block';bmPaint();
+    $('reader').classList.add('on');layout();paint();updateUI();markCurrentRib();var dbp=document.getElementById('derTopBtn');if(dbp)dbp.style.display='block';bmPaint();
     var bm=bmLoad();if(bm&&bm.f===curFile&&bm.p>=1&&bm.p<=total){cur=bm.p;paint();updateUI();}
   }catch(e){console.error(e);alert('PDF a\u00e7\u0131lamad\u0131: '+bname(bk.f));$('shelf').classList.remove('hidden');}
   finally{$('load').classList.remove('on');} }
@@ -658,7 +658,7 @@ function reloadPage(){
 }
 $('reloadB').onclick=function(){reloadPage();};
 $('nextB').onclick=next;$('prevB').onclick=prev;$('firstB').onclick=first;$('lastB').onclick=last;
-$('backB').onclick=()=>{$('reader').classList.remove('on');$('shelf').classList.remove('hidden');var dbt=document.getElementById('addCurB');if(dbt)dbt.style.display='none';};
+$('backB').onclick=()=>{$('reader').classList.remove('on');$('shelf').classList.remove('hidden');var dbp=document.getElementById('derTopBtn');if(dbp)dbp.style.display='none';};
 $('homeB').onclick=goHome;$('homeB2').onclick=goHome;
 $('bkBookmark').onclick=function(){bmToggle();};
 $('sndB').onclick=()=>setMute(!muted);$('sndB2').onclick=()=>setMute(!muted);
