@@ -173,6 +173,14 @@ button{font-family:inherit;cursor:pointer}
 .leaf .selb{position:absolute;top:-26px;left:50%;transform:translateX(-50%);z-index:23;border:none;border-radius:14px;padding:4px 9px;font-size:9.5px;font-weight:700;line-height:1.2;white-space:nowrap;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,.35);background:#1e8a4c;color:#fff;max-width:96%;overflow:hidden}
 .leaf .selb.seld{background:#c0392b}
 .leaf .bmh{position:absolute;top:4px;right:6px;z-index:24;font-size:21px;line-height:1;color:#e23636;display:none;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.45)}
+/* yazdirma: gizli alan + yazdirirken sadece onu goster (popup yerine ayni sayfadan) */
+#printArea{display:none}
+@media print{
+  body.printing #shelf,body.printing #reader,body.printing #derbox,body.printing #load{display:none!important}
+  body.printing #printArea{display:block}
+  #printArea img{width:100%;display:block;page-break-after:always}
+  @page{margin:0}
+}
 </style>
 </head>
 <body>
@@ -241,6 +249,8 @@ button{font-family:inherit;cursor:pointer}
     <button class="c g" id="derReload" title="Yenile">↻</button>
     <button class="c g" id="derNext">›</button></div>
 </div>
+<!-- gizli yazdirma alani -->
+<div id="printArea"></div>
 <script>
 /* pdf/ klasöründeki kitaplar — A.pdf boş olduğu için listede yok */
 /* pdf/ klasöründeki kitaplar — her açılışta GitHub API'den otomatik listelenir */
@@ -599,28 +609,34 @@ function showToast2(m){try{if(typeof showToast==='function')showToast(m);else al
 
 function printDer(nm){const d=loadDers();const der=d[nm];if(!der)return;printPages(der.f,der.p,nm);}
 function printBook(){if(!pdf||!curFile)return;const all=[];for(let i=1;i<=total;i++)all.push(i);printPages(curFile,all,bname(curFile));}
+/* Ayni sayfa icinde gizli alana sayfalari cizip window.print() ile yazdir.
+   Popup kullanmaz -> tam ekran/PWA'da da calisir, bos ekran/karakter sorunu olmaz. */
 async function printPages(f,pages,title){
-  const w=window.open('','_blank');if(!w)return;
-  w.document.write('<html><head><meta charset="UTF-8"><title>'+esc(title)+'</title><style>body{margin:0}img{width:100%;display:block;page-break-after:always}@media print{@page{margin:0}}</style></head><body></body></html>');
-  w.document.close();
-  let doc;try{doc=await pdfjsLib.getDocument(f).promise;}catch(e){w.close();return;}
-  for(const n of pages){
-    try{
-      const p=await doc.getPage(n);
-      const vp=p.getViewport({scale:2});
-      const c=w.document.createElement('canvas');c.width=vp.width;c.height=vp.height;
-      await p.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
-      const img=w.document.createElement('img');img.src=c.toDataURL('image/jpeg',.92);
-      w.document.body.appendChild(img);
-    }catch(e){}
-  }
-  const tryPrint=function(){try{w.focus();w.print();}catch(e){}};
-  let done=0;const chk=setInterval(function(){
-    const imgs=[].slice.call(w.document.images);
-    const ready=imgs.every(function(im){return im.complete&&im.naturalWidth>0;});
-    done++;if(ready||done>40||!imgs.length){clearInterval(chk);setTimeout(tryPrint,300);}
-  },250);
-  setTimeout(function(){clearInterval(chk);tryPrint();},9000);
+  try{
+    var area=document.getElementById('printArea');
+    area.innerHTML='';
+    document.body.classList.add('printing');
+    var doc=await pdfjsLib.getDocument(f).promise;
+    var imgs=[];
+    for(var n of pages){
+      try{
+        var p=await doc.getPage(n);
+        var vp=p.getViewport({scale:2});
+        var c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;
+        await p.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
+        var img=document.createElement('img');img.src=c.toDataURL('image/jpeg',.92);
+        area.appendChild(img);imgs.push(img);
+      }catch(e){}
+    }
+    if(!imgs.length){document.body.classList.remove('printing');return;}
+    /* tum gorseller yuklenene kadar bekle, sonra yazdir */
+    await Promise.all(imgs.map(function(im){
+      if(im.complete&&im.naturalWidth>0)return Promise.resolve();
+      return new Promise(function(res){im.onload=im.onerror=function(){res();};});
+    }));
+    window.print();
+  }catch(e){console.error(e);}
+  finally{setTimeout(function(){var a=document.getElementById('printArea');if(a)a.innerHTML='';document.body.classList.remove('printing');},600);}
 }
 
 $('addB').onclick=derlePage;$('printB').onclick=printBook;
