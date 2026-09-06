@@ -169,6 +169,9 @@ button{font-family:inherit;cursor:pointer}
 .leaf.rt .rib{right:5px}
 .leaf.lf .rib{left:5px}
 .leaf.ribbed{box-shadow:0 0 0 3px #e23636 inset!important}
+
+#bkBookmark.on{background:#c0392b!important;color:#fff!important;border-color:#c0392b}
+#addCurB{background:#1e8a4c!important;color:#fff!important;font-weight:700;padding:6px 14px;border-radius:20px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
 </style>
 </head>
 <body>
@@ -197,6 +200,7 @@ button{font-family:inherit;cursor:pointer}
   <div id="rtop">
     <button class="ib" id="backB" title="Kitaplığa dön">‹</button>
     <div id="rtitle"></div>
+    <button class="ib" id="bkBookmark" title="Kaldığın sayfayı ayraçla">🔖</button>
     <button class="ib" id="sndB2" title="Sayfa sesi aç/kapat">🔊</button>
     <button class="ib c s" id="stripB" title="Sayfa şeridi">☰</button>
     <button class="ib der-btn" id="addB" title="Bu sayfayı derlemene ekle">➕ Derle</button>
@@ -205,7 +209,7 @@ button{font-family:inherit;cursor:pointer}
   </div>
   <div id="stageWrap">
     <div id="strip"></div>
-    <div id="stage"><div id="book"></div><div id="pgLoad" style="display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,.9);padding:10px 16px;border-radius:10px;font-size:13px;color:#333;z-index:50;box-shadow:0 2px 12px rgba(0,0,0,.2)">Yükleniyor…</div></div>
+    <div id="stage"><div id="derTopBtn" style="display:none;position:absolute;top:6px;left:50%;transform:translateX(-50%);z-index:60;"><button class="der-btn der-top" id="addCurB" title="Bu sayfayı derlemeye ekle">+ Derlemeye Ekle</button></div><div id="book"></div><div id="pgLoad" style="display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,.9);padding:10px 16px;border-radius:10px;font-size:13px;color:#333;z-index:50;box-shadow:0 2px 12px rgba(0,0,0,.2)">Yükleniyor…</div></div>
   </div>
   <div id="rctl">
     <div class="rctl-row" id="rctl-nav">
@@ -393,7 +397,7 @@ function updateUI(){$('pageIn').value=cur;$('tot').textContent=total;
   const sp=sidePages();const ps=$('rtitle').querySelector('.ps');
   if(spread){ps.textContent=(rtl?'RTL · ':'')+'Sayfa '+cur+'–'+(cur+1<=total?cur+1:cur)+' / '+total;}
   else ps.textContent=(rtl?'RTL · ':'')+'Sayfa '+cur+' / '+total;
-  buildStrip();}
+  buildStrip();bmPaint();}
 async function nav(fwd){if(anim||!pdf)return;
   const ok=fwd?canFwd():canPrev();if(!ok)return;
   anim=true;playSound();try{await doFlip(fwd);}catch(e){}cur=fwd?fwdTarget():prevTarget();paint();anim=false;updateUI();markCurrentRib();}
@@ -419,14 +423,28 @@ const toggleStrip=()=>$('strip').classList.toggle('on');
 function goHome(){location.href='index.html';}
 
 /* --- kitap aç --- */
+async function bmLoad(){try{return JSON.parse(localStorage.getItem('flipBkmk')||'null')}catch(e){return null}}
+function bmSave(o){try{localStorage.setItem('flipBkmk',JSON.stringify(o))}catch(e){}}
+function bmPaint(){
+  var b=document.getElementById('bkBookmark');var o=bmLoad();
+  if(b)b.classList.toggle('on', !!(o&&o.f===curFile));
+  var d=document.getElementById('bookmarkBadge');
+  if(d){if(o&&o.f===curFile){d.style.display='flex';d.textContent='Sayfa '+o.p;}else d.style.display='none';}
+}
+function bmToggle(){
+  var o=bmLoad();var nf=(o&&o.f===curFile)?null:{f:curFile,p:cur};
+  bmSave(nf);bmPaint();showToast2(nf?('Ayra\u00e7: sayfa '+cur):'Ayra\u00e7 kald\u0131r\u0131ld\u0131.');
+}
+
 async function openBook(k){const bk=BOOKS[k];curFile=bk.f;
   $('load').classList.add('on');$('shelf').classList.add('hidden');
   pdf=null;cache={};total=0;cur=1;anim=false;rtl=false;try{
     pdf=await pdfjsLib.getDocument(bk.f).promise;total=pdf.numPages;await baseP();
     spread=total>1;
     $('rtitle').innerHTML=bk.i+' '+bname(bk.f)+'<span class="ps"></span>';
-    $('reader').classList.add('on');layout();paint();updateUI();markCurrentRib();
-  }catch(e){console.error(e);alert('PDF açılamadı: '+bname(bk.f));$('shelf').classList.remove('hidden');}
+    $('reader').classList.add('on');layout();paint();updateUI();markCurrentRib();var dbt=document.getElementById('addCurB');if(dbt)dbt.style.display='block';bmPaint();
+    var bm=bmLoad();if(bm&&bm.f===curFile&&bm.p>=1&&bm.p<=total){cur=bm.p;paint();updateUI();}
+  }catch(e){console.error(e);alert('PDF a\u00e7\u0131lamad\u0131: '+bname(bk.f));$('shelf').classList.remove('hidden');}
   finally{$('load').classList.remove('on');} }
 
 
@@ -594,7 +612,31 @@ async function printPages(f,pages,title){
   setTimeout(function(){clearInterval(chk);tryPrint();},9000);
 }
 
-$('addB').onclick=derlePage;$('printB').onclick=printBook;
+$('addB').onclick=derlePage;
+function addCurrentDer(){
+  if(!pdf||!curFile){showToast2('\u00d6nce bir eser a\u00e7.');return}
+  // kurdela seciliyse onlari, yoksa mevcut gorunen sayfayi ekle
+  var picked=[];var sep=curFile+'|';
+  curRib.forEach(function(k){if(k.indexOf(sep)===0){var pg=parseInt(k.slice(sep.length),10);if(pg>=1&&pg<=total&&picked.indexOf(pg)<0)picked.push(pg);}});
+  if(!picked.length){var sp=sidePages();if(sp.l>=1)picked.push(sp.l);if(spread&&sp.r>=1&&sp.r<=total&&sp.r!==sp.l)picked.push(sp.r);}
+  picked.sort(function(a,b){return a-b;});
+  var d=loadDers();var mine=Object.keys(d).filter(function(n){return d[n].f===curFile;});
+  var nm=null;
+  if(!mine.length){nm=(prompt('Yeni derleme ad\u0131 (bo\u015f = Derleme):')||'').trim();if(!nm)nm='Derleme';if(d[nm]){showToast2('Bu ad zaten var.');return}d[nm]={f:curFile,p:picked.slice()};}
+  else{
+    var pr=(prompt(picked.length+' sayfa eklenecek derleme? (bo\u015f = yeni)\n\nMevcut: '+mine.join(', '))||'').trim();
+    if(!pr){nm=(prompt('Yeni derleme ad\u0131:')||'').trim();if(!nm)nm='Derleme';if(d[nm]){showToast2('Zaten var.');return}d[nm]={f:curFile,p:picked.slice()};}
+    else{nm=pr;if(!d[nm]){showToast2('Derleme bulunamad\u0131.');return}
+      if(d[nm].f!==curFile){showToast2('Bu derleme ba\u015fka esere ait.');return}
+      picked.forEach(function(pg){if(d[nm].p.indexOf(pg)<0)d[nm].p.push(pg);});
+      d[nm].p.sort(function(a,b){return a-b;});
+    }
+  }
+  saveDers(d);renderDershelf();curRib=new Set();markCurrentRib();
+  showToast2(picked.length+' sayfa derlemeye eklendi.');
+}
+
+$('addCurB').onclick=addCurrentDer;$('printB').onclick=printBook;
 $('derClose').onclick=closeDer;$('derNext').onclick=derNext;$('derPrev').onclick=derPrev;
 $( 'derView1').onclick=function(){derMode=1;derCache={};renderDerPage();};
 $( 'derView2').onclick=function(){derMode=2;derCache={};renderDerPage();};
@@ -616,8 +658,9 @@ function reloadPage(){
 }
 $('reloadB').onclick=function(){reloadPage();};
 $('nextB').onclick=next;$('prevB').onclick=prev;$('firstB').onclick=first;$('lastB').onclick=last;
-$('backB').onclick=()=>{$('reader').classList.remove('on');$('shelf').classList.remove('hidden');};
+$('backB').onclick=()=>{$('reader').classList.remove('on');$('shelf').classList.remove('hidden');var dbt=document.getElementById('addCurB');if(dbt)dbt.style.display='none';};
 $('homeB').onclick=goHome;$('homeB2').onclick=goHome;
+$('bkBookmark').onclick=function(){bmToggle();};
 $('sndB').onclick=()=>setMute(!muted);$('sndB2').onclick=()=>setMute(!muted);
 $('themeB').onclick=setT;$('viewB').onclick=toggleView;$('rtlB').onclick=toggleRtl;
 $('zinB').onclick=()=>setZoom(.2);$('zoutB').onclick=()=>setZoom(-.2);$('stripB').onclick=toggleStrip;
