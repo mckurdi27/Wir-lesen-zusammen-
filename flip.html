@@ -228,9 +228,12 @@ button{font-family:inherit;cursor:pointer}
 <div id="derbox">
   <div class="derhd"><button class="dbx" id="derClose">✕</button><span id="derT"></span>
     <button class="ib" id="derPrint" title="Yazdır / PDF">🖨</button></div>
-  <div class="derbody"><div id="derLoad" style="display:none;color:#555;font-size:15px;padding:20px">Derleme yükleniyor…</div><img id="derImg" alt="" style="display:none"></div>
+  <div class="derbody"><div id="derLoad" style="display:none;color:#555;font-size:15px;padding:20px">Derleme yükleniyor…</div><div id="derStage" style="display:none;position:relative;width:100%;height:100%;background:#efe8d9;overflow:auto;text-align:center"><img id="derImg" alt="" style="display:none;max-width:98%;max-height:98%;margin:4px auto"></div></div>
   <div class="derft"><button class="c g" id="derPrev">‹</button>
     <span id="derCnt"></span>
+    <button class="c s" id="derView1" title="Tek">1</button>
+    <button class="c s" id="derView2" title="Cift">2</button>
+    <button class="c g" id="derReload" title="Yenile">↻</button>
     <button class="c g" id="derNext">›</button></div>
 </div>
 <script>
@@ -501,29 +504,41 @@ function derlePage(){
 
 function delDer(nm){if(!confirm('“'+nm+'” derlemesi silinsin mi?'))return;const d=loadDers();delete d[nm];saveDers(d);renderDershelf();}
 
-let derDoc=null,derPages=null,derIdx=0,derName='',derF=null;
+let derDoc=null,derPages=null,derIdx=0,derName='',derF=null,derMode=1,derCache={};
+function derReloadPage(){if(!derDoc||!derPages)return;var n=derPages[derIdx];delete derCache[n];delete derCache['__c'];renderDerPage();}
+function pgCached(n){if(derCache[n])return Promise.resolve(derCache[n]);if(!derDoc)return Promise.reject();
+  return derDoc.getPage(n).then(function(pp){var sc=1.35,pw=pp.view[2]-pp.view[0];if(pw>1500)sc=Math.min(sc,1300/pw);if(sc<0.7)sc=0.7;
+    var vp=pp.getViewport({scale:sc});var c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;
+    return pp.render({canvasContext:c.getContext('2d'),viewport:vp}).promise.then(function(){derCache[n]=c;return c;});});}
+function showImg(can){var img=$('derImg'),L=$('derLoad'),St=$('derStage');if(!img)return;
+  img.src=can.toDataURL('image/jpeg',0.9);img.style.display='inline-block';if(L)L.style.display='none';if(St){St.style.display='flex';}
+  img.onerror=function(){img.onerror=null;if(L)L.style.display='block';};}
 function renderDerPage(){
-  const img=$('derImg');if(!img)return;
-  const L=$('derLoad');
-  const n=derPages[derIdx];
-  img.removeAttribute('src');
-  if(!derDoc){if(L)L.style.display='none';return}
-  if(L)L.style.display='none';if(img)img.style.display='block';
-  derDoc.getPage(n).then(function(p){
-    const vp=p.getViewport({scale:1.5});const c=document.createElement('canvas');
-    c.width=vp.width;c.height=vp.height;
-    p.render({canvasContext:c.getContext('2d'),viewport:vp}).promise.then(function(){
-      img.src=c.toDataURL('image/jpeg',.92);
-    }).catch(function(){img.removeAttribute('src');});
-  }).catch(function(){img.removeAttribute('src');});
-  $('derCnt').textContent='Kaynak sayfa '+n+' · '+(derIdx+1)+'/'+derPages.length;
+  var img=$('derImg'),L=$('derLoad'),St=$('derStage'),n=derPages[derIdx];
+  if(img)img.removeAttribute('src');if(L)L.style.display='block';if(St)St.style.display='none';
+  if(!derDoc){if(L)L.style.display='none';return;}
+  if(derMode===2&&derIdx+1<derPages.length){
+    Promise.all([pgCached(n),pgCached(derPages[derIdx+1])]).then(function(cc){
+      var a=cc[0],b=cc[1],h=Math.max(a.height,b.height),gap=Math.max(4,Math.round(h*0.02));
+      var W=a.width+b.width+gap,H=h,r=1,mw=1600;if(W>mw)r=mw/W;
+      var c=document.createElement('canvas');c.width=Math.round(W*r);c.height=Math.round(H*r);
+      var x=c.getContext('2d');x.fillStyle='#efe8d9';x.fillRect(0,0,c.width,c.height);
+      var aw=Math.round(a.width*r),ah=Math.round(a.height*r),bw=Math.round(b.width*r),bh=Math.round(b.height*r),ga=Math.round(gap*r);
+      x.drawImage(a,0,Math.round((c.height-ah)/2),aw,ah);x.drawImage(b,aw+ga,Math.round((c.height-bh)/2),bw,bh);
+      derCache['__c']=c;showImg(c);
+    }).catch(function(){pgCached(n).then(showImg).catch(function(){if(L)L.style.display='block';});});
+  } else { pgCached(n).then(showImg).catch(function(){if(L)L.style.display='block';}); }
+  var tt=derMode===2?Math.ceil(derPages.length/2):derPages.length;
+  var cnt=derMode===2?(1+Math.floor(derIdx/2)):(derIdx+1);
+  $('derCnt').textContent='Sayfa '+n+' \u00b7 '+cnt+'/'+tt;
 }
-function derNext(){if(derIdx<derPages.length-1){derIdx++;renderDerPage();}}
-function derPrev(){if(derIdx>0){derIdx--;renderDerPage();}}
+
+function derNext(){var st=derMode===2?2:1;if(derIdx+1<derPages.length){derIdx+=st;if(derIdx>=derPages.length)derIdx=derPages.length-1;renderDerPage();}}
+function derPrev(){var st=derMode===2?2:1;if(derIdx>0){derIdx-=st;if(derIdx<0)derIdx=0;renderDerPage();}}
 function openDer(nm){
   const d=loadDers();const der=d[nm];if(!der)return;
   if(!der.p.length){showToast2('Boş derleme.');return}
-  derPages=der.p.slice();derIdx=0;derName=nm;derF=der.f;derDoc=null;
+  derPages=der.p.slice();derIdx=0;derName=nm;derF=der.f;derDoc=null;derCache={};derMode=1;
   $('derT').textContent=nm+' — '+bname(der.f);
   $('derbox').classList.add('on');
   const L=$('derLoad'),I=$('derImg');if(L)L.style.display='block';if(I)I.style.display='none';
@@ -580,6 +595,9 @@ async function printPages(f,pages,title){
 
 $('addB').onclick=derlePage;$('printB').onclick=printBook;
 $('derClose').onclick=closeDer;$('derNext').onclick=derNext;$('derPrev').onclick=derPrev;
+$( 'derView1').onclick=function(){derMode=1;derCache={};renderDerPage();};
+$( 'derView2').onclick=function(){derMode=2;derCache={};renderDerPage();};
+$( 'derReload').onclick=function(){derReloadPage();};
 $('derPrint').onclick=function(){if(derPages&&derF)printPages(derF,derPages,derName);};
 renderDershelf();
 
