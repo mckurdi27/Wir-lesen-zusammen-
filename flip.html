@@ -178,7 +178,9 @@ button{font-family:inherit;cursor:pointer}
 @media print{
   body.printing #shelf,body.printing #reader,body.printing #derbox,body.printing #load{display:none!important}
   body.printing #printArea{display:block}
-  #printArea img{width:100%;display:block;page-break-after:always}
+  #printArea .pp{height:100vh;page-break-after:always;display:flex;align-items:center;justify-content:center}
+  #printArea .pp:last-child{page-break-after:auto}
+  #printArea img{max-width:100%;max-height:100vh;object-fit:contain}
   @page{margin:0}
 }
 </style>
@@ -625,7 +627,8 @@ async function printPages(f,pages,title){
         var c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;
         await p.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
         var img=document.createElement('img');img.src=c.toDataURL('image/jpeg',.92);
-        area.appendChild(img);imgs.push(img);
+        var w=document.createElement('div');w.className='pp';w.appendChild(img);
+        area.appendChild(w);imgs.push(img);
       }catch(e){}
     }
     if(!imgs.length){document.body.classList.remove('printing');return;}
