@@ -518,7 +518,7 @@ function loadPdfList(){
     .catch(function(){buildShelf();});
 }
 function buildShelf(){var g=$('grid');g.innerHTML='';
-  var groups=[],last='\u0000';
+  var groups=[],last=null;
   BOOKS.forEach(function(bk,gi){var key=bk.cat||'\u0000';
     if(key!==last){groups.push({cat:key,books:[],base:gi});last=key;}
     groups[groups.length-1].books.push(gi);});
