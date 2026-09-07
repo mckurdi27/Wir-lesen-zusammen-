@@ -536,6 +536,11 @@ function loadPdfList(){
     .catch(function(){buildShelf();});
 }
 
+function shelfKey(b){return b.cat||'\u0000';}
+function shelfCatName(c){return c==='\u0000'?'\ud83d\udcd6 G\u00fcnl\u00fck Takip':('\ud83d\udcd6 '+c);}
+function loadOrder(){try{var o=JSON.parse(localStorage.getItem('flipShelfOrder')||'null');return Array.isArray(o)?o:null;}catch(e){return null;}}
+function saveOrder(list){try{localStorage.setItem('flipShelfOrder',JSON.stringify(list));}catch(e){}}
+function persistOrderFromDom(g){var order=[];var all=g.querySelectorAll('.shelf-sec');all.forEach(function(s){var c=s.getAttribute('data-cat');if(c&&c!=='\u0000')order.push(c);});saveOrder(order);}
 function buildShelf(){var g=$('grid');g.innerHTML='';
   var groups=[],last=null;
   BOOKS.forEach(function(bk,gi){var key=shelfKey(bk);
