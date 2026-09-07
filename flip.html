@@ -46,6 +46,9 @@ button{font-family:inherit;cursor:pointer}
 .shelf-sec.open .shelf-h .chv{transform:rotate(180deg)}
 .shelf-body{display:none;padding:12px 2px 2px}
 .shelf-sec.open .shelf-body{display:block}
+.shelf-h .grip{cursor:grab;color:var(--muted);font-size:14px;padding:0 2px;touch-action:none}
+.shelf-sec.dragging{opacity:.45}
+.shelf-sec.dragover{border-top:2px solid var(--gold-d)}
 .grid-row{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(108px,1fr))}
 .bk{background:var(--card);border:1px solid var(--cardb);border-radius:12px;padding:10px 8px;
   display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;
@@ -523,26 +526,48 @@ function loadPdfList(){
     })
     .catch(function(){buildShelf();});
 }
+function shelfKey(b){return b.cat||'\u0000';}
+function shelfCatName(c){return c==='\u0000'?'\ud83d\udcd6 G\u00fcnl\u00fck Takip':('\ud83d\udcd6 '+c);}
+function loadOrder(){try{var o=JSON.parse(localStorage.getItem('flipShelfOrder')||'null');return Array.isArray(o)?o:null;}catch(e){return null;}}
+function saveOrder(list){try{localStorage.setItem('flipShelfOrder',JSON.stringify(list));}catch(e){}}
+function persistOrderFromDom(g){var order=[];var all=g.querySelectorAll('.shelf-sec');all.forEach(function(s){var c=s.getAttribute('data-cat');if(c&&c!=='\u0000')order.push(c);});saveOrder(order);}
 function buildShelf(){var g=$('grid');g.innerHTML='';
   var groups=[],last=null;
-  BOOKS.forEach(function(bk,gi){var key=bk.cat||'\u0000';
+  BOOKS.forEach(function(bk,gi){var key=shelfKey(bk);
     if(key!==last){groups.push({cat:key,books:[]});last=key;}
     groups[groups.length-1].books.push(gi);});
   var rootGr=null,catGr=[];
   groups.forEach(function(gr){ if(gr.cat==='\u0000')rootGr=gr; else catGr.push(gr); });
   catGr.sort(function(a,b){return a.cat.localeCompare(b.cat,'tr');});
+  var order=loadOrder();
+  if(order&&catGr.length){var map={};catGr.forEach(function(g2){map[g2.cat]=g2;});var re=[],seen={};
+    order.forEach(function(c){if(map[c]&&!seen[c]){re.push(map[c]);seen[c]=1;}});
+    catGr.forEach(function(g2){if(!seen[g2.cat]){re.push(g2);seen[g2.cat]=1;}});
+    catGr=re;}
   var ordered=[]; if(rootGr)ordered.push(rootGr); ordered=ordered.concat(catGr);
+  var secs=[];
   ordered.forEach(function(gr,si){
-    var sec=document.createElement('div');sec.className='shelf-sec';
+    var sec=document.createElement('div');sec.className='shelf-sec';sec.setAttribute('data-cat',gr.cat);
     var hd=document.createElement('div');hd.className='shelf-h';
-    var lab=gr.cat==='\u0000'?'\ud83d\udcd6 G\u00fcnl\u00fck Takip':('\ud83d\udcd6 '+gr.cat);
-    var span=document.createElement('span');span.textContent=lab;hd.appendChild(span);
+    if(gr.cat!=='\u0000'){var grip=document.createElement('span');grip.className='grip';grip.textContent='\u2261';hd.appendChild(grip);}
+    var span=document.createElement('span');span.textContent=shelfCatName(gr.cat);hd.appendChild(span);
     var chv=document.createElement('span');chv.className='chv';chv.textContent='\u25be';hd.appendChild(chv);
     var body=document.createElement('div');body.className='shelf-body';
     var row=document.createElement('div');row.className='grid-row';body.appendChild(row);
     gr.books.forEach(function(gi){row.appendChild(bkCard(BOOKS[gi],gi));});
-    hd.onclick=function(){sec.classList.toggle('open');};
-    sec.appendChild(hd);sec.appendChild(body);g.appendChild(sec);
+    hd.addEventListener('click',function(e){if(e.target&&e.target.classList.contains('grip'))return;sec.classList.toggle('open');});
+    sec.appendChild(hd);sec.appendChild(body);g.appendChild(sec);secs.push(sec);
+  });
+  /* alt klasor raflari arasi surukle-birak (kok 'Gunluk Takip' sabit) */
+  var drag=null;
+  g.querySelectorAll('.shelf-sec').forEach(function(sec){
+    if(sec.getAttribute('data-cat')==='\u0000')return;
+    sec.draggable=true;
+    sec.addEventListener('dragstart',function(e){drag=sec;sec.classList.add('dragging');try{e.dataTransfer.setData('text/plain',sec.getAttribute('data-cat'));}catch(err){}});
+    sec.addEventListener('dragend',function(){drag=null;sec.classList.remove('dragging');g.querySelectorAll('.shelf-sec').forEach(function(s){s.classList.remove('dragover');});persistOrderFromDom(g);});
+    sec.addEventListener('dragover',function(e){e.preventDefault();if(!drag||drag===sec)return;sec.classList.add('dragover');});
+    sec.addEventListener('dragleave',function(){sec.classList.remove('dragover');});
+    sec.addEventListener('drop',function(e){e.preventDefault();g.querySelectorAll('.shelf-sec').forEach(function(s){s.classList.remove('dragover');});if(!drag||drag===sec)return;var after=sec.nextSibling;g.insertBefore(drag,after);persistOrderFromDom(g);});
   });
 }
 function bkCard(bk,gi){var c=document.createElement('div');c.className='bk';
