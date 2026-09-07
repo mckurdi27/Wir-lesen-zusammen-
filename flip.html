@@ -180,20 +180,37 @@ button{font-family:inherit;cursor:pointer}
 #busy{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:rgba(244,239,230,.88)}
 #busy.on{display:flex}
 [data-theme="dark"] #busy{background:rgba(11,19,41,.88)}
+/* Kâbe tavaf göstergesi: kare Kâbe + etrafında kare yol izleyen noktalar */
+#busy .kwrap{position:relative;width:120px;height:120px}
+#busy .kaaba{position:absolute;left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;background:#191919;border-radius:3px}
+#busy .kaaba::before{content:'';position:absolute;left:0;right:0;top:9px;height:4px;background:#c9a24b}
+#busy .kaaba::after{content:'';position:absolute;left:50%;top:-8px;width:54px;height:6px;margin-left:-27px;background:#262626;border-radius:2px}
+#busy .tawaf{position:absolute;left:50%;top:50%;width:0;height:0}
+#busy .tdot{position:absolute;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:#b8860b;animation:kwalk 2.6s linear infinite}
+#busy .tdot.d1{animation-delay:0s}
+#busy .tdot.d2{animation-delay:-.65s}
+#busy .tdot.d3{animation-delay:-1.3s}
+#busy .tdot.d4{animation-delay:-1.95s}
+@keyframes kwalk{
+  0%,100%{transform:translate(-38px,-38px)}
+  25%{transform:translate(38px,-38px)}
+  50%{transform:translate(38px,38px)}
+  75%{transform:translate(-38px,38px)}
+}
 @media print{
   body.printing #shelf,body.printing #reader,body.printing #derbox,body.printing #load,body.printing #busy{display:none!important}
   body.printing{margin:0}
   body.printing #printArea{display:block}
-  #printArea .pp{display:flex;align-items:center;justify-content:center;height:100vh;page-break-inside:avoid}
-  #printArea .pp+.pp{page-break-before:always}
-  #printArea img{max-width:100%;max-height:100vh;object-fit:contain}
-  @page{margin:0}
+  @page{size:A4;margin:0}
+  #printArea .pp{width:210mm;height:297mm;page-break-after:always;page-break-inside:avoid;display:flex;align-items:center;justify-content:center;margin:0;padding:0}
+  #printArea .pp:last-child{page-break-after:auto}
+  #printArea img{max-width:210mm;max-height:297mm;object-fit:contain;margin:0}
 }
 </style>
 </head>
 <body>
 <div id="load"><div class="sp"></div><div class="lt">Kitap açılıyor…</div></div>
-<div id="busy"><div class="sp"></div><div class="lt" id="busyTxt">İşleniyor…</div></div>
+<div id="busy"><div class="kwrap"><div class="kaaba"></div><div class="tawaf"><span class="tdot d1"></span><span class="tdot d2"></span><span class="tdot d3"></span><span class="tdot d4"></span></div></div><div class="lt" id="busyTxt">İşleniyor…</div></div>
 
 <div id="shelf">
   <div id="sh">
