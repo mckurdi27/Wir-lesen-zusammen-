@@ -502,35 +502,40 @@ async function openBook(k){const bk=BOOKS[k];curFile=bk.f;
    Sonradan eklenen klas\u00f6r/dosyalar otomatik gelir. */
 function pdfName(n){return n.replace(/\.pdf$/i,'');}
 function loadPdfList(){
-  var api='https://api.github.com/repos/mckurdi27/Wir-lesen-zusammen-/contents/pdf/';
-  fetch(api)
+  var base='https://api.github.com/repos/mckurdi27/Wir-lesen-zusammen-';
+  /* Tum dosya yollarini TEK istekle cek (git/trees recursive) -> klasor sayisi kadar
+     ayri API cagrisi gerekmez, oran limiti/sira hatasi olmaz. */
+  fetch(base+'/branches/main')
     .then(function(r){return r.ok?r.json():Promise.reject(r.status);})
-    .then(function(js){
-      if(!Array.isArray(js))return;
-      var rootPdf=js.filter(function(x){return x.type==='file'&&/\.pdf$/i.test(x.name)&&!/^A\.pdf$/i.test(x.name);})
-        .map(function(x){return {f:'pdf/'+x.name,i:classify(x.name),cat:''};});
-      var dirs=js.filter(function(x){return x.type==='dir';});
-      var sub=[];
-      if(dirs.length){
-        Promise.all(dirs.map(function(d){return fetch(api+encodeURIComponent(d.name)+'/').then(function(r){return r.ok?r.json():[];}).catch(function(){return [];});}))
-          .then(function(outs){
-            outs.forEach(function(arr,di){
-              if(Array.isArray(arr))arr.filter(function(x){return x.type==='file'&&/\.pdf$/i.test(x.name)&&!/^A\.pdf$/i.test(x.name);})
-                .forEach(function(x){sub.push({f:'pdf/'+dirs[di].name+'/'+x.name,i:classify(x.name),cat:dirs[di].name});});
-            });
-            var list=rootPdf.concat(sub);
-            if(list.length)BOOKS=list;
-            buildShelf();
-          }).catch(function(){buildShelf();});
-      }else{ if(rootPdf.length)BOOKS=rootPdf; buildShelf(); }
+    .then(function(br){return fetch(base+'/git/trees/'+encodeURIComponent(br.commit.sha)+'?recursive=1');})
+    .then(function(r){return r.ok?r.json():Promise.reject(r.status);})
+    .then(function(tr){
+      var list=[];var hasDir=false;
+      (tr.tree||[]).forEach(function(it){
+        if(it.type!=='blob')return;
+        var path=it.path||'';
+        if(path.indexOf('pdf/')!==0)return;
+        var name=path.slice(4);
+        if(name.indexOf('/')>=0)hasDir=true;
+        var fn=name.split('/').pop();
+        if(!/\.pdf$/i.test(fn)||/^A\.pdf$/i.test(fn))return;
+        var cat='';var slash=name.indexOf('/');
+        if(slash>=0)cat=name.slice(0,slash);
+        list.push({f:path,i:classify(fn),cat:cat});
+      });
+      /* kok once, sonra kategoriye gore; esit kategoriler art arda gelsin (buildShelf gruplar) */
+      list.sort(function(a,b){
+        var ao=(a.cat===''?0:1),bo=(b.cat===''?0:1);
+        if(ao!==bo)return ao-bo;
+        if(a.cat!==b.cat)return (a.cat||'').localeCompare(b.cat||'','tr');
+        return a.f.localeCompare(b.f,'tr');
+      });
+      if(list.length)BOOKS=list;
+      buildShelf();
     })
     .catch(function(){buildShelf();});
 }
-function shelfKey(b){return b.cat||'\u0000';}
-function shelfCatName(c){return c==='\u0000'?'\ud83d\udcd6 G\u00fcnl\u00fck Takip':('\ud83d\udcd6 '+c);}
-function loadOrder(){try{var o=JSON.parse(localStorage.getItem('flipShelfOrder')||'null');return Array.isArray(o)?o:null;}catch(e){return null;}}
-function saveOrder(list){try{localStorage.setItem('flipShelfOrder',JSON.stringify(list));}catch(e){}}
-function persistOrderFromDom(g){var order=[];var all=g.querySelectorAll('.shelf-sec');all.forEach(function(s){var c=s.getAttribute('data-cat');if(c&&c!=='\u0000')order.push(c);});saveOrder(order);}
+
 function buildShelf(){var g=$('grid');g.innerHTML='';
   var groups=[],last=null;
   BOOKS.forEach(function(bk,gi){var key=shelfKey(bk);
