@@ -150,7 +150,12 @@ button{font-family:inherit;cursor:pointer}
 #rtlB .rtl-t{font-size:12.5px;font-weight:600}
 #rtlB .rtl-x{font-size:10.5px;color:#c0392b;font-weight:800;line-height:1}
 
-@media(max-width:520px){.c{min-width:44px;height:44px}.c.tx{font-size:12px;padding:0 8px}}
+@media(max-width:520px){
+  #rtop{flex-wrap:wrap;gap:5px 8px;padding:5px 8px}
+  #rtop .ib,#rtop .ib.der-btn{height:auto;min-height:0;padding:3px 8px;font-size:12px;line-height:1.4}
+  #rtop #rtitle{flex-basis:100%;order:-1;font-size:13px;min-width:0}
+  .c{min-width:44px;height:44px}.c.tx{font-size:12px;padding:0 8px}
+}
 
 @media (orientation: landscape){#rctl{flex-direction:row;flex-wrap:wrap}#rctl .rctl-row{width:auto;flex:1 1 auto;flex-wrap:nowrap}.c{padding:0 10px}}
 
