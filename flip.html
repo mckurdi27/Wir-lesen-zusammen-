@@ -189,7 +189,7 @@ button{font-family:inherit;cursor:pointer}
 /* per-sayfa secim butonu + ayrac kalp ikonu */
 .leaf .selb{position:absolute;top:-26px;left:50%;transform:translateX(-50%);z-index:23;border:none;border-radius:14px;padding:4px 9px;font-size:9.5px;font-weight:700;line-height:1.2;white-space:nowrap;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,.35);background:#1e8a4c;color:#fff;max-width:96%;overflow:hidden}
 .leaf .selb.seld{background:#c0392b}
-.leaf .bmh{position:absolute;top:4px;right:6px;z-index:24;font-size:21px;line-height:1;color:#e23636;display:none;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.45)}
+.leaf .bmh{position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:16px;height:52px;z-index:24;display:none;pointer-events:none;box-shadow:0 3px 6px rgba(0,0,0,.25);background:linear-gradient(180deg,#e23636 0%,#b02525 100%);clip-path:polygon(0 0,100% 0,100% 88%,50% 100%,0 88%)}
 /* yazdirma: gizli alan + yazdirirken sadece onu goster (popup yerine ayni sayfadan) */
 #printArea{display:none}
 #busy{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:rgba(244,239,230,.88)}
@@ -395,9 +395,9 @@ function pageEl(n,isRight){const d=document.createElement('div');d.className='le
     sel.textContent=on?'Seçildi ✓':'+ Derlemeye Ekle';
     sel.classList.toggle('seld',on);
     d.appendChild(sel);
-    /* ayraç kalbi (sag ust kose) */
-    const heart=document.createElement('div');heart.className='bmh';heart.textContent='❤';
-    heart.style.display=(curAy===n)?'block':'none';
+    /* ayraç kurdela (ust kenardan sarkan) */
+    const heart=document.createElement('div');heart.className='bmh';
+    heart.style.display=ayHas(n)?'block':'none';
     d.appendChild(heart);
   }
   addPageImg(d,n);return d;}
@@ -493,7 +493,7 @@ function goHome(){location.href='index.html';}
 /* --- kitap aç --- */
 async function openBook(k){const bk=BOOKS[k];curFile=bk.f;
   $('load').classList.add('on');$('shelf').classList.add('hidden');
-  pdf=null;cache={};total=0;cur=1;anim=false;rtl=false;curRib=new Set();curAy=0;
+  pdf=null;cache={};total=0;cur=1;anim=false;rtl=false;curRib=new Set();curAy=[];loadAy();
     ayBState();try{
     pdf=await pdfjsLib.getDocument(bk.f).promise;total=pdf.numPages;await baseP();
     spread=total>1;
@@ -616,12 +616,17 @@ const DER_KEY='flipDerlemeler';
 let curRib=new Set();
 /* --- ayraç: tek isaretli sayfa (dosya başına) --- */
 const AY_KEY='flipAyrac';
-let curAy=0;
+let curAy=[];   /* bu dosyada ayraçlanan sayfalar (coklu, sirali) */
 function ayMap(){try{return JSON.parse(localStorage.getItem(AY_KEY)||'{}')}catch(e){return {}}}
-function ayForFile(){var m=ayMap();var v=parseInt(m[curFile],10);return (v&&v>=1)?v:0;}
-function setAy(n){var m=ayMap();if(n)m[curFile]=n;else delete m[curFile];try{localStorage.setItem(AY_KEY,JSON.stringify(m));}catch(e){}curAy=n||0;}
-function ayBState(){var b=$('ayB');if(b)b.classList.toggle('on',curAy===cur);}
-function toggleAy(){if(!pdf||!curFile)return;var pn=cur;var k=(curAy===pn);setAy(k?0:pn);markRibs();ayBState();
+function ayHas(n){return curAy.indexOf(n)>=0;}
+function ayListFor(){var m=ayMap();var a=m[curFile];return Array.isArray(a)?a:[];}
+function ayForFile(){var a=ayListFor();return a.length?a[a.length-1]:0;}   /* en son eklenenden basla */
+function loadAy(){curAy=ayListFor();}
+function persistAy(){var m=ayMap();m[curFile]=curAy.slice();try{localStorage.setItem(AY_KEY,JSON.stringify(m));}catch(e){}}
+function ayBState(){var b=$('ayB');if(b)b.classList.toggle('on',ayHas(cur));}
+function toggleAy(){if(!pdf||!curFile)return;var pn=cur;var i=curAy.indexOf(pn);var k=i>=0;
+  if(k)curAy.splice(i,1);else curAy.push(pn);
+  persistAy();markRibs();ayBState();
   if(typeof showToast2==='function')showToast2(k?'Ayraç kaldırıldı.':'Sayfa '+pn+' ayraçlandı.');}
 function loadDers(){try{return JSON.parse(localStorage.getItem(DER_KEY)||'{}')}catch(e){return {}}}
 function saveDers(d){localStorage.setItem(DER_KEY,JSON.stringify(d))}
@@ -639,7 +644,7 @@ function applyMarksToLeaf(el){
   var sb=el.querySelector('.selb');
   if(sb){sb.textContent=on?'Se\u00e7ildi \u2713':'+ Derlemeye Ekle';sb.classList.toggle('seld',on);}
   var hr=el.querySelector('.bmh');
-  if(hr)hr.style.display=(curAy===pn)?'block':'none';
+  if(hr)hr.style.display=ayHas(pn)?'block':'none';
 }
 function toggleRib(n){
   if(!pdf||!curFile||anim)return;var k=ribKeyFor(n);
