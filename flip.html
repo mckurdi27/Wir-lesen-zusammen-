@@ -180,17 +180,17 @@ button{font-family:inherit;cursor:pointer}
 #busy{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:rgba(244,239,230,.88)}
 #busy.on{display:flex}
 [data-theme="dark"] #busy{background:rgba(11,19,41,.88)}
-/* Kâbe tavaf göstergesi: kare Kâbe + etrafında kare yol izleyen noktalar */
-#busy .kwrap{position:relative;width:120px;height:120px}
-#busy .kaaba{position:absolute;left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;background:#191919;border-radius:3px}
-#busy .kaaba::before{content:'';position:absolute;left:0;right:0;top:9px;height:4px;background:#c9a24b}
-#busy .kaaba::after{content:'';position:absolute;left:50%;top:-8px;width:54px;height:6px;margin-left:-27px;background:#262626;border-radius:2px}
-#busy .tawaf{position:absolute;left:50%;top:50%;width:0;height:0}
-#busy .tdot{position:absolute;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:#b8860b;animation:kwalk 2.6s linear infinite}
-#busy .tdot.d1{animation-delay:0s}
-#busy .tdot.d2{animation-delay:-.65s}
-#busy .tdot.d3{animation-delay:-1.3s}
-#busy .tdot.d4{animation-delay:-1.95s}
+/* Kâbe tavaf göstergesi: kare Kâbe + etrafında kare yol izleyen 4 sarı 4 siyah nokta */
+.kwrap{position:relative;width:120px;height:120px;display:inline-block}
+.kaaba{position:absolute;left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;background:#191919;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.2)}
+.kaaba::before{content:'';position:absolute;left:0;right:0;top:9px;height:4px;background:#c9a24b}
+.tawaf{position:absolute;left:50%;top:50%;width:0;height:0}
+.tdot{position:absolute;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:#2a2a2a;animation:kwalk 2.6s linear infinite}
+.tdot.y{background:#e0a92c}
+.tdot.d1{animation-delay:0s}.tdot.d2{animation-delay:-.325s}
+.tdot.d3{animation-delay:-.65s}.tdot.d4{animation-delay:-.975s}
+.tdot.d5{animation-delay:-1.3s}.tdot.d6{animation-delay:-1.625s}
+.tdot.d7{animation-delay:-1.95s}.tdot.d8{animation-delay:-2.275s}
 @keyframes kwalk{
   0%,100%{transform:translate(-38px,-38px)}
   25%{transform:translate(38px,-38px)}
@@ -209,8 +209,8 @@ button{font-family:inherit;cursor:pointer}
 </style>
 </head>
 <body>
-<div id="load"><div class="sp"></div><div class="lt">Kitap açılıyor…</div></div>
-<div id="busy"><div class="kwrap"><div class="kaaba"></div><div class="tawaf"><span class="tdot d1"></span><span class="tdot d2"></span><span class="tdot d3"></span><span class="tdot d4"></span></div></div><div class="lt" id="busyTxt">İşleniyor…</div></div>
+<div id="load"><div class="kwrap"><div class="kaaba"></div><div class="tawaf"><span class="tdot y d1"></span><span class="tdot d2"></span><span class="tdot y d3"></span><span class="tdot d4"></span><span class="tdot y d5"></span><span class="tdot d6"></span><span class="tdot y d7"></span><span class="tdot d8"></span></div></div><div class="lt">Kitap açılıyor…</div></div>
+<div id="busy"><div class="kwrap"><div class="kaaba"></div><div class="tawaf"><span class="tdot y d1"></span><span class="tdot d2"></span><span class="tdot y d3"></span><span class="tdot d4"></span><span class="tdot y d5"></span><span class="tdot d6"></span><span class="tdot y d7"></span><span class="tdot d8"></span></div></div><div class="lt" id="busyTxt">İşleniyor…</div></div>
 
 <div id="shelf">
   <div id="sh">
