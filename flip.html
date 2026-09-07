@@ -179,6 +179,7 @@ button{font-family:inherit;cursor:pointer}
 .derft .c{min-width:44px}
 
 .der-btn{width:auto!important;padding:0 14px;gap:6px;border:none!important;background:#1e8a4c!important;color:#fff!important;font-size:13px!important;font-weight:700;white-space:nowrap}
+.der-btn.on,.der-btn.on:hover{background:#c0392b!important;filter:none}
 .der-btn:hover{filter:brightness(1.08)}
 
 .leaf .rib{position:absolute;top:0;width:24px;height:32px;background:#e23636;z-index:22;box-shadow:0 2px 6px rgba(0,0,0,.35);color:#fff;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;border-radius:0 0 5px 5px;pointer-events:none}
@@ -255,6 +256,7 @@ button{font-family:inherit;cursor:pointer}
     <button class="ib" id="sndB2" title="Sayfa sesi aç/kapat">🔊</button>
     <button class="ib c s" id="stripB" title="Sayfa şeridi">☰</button>
     <button class="ib der-btn" id="addB" title="Bu sayfayı derlemene ekle">➕ Derle</button>
+    <button class="ib der-btn" id="ayB" title="Bu sayfaya ayraç koy / kaldır">🔖 Ayraç</button>
     <button class="ib der-btn" id="printB" title="Yazdır / PDF">🖨</button>
     <button class="ib back" id="homeB2" title="Ana sayfaya dön (index.html)">Anasayfa</button>
   </div>
@@ -491,7 +493,8 @@ function goHome(){location.href='index.html';}
 /* --- kitap aç --- */
 async function openBook(k){const bk=BOOKS[k];curFile=bk.f;
   $('load').classList.add('on');$('shelf').classList.add('hidden');
-  pdf=null;cache={};total=0;cur=1;anim=false;rtl=false;curRib=new Set();curAy=0;try{
+  pdf=null;cache={};total=0;cur=1;anim=false;rtl=false;curRib=new Set();curAy=0;
+    ayBState();try{
     pdf=await pdfjsLib.getDocument(bk.f).promise;total=pdf.numPages;await baseP();
     spread=total>1;
     var st=ayForFile();if(st&&st<=total){cur=st;}
@@ -499,7 +502,6 @@ async function openBook(k){const bk=BOOKS[k];curFile=bk.f;
     $('reader').classList.add('on');layout();paint();updateUI();markCurrentRib();
   }catch(e){console.error(e);alert('PDF açılamadı: '+bname(bk.f));$('shelf').classList.remove('hidden');}
   finally{$('load').classList.remove('on');} }
-
 
 /* pdf/ i\u00e7eri\u011fini GitHub API ile \u00e7ek \u2014 k\u00f6k dosyalar en \u00fcstte, alt klas\u00f6rler kendi raflar\u0131nda.
    Sonradan eklenen klas\u00f6r/dosyalar otomatik gelir. */
@@ -609,7 +611,6 @@ function renderCover(j){
   }).catch(function(){if(j.bm.isConnected)j.bm.textContent='\u2014';})
     .then(function(){_covBusy--;pumpCovers();});}
 
-
 /* ================= DERLEMELERIM (kişisel, localStorage) ================= */
 const DER_KEY='flipDerlemeler';
 let curRib=new Set();
@@ -619,6 +620,9 @@ let curAy=0;
 function ayMap(){try{return JSON.parse(localStorage.getItem(AY_KEY)||'{}')}catch(e){return {}}}
 function ayForFile(){var m=ayMap();var v=parseInt(m[curFile],10);return (v&&v>=1)?v:0;}
 function setAy(n){var m=ayMap();if(n)m[curFile]=n;else delete m[curFile];try{localStorage.setItem(AY_KEY,JSON.stringify(m));}catch(e){}curAy=n||0;}
+function ayBState(){var b=$('ayB');if(b)b.classList.toggle('on',curAy===cur);}
+function toggleAy(){if(!pdf||!curFile)return;var pn=cur;var k=(curAy===pn);setAy(k?0:pn);markRibs();ayBState();
+  if(typeof showToast2==='function')showToast2(k?'Ayraç kaldırıldı.':'Sayfa '+pn+' ayraçlandı.');}
 function loadDers(){try{return JSON.parse(localStorage.getItem(DER_KEY)||'{}')}catch(e){return {}}}
 function saveDers(d){localStorage.setItem(DER_KEY,JSON.stringify(d))}
 
@@ -667,7 +671,6 @@ function derlePage(){
   curRib=new Set();markCurrentRib();
   showToast2(picked.length+' sayfa derlemeye eklendi.');
 }
-
 
 function delDer(nm){if(!confirm('“'+nm+'” derlemesi silinsin mi?'))return;const d=loadDers();delete d[nm];saveDers(d);renderDershelf();}
 
@@ -791,41 +794,6 @@ $('book').addEventListener('click',function(ev){
     if(pn&&!anim&&pdf&&curFile){toggleRib(pn);}return;}
   /* sayfaya tik: sayfa ileri (tek sayfa gorusunde kapatildi) */
 });
-/* --- ayraç: sayfaya ~500ms uzun basinca ekle/kaldir --- */
-(function(){
-  var _t=null,_pn=0,_moved=false,_sx=0,_sy=0;
-  function clearT(){if(_t){clearTimeout(_t);_t=null;}}
-  document.getElementById('stage').addEventListener('touchstart',function(e){
-    if(!pdf||anim)return;clearT();
-    var leaf=e.target.closest?e.target.closest('.leaf'):null;
-    if(!leaf)return;
-    /* buton/serit ustune basinca ayrac tetiklenmesin */
-    if(e.target.closest&&e.target.closest('.selb'))return;
-    _pn=parseInt(leaf.getAttribute('data-pg'),10);
-    if(!_pn)return;
-    var t=e.touches[0];_sx=t.clientX;_sy=t.clientY;_moved=false;
-    _t=setTimeout(function(){
-      _t=null;
-      try{
-        if(_pn>=1&&_pn<=total){
-          var k=curAy===_pn;
-          if(k){setAy(0);}else{setAy(_pn);}
-          markRibs();if(typeof showToast2==='function')showToast2(k?'Ayraç kaldırıldı.':'Sayfa '+_pn+' ayraçlandı.');
-        }
-      }catch(err){}
-    },500);
-  },{passive:true});
-  document.getElementById('stage').addEventListener('touchmove',function(e){
-    if(!_t)return;
-    var t=e.touches[0];
-    if(Math.abs(t.clientX-_sx)>12||Math.abs(t.clientY-_sy)>12)_moved=true;
-    if(_moved)clearT();
-  },{passive:true});
-  var endT=function(){clearT();};
-  document.getElementById('stage').addEventListener('touchend',endT);
-  document.getElementById('stage').addEventListener('touchcancel',endT);
-})();
-
 function reloadPage(){
   if(!pdf||_busy)return;busyOn('Sayfa yenileniyor…');
   var L=$('pgLoad');if(L)L.style.display='block';
@@ -859,6 +827,7 @@ document.addEventListener('touchend',e=>{if(!$('reader').classList.contains('on'
     fwd?next():prev();
   }},{passive:true});
 
+document.getElementById('ayB').onclick=function(){toggleAy();};
 loadPdfList();
 </script>
 </body>
