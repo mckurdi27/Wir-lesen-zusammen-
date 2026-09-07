@@ -214,6 +214,10 @@ button{font-family:inherit;cursor:pointer}
 #busy.on{display:flex}
 [data-theme="dark"] #busy{background:rgba(11,19,41,.88)}
 /* Kâbe tavaf göstergesi: kare Kâbe + etrafında kare yol izleyen 4 sarı 4 siyah nokta */
+#toast{position:fixed;left:50%;bottom:64px;transform:translateX(-50%);z-index:120;max-width:80%;
+  background:rgba(20,20,20,.92);color:#fff;padding:9px 18px;border-radius:20px;font-size:13px;
+  text-align:center;pointer-events:none;opacity:0;transition:opacity .2s}
+#toast.on{opacity:1}
 .kwrap{position:relative;width:120px;height:120px;display:inline-block}
 .kaaba{position:absolute;left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;background:#191919;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.2)}
 .kaaba::before{content:'';position:absolute;left:0;right:0;top:9px;height:4px;background:#c9a24b}
@@ -789,7 +793,8 @@ function renderDershelf(){
      +'</div></div>';
   }).join('');
 }
-function showToast2(m){try{if(typeof showToast==='function')showToast(m);else alert(m);}catch(e){alert(m)}}
+function showToast(m){var t=$('toast');if(!t)return;t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(function(){t.classList.remove('on');},1600);}
+function showToast2(m){try{showToast(m);}catch(e){}}
 /* meşgul göstergesi: yenile/yazdır uzun sürerken görünür geri bildirim + çift-basma kilidi */
 let _busy=false;
 function busyOn(msg){if(_busy)return false;_busy=true;
@@ -887,5 +892,6 @@ document.getElementById('ayC').onclick=function(e){e.stopPropagation();toggleAyM
 document.addEventListener('click',function(e){var w=document.getElementById('ayCw');if(w&&!w.contains(e.target))hideAyMenu();});
 loadPdfList();
 </script>
+<div id="toast"></div>
 </body>
 </html>
