@@ -177,11 +177,15 @@ button{font-family:inherit;cursor:pointer}
 .leaf .bmh{position:absolute;top:4px;right:6px;z-index:24;font-size:21px;line-height:1;color:#e23636;display:none;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.45)}
 /* yazdirma: gizli alan + yazdirirken sadece onu goster (popup yerine ayni sayfadan) */
 #printArea{display:none}
+#busy{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:rgba(244,239,230,.88)}
+#busy.on{display:flex}
+[data-theme="dark"] #busy{background:rgba(11,19,41,.88)}
 @media print{
-  body.printing #shelf,body.printing #reader,body.printing #derbox,body.printing #load{display:none!important}
+  body.printing #shelf,body.printing #reader,body.printing #derbox,body.printing #load,body.printing #busy{display:none!important}
+  body.printing{margin:0}
   body.printing #printArea{display:block}
-  #printArea .pp{height:100vh;page-break-after:always;display:flex;align-items:center;justify-content:center}
-  #printArea .pp:last-child{page-break-after:auto}
+  #printArea .pp{display:flex;align-items:center;justify-content:center;height:100vh;page-break-inside:avoid}
+  #printArea .pp+.pp{page-break-before:always}
   #printArea img{max-width:100%;max-height:100vh;object-fit:contain}
   @page{margin:0}
 }
@@ -189,6 +193,7 @@ button{font-family:inherit;cursor:pointer}
 </head>
 <body>
 <div id="load"><div class="sp"></div><div class="lt">Kitap açılıyor…</div></div>
+<div id="busy"><div class="sp"></div><div class="lt" id="busyTxt">İşleniyor…</div></div>
 
 <div id="shelf">
   <div id="sh">
@@ -549,7 +554,7 @@ function derlePage(){
 function delDer(nm){if(!confirm('“'+nm+'” derlemesi silinsin mi?'))return;const d=loadDers();delete d[nm];saveDers(d);renderDershelf();}
 
 let derDoc=null,derPages=null,derIdx=0,derName='',derF=null,derMode=1,derCache={};
-function derReloadPage(){if(!derDoc||!derPages)return;var n=derPages[derIdx];delete derCache[n];delete derCache['__c'];renderDerPage();}
+function derReloadPage(){if(!derDoc||!derPages||_busy)return;var n=derPages[derIdx];delete derCache[n];delete derCache['__c'];busyOn('Sayfa yenileniyor…');renderDerPage();setTimeout(busyOff,450);}
 function pgCached(n){if(derCache[n])return Promise.resolve(derCache[n]);if(!derDoc)return Promise.reject();
   return derDoc.getPage(n).then(function(pp){var sc=1.35,pw=pp.view[2]-pp.view[0];if(pw>1500)sc=Math.min(sc,1300/pw);if(sc<0.7)sc=0.7;
     var vp=pp.getViewport({scale:sc});var c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;
@@ -610,38 +615,47 @@ function renderDershelf(){
   }).join('');
 }
 function showToast2(m){try{if(typeof showToast==='function')showToast(m);else alert(m);}catch(e){alert(m)}}
+/* meşgul göstergesi: yenile/yazdır uzun sürerken görünür geri bildirim + çift-basma kilidi */
+let _busy=false;
+function busyOn(msg){if(_busy)return false;_busy=true;
+  var t=$('busyTxt');if(t)t.textContent=msg||'İşleniyor…';
+  var b=$('busy');if(b)b.classList.add('on');return true;}
+function busyOff(){$('busy').classList.remove('on');_busy=false;}
 
-function printDer(nm){const d=loadDers();const der=d[nm];if(!der)return;printPages(der.f,der.p,nm);}
-function printBook(){if(!pdf||!curFile)return;const all=[];for(let i=1;i<=total;i++)all.push(i);printPages(curFile,all,bname(curFile));}
+function printDer(nm){if(_busy)return;const d=loadDers();const der=d[nm];if(!der)return;printPages(der.f,der.p,nm);}
+function printBook(){if(!pdf||!curFile||_busy)return;const all=[];for(let i=1;i<=total;i++)all.push(i);printPages(curFile,all,bname(curFile));}
 /* Ayni sayfa icinde gizli alana sayfalari cizip window.print() ile yazdir.
    Popup kullanmaz -> tam ekran/PWA'da da calisir, bos ekran/karakter sorunu olmaz. */
 async function printPages(f,pages,title){
+  if(_busy)return;busyOn(pages.length+' sayfa hazırlanıyor…');
   try{
     var area=document.getElementById('printArea');
     area.innerHTML='';
-    document.body.classList.add('printing');
     var doc=await pdfjsLib.getDocument(f).promise;
     var imgs=[];
     for(var n of pages){
       try{
         var p=await doc.getPage(n);
         var vp=p.getViewport({scale:2});
-        var c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;
+        if(vp.width>1600||vp.height>1600){var sc=Math.min(1600/vp.width,1600/vp.height);vp=p.getViewport({scale:2*sc});}
+        var c=document.createElement('canvas');c.width=Math.ceil(vp.width);c.height=Math.ceil(vp.height);
         await p.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
         var img=document.createElement('img');img.src=c.toDataURL('image/jpeg',.92);
         var w=document.createElement('div');w.className='pp';w.appendChild(img);
         area.appendChild(w);imgs.push(img);
       }catch(e){}
     }
-    if(!imgs.length){document.body.classList.remove('printing');return;}
+    if(!imgs.length){return;}
     /* tum gorseller yuklenene kadar bekle, sonra yazdir */
     await Promise.all(imgs.map(function(im){
       if(im.complete&&im.naturalWidth>0)return Promise.resolve();
       return new Promise(function(res){im.onload=im.onerror=function(){res();};});
     }));
+    document.body.classList.add('printing');
+    await new Promise(function(r){setTimeout(r,100);});
     window.print();
   }catch(e){console.error(e);}
-  finally{setTimeout(function(){var a=document.getElementById('printArea');if(a)a.innerHTML='';document.body.classList.remove('printing');},600);}
+  finally{setTimeout(function(){var a=document.getElementById('printArea');if(a)a.innerHTML='';document.body.classList.remove('printing');busyOff();},700);}
 }
 
 $('addB').onclick=derlePage;$('printB').onclick=printBook;
@@ -695,10 +709,10 @@ $('book').addEventListener('click',function(ev){
 })();
 
 function reloadPage(){
+  if(!pdf||_busy)return;busyOn('Sayfa yenileniyor…');
   var L=$('pgLoad');if(L)L.style.display='block';
-  var tgt=[].slice.call(document.querySelectorAll('#book .leaf')).map(function(e){return parseInt(e.getAttribute('data-pg'),10);});
-  if(pdf&&tgt.length){}; paint();
-  setTimeout(function(){if(L)L.style.display='none';},400);
+  paint();
+  setTimeout(function(){if(L)L.style.display='none';busyOff();},450);
 }
 $('reloadB').onclick=function(){reloadPage();};
 $('nextB').onclick=next;$('prevB').onclick=prev;$('firstB').onclick=first;$('lastB').onclick=last;
