@@ -585,11 +585,29 @@ function bkCard(bk,gi){var c=document.createElement('div');c.className='bk';
   var bn=document.createElement('div');bn.className='bn';bn.textContent=pdfName(bk.f.split('/').pop());
   var bm=document.createElement('div');bm.className='bm';bm.textContent='\u2026';
   c.appendChild(cv);c.appendChild(bn);c.appendChild(bm);c.onclick=function(){openBook(gi);};
-  pdfjsLib.getDocument(bk.f).promise.then(function(p){if(bm.isConnected)bm.textContent=p.numPages+' sayfa';return p.getPage(1);})
-    .then(function(page){var vp=page.getViewport({scale:.5});canvas.width=vp.width;canvas.height=vp.height;
-      return page.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise;})
-    .catch(function(){if(bm.isConnected)bm.textContent='\u2014';});
+  scheduleCover(canvas,bm,bk);  /* kapak render islemci tarafindan gorununce, sinirli eszamanlilikla yapilir */
   return c;}
+/* Kapak render: tum PDF'leri ayni anda acmak tarayiciyi cokertip "Hay aksi" cakilmasina yol aciyordu.
+   - sadece kart ekrana girdiginde (grup acilinca) render et
+   - es zamanli is 3 ile sinirli
+   - ilk sayfa alininca PDF'i destroy et (bellek bosalir) */
+var _covQ=[],_covBusy=0,_covLim=3,_covIO=('IntersectionObserver' in window)?new IntersectionObserver(function(es){
+  es.forEach(function(e){if(e.isIntersecting){_covIO.unobserve(e.target);var d=e.target._cov;if(d){e.target._cov=null;_covQ.push(d);pumpCovers();}}});
+},{rootMargin:'300px 0px'}):null;
+function scheduleCover(canvas,bm,bk){var job={canvas:canvas,bm:bm,bk:bk};
+  if(_covIO){canvas._cov=job;_covIO.observe(canvas);}
+  else{_covQ.push(job);pumpCovers();}}
+function pumpCovers(){if(!_covQ.length)return;
+  while(_covBusy<_covLim&&_covQ.length){_covBusy++;var j=_covQ.shift();renderCover(j);}}
+function renderCover(j){
+  pdfjsLib.getDocument(j.bk.f).promise.then(function(pd){
+    if(j.bm.isConnected)j.bm.textContent=pd.numPages+' sayfa';
+    return pd.getPage(1).then(function(page){
+      var vp=page.getViewport({scale:.5});j.canvas.width=vp.width;j.canvas.height=vp.height;
+      return page.render({canvasContext:j.canvas.getContext('2d'),viewport:vp}).promise;
+    }).then(function(){try{pd.destroy();}catch(e){}});
+  }).catch(function(){if(j.bm.isConnected)j.bm.textContent='\u2014';})
+    .then(function(){_covBusy--;pumpCovers();});}
 
 
 /* ================= DERLEMELERIM (kişisel, localStorage) ================= */
