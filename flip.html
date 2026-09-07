@@ -189,7 +189,11 @@ button{font-family:inherit;cursor:pointer}
 /* per-sayfa secim butonu + ayrac kalp ikonu */
 .leaf .selb{position:absolute;top:-26px;left:50%;transform:translateX(-50%);z-index:23;border:none;border-radius:14px;padding:4px 9px;font-size:9.5px;font-weight:700;line-height:1.2;white-space:nowrap;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,.35);background:#1e8a4c;color:#fff;max-width:96%;overflow:hidden}
 .leaf .selb.seld{background:#c0392b}
-.leaf .bmh{position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:16px;height:52px;z-index:24;display:none;pointer-events:none;box-shadow:0 3px 6px rgba(0,0,0,.25);background:linear-gradient(180deg,#e23636 0%,#b02525 100%);clip-path:polygon(0 0,100% 0,100% 88%,50% 100%,0 88%)}
+.leaf .bmh{position:absolute;top:-2px;width:20px;height:60px;z-index:24;display:none;pointer-events:none;background:linear-gradient(180deg,#e23636 0%,#b02525 78%,#8c1b1b 100%);clip-path:polygon(0 0,100% 0,100% 70%,50% 100%,50% 100%,0 70%);box-shadow:2px 3px 6px rgba(0,0,0,.25)}
+.leaf.lf .bmh{left:-4px;transform:none;border-radius:0 6px 0 0}
+.leaf.rt .bmh{right:-4px;left:auto;border-radius:6px 0 0 0}
+.leaf.lf .bmh::after{content:'';position:absolute;bottom:0;left:0;width:0;height:0;border:9px solid #8c1b1b;border-top-color:transparent;border-left-color:transparent}
+.leaf.rt .bmh::after{content:'';position:absolute;bottom:0;right:0;width:0;height:0;border:9px solid #8c1b1b;border-top-color:transparent;border-right-color:transparent}
 /* yazdirma: gizli alan + yazdirirken sadece onu goster (popup yerine ayni sayfadan) */
 #printArea{display:none}
 #busy{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:rgba(244,239,230,.88)}
@@ -257,6 +261,7 @@ button{font-family:inherit;cursor:pointer}
     <button class="ib c s" id="stripB" title="Sayfa şeridi">☰</button>
     <button class="ib der-btn" id="addB" title="Bu sayfayı derlemene ekle">➕ Derle</button>
     <button class="ib der-btn" id="ayB" title="Bu sayfaya ayraç koy / kaldır">🔖 Ayraç</button>
+    <button class="ib der-btn" id="ayB2" title="Yandaki (cift/sag) sayfaya ayraç koy / kaldır">Ayraç ▶</button>
     <button class="ib der-btn" id="printB" title="Yazdır / PDF">🖨</button>
     <button class="ib back" id="homeB2" title="Ana sayfaya dön (index.html)">Anasayfa</button>
   </div>
@@ -465,7 +470,7 @@ function updateUI(){$('pageIn').value=cur;$('tot').textContent=total;
   const sp=sidePages();const ps=$('rtitle').querySelector('.ps');
   if(spread){ps.textContent=(rtl?'RTL · ':'')+'Sayfa '+cur+'–'+(cur+1<=total?cur+1:cur)+' / '+total;}
   else ps.textContent=(rtl?'RTL · ':'')+'Sayfa '+cur+' / '+total;
-  buildStrip();}
+  buildStrip();ayBState();}
 async function nav(fwd){if(anim||!pdf)return;
   const ok=fwd?canFwd():canPrev();if(!ok)return;
   anim=true;playSound();try{await doFlip(fwd);}catch(e){}cur=fwd?fwdTarget():prevTarget();paint();anim=false;updateUI();markCurrentRib();}
@@ -623,11 +628,20 @@ function ayListFor(){var m=ayMap();var a=m[curFile];return Array.isArray(a)?a:[]
 function ayForFile(){var a=ayListFor();return a.length?a[a.length-1]:0;}   /* en son eklenenden basla */
 function loadAy(){curAy=ayListFor();}
 function persistAy(){var m=ayMap();m[curFile]=curAy.slice();try{localStorage.setItem(AY_KEY,JSON.stringify(m));}catch(e){}}
-function ayBState(){var b=$('ayB');if(b)b.classList.toggle('on',ayHas(cur));}
-function toggleAy(){if(!pdf||!curFile)return;var pn=cur;var i=curAy.indexOf(pn);var k=i>=0;
+function targetPages(){if(!spread)return [cur];
+  var l=cur;var r=cur+1<=total?cur+1:0;
+  return r?[l,r]:[l];}
+function ayBState(){var b=$('ayB'),b2=$('ayB2');
+  var t=targetPages();
+  if(b)b.classList.toggle('on',ayHas(t[0]));
+  if(b2)b2.style.display=(t.length>1&&t[1])?'inline-flex':'none';   /* sadece cift gorusunde goster */
+  if(b2)b2.classList.toggle('on',t.length>1&&ayHas(t[1]));}
+function toggleAyFor(pn){if(!pdf||!curFile||!pn)return;var i=curAy.indexOf(pn);var k=i>=0;
   if(k)curAy.splice(i,1);else curAy.push(pn);
   persistAy();markRibs();ayBState();
   if(typeof showToast2==='function')showToast2(k?'Ayraç kaldırıldı.':'Sayfa '+pn+' ayraçlandı.');}
+function toggleAy(){if(!pdf||!curFile)return;toggleAyFor(cur);}
+function toggleAy2(){if(!pdf||!curFile)return;var t=targetPages();toggleAyFor(t.length>1?t[1]:t[0]);}
 function loadDers(){try{return JSON.parse(localStorage.getItem(DER_KEY)||'{}')}catch(e){return {}}}
 function saveDers(d){localStorage.setItem(DER_KEY,JSON.stringify(d))}
 
@@ -833,6 +847,7 @@ document.addEventListener('touchend',e=>{if(!$('reader').classList.contains('on'
   }},{passive:true});
 
 document.getElementById('ayB').onclick=function(){toggleAy();};
+document.getElementById('ayB2').onclick=function(){toggleAy2();};
 loadPdfList();
 </script>
 </body>
