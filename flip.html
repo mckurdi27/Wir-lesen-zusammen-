@@ -37,7 +37,10 @@ button{font-family:inherit;cursor:pointer}
 .ib:active{transform:scale(.96)}
 .ib.back{width:auto;padding:0 14px;gap:6px;background:linear-gradient(135deg,var(--gold1),var(--gold2));color:#fff;border:none;font-size:14px;font-weight:600}
 #hint{max-width:1000px;width:100%;margin:8px auto 0;font-size:11.5px;color:var(--muted)}
-#grid{max-width:1100px;width:100%;margin:14px auto 0;display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(108px,1fr))}
+#grid{max-width:1100px;width:100%;margin:14px auto 0;display:flex;flex-direction:column;gap:18px}
+.cat-h{font-size:15px;font-weight:700;color:var(--gold-d);margin:2px;display:flex;align-items:center;gap:8px}
+.cat-h::after{content:"";flex:1;height:1px;background:var(--cardb)}
+.grid-row{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(108px,1fr))}
 .bk{background:var(--card);border:1px solid var(--cardb);border-radius:12px;padding:10px 8px;
   display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;
   box-shadow:0 4px 16px var(--shadow);transition:transform .15s}
@@ -486,29 +489,57 @@ async function openBook(k){const bk=BOOKS[k];curFile=bk.f;
   finally{$('load').classList.remove('on');} }
 
 
-/* pdf/ içeriğini GitHub API ile çek — sonradan eklenen eserler otomatik gelir */
+/* pdf/ i\u00e7eri\u011fini GitHub API ile \u00e7ek \u2014 k\u00f6k dosyalar en \u00fcstte, alt klas\u00f6rler kendi raflar\u0131nda.
+   Sonradan eklenen klas\u00f6r/dosyalar otomatik gelir. */
+function pdfName(n){return n.replace(/\.pdf$/i,'');}
 function loadPdfList(){
-  fetch('https://api.github.com/repos/mckurdi27/Wir-lesen-zusammen-/contents/pdf/')
-    .then(r=>r.ok?r.json():Promise.reject(r.status))
-    .then(js=>{
+  var api='https://api.github.com/repos/mckurdi27/Wir-lesen-zusammen-/contents/pdf/';
+  fetch(api)
+    .then(function(r){return r.ok?r.json():Promise.reject(r.status);})
+    .then(function(js){
       if(!Array.isArray(js))return;
-      const list=js.filter(x=>x.type==='file'&&/\.pdf$/i.test(x.name)&&!/^A\.pdf$/i.test(x.name))
-        .map(x=>({f:'pdf/'+x.name,i:classify(x.name)}));
-      if(list.length)BOOKS=list;
-      buildShelf();
+      var rootPdf=js.filter(function(x){return x.type==='file'&&/\.pdf$/i.test(x.name)&&!/^A\.pdf$/i.test(x.name);})
+        .map(function(x){return {f:'pdf/'+x.name,i:classify(x.name),cat:''};});
+      var dirs=js.filter(function(x){return x.type==='dir';});
+      var sub=[];
+      if(dirs.length){
+        Promise.all(dirs.map(function(d){return fetch(api+encodeURIComponent(d.name)+'/').then(function(r){return r.ok?r.json():[];}).catch(function(){return [];});}))
+          .then(function(outs){
+            outs.forEach(function(arr,di){
+              if(Array.isArray(arr))arr.filter(function(x){return x.type==='file'&&/\.pdf$/i.test(x.name)&&!/^A\.pdf$/i.test(x.name);})
+                .forEach(function(x){sub.push({f:'pdf/'+dirs[di].name+'/'+x.name,i:classify(x.name),cat:dirs[di].name});});
+            });
+            var list=rootPdf.concat(sub);
+            if(list.length)BOOKS=list;
+            buildShelf();
+          }).catch(function(){buildShelf();});
+      }else{ if(rootPdf.length)BOOKS=rootPdf; buildShelf(); }
     })
-    .catch(()=>buildShelf());
+    .catch(function(){buildShelf();});
 }
-
-function buildShelf(){const g=$('grid');g.innerHTML='';
-  BOOKS.forEach((bk,i)=>{const c=document.createElement('div');c.className='bk';
-    const cv=document.createElement('div');cv.className='cv';const canvas=document.createElement('canvas');cv.appendChild(canvas);
-    const bn=document.createElement('div');bn.className='bn';bn.textContent=bname(bk.f);
-    const bm=document.createElement('div');bm.className='bm';bm.textContent='…';
-    c.appendChild(cv);c.appendChild(bn);c.appendChild(bm);c.onclick=()=>openBook(i);g.appendChild(c);
-    pdfjsLib.getDocument(bk.f).promise.then(p=>{if(bm.isConnected)bm.textContent=p.numPages+' sayfa';return p.getPage(1);}).then(page=>{const viewport = page.getViewport({scale: 0.5});canvas.width=viewport.width;canvas.height=viewport.height;return page.render({canvasContext: canvas.getContext('2d'), viewport: viewport});}).catch(()=>{if(bm.isConnected)bm.textContent='—';});
-  });}
-
+function buildShelf(){var g=$('grid');g.innerHTML='';
+  var groups=[],last='\u0000';
+  BOOKS.forEach(function(bk,gi){var key=bk.cat||'\u0000';
+    if(key!==last){groups.push({cat:key,books:[],base:gi});last=key;}
+    groups[groups.length-1].books.push(gi);});
+  groups.forEach(function(gr){
+    if(gr.cat==='\u0000'){var row=document.createElement('div');row.className='grid-row';g.appendChild(row);
+      gr.books.forEach(function(gi){row.appendChild(bkCard(BOOKS[gi],gi));});}
+    else{var h=document.createElement('div');h.className='cat-h';h.textContent='\ud83d\udcd6 '+gr.cat;g.appendChild(h);
+      var row2=document.createElement('div');row2.className='grid-row';g.appendChild(row2);
+      gr.books.forEach(function(gi){row2.appendChild(bkCard(BOOKS[gi],gi));});}
+  });
+}
+function bkCard(bk,gi){var c=document.createElement('div');c.className='bk';
+  var cv=document.createElement('div');cv.className='cv';var canvas=document.createElement('canvas');cv.appendChild(canvas);
+  var bn=document.createElement('div');bn.className='bn';bn.textContent=pdfName(bk.f.split('/').pop());
+  var bm=document.createElement('div');bm.className='bm';bm.textContent='\u2026';
+  c.appendChild(cv);c.appendChild(bn);c.appendChild(bm);c.onclick=function(){openBook(gi);};
+  pdfjsLib.getDocument(bk.f).promise.then(function(p){if(bm.isConnected)bm.textContent=p.numPages+' sayfa';return p.getPage(1);})
+    .then(function(page){var vp=page.getViewport({scale:.5});canvas.width=vp.width;canvas.height=vp.height;
+      return page.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise;})
+    .catch(function(){if(bm.isConnected)bm.textContent='\u2014';});
+  return c;}
 
 
 /* ================= DERLEMELERIM (kişisel, localStorage) ================= */
