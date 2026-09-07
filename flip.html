@@ -179,6 +179,20 @@ button{font-family:inherit;cursor:pointer}
 .derft .c{min-width:44px}
 
 .der-btn{width:auto!important;padding:0 14px;gap:6px;border:none!important;background:#1e8a4c!important;color:#fff!important;font-size:13px!important;font-weight:700;white-space:nowrap}
+.der-btn{width:auto!important;padding:0 10px!important}
+.ayCw{position:relative;display:inline-flex}
+.ayCw .der-btn{padding:0 10px!important}
+.ayMenu{position:absolute;top:100%;right:0;z-index:80;display:none;min-width:200px;max-height:280px;overflow:auto;
+  background:#fff;border:1px solid var(--cardb);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:6px}
+.ayMenu.open{display:block}
+.ayEmpty{padding:8px 10px;color:#888;font-size:12px;text-align:center}
+.ayRow{display:flex;align-items:center;gap:2px;border-bottom:1px solid #f0ece4}
+.ayRow:last-child{border-bottom:none}
+.ayGo{flex:1;background:none;border:none;padding:8px 8px;text-align:left;font-size:12.5px;color:#222;cursor:pointer;white-space:nowrap}
+.ayGo:hover{background:#f5f1e8;border-radius:6px}
+.ayN{display:inline-block;min-width:18px;height:18px;line-height:18px;text-align:center;background:#e23636;color:#fff;border-radius:50%;font-size:10px;font-weight:700;margin-right:6px}
+.ayDel{background:none;border:none;color:#c0392b;font-size:16px;cursor:pointer;padding:4px 8px;border-radius:6px}
+.ayDel:hover{background:#fbe9e7}
 .der-btn.on,.der-btn.on:hover{background:#c0392b!important;filter:none}
 .der-btn:hover{filter:brightness(1.08)}
 
@@ -260,8 +274,9 @@ button{font-family:inherit;cursor:pointer}
     <button class="ib" id="sndB2" title="Sayfa sesi aç/kapat">🔊</button>
     <button class="ib c s" id="stripB" title="Sayfa şeridi">☰</button>
     <button class="ib der-btn" id="addB" title="Bu sayfayı derlemene ekle">➕ Derle</button>
-    <button class="ib der-btn" id="ayB" title="Bu sayfaya ayraç koy / kaldır">🔖 Ayraç</button>
-    <button class="ib der-btn" id="ayB2" title="Yandaki (cift/sag) sayfaya ayraç koy / kaldır">Ayraç ▶</button>
+    <button class="ib der-btn" id="ayB" title="Sol/tek sayfaya ayraç koy / kaldır">‹ Ayraç</button>
+    <div class="ayCw" id="ayCw"><button class="ib der-btn" id="ayC" title="Ayraç listesi"><span id="ayCnt">0</span> Ayraç &#9662;</button><div class="ayMenu" id="ayMenu"></div></div>
+    <button class="ib der-btn" id="ayB2" title="Sağ/çift sayfaya ayraç koy / kaldır">Ayraç ›</button>
     <button class="ib der-btn" id="printB" title="Yazdır / PDF">🖨</button>
     <button class="ib back" id="homeB2" title="Ana sayfaya dön (index.html)">Anasayfa</button>
   </div>
@@ -631,11 +646,31 @@ function persistAy(){var m=ayMap();m[curFile]=curAy.slice();try{localStorage.set
 function targetPages(){if(!spread)return [cur];
   var l=cur;var r=cur+1<=total?cur+1:0;
   return r?[l,r]:[l];}
-function ayBState(){var b=$('ayB'),b2=$('ayB2');
+function ayBState(){var b=$('ayB'),b2=$('ayB2'),c=$('ayCnt');
   var t=targetPages();
   if(b)b.classList.toggle('on',ayHas(t[0]));
-  if(b2)b2.style.display=(t.length>1&&t[1])?'inline-flex':'none';   /* sadece cift gorusunde goster */
-  if(b2)b2.classList.toggle('on',t.length>1&&ayHas(t[1]));}
+  if(b2)b2.style.display=(t.length>1&&t[1])?'inline-flex':'none';
+  if(b2)b2.classList.toggle('on',t.length>1&&ayHas(t[1]));
+  if(c)c.textContent=curAy.length;
+  if($('ayMenu'))buildAyMenu();}
+function hideAyMenu(){var m=$('ayMenu');if(m)m.classList.remove('open');}
+function toggleAyMenu(){var m=$('ayMenu');if(!m)return;buildAyMenu();m.classList.toggle('open');}
+function goAy(n){if(!pdf||!curFile)return;if(n<1||n>total)return;cur=n;if(anim)anim=false;paint();updateUI();markRibs();ayBState();hideAyMenu();}
+function delAy(n){if(!pdf||!curFile)return;var i=curAy.indexOf(n);if(i<0)return;curAy.splice(i,1);persistAy();markRibs();ayBState();}
+function buildAyMenu(){
+  var m=$('ayMenu');if(!m)return;m.innerHTML='';
+  if(!pdf||!curAy.length){var e=document.createElement('div');e.className='ayEmpty';e.textContent='Ayraç yok';m.appendChild(e);return;}
+  var s=curAy.slice().sort(function(a,b){return a-b;});
+  s.forEach(function(pg,i){
+    var row=document.createElement('div');row.className='ayRow';
+    var go=document.createElement('button');go.type='button';go.className='ayGo';
+    go.innerHTML='<span class=ayN>'+(i+1)+'</span> Sayfa '+pg+(pg===cur?' <b style=color:#1e8a4c>&#10003;</b>':'');
+    go.onclick=function(){goAy(pg);};row.appendChild(go);
+    var rm=document.createElement('button');rm.type='button';rm.className='ayDel';rm.title='Ayracı sil';rm.textContent='×';
+    rm.onclick=function(){delAy(pg);};row.appendChild(rm);
+    m.appendChild(row);
+  });
+}
 function toggleAyFor(pn){if(!pdf||!curFile||!pn)return;var i=curAy.indexOf(pn);var k=i>=0;
   if(k)curAy.splice(i,1);else curAy.push(pn);
   persistAy();markRibs();ayBState();
@@ -848,6 +883,8 @@ document.addEventListener('touchend',e=>{if(!$('reader').classList.contains('on'
 
 document.getElementById('ayB').onclick=function(){toggleAy();};
 document.getElementById('ayB2').onclick=function(){toggleAy2();};
+document.getElementById('ayC').onclick=function(e){e.stopPropagation();toggleAyMenu();};
+document.addEventListener('click',function(e){var w=document.getElementById('ayCw');if(w&&!w.contains(e.target))hideAyMenu();});
 loadPdfList();
 </script>
 </body>
