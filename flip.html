@@ -502,38 +502,35 @@ async function openBook(k){const bk=BOOKS[k];curFile=bk.f;
    Sonradan eklenen klas\u00f6r/dosyalar otomatik gelir. */
 function pdfName(n){return n.replace(/\.pdf$/i,'');}
 function loadPdfList(){
-  var base='https://api.github.com/repos/mckurdi27/Wir-lesen-zusammen-';
-  /* Tum dosya yollarini TEK istekle cek (git/trees recursive) -> klasor sayisi kadar
-     ayri API cagrisi gerekmez, oran limiti/sira hatasi olmaz. */
-  fetch(base+'/branches/main')
-    .then(function(r){return r.ok?r.json():Promise.reject(r.status);})
-    .then(function(br){return fetch(base+'/git/trees/'+encodeURIComponent(br.commit.sha)+'?recursive=1');})
-    .then(function(r){return r.ok?r.json():Promise.reject(r.status);})
+  /* Tum dosya yollarini TEK istekle cek (git/trees recursive) */
+  var api='https://api.github.com/repos/mckurdi27/Wir-lesen-zusammen-/git/trees/main?recursive=1';
+  fetch(api)
+    .then(function(r){if(!r.ok)throw new Error('http '+r.status);return r.json();})
     .then(function(tr){
-      var list=[];var hasDir=false;
+      var list=[];
       (tr.tree||[]).forEach(function(it){
         if(it.type!=='blob')return;
         var path=it.path||'';
         if(path.indexOf('pdf/')!==0)return;
         var name=path.slice(4);
-        if(name.indexOf('/')>=0)hasDir=true;
         var fn=name.split('/').pop();
         if(!/\.pdf$/i.test(fn)||/^A\.pdf$/i.test(fn))return;
         var cat='';var slash=name.indexOf('/');
         if(slash>=0)cat=name.slice(0,slash);
         list.push({f:path,i:classify(fn),cat:cat});
       });
-      /* kok once, sonra kategoriye gore; esit kategoriler art arda gelsin (buildShelf gruplar) */
-      list.sort(function(a,b){
-        var ao=(a.cat===''?0:1),bo=(b.cat===''?0:1);
-        if(ao!==bo)return ao-bo;
-        if(a.cat!==b.cat)return (a.cat||'').localeCompare(b.cat||'','tr');
-        return a.f.localeCompare(b.f,'tr');
-      });
-      if(list.length)BOOKS=list;
+      if(list.length){
+        list.sort(function(a,b){
+          var ao=(a.cat===''?0:1),bo=(b.cat===''?0:1);
+          if(ao!==bo)return ao-bo;
+          if(a.cat!==b.cat)return (a.cat||'').localeCompare(b.cat||'','tr');
+          return a.f.localeCompare(b.f,'tr');
+        });
+        BOOKS=list;
+      }
       buildShelf();
     })
-    .catch(function(){buildShelf();});
+    .catch(function(e){buildShelf();});
 }
 
 function shelfKey(b){return b.cat||'\u0000';}
