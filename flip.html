@@ -60,7 +60,8 @@ button{font-family:inherit;cursor:pointer}
 #book{position:relative;width:100%;height:100%;transform-style:preserve-3d}
 .leaf{position:absolute;top:0;left:0;background:#efe8d9;overflow:visible;box-shadow:0 2px 18px var(--shadl)}
 .leaf img,.leaf>canvas{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
-#book .leaf .pg, .turn .face .pg{position:absolute;bottom:4px;left:0;right:0;text-align:center;font-size:11px;color:#9a8c76;pointer-events:none;z-index:2;font-weight:600}
+/* okuyucu sayfa altina kendi numarasini eklemez (eserlerin cogu kendi numarasini tasir) */
+#book .leaf .pg, .turn .face .pg{display:none!important}
 /* çevrilen sayfa: ön yüzü yalnız; dönünce saklanır, hedef altta görünür */
 .turn{position:absolute;top:0;z-index:6;will-change:transform;
   transform-style:preserve-3d;-webkit-transform-style:preserve-3d;
@@ -81,7 +82,8 @@ button{font-family:inherit;cursor:pointer}
 .turn.curl::after{animation:curlSweep .4s cubic-bezier(.4,.1,.35,1) forwards}
 .turn img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .turn img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
-.turn #book .leaf .pg, .turn .face .pg{position:absolute;bottom:4px;left:0;right:0;text-align:center;font-size:11px;color:#9a8c76;pointer-events:none;z-index:2;font-weight:600}
+/* okuyucu sayfa altina kendi numarasini eklemez (eserlerin cogu kendi numarasini tasir) */
+.turn .face .pg{display:none!important}
 .turn .face.back #book .leaf .pg, .turn .face .pg{position:absolute;transform:rotateY(180deg)}
 /* --- gerçekçi kitap hissi: sayfa kalınlığı, omurga gölgesi ve dönüş gölgesi --- */
 .leaf{box-shadow:0 3px 14px var(--shadl), inset 0 0 0 1px rgba(120,110,90,.08)}
