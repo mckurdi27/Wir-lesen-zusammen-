@@ -1664,7 +1664,9 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                     var b = null;
                     for (var k=0;k<_bk.length;k++){ if(_bk[k].id===bid){ b=_bk[k]; break; } }
                     var alimT = ''; var okumT = '';
-                    for (var u=0;u<taken.length;u++){ if(taken[u].takeDate && !alimT) alimT=taken[u].takeDate; if(taken[u].takeTime&&!alimT) alimT=taken[u].takeDate; }
+                    var okumS = ''; var okumS2 = '';
+                    for (var u=0;u<taken.length;u++){ if(taken[u].takeDate&&taken[u].takeTime){ var _tk=String(taken[u].takeDate)+' '+String(taken[u].takeTime); if(!alimT||_tk<alimT) alimT=_tk; } else if(!alimT&&taken[u].takeDate){ alimT=String(taken[u].takeDate); } }
+                    for (var u2=0;u2<taken.length;u2++){ if(taken[u2].readDate){ var _rd=String(taken[u2].readDate)+' '+(taken[u2].readTime||''); if(!okumT||_rd>okumT) okumT=_rd; } }
                     rows.push({ id: bid, name: b ? b.name : bid, taken: taken.length, read: read,
                         totalUnits: b ? (b.total_units||0) : 0, completed: read >= taken.length,
                         alimTarih: alimT, okunmaTarih: okumT });
@@ -1682,6 +1684,7 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                         <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${b.taken}</td>
                         <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${b.alimTarih || '\u2014'}</td>
                         <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${b.read}</td>
+                        <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${b.okunmaTarih || '\u2014'}</td>
                         <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">%${pct}</td>
                         <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${durum}</td>
                     </tr>`;
@@ -1698,6 +1701,7 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                             <th style="padding:8px;">Al\u0131nan</th>
                             <th style="padding:8px;">Al\u0131nd\u0131\u011f\u0131</th>
                             <th style="padding:8px;">Okunan</th>
+                            <th style="padding:8px;">Okundu\u011fu</th>
                             <th style="padding:8px;">\u0130lerleme</th>
                             <th style="padding:8px;">Durum</th>
                         </tr></thead>
@@ -3653,8 +3657,11 @@ const panel = document.getElementById('grup-takip-panel');
                         var read = taken.filter(function(u){ return u.isRead; }).length;
                         sumT += taken.length; sumR += read;
                         var b = null; for (var k=0;k<_bk.length;k++){ if(_bk[k].id===bid){ b=_bk[k]; break; } }
+                        var _alimG='', _okumG='';
+                        for(var _ug=0;_ug<taken.length;_ug++){ if(taken[_ug].takeDate&&taken[_ug].takeTime){ var _tg=String(taken[_ug].takeDate)+' '+String(taken[_ug].takeTime); if(!_alimG||_tg<_alimG) _alimG=_tg; } else if(!_alimG&&taken[_ug].takeDate){ _alimG=String(taken[_ug].takeDate); } }
+                        for(var _ug2=0;_ug2<taken.length;_ug2++){ if(taken[_ug2].readDate){ var _rg2=String(taken[_ug2].readDate)+' '+(taken[_ug2].readTime||''); if(!_okumG||_rg2>_okumG) _okumG=_rg2; } }
                         rows.push({ id: bid, name: b ? b.name : bid, taken: taken.length, read: read,
-                            totalUnits: b ? (b.total_units||0) : 0, completed: read >= taken.length });
+                            totalUnits: b ? (b.total_units||0) : 0, completed: read >= taken.length, alimTarih: _alimG, okunmaTarih: _okumG });
                     });
                     var pct = sumT>0 ? Math.round((sumR/sumT)*100) : 0;
                     html += '<div style="margin:10px 0;border:1px solid #d5dbdb;border-radius:8px;padding:8px;background:#f9f9f9;">'
@@ -3666,7 +3673,9 @@ const panel = document.getElementById('grup-takip-panel');
                             + '<thead><tr style="background:#e8f6f3;">'
                             + '<th style="padding:5px 8px;border:1px solid #d5dbdb;text-align:left;">Eser</th>'
                             + '<th style="padding:5px 8px;border:1px solid #d5dbdb;text-align:center;">Alinan</th>'
+                            + '<th style="padding:5px 8px;border:1px solid #d5dbdb;text-align:center;">Al\u0131nd\u0131\u011f\u0131</th>'
                             + '<th style="padding:5px 8px;border:1px solid #d5dbdb;text-align:center;">Okunan</th>'
+                            + '<th style="padding:5px 8px;border:1px solid #d5dbdb;text-align:center;">Okundu\u011fu</th>'
                             + '<th style="padding:5px 8px;border:1px solid #d5dbdb;text-align:center;">Durum</th>'
                             + '</tr></thead><tbody>';
                         rows.forEach(function(b){
@@ -3675,7 +3684,9 @@ const panel = document.getElementById('grup-takip-panel');
                             html += '<tr>'
                                 + '<td style="padding:5px 8px;border:1px solid #d5dbdb;">' + b.name + '</td>'
                                 + '<td style="padding:5px 8px;border:1px solid #d5dbdb;text-align:center;">' + b.taken + '</td>'
+                                + '<td style="padding:5px 8px;border:1px solid #d5dbdb;text-align:center;">' + (b.alimTarih||'\u2014') + '</td>'
                                 + '<td style="padding:5px 8px;border:1px solid #d5dbdb;text-align:center;">' + b.read + '</td>'
+                                + '<td style="padding:5px 8px;border:1px solid #d5dbdb;text-align:center;">' + (b.okunmaTarih||'\u2014') + '</td>'
                                 + '<td style="padding:5px 8px;border:1px solid #d5dbdb;text-align:center;">' + st + '</td>'
                                 + '</tr>';
                         });
