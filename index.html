@@ -2796,10 +2796,10 @@ function renderTab6(groupName, memberName) {
                                     var h=(gData.bookHatims||{})[bid]||{};
                                     var _minTake='';
                                     var _bp2=_bpsrc[bid]||[];
-                                    for(var _ti=0;_ti<_bp2.length;_ti++){ var _u=_bp2[_ti]; if(_u&&_u.owner&&String(_u.owner).trim()&&_u.takeDate){ var _dt=String(_u.takeDate); if(!_minTake||_dt<_minTake) _minTake=_dt; } }
+                                    for(var _ti=0;_ti<_bp2.length;_ti++){ var _u=_bp2[_ti]; if(_u&&_u.owner&&String(_u.owner).trim()&&_u.takeDate){ var _td0=String(_u.takeDate).split('T')[0].split(' ')[0]; var _dt=_td0+(_u.takeTime?' '+String(_u.takeTime):''); if(!_minTake||_dt<_minTake) _minTake=_dt; } }
                                     
                                         var _minRead='';
-                                        for(var _ri=0;_ri<_bp2.length;_ri++){ var _ru=_bp2[_ri]; if(_ru&&_ru.owner&&String(_ru.owner).trim()&&_ru.readDate){ var _rdt=String(_ru.readDate)+(_ru.readTime?' '+String(_ru.readTime):''); if(!_minRead||_rdt<_minRead) _minRead=_rdt; } }
+                                        for(var _ri=0;_ri<_bp2.length;_ri++){ var _ru=_bp2[_ri]; if(_ru&&_ru.owner&&String(_ru.owner).trim()&&_ru.readDate){ var _rd0=String(_ru.readDate).split('T')[0].split(' ')[0]; var _rdt=_rd0+(_ru.readTime?' '+String(_ru.readTime):''); if(!_minRead||_rdt<_minRead) _minRead=_rdt; } }
 started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo || 1, baslangic: _minTake || h.startDate || '', alindi: _minTake || '', okundu: _minRead || '' });
                                 });
                                 // 2) Tamamlanan hatimler (bookHistory)
