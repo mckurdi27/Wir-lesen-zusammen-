@@ -3784,14 +3784,14 @@ window._grpGizli = function _grpGizli(gk){ if(!gk) return false; try{ var _d=JSO
                         let gTip = (d.members || []).length === 1 ? 'tek' : 'grup';
                         // Grup satırı: 1=grup adı, 2=isim(yok), 3=şifre(yok), 4=grup şifresi, 5=tip
                         _infoRows.push([gName, '', '', gPw || '(şifresiz)', gTip, (d.regions && d.regions[gName]) || '', (d.cities && d.cities[gName]) || '', gKey]);
-                        (d.members || []).forEach(mm => {
+                        (d.members || []).slice().sort((a, b) => String(a).localeCompare(String(b), 'tr')).forEach(mm => {
                             let mpw = (d.passwords && d.passwords[mm]) ? d.passwords[mm] : '';
                             // Üye: 1=hangi grup, 2=isim, 3=üye şifresi, 4=grup şifresi, 5=tip
                             _infoRows.push([gName, mm, mpw || '(şifresiz)', gPw || '(şifresiz)', gTip, (d.regions && d.regions[mm]) || '', (d.cities && d.cities[mm]) || '']);
                         });
                     } catch(e) {}
                 });
-                (_infoPool.members || []).forEach(mm => {
+                (_infoPool.members || []).slice().sort((a, b) => String(a).localeCompare(String(b), 'tr')).forEach(mm => {
                     let mpw = (_infoPool.passwords && _infoPool.passwords[mm]) ? _infoPool.passwords[mm] : '';
                     _infoRows.push(['Bireysel', mm, mpw || '(şifresiz)', '(bireysel)', 'tek', (_infoPool.regions && _infoPool.regions[mm]) || '', (_infoPool.cities && _infoPool.cities[mm]) || '']);
                 });
