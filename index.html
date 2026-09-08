@@ -1992,6 +1992,7 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                             currentGroup = groupKey;
                             loggedInMember = userName;
                             loggedInMemberType = "grup";
+                            try { localStorage.setItem('hatim_current_group', String(groupKey)); } catch(e){}
                             localStorage.setItem('hatim_member_type_' + userName, "grup");
                             if (document.getElementById('login-remember') && document.getElementById('login-remember').checked) {
                               localStorage.setItem('hatim_remember_user', userName); localStorage.setItem('hatim_remember_pass', userPassword || ''); localStorage.setItem('hatim_remember_group', groupName || ''); localStorage.setItem('hatim_remember_group_pass', groupPassword || ''); localStorage.setItem('hatim_remember_type', 'grup');
@@ -4587,7 +4588,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                     document.addEventListener("change", async (e) => {
                         if (!e.target || e.target.id !== "admin-group-select") return;
                         let v = e.target.value;
-                        if (v.startsWith("gm:")) { let p = v.split(':'); currentGroup = p[1]; loggedInMember = decodeURIComponent(p[2]||""); loggedInMemberType = "grup"; await window.loadGroupData(true); updateUserInterface(); renderAdminSectionAtBottom(); const _sel=document.getElementById("admin-group-select"); if(_sel) _sel.value=v; }
+                        if (v.startsWith("gm:")) { let p = v.split(':'); currentGroup = p[1]; try { localStorage.setItem('hatim_current_group', String(p[1])); } catch(e){} loggedInMember = decodeURIComponent(p[2]||""); loggedInMemberType = "grup"; await window.loadGroupData(true); updateUserInterface(); renderAdminSectionAtBottom(); const _sel=document.getElementById("admin-group-select"); if(_sel) _sel.value=v; }
                         else if (v.startsWith("g:")) { currentGroup = v.slice(2); loggedInMember = ""; loggedInMemberType = ""; await window.loadGroupData(true); updateUserInterface(); if (typeof renderGrupTakipPanel === 'function') { try { renderGrupTakipPanel(); } catch(_er) { console.warn('renderGrupTakipPanel', _er); } } try { renderAdminSectionAtBottom(); } catch(_err2) { console.warn('renderAdminSectionAtBottom', _err2); } const _sel=document.getElementById("admin-group-select"); if(_sel) _sel.value=v; }
                         else if (v === "__bireysel__" || v === "") { currentGroup = v === "__bireysel__" ? "" : v; await window.loadGroupData(); }
                         else { currentGroup = ""; loggedInMember = v; loggedInMemberType = "bireysel"; await window.loadGroupData(true); updateUserInterface(); renderAdminSectionAtBottom(); }
@@ -4882,6 +4883,7 @@ var _cg = selVal || '';
             function saveBireyselPool(p) { localStorage.setItem('hatim_bireysel_pool', JSON.stringify(p)); }
 
             async function loadGroupData(skipSession, silent) {
+                try { if (!currentGroup) { const _cg = localStorage.getItem('hatim_current_group'); if (_cg) currentGroup = _cg; } } catch(e){}
                 const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
                 appData = savedData ? JSON.parse(savedData) : { members: [], password: "" };
 
