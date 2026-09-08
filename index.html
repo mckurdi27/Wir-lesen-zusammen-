@@ -1653,7 +1653,27 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                     const booksEl = document.getElementById('bt-member-books');
                     if (!booksEl) return;
                     
-                    if (typeof window._sbMemberDetail !== 'function') { return; }
+                    
+                    // Yedek anlik dolum (localStorage): Supabase cevabi gelene kadar kart bos kalmasin
+                    try {
+                        var _byd=appData||{}, _bp=_byd.bookPages||{}, _bk=_byd.books||[];
+                        var _rows=[], _sumT=0,_sumR=0;
+                        Object.keys(_bp).forEach(function(bid){
+                            var units=_bp[bid]||[];
+                            var taken=units.filter(function(u){return u&&u.owner===loggedInMember;});
+                            if(!taken.length)return;
+                            var read=taken.filter(function(u){return u.isRead;}).length;
+                            _sumT+=taken.length; _sumR+=read;
+                            var b=null; for(var k2=0;k2<_bk.length;k2++){if(_bk[k2].id===bid){b=_bk[k2];break;}}
+                            _rows.push({id:bid,name:b?b.name:bid,taken:taken.length,read:read,totalUnits:b?(b.total_units||0):0,completed:read>=taken.length});
+                        });
+                        if(_rows.length && typeof window._sbBuildCardHtml==='function'){
+                            var _bEl=document.getElementById('bt-member-books');
+                            if(_bEl) _bEl.innerHTML=window._sbBuildCardHtml(_rows,_sumT,_sumR,loggedInMember);
+                        }
+                    } catch(e){}
+
+if (typeof window._sbMemberDetail !== 'function') { return; }
                     window._sbMemberDetail(loggedInMember, (typeof window._memberGroupKey==='function'?window._memberGroupKey(loggedInMember, currentGroup):currentGroup)).then(function (data) {
                         var pwdEl = document.getElementById('bt-member-password');
                         if (pwdEl) pwdEl.value = data.password || '';
