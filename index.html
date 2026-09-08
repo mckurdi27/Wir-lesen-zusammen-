@@ -2793,7 +2793,10 @@ function renderTab6(groupName, memberName) {
                                     var _minTake='';
                                     var _bp2=_bpsrc[bid]||[];
                                     for(var _ti=0;_ti<_bp2.length;_ti++){ var _u=_bp2[_ti]; if(_u&&_u.owner&&String(_u.owner).trim()&&_u.takeDate){ var _dt=String(_u.takeDate); if(!_minTake||_dt<_minTake) _minTake=_dt; } }
-                                    started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo || 1, baslangic: _minTake || h.startDate || '' });
+                                    
+                                        var _minRead='';
+                                        for(var _ri=0;_ri<_bp2.length;_ri++){ var _ru=_bp2[_ri]; if(_ru&&_ru.owner&&String(_ru.owner).trim()&&_ru.readDate){ var _rdt=String(_ru.readDate)+(_ru.readTime?' '+String(_ru.readTime):''); if(!_minRead||_rdt<_minRead) _minRead=_rdt; } }
+started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo || 1, baslangic: _minTake || h.startDate || '', alindi: _minTake || '', okundu: _minRead || '' });
                                 });
                                 // 2) Tamamlanan hatimler (bookHistory)
                                 if (gData.bookHistory) {
@@ -2809,7 +2812,7 @@ function renderTab6(groupName, memberName) {
                     // Toplam (global) hatim sirasi, ESER BAZLI: her eserin tum hatimleri (devam eden+tamamlanan)
                     // baslangic kronolojisine gore kendi icinde numaralanir (hangi grup ilk aldiyse 1, sonraki 2, ...)
                     var _all = [];
-                    started.sort(function(a,b){return String(a.baslangic||'').localeCompare(String(b.baslangic||''));}); started.forEach(function(r){ r.kind='start'; _all.push(r); });
+                    started.sort(function(a,b){var x=String(a.baslangic||''),y=String(b.baslangic||''); if(!x&&!y)return 0; if(!x)return 1; if(!y)return -1; return x<y?-1:x>y?1:0;}); started.forEach(function(r){ r.kind='start'; _all.push(r); });
                     done.sort(function(a,b){return String(a.tamamlandi||a.baslangic||'').localeCompare(String(b.tamamlandi||b.baslangic||''));}); done.forEach(function(r){ r.kind='done'; _all.push(r); });
                     _all.sort(function(a,b){ var ea=a.eser||'', eb=b.eser||'', ta=a.baslangic||'', tb=b.baslangic||''; return ea<eb?-1:ea>eb?1:(ta<tb?-1:ta>tb?1:0); });
                     var _bookCounter = {};
@@ -2831,6 +2834,8 @@ function renderTab6(groupName, memberName) {
                             + '<th data-k="eser" class="t6-th" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="S\u0131rala">Eser \u21c5</th>'
                             + '<th data-k="grup" class="t6-th" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="S\u0131rala">Grup Ad\u0131 \u21c5</th>'
                             + '<th data-k="baslangic" class="t6-th" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="S\u0131rala">Ba\u015flang\u0131\u00e7 \u21c5</th>'
+                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Al\u0131nd\u0131</th>'
+                            + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Okundu</th>'
                             + '<th data-k="durum" class="t6-th" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="S\u0131rala">Durum \u21c5</th>';
                         if (admin) html += '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Y\u00f6net</th>';
                         html += '</tr></thead><tbody id="tab6-start-tb">';
@@ -2841,6 +2846,8 @@ function renderTab6(groupName, memberName) {
                                 + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.eser||'') + '</td>'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.grup||'') + '</td>'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.baslangic||'-') + '</td>'
+                                + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.alindi||'-') + '</td>'
+                                + '<td style="padding:8px;border:1px solid var(--border-color);">' + (r.okundu||'-') + '</td>'
                                 + '<td style="padding:8px;border:1px solid var(--border-color);">Devam ediyor</td>';
                             if (admin) html += '<td style="padding:6px;border:1px solid var(--border-color);"><button class="tab6-btn" data-act="delStart" data-gkey="' + encodeURIComponent(r.grup) + '" data-bid="' + encodeURIComponent(r.bid) + '" style="background:#e74c3c;color:#fff;border:none;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;">Sil / S\u0131f\u0131rla</button></td>';
                             html += '</tr>';
