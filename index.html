@@ -1642,6 +1642,14 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                     var _rEl = document.getElementById('bt-member-region');
                     var _cEl = document.getElementById('bt-member-city');
                     try { var _md = appData || {}; if (_rEl) _rEl.value = (_md.regions && _md.regions[loggedInMember]) || ''; if (_cEl) _cEl.value = (_md.cities && _md.cities[loggedInMember]) || ''; } catch(e){}
+                    // Supabase'ten taze Bölge/Şehir (uyeye kart Supabase'ten okuyup göstersin)
+                    (function(){ if (typeof window._sbMemberDetail !== 'function') return;
+                      var _gk=(window.currentGroup!==undefined&&window.currentGroup)||(appData&&appData.group)||'';
+                      window._sbMemberDetail(loggedInMember,_gk).then(function(md){
+                        var rE=document.getElementById('bt-member-region'),cE=document.getElementById('bt-member-city');
+                        if(md&&md.region!=null&&rE){ rE.value=md.region||''; if(appData&&!appData.regions)appData.regions={}; if(appData.regions)appData.regions[loggedInMember]=md.region||''; }
+                        if(md&&md.city!=null&&cE){ cE.value=md.city||''; if(appData&&!appData.cities)appData.cities={}; if(appData.cities)appData.cities[loggedInMember]=md.city||''; }
+                      }).catch(function(){}); })();
                     const booksEl = document.getElementById('bt-member-books');
                     if (!booksEl) return;
                     // Anl\u0131k g\u00fcncelleme: \u00f6nce yerel veriden senkron g\u00f6ster, sonra Supabase'ten tazele
@@ -1729,7 +1737,10 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                         if (!appData.regions) appData.regions = {};
                         appData.regions[loggedInMember] = _v;
                         try { saveGroupData(); } catch(e){}
-                        if (loggedInMemberType !== 'grup') { try { var _bp=getBireyselPool(); if(!_bp.regions)_bp.regions={}; _bp.regions[loggedInMember]=_v; saveBireyselPool(_bp); } catch(e){} }
+                        if (typeof window._sbUpdateRegionCity === 'function') {
+                          var _gr = (window.currentGroup !== undefined && window.currentGroup) || (appData && appData.group) || '';
+                          window._sbUpdateRegionCity(loggedInMember, _gr, 'region', _v).catch(function(){});
+                        }
                         showToast('Bölge kaydedildi.', 'success');
                         return;
                     }
@@ -1739,7 +1750,10 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                         if (!appData.cities) appData.cities = {};
                         appData.cities[loggedInMember] = _v;
                         try { saveGroupData(); } catch(e){}
-                        if (loggedInMemberType !== 'grup') { try { var _bp=getBireyselPool(); if(!_bp.cities)_bp.cities={}; _bp.cities[loggedInMember]=_v; saveBireyselPool(_bp); } catch(e){} }
+                        if (typeof window._sbUpdateRegionCity === 'function') {
+                          var _gc = (window.currentGroup !== undefined && window.currentGroup) || (appData && appData.group) || '';
+                          window._sbUpdateRegionCity(loggedInMember, _gc, 'city', _v).catch(function(){});
+                        }
                         showToast('Şehir kaydedildi.', 'success');
                         return;
                     }
@@ -5411,7 +5425,7 @@ document.addEventListener('click', function (e) {
   }
   window._sbMemberDetail = function (name, groupKey) {
     return Promise.all([
-      rest.select("members", "?select=id,name,password,group_key"),
+      rest.select("members", "?select=id,name,password,group_key,region,city"),
       rest.select("shares", "?select=member_id,book_id,unit_index,is_read,read_date,read_time,take_date,take_time"),
       rest.select("books", "?select=id,name,total_units")
     ]).then(function (res) {
@@ -5440,7 +5454,18 @@ document.addEventListener('click', function (e) {
       });
       var groupKey = null;
       mems.forEach(function (m) { if (m.group_key) groupKey = m.group_key; });
-      return { name: name, password: mems[0].password || "", groupKey: groupKey, books: bookRows };
+      return { name: name, password: mems[0].password || "", groupKey: groupKey, region: (mems[0]&&mems[0].region) || "", city: (mems[0]&&mems[0].city) || "", books: bookRows };
+    });
+  };
+  window._sbUpdateRegionCity = function (name, group, field, val) {
+    if (!field) return Promise.resolve();
+    return rest.select("members", "?select=id,name,group_key").then(function (allM) {
+      var target = null;
+      (allM || []).forEach(function (m) { if (m.name === name && String(m.group_key || "") === String(group || "")) target = m; });
+      if (!target) { var same = (allM || []).filter(function (m) { return m.name === name; }); if (same.length === 1) target = same[0]; }
+      if (!target) return { ok: false };
+      var bd = {}; bd[field] = val;
+      return api("/members?id=eq." + target.id, { method: "PATCH", headers: { "Prefer": "return=representation" }, body: JSON.stringify(bd) });
     });
   };
   window._sbUpdatePassword = function (name, newPwd, group) {
