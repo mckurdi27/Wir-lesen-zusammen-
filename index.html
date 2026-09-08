@@ -2818,7 +2818,7 @@ started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo
                     var _all = [];
                     started.sort(function(a,b){var x=String(a.baslangic||''),y=String(b.baslangic||''); if(!x&&!y)return 0; if(!x)return 1; if(!y)return -1; return x<y?-1:x>y?1:0;}); started.forEach(function(r){ r.kind='start'; _all.push(r); });
                     done.sort(function(a,b){return String(a.tamamlandi||a.baslangic||'').localeCompare(String(b.tamamlandi||b.baslangic||''));}); done.forEach(function(r){ r.kind='done'; _all.push(r); });
-                    _all.sort(function(a,b){ var ea=a.eser||'', eb=b.eser||'', ta=a.baslangic||'', tb=b.baslangic||''; return ea<eb?-1:ea>eb?1:(ta<tb?-1:ta>tb?1:0); });
+                    _all.sort(function(a,b){ var ta=a.baslangic||'', tb=b.baslangic||''; if(!ta&&!tb)return 0; if(!ta)return 1; if(!tb)return -1; return ta<tb?-1:ta>tb?1:0; });
                     var _bookCounter = {};
                     _all.forEach(function(r){ var b=r.eser||''; if(!_bookCounter[b]) _bookCounter[b]=0; _bookCounter[b]++; r.globalNo=_bookCounter[b]; });
                     if (started.length === 0 && done.length === 0) {
@@ -3110,7 +3110,7 @@ started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo
                                 } catch(e){}
                             });
                             let _al = st2.concat(dn2);
-                            _al.sort(function(a,b){ let ea=a.eser||'',eb=b.eser||'',ta=a.bas||'',tb=b.bas||''; return ea<eb?-1:ea>eb?1:(ta<tb?-1:ta>tb?1:0); });
+                            _al.sort(function(a,b){ let ta=a.bas||'',tb=b.bas||''; if(!ta&&!tb)return 0; if(!ta)return 1; if(!tb)return -1; return ta<tb?-1:ta>tb?1:0; });
                             let _bc={}; _al.forEach(function(r){ let b=r.eser||''; if(!_bc[b])_bc[b]=0; _bc[b]++; r.gn=_bc[b]; });
                             _al.forEach(function(r){ hatim.push([r.gn, r.no+'. Hatim', r.eser, r.g, r.bas||'-', r.kind==='start'?'Devam ediyor':'Tamamland\u0131']); });
                         } catch(e){}
