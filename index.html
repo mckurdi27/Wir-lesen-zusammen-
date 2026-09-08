@@ -4066,28 +4066,41 @@ window.infoSortTable = function infoSortTable(col) {
                         return null;
                     }
                     function bulkSave(data) {
+                        // 1) localStorage'a yaz (aninda goruntuleme)
                         if (data.type === 'bireysel') localStorage.setItem('hatim_group_' + data.mName.toLowerCase(), JSON.stringify(data.gData));
                         else localStorage.setItem(`hatim_group_${data.gKey}`, JSON.stringify(data.gData));
-                        // Supabase tam senkron: önce grubun share'lerini sil, sonra gData ile yeniden yaz (sil/sıfırla kalıcı olsun)
-                        try {
-                            var _k = (data.type === 'bireysel') ? (data.mName || '').toLowerCase() : data.gKey;
-                            if (_k && typeof window.api === 'function' && typeof window.replaceShares === 'function') {
-                                var _keyEnc = encodeURIComponent(_k);
-                                window.api("/members?select=id&group_key=eq." + _keyEnc).then(function (mems) {
-                                    var ids = (mems || []).map(function (mm) { return mm.id; });
-                                    var del = ids.map(function (id) { return window.api("/shares?member_id=eq." + id, { method: "DELETE" }); });
-                                    return Promise.all(del).catch(function(){});
-                                }).then(function () {
-                                    return window.replaceShares(data.gData, _k);
-                                }).then(function () {
-                                    // Toplu atama da hatim kaydini Supabase'e yaz (hisse olan eserler icin)
-                                    if (typeof window.syncHatimToSB === 'function') { return window.syncHatimToSB(_k, data.gData); }
-                                    return undefined;
-                                }).catch(function(e){ console.warn('bulkSave supabase', e); });
-                            }
-                        } catch(e){ console.warn('bulkSave supabase', e); }
+                        // 2) Supabase senkronu: kuyruga al, sirayla calistir, hatayi GORUNUR yap
+                        //    Boylece localStorage ile Supabase ayrismaz.
+                        var _k = (data.type === 'bireysel') ? (data.mName || '').toLowerCase() : data.gKey;
+                        if (!_k || typeof window.api !== 'function' || typeof window.replaceShares !== 'function') return Promise.resolve();
+                        window._sbQ = window._sbQ || Promise.resolve();
+                        var p = window._sbQ = window._sbQ.then(function () {
+                            if (typeof window.showToast === 'function') showToast('Supabase’e senkronlanıyor...', 'info');
+                            var _keyEnc = encodeURIComponent(_k);
+                            return window.api("/members?select=id&group_key=eq." + _keyEnc).then(function (mems) {
+                                var ids = (mems || []).map(function (mm) { return mm.id; });
+                                var del = ids.map(function (id) { return window.api("/shares?member_id=eq." + id, { method: "DELETE" }); });
+                                return Promise.all(del);
+                            }).then(function () {
+                                return window.replaceShares(data.gData, _k);
+                            }).then(function () {
+                                if (typeof window.syncHatimToSB === 'function') return window.syncHatimToSB(_k, data.gData);
+                                return undefined;
+                            }).then(function () {
+                                return 'ok';
+                            }).catch(function (e) {
+                                // Hata: kullaniciya goster + localStorage'i supabase gercegiyle yeniden hizala
+                                console.error('bulkSave supabase', e);
+                                if (typeof window.showToast === 'function') showToast('Supabase senkron hatası: veri geri alındı. ' + (e && e.message ? e.message : e), 'error');
+                                if (typeof window.pullAll === 'function') { try { window.pullAll(); } catch (e2) {} }
+                                throw e;
+                            });
+                        });
+                        p.catch(function(){}); // kuyruk bir onceki hata ile kirilmasin
+                        return p;
                     }
-                    function bulkBookIds() {
+
+function bulkBookIds() {
                         let ids = getSelectedBulkBooks();
                         if (!ids.length) ids = (appData.books || []).map(b => b.id);
                         return ids;
