@@ -5386,7 +5386,7 @@ document.addEventListener('click', function (e) {
   function pullAll() {
     if (_pulling) return Promise.resolve();
     _pulling = true;
-    return Promise.all([rest.select("groups"), rest.select("members"), rest.select("shares", "?select=member_id,book_id,unit_index,is_read,read_date,read_time,take_date,take_time"), rest.select("books", "?select=id,name,total_units,type,default_mode,sort_order"), rest.select("book_hatims"), rest.select("book_history")])
+    return Promise.all([rest.select("groups"), rest.select("members"), rest.select("shares", "?select=member_id,book_id,unit_index,is_read,read_date,read_time,take_date,take_time"), rest.select("books", "?select=id,name,total_units,type,default_mode,sort_order&order=sort_order"), rest.select("book_hatims"), rest.select("book_history")])
       .then(function (res) {
         var groups = res[0] || [], members = res[1] || [], shares = res[2] || [], books = res[3] || [], bhRows = res[4] || [], histRows = res[5] || [];
         var bookDef = (books && books.length) ? books.map(function (x) { return { id: x.id, total_units: x.total_units }; }) : [];
