@@ -5400,9 +5400,11 @@ document.addEventListener('click', function (e) {
         members.forEach(function (m) { if (!m.group_key) { poolNames.add(m.name); poolPass[m.name] = m.password; poolTypes[m.name] = m.type || "bireysel"; } });
         Object.keys(byKey).forEach(function (gk) {
           var gm = members.filter(function (m) { return m.group_key === gk; });
-          var g = { members: gm.map(function (m) { return m.name; }), memberTypes: {}, passwords: {}, password: byKey[gk].password || "", books: bookFull, bookPages: {}, bookHatims: bhByGroup[gk] || {}, bookHistory: histByGroup[gk] || {}, readingLogs: [] };
-          // Bolge/sehir localStorage'dan korunur (Supabase'te kolon yok)
-          try { var _prev = JSON.parse(origGetItem("hatim_group_" + gk) || "null"); if (_prev) { if (_prev.regions) g.regions = _prev.regions; if (_prev.cities) g.cities = _prev.cities; if (_prev.books && _prev.books.length) g.books = _prev.books; if (_prev.bookSectionPages) g.bookSectionPages = _prev.bookSectionPages; if (typeof _prev.dropdownVisible === 'boolean') g.dropdownVisible = _prev.dropdownVisible; } } catch(e){}
+          var g = { members: gm.map(function (m) { return m.name; }), memberTypes: {}, passwords: {}, password: byKey[gk].password || "", books: bookFull, bookPages: {}, bookHatims: bhByGroup[gk] || {}, bookHistory: histByGroup[gk] || {}, readingLogs: {}, regions: {}, cities: {} };
+          // Supabase uyelerinden bolge/sehir (Supabase tek dogruluk kaynagi)
+          gm.forEach(function (m) { if (m.region) { if (!g.regions) g.regions = {}; g.regions[m.name] = m.region; } if (m.city) { if (!g.cities) g.cities = {}; g.cities[m.name] = m.city; } });
+          // Yerelde kayitli ama Supabase'te bos olan bolge/sehir varsa koru (asla bos ile ezme)
+          try { var _prev = JSON.parse(origGetItem("hatim_group_" + gk) || "null"); if (_prev) { if (_prev.regions) { if (!g.regions) g.regions = {}; Object.keys(_prev.regions).forEach(function (nm) { if (!g.regions[nm]) g.regions[nm] = _prev.regions[nm]; }); } if (_prev.cities) { if (!g.cities) g.cities = {}; Object.keys(_prev.cities).forEach(function (nm) { if (!g.cities[nm]) g.cities[nm] = _prev.cities[nm]; }); } if (_prev.books && _prev.books.length) g.books = _prev.books; if (_prev.bookSectionPages) g.bookSectionPages = _prev.bookSectionPages; if (typeof _prev.dropdownVisible === 'boolean') g.dropdownVisible = _prev.dropdownVisible; } } catch(e){}
           if (typeof byKey[gk].dropdown_visible === 'boolean') g.dropdownVisible = byKey[gk].dropdown_visible;
           gm.forEach(function (m) { g.memberTypes[m.name] = m.type || "grup"; g.passwords[m.name] = m.password || ""; });
           bookDef.forEach(function (b) { g.bookPages[b.id] = Array(b.total_units).fill(null).map(function () { return { owner: "", isRead: false }; }); });
