@@ -1666,7 +1666,7 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                     var alimT = ''; var okumT = '';
                     var okumS = ''; var okumS2 = '';
                     for (var u=0;u<taken.length;u++){ if(taken[u].takeDate&&taken[u].takeTime){ var _tk=String(taken[u].takeDate)+' '+String(taken[u].takeTime); if(!alimT||_tk<alimT) alimT=_tk; } else if(!alimT&&taken[u].takeDate){ alimT=String(taken[u].takeDate); } }
-                    for (var u2=0;u2<taken.length;u2++){ if(taken[u2].readDate){ var _rd=String(taken[u2].readDate)+' '+(taken[u2].readTime||''); if(!okumT||_rd>okumT) okumT=_rd; } }
+                    for (var u2=0;u2<taken.length;u2++){ if(taken[u2].readDate){ var _rdt0=String(taken[u2].readDate).split('T')[0].split(' ')[0]; var _rdt=_rdt0+' '+(taken[u2].readTime||'').toString().slice(0,5); if(!okumT||_rdt>okumT) okumT=_rdt; } }
                     rows.push({ id: bid, name: b ? b.name : bid, taken: taken.length, read: read,
                         totalUnits: b ? (b.total_units||0) : 0, completed: read >= taken.length,
                         alimTarih: alimT, okunmaTarih: okumT });
@@ -2739,7 +2739,7 @@ var rows = [];
                         return analysisSortDir==='az' ? String(av).localeCompare(String(bv),'tr') : String(bv).localeCompare(String(av),'tr');
                     });
 
-                    function fmt(d, t){ return (d&&d!=='Tarih yok') ? (d + (t&&t!=='--:--' ? ' '+t : '')) : '--'; }
+                    function fmt(d, t){ if(d&&d.indexOf('T')>0) d=String(d).split('T')[0].split(' ')[0]; if(t&&String(t).length>5) t=String(t).slice(0,5); return (d&&d!=='Tarih yok') ? (d + (t&&t!=='--:--' ? ' '+t : '')) : '--'; }
 
                     let html = `
                         <div class="d-tab-scroll">
@@ -3659,7 +3659,7 @@ const panel = document.getElementById('grup-takip-panel');
                         var b = null; for (var k=0;k<_bk.length;k++){ if(_bk[k].id===bid){ b=_bk[k]; break; } }
                         var _alimG='', _okumG='';
                         for(var _ug=0;_ug<taken.length;_ug++){ if(taken[_ug].takeDate&&taken[_ug].takeTime){ var _tg=String(taken[_ug].takeDate)+' '+String(taken[_ug].takeTime); if(!_alimG||_tg<_alimG) _alimG=_tg; } else if(!_alimG&&taken[_ug].takeDate){ _alimG=String(taken[_ug].takeDate); } }
-                        for(var _ug2=0;_ug2<taken.length;_ug2++){ if(taken[_ug2].readDate){ var _rg2=String(taken[_ug2].readDate)+' '+(taken[_ug2].readTime||''); if(!_okumG||_rg2>_okumG) _okumG=_rg2; } }
+                        for(var _ug2=0;_ug2<taken.length;_ug2++){ if(taken[_ug2].readDate){ var _rg0=String(taken[_ug2].readDate).split('T')[0].split(' ')[0]; var _rg2=_rg0+' '+(taken[_ug2].readTime||'').toString().slice(0,5); if(!_okumG||_rg2>_okumG) _okumG=_rg2; } }
                         rows.push({ id: bid, name: b ? b.name : bid, taken: taken.length, read: read,
                             totalUnits: b ? (b.total_units||0) : 0, completed: read >= taken.length, alimTarih: _alimG, okunmaTarih: _okumG });
                     });
