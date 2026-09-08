@@ -4358,8 +4358,11 @@ function bulkBookIds() {
                                 panel.querySelectorAll('.bv-unit:checked').forEach(cb => {
                                     let s = parseInt(cb.getAttribute('data-start'));
                                     let en = parseInt(cb.getAttribute('data-end'));
+                                    let _tkD = new Date().toLocaleDateString('tr-TR');
+                                    let _tkT = new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
                                     for (let i = s; i < en; i++) {
-                                        tpages[i].owner = m; tpages[i].isRead = tpages[i].isRead || false; cnt++;
+                                        if (tpages[i] && tpages[i].owner !== m) { tpages[i].owner = m; tpages[i].isRead = tpages[i].isRead || false; tpages[i].takeDate = _tkD; tpages[i].takeTime = _tkT; }
+                                        cnt++;
                                     }
                                 });
                                 // 2) Okundu: tik EKLE (kutu secili) / tik CIKAR (kutu bos) -> cift yonlu guncelle, hisse kaybetme
