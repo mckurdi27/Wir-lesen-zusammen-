@@ -5303,7 +5303,7 @@ document.addEventListener('click', function (e) {
       return rest.upsert("groups", [{ key: key, name: (g && g.name) || String(key).replace(/_/g, " "), password: (g && g.password) || "" }])
         .then(function () {
           var memArr = (g && g.members) || [];
-          var allNames = Array.from(new Set(memArr.concat(ownersOf(g))));
+          var allNames = Array.from(new Set(memArr));
           return replaceMembers(allNames, key, (g && g.passwords) || {}).then(function () { return replaceShares(g, key); }).then(function () { return syncHatimToSB(key, g); });
         });
     }).then(function () { setTimeout(function () { _myPush = false; }, 1200); });
@@ -5313,7 +5313,8 @@ document.addEventListener('click', function (e) {
     _myPush = true;
     return enqueue(function () {
       var memArr = (g && g.members) || [];
-      var allNames = Array.from(new Set(memArr.concat(ownersOf(g))));
+      // Otomatik uye URETME: sadece gercek uyeler yazilir. ownersOf (hisse sahibi) otomatik uye yaratmaz.
+      var allNames = Array.from(new Set(memArr));
       if (!allNames.length && key) allNames.push(key);
       var gk = key || "bireysel";
       return rest.upsert("groups", [{ key: gk, name: (g && g.name) || String(gk).replace(/_/g, " "), password: (g && g.password) || "" }])
