@@ -5464,12 +5464,14 @@ document.addEventListener('click', function (e) {
   window._sbUpdateRegionCity = function (name, group, field, val) {
     if (!field) return Promise.resolve();
     return rest.select("members", "?select=id,name,group_key").then(function (allM) {
-      var target = null;
-      (allM || []).forEach(function (m) { if (m.name === name && String(m.group_key || "") === String(group || "")) target = m; });
-      if (!target) { var same = (allM || []).filter(function (m) { return m.name === name; }); if (same.length === 1) target = same[0]; }
-      if (!target) return { ok: false };
+      var targets = (allM || []).filter(function (m) { return m.name === name; });
+      // once ayni gruptaki kaydi tercih et; yoksa o isimdeki TUM kayitlari guncelle (isim cift kopyalanmis olsa da yazim ulsin)
+      var groupMatch = targets.filter(function (m) { return String(m.group_key || "") === String(group || ""); });
+      var pick = (groupMatch.length ? groupMatch : targets);
+      if (!pick.length) return { ok: false };
       var bd = {}; bd[field] = val;
-      return api("/members?id=eq." + target.id, { method: "PATCH", headers: { "Prefer": "return=representation" }, body: JSON.stringify(bd) });
+      var tasks = pick.map(function (t) { return api("/members?id=eq." + t.id, { method: "PATCH", headers: { "Prefer": "return=representation" }, body: JSON.stringify(bd) }); });
+      return Promise.all(tasks);
     });
   };
   window._sbUpdatePassword = function (name, newPwd, group) {
