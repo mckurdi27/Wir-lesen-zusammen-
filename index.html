@@ -5432,13 +5432,16 @@ document.addEventListener('click', function (e) {
   window._memberGroupKey = function (memberName, preferGroup) {
     if (preferGroup && String(preferGroup)) return String(preferGroup);
     if (!memberName) return "";
+    // 1) Kalici/aktif grup (deterministik) - giris/admin secimde yazildi
+    try { var _cg = localStorage.getItem('hatim_current_group'); if (_cg && String(_cg)) return String(_cg); } catch(e){}
+    // 2) Oturum anahtarlarini tara
     try {
       for (var gi=0; gi<localStorage.length; gi++) {
         var k = localStorage.key(gi);
         if (k && k.indexOf('hatim_session_') === 0 && k.length>14) {
           if (localStorage.getItem(k) === memberName) {
             var g = k.slice(14);
-            return g;
+            if (g) return g;
           }
         }
       }
