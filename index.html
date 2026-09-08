@@ -2789,7 +2789,11 @@ function renderTab6(groupName, memberName) {
                                     Object.keys(gData.bookHatims).forEach(function(bid){
                                         if(!_sbHasShare(bid)) return; // hissesiz hayalet hatim gosterme
                                         var h = gData.bookHatims[bid] || {};
-                                        started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo || 1, baslangic: h.startDate || '' });
+                                        // Hatim baslangici = o eserde en erken hisse alim zamani (supabase take_date)
+                                        var _minTake='';
+                                        var _bp2=(gData.bookPages&&gData.bookPages[bid])||[];
+                                        for(var _ti=0;_ti<_bp2.length;_ti++){ var _u=_bp2[_ti]; if(_u&&_u.owner&&String(_u.owner).trim()&&_u.takeDate){ var _dt=String(_u.takeDate); if(!_minTake||_dt<_minTake) _minTake=_dt; } }
+                                        started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo || 1, baslangic: _minTake || h.startDate || '' });
                                     });
                                 }
                                 // 2) Tamamlanan hatimler (bookHistory)
