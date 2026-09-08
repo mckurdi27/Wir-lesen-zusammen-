@@ -4299,6 +4299,19 @@ function bulkBookIds() {
                                 }
                                 if (!tpages) return;
                                 let cnt = 0;
+                                let remCnt = 0;
+                                // 1a) Kaldirilan tik (bos kutu): o blok seçili uyenin sahipliğindeyse geri al
+                                panel.querySelectorAll('.bv-unit:not(:checked)').forEach(cb => {
+                                    if (cb.disabled) return; // baskasina ait, dokunma
+                                    let s = parseInt(cb.getAttribute('data-start'));
+                                    let en = parseInt(cb.getAttribute('data-end'));
+                                    let anyMine = false;
+                                    for (let i = s; i < en; i++) { if (tpages[i] && tpages[i].owner === m) { anyMine = true; break; } }
+                                    if (!anyMine) return;
+                                    for (let i = s; i < en; i++) {
+                                        if (tpages[i] && tpages[i].owner === m) { tpages[i].owner=''; tpages[i].isRead=false; tpages[i].readDate=null; tpages[i].readTime=null; tpages[i].takeDate=null; tpages[i].takeTime=null; remCnt++; }
+                                    }
+                                });
                                 panel.querySelectorAll('.bv-unit:checked').forEach(cb => {
                                     let s = parseInt(cb.getAttribute('data-start'));
                                     let en = parseInt(cb.getAttribute('data-end'));
@@ -4321,10 +4334,12 @@ function bulkBookIds() {
                                         }
                                     }
                                 });
-                                if (cnt > 0 || readChanged > 0) {
+                                if (cnt > 0 || remCnt > 0 || readChanged > 0) {
                                     bulkSave(targetData);
-                                    if (cnt > 0) showToast('\u2705 ' + cnt + ' hisse ' + m + ' \u00fcyesine atandı.', 'success');
-                                    else showToast('\u2705 Okundu durumu güncellendi.', 'success');
+                                    if (cnt > 0 && remCnt > 0) showToast('\u2705 ' + cnt + ' hisse atand\u0131, ' + remCnt + ' geri al\u0131nd\u0131.', 'success');
+                                    else if (cnt > 0) showToast('\u2705 ' + cnt + ' hisse ' + m + ' \u00fcyesine atand\u0131.', 'success');
+                                    else if (remCnt > 0) showToast('\u21a9\ufe0f ' + remCnt + ' hisse ' + m + ' \u00fcyesinden geri al\u0131nd\u0131.', 'success');
+                                    else showToast('\u2705 Okundu durumu g\u00fcncellendi.', 'success');
                                     renderUnits();
                                 } else { showToast('İşaretli hisse yok.', 'info'); }
                             });
