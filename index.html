@@ -1622,107 +1622,88 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                     </table>`;
             }
             function renderBireyselTakipPanel() {
-                    const panel = document.getElementById('bireysel-takip-panel');
-                    const _gp1 = document.getElementById('grup-takip-panel');
-                    if (!panel) return;
-                    if (!loggedInMember) { panel.style.display='none'; return; }
-                    panel.style.display = 'block';
-                    if (_gp1) _gp1.style.display='none';
-                    // kart gir paneli hemen altina sabitle (admin/eserler araya girmesin)
-                    try {
-                        var _lp = document.getElementById('simple-login-panel');
-                        if (_lp) {
-                            var _loginParent = _lp.parentNode;
-                            if (_loginParent && _loginParent !== panel.parentNode) { _loginParent.appendChild(panel); }
-                            else if (_loginParent && panel !== _lp.nextSibling) { _loginParent.insertBefore(panel, _lp.nextSibling); }
-                        }
-                    } catch(e){}
-                    const nameEl = document.getElementById('bt-member-name');
-                    if (nameEl) nameEl.value = loggedInMember;
-                    var _rEl = document.getElementById('bt-member-region');
-                    var _cEl = document.getElementById('bt-member-city');
-                    try { var _md = appData || {}; if (_rEl) _rEl.value = (_md.regions && _md.regions[loggedInMember]) || ''; if (_cEl) _cEl.value = (_md.cities && _md.cities[loggedInMember]) || ''; } catch(e){}
-                    // Supabase'ten taze Bölge/Şehir (uyeye kart Supabase'ten okuyup göstersin)
-                    (function(){ if (typeof window._sbMemberDetail !== 'function') return;
-                      var _gk=(typeof window._memberGroupKey==='function')?window._memberGroupKey(loggedInMember,(window.currentGroup!==undefined&&window.currentGroup)||(appData&&appData.group)||''):((window.currentGroup!==undefined&&window.currentGroup)||(appData&&appData.group)||'');
-                      window._sbMemberDetail(loggedInMember,_gk).then(function(md){
-                        var rE=document.getElementById('bt-member-region'),cE=document.getElementById('bt-member-city');
-                        if(md&&md.region!=null&&rE){ rE.value=md.region||''; if(appData&&!appData.regions)appData.regions={}; if(appData.regions)appData.regions[loggedInMember]=md.region||''; }
-                        if(md&&md.city!=null&&cE){ cE.value=md.city||''; if(appData&&!appData.cities)appData.cities={}; if(appData.cities)appData.cities[loggedInMember]=md.city||''; }
-                      }).catch(function(){}); })();
-                    const booksEl = document.getElementById('bt-member-books');
-                    if (!booksEl) return;
-                    
-                    
-                    // Yedek anlik dolum (localStorage): Supabase cevabi gelene kadar kart bos kalmasin
-                    try {
-                        var _byd=appData||{}, _bp=_byd.bookPages||{}, _bk=_byd.books||[];
-                        var _rows=[], _sumT=0,_sumR=0;
-                        Object.keys(_bp).forEach(function(bid){
-                            var units=_bp[bid]||[];
-                            var taken=units.filter(function(u){return u&&u.owner===loggedInMember;});
-                            if(!taken.length)return;
-                            var read=taken.filter(function(u){return u.isRead;}).length;
-                            _sumT+=taken.length; _sumR+=read;
-                            var b=null; for(var k2=0;k2<_bk.length;k2++){if(_bk[k2].id===bid){b=_bk[k2];break;}}
-                            _rows.push({id:bid,name:b?b.name:bid,taken:taken.length,read:read,totalUnits:b?(b.total_units||0):0,completed:read>=taken.length});
-                        });
-                        if(_rows.length && typeof window._sbBuildCardHtml==='function'){
-                            var _bEl=document.getElementById('bt-member-books');
-                            if(_bEl) _bEl.innerHTML=window._sbBuildCardHtml(_rows,_sumT,_sumR,loggedInMember);
-                        }
-                    } catch(e){}
-
-if (typeof window._sbMemberDetail !== 'function') { return; }
-                    window._sbMemberDetail(loggedInMember, (typeof window._memberGroupKey==='function'?window._memberGroupKey(loggedInMember, currentGroup):currentGroup)).then(function (data) {
-                        var pwdEl = document.getElementById('bt-member-password');
-                        if (pwdEl) pwdEl.value = data.password || '';
-                        var passInfo = document.getElementById('bt-member-password-hint');
-                        if (passInfo) passInfo.textContent = 'Grup: ' + (data.groupKey || '\u2014');
-                        if (!data.books || data.books.length === 0) {
-                            booksEl.innerHTML = '<div style="text-align:center; color:#777; padding:16px;">Hen\u00fcz hisse al\u0131nmam\u0131\u015f.</div>';
-                            return;
-                        }
-                        var totalTaken = data.books.reduce(function(s,b){return s+b.taken;},0);
-                        var totalRead = data.books.reduce(function(s,b){return s+b.read;},0);
-                        var totalPct = totalTaken>0 ? Math.round((totalRead/totalTaken)*100) : 0;
-                        var rows = data.books.map(function (b) {
-                            const pct = b.taken>0 ? Math.round((b.read/b.taken)*100) : 0;
-                            const durum = b.completed ? '\u2713 Tamamland\u0131' : (b.taken>0 ? (b.read>=b.taken?'Okundu':'Devam ediyor') : 'Hisse yok');
-                            const alimTarih = b.takeDates && b.takeDates.length ? b.takeDates[b.takeDates.length-1] : '\u2014';
-                            const okunmaTarih = b.readDates && b.readDates.length ? b.readDates[b.readDates.length-1] : '\u2014';
-                            return `<tr>
-                                <td style="padding:8px; border-bottom:1px solid var(--border-color); font-weight:bold;">${b.name}</td>
-                                <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${b.taken}</td>
-                                <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${alimTarih}</td>
-                                <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${b.read}</td>
-                                <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${okunmaTarih}</td>
-                                <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">%${pct}</td>
-                                <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${durum}</td>
-                            </tr>`;
-                        }).join('');
-                        booksEl.innerHTML = `
-                            <div style="display:flex; gap:12px; margin-bottom:10px; flex-wrap:wrap;">
-                                <div style="background:rgba(212,175,55,0.12); padding:8px 14px; border-radius:8px; font-size:13px;"><b>Toplam Hisse:</b> ${totalTaken}</div>
-                                <div style="background:rgba(39,174,96,0.12); padding:8px 14px; border-radius:8px; font-size:13px;"><b>Okunan:</b> ${totalRead}</div>
-                                <div style="background:rgba(142,68,173,0.12); padding:8px 14px; border-radius:8px; font-size:13px;"><b>Tamamlama:</b> %${totalPct}</div>
-                            </div>
-                            <table style="width:100%; border-collapse:collapse; font-size:13px;">
-                                <thead><tr style="background:rgba(212,175,55,0.15);">
-                                    <th style="padding:8px; text-align:left;">Eser</th>
-                                    <th style="padding:8px;">Al\u0131nan Hisse</th>
-                                    <th style="padding:8px;">Al\u0131nd\u0131\u011f\u0131 saat-g\u00fcn</th>
-                                    <th style="padding:8px;">Okunan</th>
-                                    <th style="padding:8px;">Okundu saat-g\u00fcn</th>
-                                    <th style="padding:8px;">\u0130lerleme</th>
-                                    <th style="padding:8px;">Durum</th>
-                                </tr></thead>
-                                <tbody>${rows}</tbody>
-                            </table>`;
-                    }).catch(function (e) {
-                        booksEl.innerHTML = '<div style="text-align:center; color:#e74c3c; padding:16px;">Veri \u00e7ekilirken hata: ' + e.message + '</div>';
-                    });
+                const panel = document.getElementById('bireysel-takip-panel');
+                if (!panel) return;
+                if (!loggedInMember) { panel.style.display='none'; return; }
+                panel.style.display = 'block';
+                const _gp1 = document.getElementById('grup-takip-panel');
+                if (_gp1) _gp1.style.display='none';
+                try {
+                    var _lp = document.getElementById('simple-login-panel');
+                    if (_lp) { var _lp2 = _lp.parentNode; if (_lp2 && panel.parentNode !== _lp2) _lp2.appendChild(panel); }
+                } catch(e){}
+                // Hisse verisi, grup kartiyla AYNI kaynaktan: pullAll'in Supabase'ten doldurdugu appData
+                var _ad = (typeof appData !== 'undefined' && appData) ? appData : {};
+                var _bp = _ad.bookPages || {};
+                var _bk = _ad.books || [];
+                var _pass = _ad.passwords || {};
+                var _regs = _ad.regions || {};
+                var _cits = _ad.cities || {};
+                var _pwd = _ad.password || '';
+                var nameEl = document.getElementById('bt-member-name');
+                if (nameEl) nameEl.value = loggedInMember;
+                var rEl = document.getElementById('bt-member-region');
+                if (rEl) rEl.value = _regs[loggedInMember] || '';
+                var cEl = document.getElementById('bt-member-city');
+                if (cEl) cEl.value = _cits[loggedInMember] || '';
+                var pwdEl = document.getElementById('bt-member-password');
+                if (pwdEl) pwdEl.value = (_pass[loggedInMember] || _pwd || '');
+                var hintEl = document.getElementById('bt-member-password-hint');
+                var gKey = (window.currentGroup !== undefined && currentGroup) || (_ad.group || '');
+                if (hintEl) hintEl.textContent = 'Grup: ' + gKey;
+                var booksEl = document.getElementById('bt-member-books');
+                if (!booksEl) return;
+                // Uyenin hisseleri (owner === loggedInMember)
+                var rows = []; var sumT = 0, sumR = 0;
+                Object.keys(_bp).forEach(function (bid) {
+                    var units = _bp[bid] || [];
+                    var taken = units.filter(function(u){ return u && u.owner === loggedInMember; });
+                    if (!taken.length) return;
+                    var read = taken.filter(function(u){ return u.isRead; }).length;
+                    sumT += taken.length; sumR += read;
+                    var b = null;
+                    for (var k=0;k<_bk.length;k++){ if(_bk[k].id===bid){ b=_bk[k]; break; } }
+                    var alimT = ''; var okumT = '';
+                    for (var u=0;u<taken.length;u++){ if(taken[u].takeDate && !alimT) alimT=taken[u].takeDate; if(taken[u].takeTime&&!alimT) alimT=taken[u].takeDate; }
+                    rows.push({ id: bid, name: b ? b.name : bid, taken: taken.length, read: read,
+                        totalUnits: b ? (b.total_units||0) : 0, completed: read >= taken.length,
+                        alimTarih: alimT, okunmaTarih: okumT });
+                });
+                if (!rows.length) {
+                    booksEl.innerHTML = '<div style="text-align:center; color:#777; padding:16px;">Hen\u00fcz hisse al\u0131nmam\u0131\u015f.</div>';
+                    return;
                 }
+                var totalPct = sumT>0 ? Math.round((sumR/sumT)*100) : 0;
+                var body = rows.map(function (b) {
+                    var pct = b.taken>0 ? Math.round((b.read/b.taken)*100) : 0;
+                    var durum = b.completed ? '\u2713 Tamamland\u0131' : (b.taken>0 ? (b.read>=b.taken?'Okundu':'Devam ediyor') : 'Al\u0131nd\u0131');
+                    return `<tr>
+                        <td style="padding:8px; border-bottom:1px solid var(--border-color); font-weight:bold;">${b.name}</td>
+                        <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${b.taken}</td>
+                        <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${b.alimTarih || '\u2014'}</td>
+                        <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${b.read}</td>
+                        <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">%${pct}</td>
+                        <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${durum}</td>
+                    </tr>`;
+                }).join('');
+                booksEl.innerHTML = `
+                    <div style="display:flex; gap:12px; margin-bottom:10px; flex-wrap:wrap;">
+                        <div style="background:rgba(212,175,55,0.12); padding:8px 14px; border-radius:8px; font-size:13px;"><b>Toplam Hisse:</b> ${sumT}</div>
+                        <div style="background:rgba(39,174,96,0.12); padding:8px 14px; border-radius:8px; font-size:13px;"><b>Okunan:</b> ${sumR}</div>
+                        <div style="background:rgba(142,68,173,0.12); padding:8px 14px; border-radius:8px; font-size:13px;"><b>Tamamlama:</b> %${totalPct}</div>
+                    </div>
+                    <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                        <thead><tr style="background:rgba(212,175,55,0.15);">
+                            <th style="padding:8px; text-align:left;">Eser</th>
+                            <th style="padding:8px;">Al\u0131nan</th>
+                            <th style="padding:8px;">Al\u0131nd\u0131\u011f\u0131</th>
+                            <th style="padding:8px;">Okunan</th>
+                            <th style="padding:8px;">\u0130lerleme</th>
+                            <th style="padding:8px;">Durum</th>
+                        </tr></thead>
+                        <tbody>${body}</tbody>
+                    </table>`;
+            }
 
                 document.addEventListener('click', function(e) {
                     if (e.target && e.target.id === 'bt-change-name') {
