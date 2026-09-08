@@ -5491,7 +5491,13 @@ document.addEventListener('click', function (e) {
         } catch (e) {}
       })
       .catch(function (e) { console.warn("pullAll hata:", e); })
-      .then(function () { _pulling = false; });
+      .then(function () {
+        try {
+          var _cgp = (typeof currentGroup !== 'undefined' && currentGroup) ? String(currentGroup) : '';
+          if (_cgp) { var _lsg = localStorage.getItem('hatim_group_' + _cgp); if (_lsg && typeof appData !== 'undefined') { try { appData = JSON.parse(_lsg); } catch(e2){} } }
+        } catch(e3){}
+        _pulling = false;
+      });
   }
   window.
   // --- Uyenin gercek grup anahtarini bulur (isim+grup birlikte eslesin): currentGroup yoksa session'dan ---
