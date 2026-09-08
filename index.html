@@ -3667,11 +3667,11 @@ window._grpGizli = function _grpGizli(gk){ if(!gk) return false; try{ var _d=JSO
                 bottomContainer.style.cssText = "margin: 20px 0; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--card-bg);";
 
                 let allGroups = getAllGroupKeysForAdmin();
-                let _grpSelFirst = true;
+                // Secili grubu isaretle (ilk gruba otomatik atlama yok -> 1. grubu secebilmek + uye sonrasi sabit kalmak)
+                let _selTarget = (currentGroup && allGroups.indexOf(String(currentGroup)) >= 0) ? String(currentGroup) : null;
                 let groupsHtml = `<option value="">-- Seçin --</option>`;
                 allGroups.filter(g => String(g).trim() !== '').forEach(gKey => {
-                    let _selMark = _grpSelFirst ? ' selected' : '';
-                    _grpSelFirst = false;
+                    let _selMark = (_selTarget === gKey) ? ' selected' : '';
                     let gLabel = gKey.replace(/_/g, ' ').toUpperCase();
                     let gRaw = null;
                     try { gRaw = JSON.parse(localStorage.getItem('hatim_group_' + gKey) || 'null'); } catch(e){}
