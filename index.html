@@ -2982,7 +2982,6 @@ function renderTab6(groupName, memberName) {
                             <div style="flex: 1; min-width: 150px;">
                                 <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">📚 Kitap Seç:</label>
                                 <select id="analysis-book-select" multiple size="1" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px;">
-                                    <option value="all">📚 Tüm Kitaplar</option>
                                     ${getBookSelectHtml()}
                                 </select>
                             </div>
@@ -3149,6 +3148,14 @@ function renderTab6(groupName, memberName) {
 
                 document.getElementById('analysis-group-select').addEventListener('change', function() {
                     var _o = [].slice.call(this.selectedOptions).map(function(x){ return x.value; });
+                    // "Tum" secildiyse alttaki tum secenekleri isaretle
+                    if (_o.indexOf('all') > -1) {
+                        var _all=[].slice.call(this.options);
+                        for (var _k=0;_k<_all.length;_k++) _all[_k].selected = true;
+                    } else if (_o.length > 0) {
+                        var _optAll = this.querySelector('option[value="all"]');
+                        if (_optAll) _optAll.selected = false;
+                    }
                     var _gsel = (_o.length && _o.indexOf('all')===-1) ? _o : ['all'];
                     selGroupsArr = _gsel;
                     const memberSelect = document.getElementById('analysis-member-select');
@@ -3159,11 +3166,27 @@ function renderTab6(groupName, memberName) {
                 });
 
                 document.getElementById('analysis-member-select').addEventListener('change', function() {
+                    var _mo = [].slice.call(this.selectedOptions).map(function(x){ return x.value; });
+                    if (_mo.indexOf('all') > -1) {
+                        var _ma=[].slice.call(this.options);
+                        for (var _n=0;_n<_ma.length;_n++) _ma[_n].selected = true;
+                    } else if (_mo.length > 0) {
+                        var _mopt=this.querySelector('option[value="all"]');
+                        if (_mopt) _mopt.selected = false;
+                    }
                     updateAllTabs();
                 });
 
                 document.getElementById('analysis-book-select').addEventListener('change', function() {
                     var _b = [].slice.call(this.selectedOptions).map(function(x){ return x.value; });
+                    if (_b.indexOf('all') > -1) {
+                        var _ba=[].slice.call(this.options);
+                        for (var _j=0;_j<_ba.length;_j++) _ba[_j].selected = true;
+                        _b = [].slice.call(this.selectedOptions).map(function(x){ return x.value; });
+                    } else if (_b.length > 0) {
+                        var _bo=this.querySelector('option[value="all"]');
+                        if (_bo) _bo.selected = false;
+                    }
                     analysisBooks = (_b.length && _b.indexOf('all')===-1) ? _b : [];
                     updateAllTabs();
                 });
