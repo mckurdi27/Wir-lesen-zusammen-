@@ -1952,11 +1952,13 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                         loggedInMemberType = "bireysel";
                         currentGroup = userName.toLowerCase();
                         localStorage.setItem('hatim_member_type_' + userName, "bireysel");
-                        localStorage.setItem(`hatim_session_${currentGroup}`, userName);
-                        if (document.getElementById('login-remember') && document.getElementById('login-remember').checked) { localStorage.setItem('hatim_remember_user', userName); localStorage.setItem('hatim_remember_pass', userPassword || ''); localStorage.setItem('hatim_remember_group', ''); localStorage.setItem('hatim_remember_group_pass', ''); localStorage.setItem('hatim_remember_type', 'bireysel'); }
-                        localStorage.setItem(`hatim_session_type_${currentGroup}`, "bireysel");
-                        localStorage.setItem('hatim_bireysel_session', userName);
-                        localStorage.setItem('hatim_bireysel_session_type', "bireysel");
+                        if (document.getElementById('login-remember') && document.getElementById('login-remember').checked) {
+                            localStorage.setItem('hatim_remember_user', userName); localStorage.setItem('hatim_remember_pass', userPassword || ''); localStorage.setItem('hatim_remember_group', ''); localStorage.setItem('hatim_remember_group_pass', ''); localStorage.setItem('hatim_remember_type', 'bireysel');
+                            localStorage.setItem('hatim_bireysel_session', userName);
+                            localStorage.setItem('hatim_bireysel_session_type', "bireysel");
+                            localStorage.setItem(`hatim_session_${currentGroup}`, userName);
+                            localStorage.setItem(`hatim_session_type_${currentGroup}`, "bireysel");
+                        }
                         const _prevB = localStorage.getItem(`hatim_group_${currentGroup}`);
                         appData = _prevB ? JSON.parse(_prevB) : { members: [], password: "" };
                         if (!appData.members) appData.members = [];
@@ -2013,9 +2015,11 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                             loggedInMember = userName;
                             loggedInMemberType = "grup";
                             localStorage.setItem('hatim_member_type_' + userName, "grup");
-                            localStorage.setItem(`hatim_session_${groupKey}`, userName);
-                            if (document.getElementById('login-remember') && document.getElementById('login-remember').checked) { localStorage.setItem('hatim_remember_user', userName); localStorage.setItem('hatim_remember_pass', userPassword || ''); localStorage.setItem('hatim_remember_group', groupName || ''); localStorage.setItem('hatim_remember_group_pass', groupPassword || ''); localStorage.setItem('hatim_remember_type', 'grup'); }
-                            localStorage.setItem(`hatim_session_type_${groupKey}`, "grup");
+                            if (document.getElementById('login-remember') && document.getElementById('login-remember').checked) {
+                              localStorage.setItem('hatim_remember_user', userName); localStorage.setItem('hatim_remember_pass', userPassword || ''); localStorage.setItem('hatim_remember_group', groupName || ''); localStorage.setItem('hatim_remember_group_pass', groupPassword || ''); localStorage.setItem('hatim_remember_type', 'grup');
+                              localStorage.setItem(`hatim_session_${groupKey}`, userName);
+                              localStorage.setItem(`hatim_session_type_${groupKey}`, "grup");
+                            }
                             showToast(`✅ ${userName}, "${groupKey.replace(/_/g, ' ').toUpperCase()}" grubuna katıldı!`, 'success');
                             updateUserInterface();
                             loadGroupData();
