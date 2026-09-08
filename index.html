@@ -2983,21 +2983,24 @@ started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo
                             <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                             <div style="flex: 1; min-width: 150px;">
                                 <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">📁 Grup Seç:</label>
-                                <select id="analysis-group-select" multiple size="1" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px;">
+                                <select id="analysis-group-select" multiple style="display:none;" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px;">
                                     ${getGroupSelectHtml()}
                                 </select>
+<div id="anl-box-g" class="anl-chkbox"></div>
                             </div>
                             <div style="flex: 1; min-width: 150px;">
                                 <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">👤 Üye Seç:</label>
-                                <select id="analysis-member-select" multiple size="1" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px;">
+                                <select id="analysis-member-select" multiple style="display:none;" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px;">
                                     ${getMemberSelectHtml()}
                                 </select>
+<div id="anl-box-m" class="anl-chkbox"></div>
                             </div>
                             <div style="flex: 1; min-width: 150px;">
                                 <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">📚 Kitap Seç:</label>
-                                <select id="analysis-book-select" multiple size="1" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px;">
+                                <select id="analysis-book-select" multiple style="display:none;" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px;">
                                     ${getBookSelectHtml()}
                                 </select>
+<div id="anl-box-b" class="anl-chkbox"></div>
                             </div>
                             <div id="analysis-selected-group-col" style="flex: 1; min-width: 150px; align-self: center;">
                                 <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">📌 Seçili Grup:</label>
@@ -3031,6 +3034,8 @@ started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo
                 `;
 
                 document.body.appendChild(modalOverlay);
+                if (typeof _anlRenderAll==='function') { try { _anlRenderAll(); } catch(e){} }
+                
 
                 
                 function exportAnalysisToExcel() {
@@ -3126,6 +3131,57 @@ started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo
                         XLSX.writeFile(wb, 'Hatim_Analiz.xlsx');
                     } catch(err) { alert('Excel oluşturulamadı: ' + err.message); }
                 }
+                
+// --- Analiz filtreleri: gizli select + gorunur tik kutusu (mobil uyumlu) ---
+function _anlRenderBox(selId, boxId, labelPlural){
+  var sel=document.getElementById(selId), box=document.getElementById(boxId);
+  if(!sel||!box) return;
+  var opts=[].slice.call(sel.options);
+  var cur=[].slice.call(sel.selectedOptions).map(function(x){return x.value;});
+  var allOn = !cur.length || cur.indexOf('all')>-1 || cur.length===opts.length;
+  var h='<label style="display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:bold;cursor:pointer;margin-bottom:2px;"><input type="checkbox" class="anl-master" '+(allOn?'checked':'')+' style="accent-color:#27ae60;"> T\u00fcm\u00fc</label>';
+  h+='<div style="max-height:110px;overflow-y:auto;border:1px solid var(--border-color);border-radius:6px;padding:4px;display:flex;flex-direction:column;gap:1px;background:#fff;">';
+  opts.forEach(function(o){
+    if(o.value==='all') return;
+    var on = allOn || cur.indexOf(o.value)>-1;
+    h+='<label style="display:inline-flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;padding:1px 2px;"><input type="checkbox" class="anl-item" value="'+o.value+'" '+(on?'checked':'')+' style="accent-color:#27ae60;"> '+o.textContent+'</label>';
+  });
+  h+='</div>';
+  box.innerHTML=h;
+  // master dinle
+  var master=box.querySelector('.anl-master');
+  if(master) master.addEventListener('change', function(){
+    box.querySelectorAll('.anl-item').forEach(function(cb){ cb.checked=master.checked; });
+    _anlSync(sel,box);
+  });
+  // item dinle
+  box.querySelectorAll('.anl-item').forEach(function(cb){
+    cb.addEventListener('change', function(){
+      var allcb=box.querySelector('.anl-master');
+      var it=[].slice.call(box.querySelectorAll('.anl-item'));
+      allcb.checked = it.length && it.every(function(x){return x.checked;});
+      _anlSync(sel,box);
+    });
+  });
+}
+function _anlSync(sel, box){
+  var it=[].slice.call(box.querySelectorAll('.anl-item'));
+  var checked = it.filter(function(x){return x.checked;}).map(function(x){return x.value;});
+  var allcb=box.querySelector('.anl-master');
+  var opts=[].slice.call(sel.options);
+  if(!checked.length || (allcb&&allcb.checked && checked.length===it.length)){
+    for(var i=0;i<opts.length;i++) opts[i].selected=(opts[i].value==='all');
+  } else {
+    for(var i2=0;i2<opts.length;i2++){ if(opts[i2].value==='all') opts[i2].selected=false; else opts[i2].selected=checked.indexOf(opts[i2].value)>-1; }
+  }
+  sel.dispatchEvent(new Event('change'));
+}
+function _anlRenderAll(){
+  _anlRenderBox('analysis-group-select','anl-box-g','Grup');
+  _anlRenderBox('analysis-member-select','anl-box-m','Üye');
+  _anlRenderBox('analysis-book-select','anl-box-b','Kitap');
+}
+
                 function _curGroupArr(){
                       var s=document.getElementById('analysis-group-select'); if(!s) return ['all'];
                       var o=[].slice.call(s.selectedOptions).map(function(x){return x.value;});
@@ -3181,6 +3237,7 @@ started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo
                     selGroupsArr = _gsel;
                     const memberSelect = document.getElementById('analysis-member-select');
                     memberSelect.innerHTML = getMemberSelectHtml((_gsel.length===1)?_gsel[0]:'all');
+                                    if (typeof _anlRenderBox==='function') { try { _anlRenderBox('analysis-member-select','anl-box-m','\u00dcye'); } catch(e){} }
                     const sg = document.getElementById('analysis-selected-group-name');
                     if (sg) sg.textContent = (_gsel.length===1 && _gsel[0]==='all') ? 'Tüm Gruplar' : _gsel.map(function(x){return x.replace(/_/g,' ').toUpperCase();}).join(', ') + (loggedInMember ? ' — ' + loggedInMember : '');
                     updateAllTabs();
