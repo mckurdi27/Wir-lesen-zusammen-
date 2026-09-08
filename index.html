@@ -4829,8 +4829,20 @@ var _cg = selVal || '';
                             }
                             if (changed) {
                                 window.saveGroupData();
-                                await window.loadGroupData();
-                                showToast('\u2705 G\u00fcncellendi: ' + clean, 'success');
+                                // Supabase'e de yaz (isim degisince members + shares owner referansi)
+                                var sbName = (typeof window._sbUpdateName === 'function');
+                                var doSB = function(){
+                                    var p = sbName ? window._sbUpdateName(old, clean, currentGroup).then(function(){ return window._sbRenameOwner(old, clean, currentGroup); }) : Promise.resolve();
+                                    return p;
+                                };
+                                doSB().then(function(){
+                                    if (typeof window.loadGroupData === 'function') return window.loadGroupData();
+                                }).then(function(){
+                                    showToast('\u2705 G\u00fcncellendi: ' + clean, 'success');
+                                }).catch(function(err){
+                                    showToast('\u2705 Yerel g\u00fcncellendi (Supabase: ' + ((err&&err.message)||'hata') + ')', 'info');
+                                    if (typeof window.loadGroupData === 'function') return window.loadGroupData();
+                                });
                             }
                         });
                     });
