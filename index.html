@@ -2785,17 +2785,16 @@ function renderTab6(groupName, memberName) {
                                 // 1) Baslayan / devam eden hatimler (bookHatims) - yalniz hissesi olan eserler
                                 function _sbHasShare(bid2){ var arr=(gData.bookPages||{})[bid2]; if(!arr)return false;
                                   for(var i=0;i<arr.length;i++){ if(arr[i]&&arr[i].owner&&String(arr[i].owner).trim()) return true; } return false; }
-                                if (gData.bookHatims) {
-                                    Object.keys(gData.bookHatims).forEach(function(bid){
-                                        if(!_sbHasShare(bid)) return; // hissesiz hayalet hatim gosterme
-                                        var h = gData.bookHatims[bid] || {};
-                                        // Hatim baslangici = o eserde en erken hisse alim zamani (supabase take_date)
-                                        var _minTake='';
-                                        var _bp2=(gData.bookPages&&gData.bookPages[bid])||[];
-                                        for(var _ti=0;_ti<_bp2.length;_ti++){ var _u=_bp2[_ti]; if(_u&&_u.owner&&String(_u.owner).trim()&&_u.takeDate){ var _dt=String(_u.takeDate); if(!_minTake||_dt<_minTake) _minTake=_dt; } }
-                                        started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo || 1, baslangic: _minTake || h.startDate || '' });
-                                    });
-                                }
+                                // Hatim = hissesi olan her eser (bookPages sahipliginden), bookHatims kaydi olsun olmasin
+                                var _bpsrc=(gData.bookPages)||{};
+                                Object.keys(_bpsrc).forEach(function(bid){
+                                    if(!_sbHasShare(bid)) return; // hissesiz kitap hatim degildir
+                                    var h=(gData.bookHatims||{})[bid]||{};
+                                    var _minTake='';
+                                    var _bp2=_bpsrc[bid]||[];
+                                    for(var _ti=0;_ti<_bp2.length;_ti++){ var _u=_bp2[_ti]; if(_u&&_u.owner&&String(_u.owner).trim()&&_u.takeDate){ var _dt=String(_u.takeDate); if(!_minTake||_dt<_minTake) _minTake=_dt; } }
+                                    started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo || 1, baslangic: _minTake || h.startDate || '' });
+                                });
                                 // 2) Tamamlanan hatimler (bookHistory)
                                 if (gData.bookHistory) {
                                     Object.keys(gData.bookHistory).forEach(function(bid){
