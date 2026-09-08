@@ -3148,15 +3148,22 @@ function renderTab6(groupName, memberName) {
 
                 document.getElementById('analysis-group-select').addEventListener('change', function() {
                     var _o = [].slice.call(this.selectedOptions).map(function(x){ return x.value; });
-                    // "Tum" secildiyse alttaki tum secenekleri isaretle
+                    var _wasAll = (this._hadAll === true);
                     if (_o.indexOf('all') > -1) {
                         var _all=[].slice.call(this.options);
                         for (var _k=0;_k<_all.length;_k++) _all[_k].selected = true;
+                        this._hadAll = true;
+                    } else if (_wasAll) {
+                        // Tumu'den tik kaldirildi -> hepsinden tik kalkar (tek tek silmek gerekmez)
+                        var _a2=[].slice.call(this.options);
+                        for (var _kk=0;_kk<_a2.length;_kk++) _a2[_kk].selected = false;
+                        this._hadAll = false;
                     } else if (_o.length > 0) {
                         var _optAll = this.querySelector('option[value="all"]');
                         if (_optAll) _optAll.selected = false;
                     }
-                    var _gsel = (_o.length && _o.indexOf('all')===-1) ? _o : ['all'];
+                    var _o2 = [].slice.call(this.selectedOptions).map(function(x){ return x.value; });
+                    var _gsel = (_o2.length && _o2.indexOf('all')===-1) ? _o2 : ['all'];
                     selGroupsArr = _gsel;
                     const memberSelect = document.getElementById('analysis-member-select');
                     memberSelect.innerHTML = getMemberSelectHtml((_gsel.length===1)?_gsel[0]:'all');
@@ -3167,9 +3174,15 @@ function renderTab6(groupName, memberName) {
 
                 document.getElementById('analysis-member-select').addEventListener('change', function() {
                     var _mo = [].slice.call(this.selectedOptions).map(function(x){ return x.value; });
+                    var _mWasAll = (this._hadAll === true);
                     if (_mo.indexOf('all') > -1) {
                         var _ma=[].slice.call(this.options);
                         for (var _n=0;_n<_ma.length;_n++) _ma[_n].selected = true;
+                        this._hadAll = true;
+                    } else if (_mWasAll) {
+                        var _m2=[].slice.call(this.options);
+                        for (var _nn=0;_nn<_m2.length;_nn++) _m2[_nn].selected = false;
+                        this._hadAll = false;
                     } else if (_mo.length > 0) {
                         var _mopt=this.querySelector('option[value="all"]');
                         if (_mopt) _mopt.selected = false;
@@ -3179,10 +3192,17 @@ function renderTab6(groupName, memberName) {
 
                 document.getElementById('analysis-book-select').addEventListener('change', function() {
                     var _b = [].slice.call(this.selectedOptions).map(function(x){ return x.value; });
+                    var _bWasAll = (this._hadAll === true);
                     if (_b.indexOf('all') > -1) {
                         var _ba=[].slice.call(this.options);
                         for (var _j=0;_j<_ba.length;_j++) _ba[_j].selected = true;
+                        this._hadAll = true;
                         _b = [].slice.call(this.selectedOptions).map(function(x){ return x.value; });
+                    } else if (_bWasAll) {
+                        var _bb=[].slice.call(this.options);
+                        for (var _jj=0;_jj<_bb.length;_jj++) _bb[_jj].selected = false;
+                        this._hadAll = false;
+                        _b = [];
                     } else if (_b.length > 0) {
                         var _bo=this.querySelector('option[value="all"]');
                         if (_bo) _bo.selected = false;
