@@ -1644,7 +1644,7 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                     try { var _md = appData || {}; if (_rEl) _rEl.value = (_md.regions && _md.regions[loggedInMember]) || ''; if (_cEl) _cEl.value = (_md.cities && _md.cities[loggedInMember]) || ''; } catch(e){}
                     // Supabase'ten taze Bölge/Şehir (uyeye kart Supabase'ten okuyup göstersin)
                     (function(){ if (typeof window._sbMemberDetail !== 'function') return;
-                      var _gk=(window.currentGroup!==undefined&&window.currentGroup)||(appData&&appData.group)||'';
+                      var _gk=(typeof window._memberGroupKey==='function')?window._memberGroupKey(loggedInMember,(window.currentGroup!==undefined&&window.currentGroup)||(appData&&appData.group)||''):((window.currentGroup!==undefined&&window.currentGroup)||(appData&&appData.group)||'');
                       window._sbMemberDetail(loggedInMember,_gk).then(function(md){
                         var rE=document.getElementById('bt-member-region'),cE=document.getElementById('bt-member-city');
                         if(md&&md.region!=null&&rE){ rE.value=md.region||''; if(appData&&!appData.regions)appData.regions={}; if(appData.regions)appData.regions[loggedInMember]=md.region||''; }
@@ -1654,7 +1654,7 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                     if (!booksEl) return;
                     
                     if (typeof window._sbMemberDetail !== 'function') { return; }
-                    window._sbMemberDetail(loggedInMember, currentGroup).then(function (data) {
+                    window._sbMemberDetail(loggedInMember, (typeof window._memberGroupKey==='function'?window._memberGroupKey(loggedInMember, currentGroup):currentGroup)).then(function (data) {
                         var pwdEl = document.getElementById('bt-member-password');
                         if (pwdEl) pwdEl.value = data.password || '';
                         var passInfo = document.getElementById('bt-member-password-hint');
@@ -5425,7 +5425,25 @@ document.addEventListener('click', function (e) {
       .catch(function (e) { console.warn("pullAll hata:", e); })
       .then(function () { _pulling = false; });
   }
-  window._sbMemberDetail = function (name, groupKey) {
+  window.
+  // --- Uyenin gercek grup anahtarini bulur (isim+grup birlikte eslesin): currentGroup yoksa session'dan ---
+  window._memberGroupKey = function (memberName, preferGroup) {
+    if (preferGroup && String(preferGroup)) return String(preferGroup);
+    if (!memberName) return "";
+    try {
+      for (var gi=0; gi<localStorage.length; gi++) {
+        var k = localStorage.key(gi);
+        if (k && k.indexOf('hatim_session_') === 0 && k.length>14) {
+          if (localStorage.getItem(k) === memberName) {
+            var g = k.slice(14);
+            return g;
+          }
+        }
+      }
+    } catch(e) {}
+    return "";
+  };
+_sbMemberDetail = function (name, groupKey) {
     return Promise.all([
       rest.select("members", "?select=id,name,password,group_key,region,city"),
       rest.select("shares", "?select=member_id,book_id,unit_index,is_read,read_date,read_time,take_date,take_time"),
