@@ -5232,7 +5232,11 @@ document.addEventListener('click', function (e) {
       var have = {};
       (existing || []).forEach(function (r) { have[r.name] = r.id; });
       var tasks = [];
-      // Asla silme: var olan üyenin UUID'si ve hisseleri korunur; yalnızca şifre güncellenir
+      // Grubun guncel listesinde artik OLMAYAN eski uyeleri DB'den sil (silme/duzeltme aninda eski kayit kalmasin, yenileyince geri gelmesin)
+      var want = {}; names.forEach(function(n){ want[n]=true; });
+      (existing || []).forEach(function (r) {
+        if (r.id && !want[r.name]) tasks.push(api("/members?id=eq." + r.id, { method: "DELETE", headers: { "Prefer": "return=minimal" } }));
+      });
       names.forEach(function (n) {
         if (have[n]) {
           tasks.push(api("/members?id=eq." + have[n], { method: "PATCH", headers: { "Prefer": "return=minimal" }, body: JSON.stringify({ password: pw[n] || "", type: (groupKey === null ? "bireysel" : "grup") }) }));
