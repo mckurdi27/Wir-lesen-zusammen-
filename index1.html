@@ -4169,13 +4169,12 @@ window.infoSortTable = function infoSortTable(col) {
                         var p = window._sbQ = window._sbQ.then(function () {
                             if (typeof window.showToast === 'function') showToast('Supabase’e senkronlanıyor...', 'info');
                             var _keyEnc = encodeURIComponent(_k);
-                            return window.api("/members?select=id&group_key=eq." + _keyEnc).then(function (mems) {
-                                var ids = (mems || []).map(function (mm) { return mm.id; });
-                                var del = ids.map(function (id) { return window.api("/shares?member_id=eq." + id, { method: "DELETE" }); });
-                                return Promise.all(del);
-                            }).then(function () {
-                                return window.replaceShares(data.gData, _k);
-                            }).then(function () {
+                            return window.replaceShares(data.gData, _k).then(function (rs) {
+                                if (rs && rs.conflicts && rs.conflicts.length) {
+                                    var _seen = {}; rs.conflicts.forEach(function (c) { _seen[c.ownerName] = true; });
+                                    var _owners = Object.keys(_seen).join(', ');
+                                    if (typeof window.showToast === 'function') showToast('\u26a0\ufe0f Baz\u0131 hisseler zaten al\u0131nm\u0131\u015f (' + _owners + '): ilk alan korundu.', 'warning');
+                                }
                                 if (typeof window.syncHatimToSB === 'function') return window.syncHatimToSB(_k, data.gData);
                                 return undefined;
                             }).then(function () {
@@ -5362,24 +5361,49 @@ window._origSetItem = origSetItem;
 
   function replaceShares(g, groupKey) {
     return rest.select("members", "?select=id,name,group_key").then(function (allM) {
-      var nameId = {};
-      (allM || []).forEach(function (r) { if (String(r.group_key) === String(groupKey)) nameId[r.name] = r.id; });
+      var nameId = {}, idName = {};
+      var gMembers = (allM || []).filter(function (r) { return String(r.group_key) === String(groupKey); });
+      gMembers.forEach(function (r) { nameId[r.name] = r.id; idName[r.id] = r.name; });
       var bp = (g && g.bookPages) || {};
-      var rows = [];
-      Object.keys(bp).forEach(function (bid) {
-        (bp[bid] || []).forEach(function (p, idx) {
-          if (p && p.owner && nameId[p.owner]) {
-            rows.push({ member_id: nameId[p.owner], book_id: bid, unit_index: idx, is_read: !!p.isRead, read_date: p.readDate || null, read_time: p.readTime || null, take_date: p.takeDate || null, take_time: p.takeTime || null });
-          }
+      var myIds = gMembers.map(function (r) { return r.id; });
+      var ownerQuery = myIds.length ? "/shares?select=member_id,book_id,unit_index&member_id=in.(" + myIds.join(",") + ")" : null;
+      var readExisting = ownerQuery ? rest.select("shares", ownerQuery) : Promise.resolve([]);
+      return readExisting.then(function (existing) {
+        var taken = {}; // "bid:idx" -> member_id
+        (existing || []).forEach(function (x) { taken[x.book_id + ":" + x.unit_index] = x.member_id; });
+        var rows = [], conflicts = [], seen = {}, localSlot = {};
+        // Yerel anlik goruntude kimin hangi birime sahip oldugu
+        Object.keys(bp).forEach(function (bid) {
+          (bp[bid] || []).forEach(function (p, idx) {
+            if (p && p.owner) localSlot[bid + ":" + idx] = p.owner;
+          });
         });
+        // Adim 1 - yalnizca BU yerel goruntuden dogan yeni/ham atamalari upsert et; cakisma olanlari atla
+        Object.keys(bp).forEach(function (bid) {
+          (bp[bid] || []).forEach(function (p, idx) {
+            if (!p || !p.owner || !nameId[p.owner]) return;
+            var slot = bid + ":" + idx;
+            var cur = taken[slot];
+            if (cur && cur !== nameId[p.owner]) {
+              if (!seen[slot]) { seen[slot] = true; conflicts.push({ ownerName: idName[cur] || "baska uye", book_id: bid, unit_index: idx }); }
+              return;
+            }
+            rows.push({ member_id: nameId[p.owner], book_id: bid, unit_index: idx, is_read: !!p.isRead, read_date: p.readDate || null, read_time: p.readTime || null, take_date: p.takeDate || null, take_time: p.takeTime || null });
+          });
+        });
+        // Adim 2 - Supabase'te bu grupta olup yerelde artik SAHIPSIZ kalan birimleri hedefli sil (geri alma)
+        // Yalnizca DB'de sahibi bu grubun bir uyesi olan birimler silinir; baska grubun/baska anin atamasi ezilmez.
+        var toDelete = [];
+        (existing || []).forEach(function (x) {
+          var slot = x.book_id + ":" + x.unit_index;
+          if (!localSlot[slot]) toDelete.push(x.id);
+        });
+        var doDel = toDelete.length ? api("/shares?id=in.(" + toDelete.join(",") + ")", { method: "DELETE", headers: { "Prefer": "return=minimal" } }) : Promise.resolve();
+        var doUpsert = rows.length ? api("/shares?on_conflict=member_id,book_id,unit_index", { method: "POST", headers: { "Prefer": "resolution=merge-duplicates" }, body: JSON.stringify(rows) }) : Promise.resolve();
+        return Promise.all([doDel, doUpsert]).then(function () { return { conflicts: conflicts }; });
       });
-      // Hisseleri ASLA silme — yalnızca ekle/güncelle (upsert).
-      // Bayat/eksik localStorage verisi Supabase'teki doğru hisseleri silemez;
-      // unique anahtar (member_id,book_id,unit_index) aynı slotun iki kez eklenmesini engeller.
-      return rows.length ? api("/shares?on_conflict=member_id,book_id,unit_index", { method: "POST", headers: { "Prefer": "resolution=merge-duplicates" }, body: JSON.stringify(rows) }) : Promise.resolve();
     });
-  }
-  window.replaceShares = replaceShares;
+  }  window.replaceShares = replaceShares;
 
 /* pushGroup / pushIndividual / pushPool (yerel->Supabase) */
   function pushGroup(key, g) {
