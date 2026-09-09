@@ -5393,6 +5393,7 @@ window._origSetItem = origSetItem;
             rows.push({ member_id: nameId[p.owner], book_id: bid, unit_index: idx, is_read: !!p.isRead, read_date: p.readDate || null, read_time: p.readTime || null, take_date: p.takeDate || null, take_time: p.takeTime || null });
           });
         });
+        if (conflicts.length) { try { if (typeof window.showToast === 'function') { var _ow = conflicts.map(function(c){ return c.ownerName; }).filter(function(v,i,a){ return a.indexOf(v)===i; }).join(", "); window.showToast('⚠️ ' + conflicts.length + ' hisse zaten alınmış (' + _ow + '): ilk alan korundu.', 'error'); } } catch(_e){ console.warn('conflict toast', _e); } }
         var write = rows.length ? api("/shares?on_conflict=member_id,book_id,unit_index", { method: "POST", headers: { "Prefer": "resolution=merge-duplicates" }, body: JSON.stringify(rows) }).then(function () { return { conflicts: conflicts }; }) : Promise.resolve({ conflicts: conflicts });
         return write;
       });
