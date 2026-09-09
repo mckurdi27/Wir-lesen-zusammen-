@@ -5394,7 +5394,14 @@ window._origSetItem = origSetItem;
           });
         });
         if (conflicts.length) { try { if (typeof window.showToast === 'function') { var _ow = conflicts.map(function(c){ return c.ownerName; }).filter(function(v,i,a){ return a.indexOf(v)===i; }).join(", "); window.showToast('⚠️ ' + conflicts.length + ' hisse zaten alınmış (' + _ow + '): ilk alan korundu.', 'error'); } } catch(_e){ console.warn('conflict toast', _e); } }
-        var write = rows.length ? api("/shares?on_conflict=member_id,book_id,unit_index", { method: "POST", headers: { "Prefer": "resolution=merge-duplicates" }, body: JSON.stringify(rows) }).then(function () { return { conflicts: conflicts }; }) : Promise.resolve({ conflicts: conflicts });
+        var write = rows.length ? api("/shares?on_conflict=member_id,book_id,unit_index", { method: "POST", headers: { "Prefer": "resolution=merge-duplicates" }, body: JSON.stringify(rows) }).then(function (resp) {
+          // api, 409 (duplicate) JSON hata govdesini doner - eger cakisma varsa kullaniciya bildir
+          if (resp && typeof resp === 'object' && (resp.code === '23505' || /duplicate|violates unique/i.test(resp.message || ''))) {
+            try { if (typeof window.showToast === 'function') window.showToast('\u26a0\ufe0f Bu hisseler tam o anda baska uye tarafindan alindi: ilk alan korundu. Sayfa yenileniyor.', 'error'); } catch(_e){}
+            conflicts.length = 0; // konsol 409'u bu toast'a cevir
+          }
+          return { conflicts: conflicts };
+        }) : Promise.resolve({ conflicts: conflicts });
         return write;
       });
     });
