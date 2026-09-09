@@ -1587,40 +1587,6 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
   window._buildGrpDd('');
 })();
 // GİRİŞ PANELİ İŞLEVLERİ
-            function _sbBuildCardHtml(rows, sumT, sumR, memberName) {
-                var totalPct = sumT>0 ? Math.round((sumR/sumT)*100) : 0;
-                var r = rows.map(function (b) {
-                    var pct = b.taken>0 ? Math.round((b.read/b.taken)*100) : 0;
-                    var durum = b.completed ? '\u2713 Tamamland\u0131' : (b.taken>0 ? (b.read>=b.taken ? 'Okundu' : (b.read>0?'Devam ediyor':'Al\u0131nd\u0131')) : 'Bo\u015f');
-                    return `<tr>
-                        <td style="padding:8px; border-bottom:1px solid var(--border-color); font-weight:bold;">${b.name}</td>
-                        <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${b.taken}</td>
-                        <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">-</td>
-                        <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${b.read}</td>
-                        <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">-</td>
-                        <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${pct}%</td>
-                        <td style="padding:8px; border-bottom:1px solid var(--border-color); text-align:center;">${durum}</td>
-                    </tr>`;
-                }).join('');
-                return `
-                    <div style="display:flex; gap:12px; margin-bottom:10px; flex-wrap:wrap;">
-                        <div style="background:rgba(212,175,55,0.12); padding:8px 14px; border-radius:8px; font-size:13px; font-weight:bold;">Toplam Al\u0131nan: ${sumT}</div>
-                        <div style="background:rgba(39,174,96,0.12); padding:8px 14px; border-radius:8px; font-size:13px; font-weight:bold;">Okunan: ${sumR}</div>
-                        <div style="background:rgba(142,68,173,0.12); padding:8px 14px; border-radius:8px; font-size:13px; font-weight:bold;">\u0130lerleme: %${totalPct}</div>
-                    </div>
-                    <table style="width:100%; border-collapse:collapse; font-size:13px;">
-                        <thead><tr style="background:rgba(212,175,55,0.15);">
-                            <th style="padding:8px; text-align:left;">Eser</th>
-                            <th style="padding:8px;">Al\u0131nan Hisse</th>
-                            <th style="padding:8px;">Al\u0131nd\u0131\u011f\u0131 saat-g\u00fcn</th>
-                            <th style="padding:8px;">Okunan</th>
-                            <th style="padding:8px;">Okundu saat-g\u00fcn</th>
-                            <th style="padding:8px;">\u0130lerleme</th>
-                            <th style="padding:8px;">Durum</th>
-                        </tr></thead>
-                        <tbody>${r}</tbody>
-                    </table>`;
-            }
             function renderBireyselTakipPanel() {
                 const panel = document.getElementById('bireysel-takip-panel');
                 if (!panel) return;
@@ -4673,20 +4639,6 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                             appData.bookHistory[id] = [];
                         }
                         // modlara gore birim-sayfa haritalari: once temiz sonra satirlardan doldur
-                        function _parsePagesTa(ta, fill) {
-                            let map = {};
-                            let rawLines = (ta.value || '').split(/\n|,/).map(x=>x.trim()).filter(Boolean);
-                            rawLines.forEach(function(line) {
-                                let parts = line.split(':');
-                                if (parts.length === 2) {
-                                    let ui = parseInt(parts[0]) - 1;
-                                    let pg = parseInt(parts[1]);
-                                    if (!isNaN(ui) && ui >= 0 && !isNaN(pg) && pg > 0) map[ui] = pg;
-                                }
-                            });
-                            for (let i = 0; i < units; i++) { if (map[i] === undefined) map[i] = fill(i); }
-                            return map;
-                        }
                         let baseFill = function(i) { return startPg + i * ppu; };
                         let pages1 = {}, pages5 = {}, pages10 = {}, pages20 = {};
                         if (mTable) {
@@ -5433,28 +5385,6 @@ document.addEventListener('click', function (e) {
     return enqueue(function () { return replaceMembers(p.members, null, p.passwords || {}); })
       .then(function () { setTimeout(function () { _myPush = false; }, 1200); });
   }
-
-  function pushAllLocal() {
-    var tasks = [];
-    try {
-      var poolRaw = localStorage.getItem("hatim_bireysel_pool");
-      if (poolRaw) { try { var p = JSON.parse(poolRaw); if (p && p.members) tasks.push(pushPool(p)); } catch (e) {} }
-      for (var i = 0; i < localStorage.length; i++) {
-        var k = localStorage.key(i);
-        if (k && k.indexOf("hatim_group_") === 0 && k !== "hatim_bireysel_pool") {
-          var raw = localStorage.getItem(k); if (!raw) continue;
-          var g; try { g = JSON.parse(raw); } catch (e) { continue; }
-          if (!g) continue;
-          var gkey = k.replace("hatim_group_", "");
-          if (!gkey) continue; // bos-anahtarli hayalet grubu push etme
-          if (isIndividualGroup(g, gkey)) continue;
-          tasks.push(pushGroup(gkey, g));
-        }
-      }
-    } catch (e) {}
-    return Promise.all(tasks);
-  }
-
   function pullAll() {
     if (_pulling) return Promise.resolve();
     _pulling = true;
