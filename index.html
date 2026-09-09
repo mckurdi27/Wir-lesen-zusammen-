@@ -5624,8 +5624,8 @@ _sbMemberDetail = function (name, groupKey) {
 
   function refreshUI() {
     try { if (typeof loadGroupData === "function") window.loadGroupData(); if (typeof updateUserInterface === "function") updateUserInterface(); if (typeof renderAdminSectionAtBottom === "function") renderAdminSectionAtBottom(); if (typeof updateAutocompleteLists === "function") updateAutocompleteLists(); } catch (e) {}
-  window.refreshUI = refreshUI;
   }
+  window.refreshUI = refreshUI;
 
 /* doInit + localStorage override (senkron kopru) */
   function doInit() {
