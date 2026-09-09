@@ -2182,14 +2182,24 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                     return h;
                 }
 
-                function getMemberSelectHtml(groupName = 'all', selected = 'all') {
+                function getMemberSelectHtml(groupNames = 'all', selected = 'all') {
                     let members = [];
-                    if (groupName === 'all') {
+                    if (groupNames === 'all') {
                         members = allMembers;
                     } else {
-                        let group = groupStats.find(g => g.name === groupName);
-                        if (group) {
-                            members = group.memberNames.map(m => ({ name: m, groups: [groupName] }));
+                        const _gl = Array.isArray(groupNames) ? groupNames : [groupNames];
+                        if (_gl.indexOf('all') > -1) { members = allMembers; }
+                        else {
+                            let _seen = {};
+                            _gl.forEach(gName => {
+                                let group = groupStats.find(g => g.name === gName);
+                                if (!group) return;
+                                group.memberNames.forEach(mn => {
+                                    const _t = (group.data && group.data.memberTypes && group.data.memberTypes[mn]) || 'grup';
+                                    const _k = mn + '@' + gName;
+                                    if (!_seen[_k]) { _seen[_k] = 1; members.push({ name: mn, groups: [gName], type: _t }); }
+                                });
+                            });
                         }
                     }
                     let html = `<option value="all">👥 Tüm Üyeler</option>`;
@@ -3239,26 +3249,11 @@ function _anlRenderAll(){
                 });
 
                 document.getElementById('analysis-group-select').addEventListener('change', function() {
-                    var _o = [].slice.call(this.selectedOptions).map(function(x){ return x.value; });
-                    var _wasAll = (this._hadAll === true);
-                    if (_o.indexOf('all') > -1) {
-                        var _all=[].slice.call(this.options);
-                        for (var _k=0;_k<_all.length;_k++) _all[_k].selected = true;
-                        this._hadAll = true;
-                    } else if (_wasAll) {
-                        // Tumu'den tik kaldirildi -> hepsinden tik kalkar (tek tek silmek gerekmez)
-                        var _a2=[].slice.call(this.options);
-                        for (var _kk=0;_kk<_a2.length;_kk++) _a2[_kk].selected = false;
-                        this._hadAll = false;
-                    } else if (_o.length > 0) {
-                        var _optAll = this.querySelector('option[value="all"]');
-                        if (_optAll) _optAll.selected = false;
-                    }
                     var _o2 = [].slice.call(this.selectedOptions).map(function(x){ return x.value; });
                     var _gsel = (_o2.length && _o2.indexOf('all')===-1) ? _o2 : ['all'];
                     selGroupsArr = _gsel;
                     const memberSelect = document.getElementById('analysis-member-select');
-                    memberSelect.innerHTML = getMemberSelectHtml((_gsel.length===1)?_gsel[0]:'all');
+                    memberSelect.innerHTML = getMemberSelectHtml(_gsel);
                                     if (typeof _anlRenderBox==='function') { try { _anlRenderBox('analysis-member-select','anl-box-m','\u00dcye'); } catch(e){} }
                     const sg = document.getElementById('analysis-selected-group-name');
                     if (sg) sg.textContent = (_gsel.length===1 && _gsel[0]==='all') ? 'Tüm Gruplar' : _gsel.map(function(x){return x.replace(/_/g,' ').toUpperCase();}).join(', ') + (loggedInMember ? ' — ' + loggedInMember : '');
