@@ -5141,20 +5141,21 @@ var _cg = selVal || '';
                                 changed = true;
                             }
                             if (changed) {
-                                window.saveGroupData();
-                                // Supabase'e de yaz (isim degisince members + shares owner referansi)
+                                // SUPABASE-ONCE: once hedefli PATCH (ad+owner), Supabase onaylayinca yerel cache kaydet
                                 var sbName = (typeof window._sbUpdateName === 'function');
                                 var doSB = function(){
                                     var p = sbName ? window._sbUpdateName(old, clean, currentGroup).then(function(){ return window._sbRenameOwner(old, clean, currentGroup); }) : Promise.resolve();
                                     return p;
                                 };
                                 doSB().then(function(){
+                                    window.saveGroupData();
                                     if (typeof window.loadGroupData === 'function') return window.loadGroupData();
                                 }).then(function(){
                                     showToast('\u2705 G\u00fcncellendi: ' + clean, 'success');
                                 }).catch(function(err){
-                                    showToast('\u2705 Yerel g\u00fcncellendi (Supabase: ' + ((err&&err.message)||'hata') + ')', 'info');
-                                    if (typeof window.loadGroupData === 'function') return window.loadGroupData();
+                                    // Supabase basarisizsa yerel degisikligi geri al (localStorage eski halde)
+                                    if (typeof window.loadGroupData === 'function') window.loadGroupData();
+                                    showToast('\u274c Supabase hatas\u0131: ' + ((err&&err.message)||err), 'error');
                                 });
                             }
                         });
