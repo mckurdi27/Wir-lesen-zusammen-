@@ -4999,17 +4999,24 @@ var _cg = selVal || '';
                             let gpw = prompt("Grup üyesi şifresi:");
                             if (!gpw || !gpw.trim()) { showToast('❌ Şifre gerekli!', 'error'); return; }
                             if (!appData.members.includes(clean)) {
-                                appData.members.push(clean);
-                                if (!appData.memberTypes) appData.memberTypes = {};
-                                appData.memberTypes[clean] = "grup";
-                                if (appData.passiveMembers) { appData.passiveMembers = appData.passiveMembers.filter(p => p !== clean); }
-                                if (!appData.passwords) appData.passwords = {};
-                                appData.passwords[clean] = gpw.trim();
-                                window.saveGroupData();
-                                await window.loadGroupData();
-                                showToast(`✅ ${clean} eklendi!`, 'success');
+                                // SUPABASE-ONCE: uyeyi once members tablosuna yaz, onaylayinca yerel guncelle
+                                var _memSB_ = (typeof window.api === 'function') ? window.api('/members', { method: 'POST', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify({ name: clean, password: gpw.trim(), type: 'grup', group_key: currentGroup }) }) : Promise.resolve();
+                                _memSB_.then(function(){
+                                    appData.members.push(clean);
+                                    if (!appData.memberTypes) appData.memberTypes = {};
+                                    appData.memberTypes[clean] = 'grup';
+                                    if (appData.passiveMembers) { appData.passiveMembers = appData.passiveMembers.filter(function(pp){ return pp !== clean; }); }
+                                    if (!appData.passwords) appData.passwords = {};
+                                    appData.passwords[clean] = gpw.trim();
+                                    window.saveGroupData();
+                                    return window.loadGroupData();
+                                }).then(function(){
+                                    if (typeof window.showToast === 'function') window.showToast('\u2705 ' + clean + ' eklendi!', 'success');
+                                }).catch(function(err){
+                                    if (typeof window.showToast === 'function') window.showToast('Supabase hatasi: ' + ((err&&err.message)||err), 'error');
+                                });
                             } else {
-                                showToast('Bu üye zaten var.', 'error');
+                                showToast('Bu \u00fcye zaten var.', 'error');
                             }
                         }
                     });
@@ -5041,27 +5048,38 @@ var _cg = selVal || '';
                                     if (!appData.passiveMembers) appData.passiveMembers = [];
                                     if (!appData.passiveMembers.includes(name)) appData.passiveMembers.push(name);
                                     if (!appData.memberTypes) appData.memberTypes = {};
-                                    appData.memberTypes[name] = 'pasif';
-                                    appData.members = appData.members.filter(m => m !== name);
-                                    try { if (typeof window.api === 'function') await window.api("/members?name=eq." + encodeURIComponent(name) + "&group_key=eq." + encodeURIComponent(currentGroup), { method: "DELETE" }); } catch(e){}
-                                    window.saveGroupData();
-                                    await window.loadGroupData();
-                                    await window.pullAll();
-                                    window.refreshUI();
-                                    showToast(`ℹ️ ${name} pasif üye yapıldı (tamamlanmış eserleri korundu).`, 'info');
-                                } else {
-                                    appData.members = appData.members.filter(m => m !== name);
-                                    Object.keys(appData.bookPages).forEach(bId => {
-                                        appData.bookPages[bId].forEach(p => {
-                                            if (p.owner === name) { p.owner = ""; p.isRead = false; }
-                                        });
+                                    // SUPABASE-ONCE: uyeyi once members'tan sil, onaylayinca yerel pasif yap
+                                    var _rmSB_ = (typeof window.api === 'function') ? window.api("/members?name=eq." + encodeURIComponent(name) + "&group_key=eq." + encodeURIComponent(currentGroup), { method: "DELETE" }) : Promise.resolve();
+                                    _rmSB_.then(function(){
+                                        if (!appData.passiveMembers) appData.passiveMembers = [];
+                                        if (!appData.passiveMembers.includes(name)) appData.passiveMembers.push(name);
+                                        if (!appData.memberTypes) appData.memberTypes = {};
+                                        appData.memberTypes[name] = 'pasif';
+                                        appData.members = appData.members.filter(function(m){ return m !== name; });
+                                        window.saveGroupData();
+                                        return window.loadGroupData();
+                                    }).then(function(){ return window.pullAll(); }).then(function(){
+                                        window.refreshUI();
+                                        if (typeof window.showToast === 'function') window.showToast('\u2139\ufe0f ' + name + ' pasif \u00fcye yap\u0131ld\u0131 (tamamlanm\u0131\u015f eserleri korundu).', 'info');
+                                    }).catch(function(err){
+                                        if (typeof window.showToast === 'function') window.showToast('Supabase hatasi: ' + ((err&&err.message)||err), 'error');
                                     });
-                                    try { if (typeof window.api === 'function') await window.api("/members?name=eq." + encodeURIComponent(name) + "&group_key=eq." + encodeURIComponent(currentGroup), { method: "DELETE" }); } catch(e){}
-                                    window.saveGroupData();
-                                    await window.loadGroupData();
-                                    await window.pullAll();
-                                    window.refreshUI();
-                                    showToast(`❌ ${name} çıkartıldı.`, 'info');
+                                } else {
+                                    // SUPABASE-ONCE: uyeyi once members'tan sil + hisseleri bosalt, onaylayinca yerel guncelle
+                                    var _rmSB2_ = (typeof window.api === 'function') ? window.api("/members?name=eq." + encodeURIComponent(name) + "&group_key=eq." + encodeURIComponent(currentGroup), { method: "DELETE" }) : Promise.resolve();
+                                    _rmSB2_.then(function(){
+                                        appData.members = appData.members.filter(function(m){ return m !== name; });
+                                        Object.keys(appData.bookPages || {}).forEach(function(bId){
+                                            (appData.bookPages[bId]||[]).forEach(function(pp){ if (pp.owner === name) { pp.owner = ""; pp.isRead = false; } });
+                                        });
+                                        window.saveGroupData();
+                                        return window.loadGroupData();
+                                    }).then(function(){ return window.pullAll(); }).then(function(){
+                                        window.refreshUI();
+                                        if (typeof window.showToast === 'function') window.showToast('\u274c ' + name + ' \u00e7\u0131kart\u0131ld\u0131.', 'info');
+                                    }).catch(function(err){
+                                        if (typeof window.showToast === 'function') window.showToast('Supabase hatasi: ' + ((err&&err.message)||err), 'error');
+                                    });
                                 }
                             }
                         });
