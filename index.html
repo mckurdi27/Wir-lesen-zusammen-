@@ -4231,16 +4231,33 @@ function bulkBookIds() {
                               return 0;
                             }
                             function _mkPages(u){ return Array(u).fill(null).map(function(){ return { owner:'', isRead:false, takeDate:null, takeTime:null, readDate:null, readTime:null }; }); }
-                            var _needBooks = bookIds.filter(function(bId){ return !g.bookPages[bId] || !g.bookPages[bId].length; });
-                            if (_needBooks.length && typeof window.api === 'function') {
+                            // Her secili eseri TAM kapasiteye getir (Supabase books'tan total_units)
+                            function _fullPages(bId, cap){
+                              var arr = g.bookPages[bId];
+                              if (cap > 0 && (!arr || !arr.length)) { g.bookPages[bId] = _mkPages(cap); return; }
+                              if (cap > 0 && arr && arr.length < cap) {
+                                var pad = _mkPages(cap - arr.length);
+                                g.bookPages[bId] = arr.concat(pad);
+                              }
+                            }
+                            function _ensureAll(capMap){
+                              bookIds.forEach(function(bId){
+                                var cap = 0;
+                                if (capMap && capMap[bId]) cap = capMap[bId];
+                                else { cap = _unitCountOf(bId); }
+                                _fullPages(bId, cap);
+                              });
+                            }
+                            if (typeof window.api === 'function') {
                               try { window.api("/books?select=id,total_units").then(function(bs){
-                                (bs||[]).forEach(function(bk){ _bkPool.push({ id:bk.id, totalUnits:bk.total_units }); });
-                                _needBooks.forEach(function(bId){ var u=_unitCountOf(bId); if(u>0 && (!g.bookPages[bId]||!g.bookPages[bId].length)) g.bookPages[bId]=_mkPages(u); });
+                                var cmap = {};
+                                (bs||[]).forEach(function(bk){ cmap[bk.id] = (bk.total_units||0); });
+                                _ensureAll(cmap);
                                 _doAssign();
-                              }).catch(function(){ _needBooks.forEach(function(bId){ var u=_unitCountOf(bId); if(u>0 && !g.bookPages[bId]) g.bookPages[bId]=_mkPages(u); }); _doAssign(); });
-                              } catch(e){ _needBooks.forEach(function(bId){ var u=_unitCountOf(bId); if(u>0 && !g.bookPages[bId]) g.bookPages[bId]=_mkPages(u); }); _doAssign(); }
+                              }).catch(function(){ _ensureAll(null); _doAssign(); });
+                              } catch(e){ _ensureAll(null); _doAssign(); }
                             } else {
-                              _needBooks.forEach(function(bId){ var u=_unitCountOf(bId); if(u>0 && !g.bookPages[bId]) g.bookPages[bId]=_mkPages(u); });
+                              _ensureAll(null);
                               _doAssign();
                             }
                             function _doAssign() {
