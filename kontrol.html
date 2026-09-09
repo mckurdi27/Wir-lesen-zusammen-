@@ -327,5 +327,61 @@
   });
 })();
 </script>
+
+<!-- ===== SUPABASE CANLI DURUM PANELI ===== -->
+<div class="kap" id="sb-canli" style="margin-top:26px;">
+  <h2>📡 Supabase Canlı Durum (Telefon/PC anlık)</h2>
+  <div class="uyarı" style="background:#eafaf1;border-color:#82e0aa;">
+    Bu panel verileri <b>doğrudan Supabase'ten</b> çeker — cihaz hafızası (localStorage) kullanılmaz. Her cihazda aynı anlık görüntüyü görürsünüz; WhatsApp mesajı gibi, sayfa açıkken 3 saniyede bir kendini yeniler.
+  </div>
+  <div class="kart">
+    <table>
+      <tr><th>Veri</th><th>Adet / Bilgi</th><th>Son kontrol</th></tr>
+      <tr><td>👥 Gruplar</td><td id="sbc-grup">—</td><td rowspan="6" id="sbc-saat" style="vertical-align:top;white-space:nowrap;">—</td></tr>
+      <tr><td>🙋 Üyeler</td><td id="sbc-uye">—</td></tr>
+      <tr><td>📖 Eserler</td><td id="sbc-eser">—</td></tr>
+      <tr><td>🎯 Hisseler</td><td id="sbc-hisse">—</td></tr>
+      <tr><td>📜 Okuma geçmişi</td><td id="sbc-gecmis">—</td></tr>
+      <tr><td>🔔 Bağlantı</td><td id="sbc-bag">—</td></tr>
+    </table>
+  </div>
+  <div class="kart" style="background:#f4f6f7;">
+    <h3 style="margin-top:0;">🔄 Nasıl çalışıyor?</h3>
+    <ul style="font-size:13.5px;margin-left:18px;">
+      <li>Telefon veya PC bir iş yapınca (hisse al/oku/sil, üye ekle…) veri <b>anında Supabase'e</b> gider.</li>
+      <li>Diğer tüm açık cihazlar bu paneli <b>3 saniyede bir Supabase'ten yeniden çeker</b>.</li>
+      <li>Cihaz hafızasındaki bayat veri <b>kullanılmaz</b> — herkes aynı canlı görüntüyü görür.</li>
+      <li>Sayfayı yenilemenize gerek yoktur; telefon mesajlaşması gibi kendiliğinden tazelenir.</li>
+    </ul>
+  </div>
+</div>
+<script>
+(function(){
+  var SB_URL="https://dututlhijniendbpmdrg.supabase.co/rest/v1";
+  var SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dHV0bGhpam5pZW5kYnBtZHJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwODE4MDQsImV4cCI6MjEwMzY1NzgwNH0.3ft8BNNk45vI0HK5hZHmgU1n2-oQaVknG1c0ZLzO-Xw";
+  var H={apikey:SB_KEY,Authorization:"Bearer "+SB_KEY,Accept:"application/json"};
+  function g(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; }
+  function ceviri(x){ try{return JSON.parse(x);}catch(e){return null;} }
+  function say(tablo){ return fetch(SB_URL+"/"+tablo+"?select=id",{headers:H}).then(function(r){ return r.headers.get('content-range')||''; }).then(function(cr){ var p=(cr||'').split('/'); return p.length?parseInt(p[p.length-1]):null; }).catch(function(){return null;}); }
+  function yenile(){
+    var simdi=new Date().toLocaleTimeString('tr-TR');
+    g('sbc-saat',simdi);
+    Promise.all([
+      say('groups').then(function(n){g('sbc-grup',(n==null?'hata':n));}),
+      say('members').then(function(n){g('sbc-uye',(n==null?'hata':n));}),
+      say('books').then(function(n){g('sbc-eser',(n==null?'hata':n));}),
+      say('shares').then(function(n){g('sbc-hisse',(n==null?'hata':n));}),
+      say('book_history').then(function(n){g('sbc-gecmis',(n==null?'hata':n));})
+    ]).then(function(){
+      g('sbc-bag','✅ Bağlı');
+    }).catch(function(){
+      g('sbc-bag','❌ Bağlantı hatası');
+    });
+  }
+  yenile();
+  setInterval(yenile,3000);
+})();
+</script>
+
 </body>
 </html>
