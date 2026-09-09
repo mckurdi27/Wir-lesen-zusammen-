@@ -4006,10 +4006,8 @@ window.infoSortTable = function infoSortTable(col) {
                                 </div>
                                 <div>
                                     <label style="font-size: 12px; font-weight: bold; text-align: left;">⚖️ Paylaştırma:</label>
-                                    <select id="admin-bulk-mode-select" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px; min-height: 44px;">
-                                        <option value="equal">⚖️ Eşit paylaştır (gruba dağıt)</option>
-                                        <option value="individual">🔀 Tek tek (seçilen üyeye)</option>
-                                    </select>
+                                    <label style="display:flex; align-items:center; gap:6px; font-size:13px;"><input type="checkbox" id="bulk-mode-equal" checked> ⚖️ Eşit paylaştır (gruba dağıt)</label>
+                                    <label style="display:flex; align-items:center; gap:6px; font-size:13px;"><input type="checkbox" id="bulk-mode-individual"> 🔀 Tek tek (seçilen üyeye)</label>
                                 </div>
                                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                                     <button id="admin-bulk-assign-btn" style="flex: 1; padding: 10px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; min-width: 80px;">📥 Atama</button>
@@ -4217,13 +4215,24 @@ function bulkBookIds() {
                         bulkAssignBtn.addEventListener("click", () => {
                             let target = bottomContainer.querySelector("#admin-bulk-target-select").value;
                             if (!target) { showToast('Lütfen hedef seçin.', 'error'); return; }
-                            let mode = bottomContainer.querySelector("#admin-bulk-mode-select").value;
+                            let _eqEl = bottomContainer.querySelector("#bulk-mode-equal"); let _indEl = bottomContainer.querySelector("#bulk-mode-individual");
+                            let mode = ((_eqEl && _eqEl.checked) || !(_indEl && _indEl.checked)) ? "equal" : "individual";
                             let data = bulkResolveData(target);
                             if (!data) { showToast('Hedef verisi bulunamadı.', 'error'); return; }
                             let bookIds = bulkBookIds();
                             let assigned = 0;
                                                         let g = data.gData;
                             if (!g.bookPages) g.bookPages = {};
+                            // Seçilen TÜM eserler için sayfa dizisi var olsun (yoksa boş bırakılır, atama kaçırılırdı)
+                            var _bkPool = (g.books && g.books.length) ? g.books : ((appData && appData.books) || []);
+                            bookIds.forEach(function(bId){
+                              if (!g.bookPages[bId]) {
+                                var _b = null;
+                                for (var _bi=0;_bi<_bkPool.length;_bi++){ if(String(_bkPool[_bi].id)===String(bId)){ _b=_bkPool[_bi]; break; } }
+                                var _units = (_b && (_b.totalUnits||_b.total_units)) || 0;
+                                if (_units>0) { g.bookPages[bId] = Array(_units).fill(null).map(function(){ return { owner:'', isRead:false, takeDate:null, takeTime:null, readDate:null, readTime:null }; }); }
+                              }
+                            });
                             // Toplu atama da tarih/saat yaz (hisse alim zamani)
                             var bulkTakeNow = new Date().toLocaleDateString("tr-TR");
                             var bulkTakeClock = new Date().toLocaleTimeString("tr-TR", {hour: '2-digit', minute:'2-digit'});
