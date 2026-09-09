@@ -2224,7 +2224,8 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                                                 });
                                                 if (p.isRead) { read++; }
                                                 // Okuma Gunlugu: hisse alininca tek satir olusur; okununca Okunma bilgisi dolar
-                                                result.readingLogs.push({
+                                                if (!Array.isArray(result.readingLogs)) result.readingLogs = [];
+                        result.readingLogs.push({
                                                     bookName: b.name,
                                                     unit: idx + 1,
                                                     range: `${idx+1}. bölüm`,
