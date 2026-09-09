@@ -576,7 +576,7 @@
                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                     <span id="user-icon" class="login-user-icon">&#128100;</span>
                     <div>
-                        <span class="login-user-label">Aktif Kullanıcı:</span>
+                        
                         <span id="active-user-name" class="name">-</span>
                         <span id="active-user-group" class="login-user-group"></span>
                     </div>
@@ -1694,9 +1694,9 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                 }).join('');
                 booksEl.innerHTML = `
                     <div style="display:flex; gap:12px; margin-bottom:10px; flex-wrap:wrap;">
-                        <div style="background:rgba(212,175,55,0.12); padding:8px 14px; border-radius:8px; font-size:13px;"><b>Toplam Hisse:</b> ${sumT}</div>
+                        <div style="background:rgba(212,175,55,0.12); padding:8px 14px; border-radius:8px; font-size:13px;"><b>Alınan:</b> ${sumT}</div>
                         <div style="background:rgba(39,174,96,0.12); padding:8px 14px; border-radius:8px; font-size:13px;"><b>Okunan:</b> ${sumR}</div>
-                        <div style="background:rgba(142,68,173,0.12); padding:8px 14px; border-radius:8px; font-size:13px;"><b>Tamamlama:</b> %${totalPct}</div>
+                        <div style="background:rgba(142,68,173,0.12); padding:8px 14px; border-radius:8px; font-size:13px;"><b>Yüzdeniz:</b> %${totalPct}</div>
                     </div>
                     <table style="width:100%; border-collapse:collapse; font-size:13px;">
                         <thead><tr style="background:rgba(212,175,55,0.15);">
@@ -1857,10 +1857,10 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                     (function(){ const _gm=document.getElementById('group-members-line'); if(!_gm) return; try{ const _gr=JSON.parse(localStorage.getItem('hatim_group_'+String(currentGroup).toLowerCase())||'null'); let _arr=(_gr&&_gr.members&&Array.isArray(_gr.members))?_gr.members.filter(function(x){return x&&String(x).trim()&&x!==loggedInMember;}):[]; if(_arr.length){ _gm.style.display='block'; _gm.textContent='Gruptakiler: '+_arr.join(', '); } else { _gm.style.display='none'; _gm.textContent=''; } }catch(_er){ _gm.style.display='none'; } })();
                     
                     if (loggedInMemberType === 'grup') {
-                        userIcon.textContent = '👥';
+                        userIcon.innerHTML = '<img src="img/grupikon.jpg" style="width:26px;height:26px;border-radius:50%;object-fit:cover;vertical-align:middle;" alt="grup">';
                         userIcon.title = 'Grup Üyesi';
                     } else {
-                        userIcon.textContent = '👤';
+                        userIcon.innerHTML = '👤';
                         userIcon.title = 'Bireysel Kullanıcı';
                     }
                     
