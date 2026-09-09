@@ -5360,6 +5360,9 @@ window._origSetItem = origSetItem;
   window.syncHatimToSB = syncHatimToSB;
 
   function replaceShares(g, groupKey) {
+    // Ilk-alan-korur: Supabase'te o an kayitli sahipligi okur, yalnizca
+    // bos veya zaten bu anlik goruntudeki sahibine ait olan slotlari upsert eder.
+    // ASLA silme yapmaz - silme yalnizca acik admin geri-al butonundan hedefli olarak yapilir.
     return rest.select("members", "?select=id,name,group_key").then(function (allM) {
       var nameId = {}, idName = {};
       var gMembers = (allM || []).filter(function (r) { return String(r.group_key) === String(groupKey); });
@@ -5371,36 +5374,22 @@ window._origSetItem = origSetItem;
       return readExisting.then(function (existing) {
         var taken = {}; // "bid:idx" -> member_id
         (existing || []).forEach(function (x) { taken[x.book_id + ":" + x.unit_index] = x.member_id; });
-        var rows = [], conflicts = [], seen = {}, localSlot = {};
-        // Yerel anlik goruntude kimin hangi birime sahip oldugu
-        Object.keys(bp).forEach(function (bid) {
-          (bp[bid] || []).forEach(function (p, idx) {
-            if (p && p.owner) localSlot[bid + ":" + idx] = p.owner;
-          });
-        });
-        // Adim 1 - yalnizca BU yerel goruntuden dogan yeni/ham atamalari upsert et; cakisma olanlari atla
+        var rows = [], conflicts = [], seen = {};
         Object.keys(bp).forEach(function (bid) {
           (bp[bid] || []).forEach(function (p, idx) {
             if (!p || !p.owner || !nameId[p.owner]) return;
             var slot = bid + ":" + idx;
             var cur = taken[slot];
             if (cur && cur !== nameId[p.owner]) {
+              // Birim Supabase'te BASKA bir uyede kayitli -> ilk alan kazanir, atla ve raporla
               if (!seen[slot]) { seen[slot] = true; conflicts.push({ ownerName: idName[cur] || "baska uye", book_id: bid, unit_index: idx }); }
               return;
             }
             rows.push({ member_id: nameId[p.owner], book_id: bid, unit_index: idx, is_read: !!p.isRead, read_date: p.readDate || null, read_time: p.readTime || null, take_date: p.takeDate || null, take_time: p.takeTime || null });
           });
         });
-        // Adim 2 - Supabase'te bu grupta olup yerelde artik SAHIPSIZ kalan birimleri hedefli sil (geri alma)
-        // Yalnizca DB'de sahibi bu grubun bir uyesi olan birimler silinir; baska grubun/baska anin atamasi ezilmez.
-        var toDelete = [];
-        (existing || []).forEach(function (x) {
-          var slot = x.book_id + ":" + x.unit_index;
-          if (!localSlot[slot]) toDelete.push(x.id);
-        });
-        var doDel = toDelete.length ? api("/shares?id=in.(" + toDelete.join(",") + ")", { method: "DELETE", headers: { "Prefer": "return=minimal" } }) : Promise.resolve();
-        var doUpsert = rows.length ? api("/shares?on_conflict=member_id,book_id,unit_index", { method: "POST", headers: { "Prefer": "resolution=merge-duplicates" }, body: JSON.stringify(rows) }) : Promise.resolve();
-        return Promise.all([doDel, doUpsert]).then(function () { return { conflicts: conflicts }; });
+        var write = rows.length ? api("/shares?on_conflict=member_id,book_id,unit_index", { method: "POST", headers: { "Prefer": "resolution=merge-duplicates" }, body: JSON.stringify(rows) }).then(function () { return { conflicts: conflicts }; }) : Promise.resolve({ conflicts: conflicts });
+        return write;
       });
     });
   }  window.replaceShares = replaceShares;
