@@ -4641,14 +4641,20 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                                 return;
                             }
                             if (confirm(`"${book.name}" silinsin mi?`)) {
-                                appData.books = appData.books.filter(b => b.id !== id);
-                                delete appData.bookPages[id];
-                                delete appData.bookHatims[id];
-                                delete appData.bookHistory[id];
-                                delete window.bookSectionPages[id];
-                                saveGroupData();
-                                loadGroupData();
-                                showToast('🗑️ Eser silindi.', 'info');
+                                // SUPABASE-ONCE: once bu eserin hisselerini ve books kaydini sil, onaylayinca yerel guncelle
+                                var _delSB_ = (typeof window.api === 'function') ? window.api('/shares?book_id=eq.' + encodeURIComponent(id), { method: 'DELETE', headers: { 'Prefer': 'return=minimal' } }).then(function(){ return window.api('/books?id=eq.' + encodeURIComponent(id), { method: 'DELETE', headers: { 'Prefer': 'return=minimal' } }); }) : Promise.resolve();
+                                _delSB_.then(function(){
+                                    appData.books = appData.books.filter(function(b){ return b.id !== id; });
+                                    delete appData.bookPages[id];
+                                    delete appData.bookHatims[id];
+                                    delete appData.bookHistory[id];
+                                    delete window.bookSectionPages[id];
+                                    saveGroupData();
+                                    loadGroupData();
+                                    if (typeof window.showToast === 'function') showToast('\ud83d\uddd1\ufe0f Eser silindi.', 'info');
+                                }).catch(function(err){
+                                    if (typeof window.showToast === 'function') showToast('Supabase hatasi: ' + ((err&&err.message)||err), 'error');
+                                });
                             }
                         });
                     });
@@ -4835,10 +4841,17 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         } else {
                             appData.bookPages[id] = Array(units).fill(null).map(() => ({ owner: '', isRead: false }));
                         }
-                        window.saveGroupData();
-                        window.loadGroupData();
-                        closeBookModal();
-                        showToast(editId ? '✅ Eser güncellendi!' : '✅ Yeni eser eklendi!', 'success');
+                        // SUPABASE-ONCE: eser tanimini books tablosuna yaz, onaylayinca yerel guncelle
+                        var _bookRow = { id: id, name: name, total_units: units, type: bookType, default_mode: (bookType === 'bab' ? 'on_bab' : 'yirmi_sayfa'), sort_order: (appData.books && appData.books.length ? appData.books.length : 1) };
+                        var _bookSB_ = (typeof window.api === 'function') ? window.api('/books?on_conflict=id', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: JSON.stringify(_bookRow) }) : Promise.resolve();
+                        _bookSB_.then(function(){
+                            window.saveGroupData();
+                            window.loadGroupData();
+                            closeBookModal();
+                            if (typeof window.showToast === 'function') showToast(editId ? '\u2705 Eser g\u00fcncellendi!' : '\u2705 Yeni eser eklendi!', 'success');
+                        }).catch(function(err){
+                            if (typeof window.showToast === 'function') showToast('Supabase hatasi: ' + ((err&&err.message)||err), 'error');
+                        });
                     }); }
                     window.closeBookModal = closeBookModal;
                     let _bme = document.getElementById('book-edit-modal');
