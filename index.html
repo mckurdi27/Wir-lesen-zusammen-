@@ -16,16 +16,26 @@
      veriye dayanmalidir.
   4) Yeni agent sohbetinde: "veriler bayat/eski" sikayeti gelirse once
      Supabase'teki gercek veriyi kontrol et, localStorage'i senkronla.
-  5) Eser PDF sayfa/bab eslemesi (bookSectionPages) global localStorage
-     anahtarinda ('hatim_bookpages') saklanir - grup bazli degil.  5) Eser PDF sayfa/bab eslemesi (bookSectionPages) global localStorage
-     anahtarinda ('hatim_bookpages') saklanir - grup bazli degil.
-  6) HER GRUP KENDI ICINDE BAGIMSIZDIR: ayni eserin ayni birimi farkli
-     gruplarda ayri uyeler tarafindan sahiplenilebilir (grup ici paylasim).
-     Bir (eser, birim) cakismasi yalnizca AYNI GRUP icinde gecersizdir.
-  7) Hisse/hisseci kaydi ne olursa olsun SUPABASE'e yazilmak zorundadir;
-     kaynak Supabase'tir, kayip yoktur. Bir grup ayni birimi almak istedigi
-     anda DB'de baska grupta dolu olmasi ONAYLANIR bir durumdur (409 degil).
-=====================================================================
+   5) Eser PDF sayfa/bab eslemesi (bookSectionPages) global localStorage
+      anahtarinda ('hatim_bookpages') saklanir - grup bazli degil.
+   6) HER GRUP KENDI ICINDE BAGIMSIZDIR: ayni eserin ayni birimi farkli
+      gruplarda ayri uyeler tarafindan sahiplenilebilir (grup ici paylasim).
+      Bir (eser, birim) cakismasi yalnizca AYNI GRUP icinde gecersizdir.
+   7) Hisse/hisseci kaydi ne olursa olsun SUPABASE'e yazilmak zorundadir;
+      kaynak Supabase'tir, kayip yoktur. Bir grup ayni birimi almak istedigi
+      anda DB'de baska grupta dolu olmasi ONAYLANIR bir durumdur (409 degil).
+   8) YAZMA YOLU (TEK METOD - agentlar bu kalibi uygular):
+      a) Her veri girisinde ONCE hedefli Supabase islemini yap:
+         - hisse al/oku/okunmadi/geri al => ilgili (member_id,book_id,unit_index)
+           satir(lar)ina hedefli POST-upsert veya PATCH (sadece degisen satir).
+         - EKSIK ESER ATLAMA: secili/ilgili eserin TUM birimlerini doldur;
+           kapasitesi Supabase books.total_units'ten gelir, asla atlanmaz.
+      b) Supabase islemi ONAYLANDIKTAN sonra localStorage'i guncelle (cache).
+      c) Supabase reddederse (409/cakisma) yereli GERI AL, kullaniciya uyari ver.
+      d) TUM-GRUP SNAPSHOT'unu oldugu gibi yeniden yazan yazim YASAKTIR
+         (localStorage.setItem koprusu karar veren degil, salt cache'tir).
+   9) Gecersiz cihaz localStorage'i asla Supabase'in dogru kaydini ezemez.
+      Sayfa yenilendiginde gorunen veri her zaman Supabase'ten gelir.
 -->
 
 <!-- ===================== BELGE BASI (DOCTYPE / <html>) ===================== -->
@@ -5289,7 +5299,7 @@ document.addEventListener('click', function (e) {
 });
 
 </script>
-/* ----- ANA SCRIPT SONU / kucuk yardimci blogu ----- */
+<!-- (ANA SCRIPT SONU / kucuk yardimci blogu) -->
 <script>
 </script>
 <script>
@@ -5802,7 +5812,7 @@ _sbMemberDetail = function (name, groupKey) {
 </script>
 
 
-/* ----- KAPANIS / BASLATMA (init) ----- */
+<!-- (KAPANIS / BASLATMA - init) -->
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', function () {
