@@ -4210,11 +4210,7 @@ window.infoSortTable = function infoSortTable(col) {
                         return null;
                     }
                     function bulkSave(data) {
-                        // 1) localStorage'a yaz (aninda goruntuleme)
-                        if (data.type === 'bireysel') localStorage.setItem('hatim_group_' + data.mName.toLowerCase(), JSON.stringify(data.gData));
-                        else localStorage.setItem(`hatim_group_${data.gKey}`, JSON.stringify(data.gData));
-                        // 2) Supabase senkronu: kuyruga al, sirayla calistir, hatayi GORUNUR yap
-                        //    Boylece localStorage ile Supabase ayrismaz.
+                        // SUPABASE-ONCE: localStorage yalnizca Supabase onayi sonrasi guncellenir (asagida .then).
                         var _k = (data.type === 'bireysel') ? (data.mName || '').toLowerCase() : data.gKey;
                         if (!_k || typeof window.api !== 'function' || typeof window.replaceShares !== 'function') return Promise.resolve();
                         window._sbQ = window._sbQ || Promise.resolve();
@@ -4230,6 +4226,9 @@ window.infoSortTable = function infoSortTable(col) {
                                 if (typeof window.syncHatimToSB === 'function') return window.syncHatimToSB(_k, data.gData);
                                 return undefined;
                             }).then(function () {
+                                // Supabase onayladi -> localStorage'i guncelle (cache)
+                                if (data.type === 'bireysel') localStorage.setItem('hatim_group_' + data.mName.toLowerCase(), JSON.stringify(data.gData));
+                                else localStorage.setItem('hatim_group_' + data.gKey, JSON.stringify(data.gData));
                                 return 'ok';
                             }).catch(function (e) {
                                 // Hata: kullaniciya goster + localStorage'i supabase gercegiyle yeniden hizala
