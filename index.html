@@ -4198,6 +4198,14 @@ window.infoSortTable = function infoSortTable(col) {
                         p.catch(function(){}); // kuyruk bir onceki hata ile kirilmasin
                         return p;
                     }
+                    function bulkDeleteSharesSB(data, bookIds) {
+                      if (typeof window.api !== 'function') return Promise.resolve();
+                      var _k = (data && (data.gKey || (data.type==='bireysel' ? (data.mName||'').toLowerCase() : ''))) || '';
+                      if (!_k || !bookIds || !bookIds.length) return Promise.resolve();
+                      var _ke = encodeURIComponent(_k);
+                      var _bids = bookIds.map(function(b){ return encodeURIComponent(b); }).join(',');
+                      return window.api('/shares?group_key=eq.'+_ke+'&book_id=in.('+_bids+')', { method: 'DELETE', headers: { 'Prefer': 'return=minimal' } }).catch(function(e){ console.warn('bulk sil SB', e); });
+                    }
 
 function bulkBookIds() {
                         let ids = getSelectedBulkBooks();
@@ -4257,6 +4265,7 @@ function bulkBookIds() {
                                 if (data.type === "group") { pages.forEach(p => { if (p.owner) { p.owner = ""; p.isRead = false; removed++; } }); }
                                 else { let m = data.mName; pages.forEach(p => { if (p.owner === m) { p.owner = ""; p.isRead = false; removed++; } }); }
                             });
+                            bulkDeleteSharesSB(data, bookIds);
                             bulkSave(data);
                             showToast('🗑️ ' + removed + ' hisse silindi.', 'info');
                             loadGroupData();
@@ -4280,6 +4289,7 @@ function bulkBookIds() {
                                 else { let m = data.mName; pages.forEach(p => { if (p.owner === m) { p.owner = ""; p.isRead = false; reset++; } }); }
                                 if (g.bookHatims && g.bookHatims[bId]) { g.bookHatims[bId].hatimNo = 1; g.bookHatims[bId].prayerDone = false; }
                             });
+                            bulkDeleteSharesSB(data, bookIds);
                             bulkSave(data);
                             showToast('🔄 ' + reset + ' hisse sıfırlandı.', 'info');
                             loadGroupData();
