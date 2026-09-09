@@ -1747,19 +1747,26 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                         const pwdEl = document.getElementById('bt-member-password');
                         const val = (pwdEl ? pwdEl.value : '').trim();
                         if (!val) { showToast('⚠️ Şifre boş olamaz!', 'error'); return; }
-                        if (loggedInMemberType === 'grup') {
-                            if (appData) {
-                                if (!appData.passwords) appData.passwords = {};
-                                appData.passwords[loggedInMember] = val;
-                                saveGroupData();
+                        // SUPABASE-ONCE: sifreyi Supabase'e yaz, onaylayinca yerel guncelle
+                        var _grpPwd = (loggedInMemberType === 'grup') ? (currentGroup || '') : String(loggedInMember).toLowerCase();
+                        var _pwdSB_ = (typeof window._sbUpdatePassword === 'function') ? window._sbUpdatePassword(loggedInMember, val, _grpPwd) : Promise.resolve();
+                        _pwdSB_.then(function(){
+                            if (loggedInMemberType === 'grup') {
+                                if (appData) {
+                                    if (!appData.passwords) appData.passwords = {};
+                                    appData.passwords[loggedInMember] = val;
+                                    saveGroupData();
+                                }
+                            } else {
+                                let _bp = getBireyselPool();
+                                if (!_bp.passwords) _bp.passwords = {};
+                                _bp.passwords[loggedInMember] = val;
+                                saveBireyselPool(_bp);
                             }
-                        } else {
-                            let _bp = getBireyselPool();
-                            if (!_bp.passwords) _bp.passwords = {};
-                            _bp.passwords[loggedInMember] = val;
-                            saveBireyselPool(_bp);
-                        }
-                        showToast('✅ Şifreniz güncellendi.', 'success');
+                            if (typeof window.showToast === 'function') showToast('\u2705 \u015eifreniz g\u00fcncellendi.', 'success');
+                        }).catch(function(err){
+                            if (typeof window.showToast === 'function') showToast('Supabase hatasi: ' + ((err&&err.message)||err), 'error');
+                        });
                     }
 
                 });
