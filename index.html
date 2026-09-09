@@ -4225,14 +4225,26 @@ function bulkBookIds() {
                             if (!g.bookPages) g.bookPages = {};
                             // Seçilen TÜM eserler için sayfa dizisi var olsun (yoksa boş bırakılır, atama kaçırılırdı)
                             var _bkPool = (g.books && g.books.length) ? g.books : ((appData && appData.books) || []);
-                            bookIds.forEach(function(bId){
-                              if (!g.bookPages[bId]) {
-                                var _b = null;
-                                for (var _bi=0;_bi<_bkPool.length;_bi++){ if(String(_bkPool[_bi].id)===String(bId)){ _b=_bkPool[_bi]; break; } }
-                                var _units = (_b && (_b.totalUnits||_b.total_units)) || 0;
-                                if (_units>0) { g.bookPages[bId] = Array(_units).fill(null).map(function(){ return { owner:'', isRead:false, takeDate:null, takeTime:null, readDate:null, readTime:null }; }); }
-                              }
-                            });
+                            // Seçilen HER eserin sayfa dizisini garantile (yerelde yoksa Supabase books'tan birim sayisini al)
+                            function _unitCountOf(bId){
+                              for (var _q=0;_q<_bkPool.length;_q++){ if(String(_bkPool[_q].id)===String(bId)) return (_bkPool[_q].totalUnits||_bkPool[_q].total_units)||0; }
+                              return 0;
+                            }
+                            function _mkPages(u){ return Array(u).fill(null).map(function(){ return { owner:'', isRead:false, takeDate:null, takeTime:null, readDate:null, readTime:null }; }); }
+                            var _needBooks = bookIds.filter(function(bId){ return !g.bookPages[bId] || !g.bookPages[bId].length; });
+                            if (_needBooks.length && typeof window.api === 'function') {
+                              try { window.api("/books?select=id,total_units").then(function(bs){
+                                (bs||[]).forEach(function(bk){ _bkPool.push({ id:bk.id, totalUnits:bk.total_units }); });
+                                _needBooks.forEach(function(bId){ var u=_unitCountOf(bId); if(u>0 && (!g.bookPages[bId]||!g.bookPages[bId].length)) g.bookPages[bId]=_mkPages(u); });
+                                _doAssign();
+                              }).catch(function(){ _needBooks.forEach(function(bId){ var u=_unitCountOf(bId); if(u>0 && !g.bookPages[bId]) g.bookPages[bId]=_mkPages(u); }); _doAssign(); });
+                              } catch(e){ _needBooks.forEach(function(bId){ var u=_unitCountOf(bId); if(u>0 && !g.bookPages[bId]) g.bookPages[bId]=_mkPages(u); }); _doAssign(); }
+                            } else {
+                              _needBooks.forEach(function(bId){ var u=_unitCountOf(bId); if(u>0 && !g.bookPages[bId]) g.bookPages[bId]=_mkPages(u); });
+                              _doAssign();
+                            }
+                            function _doAssign() {
+                            // Toplu atama da tarih/saat yaz (hisse alim zamani)
                             // Toplu atama da tarih/saat yaz (hisse alim zamani)
                             var bulkTakeNow = new Date().toLocaleDateString("tr-TR");
                             var bulkTakeClock = new Date().toLocaleTimeString("tr-TR", {hour: '2-digit', minute:'2-digit'});
@@ -4255,6 +4267,7 @@ function bulkBookIds() {
                             bulkSave(data);
                             showToast('✅ ' + assigned + ' hisse atandı.', 'success');
                             loadGroupData();
+                            }
                         });
                     }
 
