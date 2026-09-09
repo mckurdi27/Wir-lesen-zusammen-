@@ -4723,7 +4723,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         if (!name || !name.trim()) return;
                         let key = name.trim().toLowerCase().replace(/\s+/g, '_');
                         if (key === _oldKey) { showToast("Ad aynı, değişiklik yok.", "info"); return; }
-                        origSetItem(`hatim_group_${key}`, JSON.stringify(appData));
+                        window._origSetItem(`hatim_group_${key}`, JSON.stringify(appData));
                         localStorage.removeItem(`hatim_group_${_oldKey}`);
                         var _api2 = (typeof window.api === 'function') ? window.api : null;
                         if (_api2) {
@@ -5222,6 +5222,7 @@ document.addEventListener('click', function (e) {
   var _queue = Promise.resolve();
   var origSetItem = localStorage.setItem.bind(localStorage);
   var origGetItem = localStorage.getItem.bind(localStorage);
+window._origSetItem = origSetItem;
 
   // ---------- REST yardımcıları (fetch tabanlı) ----------
   function api(path, opts) {
