@@ -5374,7 +5374,7 @@ window._origSetItem = origSetItem;
       gMembers.forEach(function (r) { nameId[r.name] = r.id; idName[r.id] = r.name; });
       var bp = (g && g.bookPages) || {};
       var myIds = gMembers.map(function (r) { return r.id; });
-      var ownerQuery = myIds.length ? "/shares?select=member_id,book_id,unit_index&member_id=in.(" + myIds.join(",") + ")" : null;
+      var ownerQuery = myIds.length ? "?select=member_id,book_id,unit_index&member_id=in.(" + myIds.join(",") + ")" : null;
       var readExisting = ownerQuery ? rest.select("shares", ownerQuery) : Promise.resolve([]);
       return readExisting.then(function (existing) {
         var taken = {}; // "bid:idx" -> member_id
