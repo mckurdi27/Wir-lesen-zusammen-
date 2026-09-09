@@ -4873,22 +4873,23 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         if (name?.trim()) {
                             let key = name.trim().toLowerCase().replace(/\s+/g, '_');
                             let pwd = prompt("Grup şifresi (boş bırakabilirsiniz):") || "";
-                            currentGroup = key;
-                            const today = new Date().toLocaleDateString("tr-TR");
-                            let books = JSON.parse(JSON.stringify(defaultBooksTemplate));
-                            let pages = {}, hatims = {}, history = {};
-                            books.forEach(b => {
-                                pages[b.id] = Array(b.totalUnits).fill(null).map(() => ({ owner: "", isRead: false }));
-                                hatims[b.id] = { hatimNo: 1, startDate: today, prayerDone: false };
-                                history[b.id] = [];
+                            // SUPABASE-ONCE: grubu once Supabase'e yaz, onaylayinca yerel kur
+                            var _apiG = (typeof window.api === 'function') ? window.api : null;
+                            var _grpProm = _apiG ? _apiG("/groups", { method: "POST", headers: { "Prefer": "return=representation" }, body: JSON.stringify({ key: key, name: name.trim(), password: pwd.trim(), dropdown_visible: true }) }) : Promise.resolve();
+                            _grpProm.then(function(){
+                                currentGroup = key;
+                                const today = new Date().toLocaleDateString("tr-TR");
+                                let books = JSON.parse(JSON.stringify(defaultBooksTemplate));
+                                let pages = {}, hatims = {}, history = {};
+                                books.forEach(b => { pages[b.id] = Array(b.totalUnits).fill(null).map(() => ({ owner: "", isRead: false })); hatims[b.id] = { hatimNo: 1, startDate: today, prayerDone: false }; history[b.id] = []; });
+                                appData = { members: [], memberTypes: {}, password: pwd.trim(), dropdownVisible: true, books: books, bookPages: pages, bookHatims: hatims, bookHistory: history, readingLogs: [] };
+                                window.saveGroupData();
+                                return window.loadGroupData();
+                            }).then(function(){
+                                if (typeof window.showToast === 'function') showToast('✅ Yeni grup oluşturuldu!', 'success');
+                            }).catch(function(err){
+                                if (typeof window.showToast === 'function') showToast('Supabase hatasi: ' + ((err&&err.message)||err), 'error');
                             });
-                            appData = { members: [], memberTypes: {}, password: pwd.trim(), dropdownVisible: (String(pwd||'').trim() === ''), books, bookPages: pages, bookHatims: hatims, bookHistory: history, readingLogs: [] };
-                            window.saveGroupData();
-                            // Supabase'e de yaz (tek doğruluk kaynağı)
-                            var _api = (typeof window.api === 'function') ? window.api : null;
-                            if (_api) { try { await _api("/groups", { method: "POST", body: JSON.stringify({ key: key, name: name.trim(), password: pwd.trim() }) }); } catch(e){ console.warn('grup ekle', e); } }
-                            await window.loadGroupData();
-                            showToast('✅ Yeni grup oluşturuldu!', 'success');
                         }
                     });
 
