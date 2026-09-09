@@ -4089,7 +4089,7 @@ window.infoSortTable = function infoSortTable(col) {
                                     <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
                                     <label style="font-size: 12px; font-weight: bold; text-align: left; white-space:nowrap;">⚖️ Paylaştırma:</label>
                                     <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
-                                        <label style="display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer;"><input type="checkbox" id="bulk-mode-equal" checked> Eşit pay</label>
+                                        <label style="display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer;"><input type="checkbox" id="bulk-mode-equal"> Eşit pay</label>
                                         <label style="display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer;"><input type="checkbox" id="bulk-mode-individual"> Tek tek pay</label>
                                     </div>
                                 </div>
@@ -4299,12 +4299,26 @@ function bulkBookIds() {
                         return ids;
                     }
 
+                    // Paylaştırma secimi: tek secim (iki checkbox karşılıklı dislanir)
+                    (function(){
+                      function bindModeSel(root){
+                        var eq = root ? root.querySelector('#bulk-mode-equal') : null;
+                        var ind = root ? root.querySelector('#bulk-mode-individual') : null;
+                        if (eq && ind) {
+                          eq.onchange = function(){ if (eq.checked) ind.checked = false; };
+                          ind.onchange = function(){ if (ind.checked) eq.checked = false; };
+                        }
+                      }
+                      bindModeSel(bottomContainer);
+                    })();
                     if (bulkAssignBtn) {
                         bulkAssignBtn.addEventListener("click", () => {
                             let target = bottomContainer.querySelector("#admin-bulk-target-select").value;
                             if (!target) { showToast('Lütfen hedef seçin.', 'error'); return; }
                             let _eqEl = bottomContainer.querySelector("#bulk-mode-equal"); let _indEl = bottomContainer.querySelector("#bulk-mode-individual");
-                            let mode = ((_eqEl && _eqEl.checked) || !(_indEl && _indEl.checked)) ? "equal" : "individual";
+                            let _eqC = !!(_eqEl && _eqEl.checked), _indC = !!(_indEl && _indEl.checked);
+                            if (_eqC === _indC) { showToast("Lütfen Paylaştırma seçeneklerinden birini seçin (Eşit pay veya Tek tek pay).", "error"); return; }
+                            let mode = _eqC ? "equal" : "individual";
                             let data = bulkResolveData(target);
                             if (!data) { showToast('Hedef verisi bulunamadı.', 'error'); return; }
                             let bookIds = bulkBookIds();
