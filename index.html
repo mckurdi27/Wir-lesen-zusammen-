@@ -4086,16 +4086,12 @@ window.infoSortTable = function infoSortTable(col) {
                         <h3 style="font-size: 15px; margin: 0;">📢 Yöneticiye Mesaj</h3>
                         
                     </div>
-                    <div style="display:grid; grid-template-columns:1fr auto; gap:14px; align-items:stretch;">
-                        <div style="min-width:0;">
-                    <textarea id="admin-msg-input" placeholder="Mesajınızı yazın..." style="width: 100%; height: 60px; padding: 12px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; margin-bottom: 10px; font-size: 14px;"></textarea>
-                    <button id="send-admin-msg-btn" style="width: 100%; padding: 14px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 15px; min-height: 48px;">💬 WhatsApp ile Gönder</button>
-                        </div>
-                        <div style="display:flex; flex-direction:column; gap:6px; justify-content:flex-start;">
-                            <button id="wa-app-btn" class="wa-app-btn" title="Uygulamayı WhatsApp'ta paylaş" style="flex:1; padding:12px 16px; background:#128C7E; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:14px; white-space:nowrap;">📱 Uygulamayı Paylaş</button>
-                            <div style="font-size:11px; color:#777; text-align:center;">Ortak Hatim &amp; Dua takibi uygulamasına davet et</div>
-                        </div>
+                    <textarea id="admin-msg-input" placeholder="Mesajınızı yazın..." style="width: 100%; height: 60px; padding: 12px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; margin-bottom: 10px; font-size: 14px; box-sizing: border-box; resize: vertical;"></textarea>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button id="send-admin-msg-btn" style="flex: 1.4; min-width: 0; padding: 10px 12px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">💬 WhatsApp ile Gönder</button>
+                        <button id="wa-app-btn" class="wa-app-btn" title="Uygulamayı WhatsApp'ta paylaş" style="flex: 1; min-width: 0; padding: 10px 12px; background: #128C7E; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">📱 Uygulamayı Paylaş</button>
                     </div>
+                    <div style="font-size: 11px; color: #777; text-align: left; margin-top: 6px;">Arkadaşlarını bu uygulamaya WhatsApp ile davet et</div>
                 `;
 
                 let adminPanelHtml = "";
