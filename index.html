@@ -4275,7 +4275,15 @@ function bulkBookIds() {
                                     let members = g.members || [];
                                     if (!members.length) return;
                                     let idx = 0;
-                                    pages.forEach(p => { if (!p.owner) { p.owner = members[idx % members.length]; idx++; p.isRead = false; p.takeDate = bulkTakeNow; p.takeTime = bulkTakeClock; assigned++; } });
+                                    // Eseri uye sayisina bol; her uyeye ARDISIK (sirali) dilim ver, 1'er donusumlu degil
+                                    var _nMem = members.length;
+                                    var _band = Math.max(1, Math.ceil(pages.length / _nMem));
+                                    pages.forEach(function(p, i){
+                                        if (!p.owner) {
+                                            var mi = Math.min(_nMem-1, Math.floor(i / _band));
+                                            p.owner = members[mi]; p.isRead = false; p.takeDate = bulkTakeNow; p.takeTime = bulkTakeClock; assigned++;
+                                        }
+                                    });
                                 } else {
                                     let m = data.mName;
                                     pages.forEach(p => { if (!p.owner) { p.owner = m; p.isRead = false; p.takeDate = bulkTakeNow; p.takeTime = bulkTakeClock; assigned++; } });
