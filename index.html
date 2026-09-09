@@ -4723,7 +4723,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         if (!name || !name.trim()) return;
                         let key = name.trim().toLowerCase().replace(/\s+/g, '_');
                         if (key === _oldKey) { showToast("Ad aynı, değişiklik yok.", "info"); return; }
-                        localStorage.setItem(`hatim_group_${key}`, JSON.stringify(appData));
+                        origSetItem(`hatim_group_${key}`, JSON.stringify(appData));
                         localStorage.removeItem(`hatim_group_${_oldKey}`);
                         var _api2 = (typeof window.api === 'function') ? window.api : null;
                         if (_api2) {
