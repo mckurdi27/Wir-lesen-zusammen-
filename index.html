@@ -1719,28 +1719,32 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                     }
                     if (e.target && e.target.id === 'bt-change-region') {
                         var _v = (document.getElementById('bt-member-region') || {}).value ? document.getElementById('bt-member-region').value.trim() : '';
-                        if (!appData) appData = {};
-                        if (!appData.regions) appData.regions = {};
-                        appData.regions[loggedInMember] = _v;
-                        try { saveGroupData(); } catch(e){}
-                        if (typeof window._sbUpdateRegionCity === 'function') {
-                          var _gr = (window.currentGroup !== undefined && window.currentGroup) || (appData && appData.group) || '';
-                          window._sbUpdateRegionCity(loggedInMember, _gr, 'region', _v).catch(function(){});
-                        }
-                        showToast('Bölge kaydedildi.', 'success');
+                        var _grpR = (typeof currentGroup !== 'undefined' && currentGroup) ? currentGroup : '';
+                        var _regSB_ = (typeof window._sbUpdateRegionCity === 'function') ? window._sbUpdateRegionCity(loggedInMember, _grpR, 'region', _v) : Promise.resolve();
+                        _regSB_.then(function(){
+                            if (!appData) appData = {};
+                            if (!appData.regions) appData.regions = {};
+                            appData.regions[loggedInMember] = _v;
+                            try { saveGroupData(); } catch(e){}
+                            if (typeof window.showToast === 'function') showToast('B\u00f6lge kaydedildi.', 'success');
+                        }).catch(function(err){
+                            if (typeof window.showToast === 'function') showToast('Supabase hatasi: ' + ((err&&err.message)||err), 'error');
+                        });
                         return;
                     }
                     if (e.target && e.target.id === 'bt-change-city') {
                         var _v = (document.getElementById('bt-member-city') || {}).value ? document.getElementById('bt-member-city').value.trim() : '';
-                        if (!appData) appData = {};
-                        if (!appData.cities) appData.cities = {};
-                        appData.cities[loggedInMember] = _v;
-                        try { saveGroupData(); } catch(e){}
-                        if (typeof window._sbUpdateRegionCity === 'function') {
-                          var _gc = (window.currentGroup !== undefined && window.currentGroup) || (appData && appData.group) || '';
-                          window._sbUpdateRegionCity(loggedInMember, _gc, 'city', _v).catch(function(){});
-                        }
-                        showToast('Şehir kaydedildi.', 'success');
+                        var _grpC = (typeof currentGroup !== 'undefined' && currentGroup) ? currentGroup : '';
+                        var _citySB_ = (typeof window._sbUpdateRegionCity === 'function') ? window._sbUpdateRegionCity(loggedInMember, _grpC, 'city', _v) : Promise.resolve();
+                        _citySB_.then(function(){
+                            if (!appData) appData = {};
+                            if (!appData.cities) appData.cities = {};
+                            appData.cities[loggedInMember] = _v;
+                            try { saveGroupData(); } catch(e){}
+                            if (typeof window.showToast === 'function') showToast('\u015eehir kaydedildi.', 'success');
+                        }).catch(function(err){
+                            if (typeof window.showToast === 'function') showToast('Supabase hatasi: ' + ((err&&err.message)||err), 'error');
+                        });
                         return;
                     }
                     if (e.target && e.target.id === 'bt-change-password') {
