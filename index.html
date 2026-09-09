@@ -5604,6 +5604,7 @@ _sbMemberDetail = function (name, groupKey) {
       return Promise.resolve({ ok: true });
     });
   };
+  window.pullAll = pullAll;
   window._sbPullAll = function () { return pullAll(); };
 
   localStorage.setItem = function (key, value) {
