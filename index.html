@@ -622,9 +622,6 @@
 
             </div>
 
-            <div id="bulk-share-area" class="bulk-share-area" style="display: none;">
-                <button id="bulk-whatsapp-btn" class="bulk-whatsapp-btn">&#128172; Tüm Seçtiklerimi WhatsApp'ta Paylaş</button>
-            </div>
         </div>
 
 
@@ -1698,6 +1695,9 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                         <div style="background:rgba(39,174,96,0.12); padding:8px 14px; border-radius:8px; font-size:13px;"><b>Okunan:</b> ${sumR}</div>
                         <div style="background:rgba(142,68,173,0.12); padding:8px 14px; border-radius:8px; font-size:13px;"><b>Yüzdeniz:</b> %${totalPct}</div>
                     </div>
+        <div id="bulk-share-area" class="bulk-share-area" style="display: none; margin-top:6px;">
+            <button id="bulk-whatsapp-btn" class="bulk-whatsapp-btn">&#128172; Tüm Seçtiklerimi WhatsApp'ta Paylaş</button>
+        </div>
                     <table style="width:100%; border-collapse:collapse; font-size:13px;">
                         <thead><tr style="background:rgba(212,175,55,0.15);">
                             <th style="padding:8px; text-align:left;">Eser</th>
@@ -1853,11 +1853,11 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                     activeName.textContent = loggedInMember;
                     
                     const groupName = currentGroup.replace(/_/g, ' ').toUpperCase();
-                    activeGroup.textContent = `📍 ${groupName}`;
+                    activeGroup.innerHTML = '<img src="img/grupikon.jpg" style="width:18px;height:18px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px;" alt="grup">' + `<span style="vertical-align:middle;">${groupName}</span>`;
                     (function(){ const _gm=document.getElementById('group-members-line'); if(!_gm) return; try{ const _gr=JSON.parse(localStorage.getItem('hatim_group_'+String(currentGroup).toLowerCase())||'null'); let _arr=(_gr&&_gr.members&&Array.isArray(_gr.members))?_gr.members.filter(function(x){return x&&String(x).trim()&&x!==loggedInMember;}):[]; if(_arr.length){ _gm.style.display='block'; _gm.textContent='Gruptakiler: '+_arr.join(', '); } else { _gm.style.display='none'; _gm.textContent=''; } }catch(_er){ _gm.style.display='none'; } })();
                     
                     if (loggedInMemberType === 'grup') {
-                        userIcon.innerHTML = '<img src="img/grupikon.jpg" style="width:26px;height:26px;border-radius:50%;object-fit:cover;vertical-align:middle;" alt="grup">';
+                        userIcon.innerHTML = '👥';
                         userIcon.title = 'Grup Üyesi';
                     } else {
                         userIcon.innerHTML = '👤';
