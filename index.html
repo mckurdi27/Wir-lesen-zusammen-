@@ -3701,17 +3701,17 @@ booksGrid.appendChild(_readBtn);
                             baseArray[i].takeDate = undefined;
                             baseArray[i].takeTime = undefined;
                         }
-                        saveGroupData();                        // Supabase'ten de sil (upsert silmez, yoksa yenilenince geri gelir)
-                        try {
-                            if (window.rest && typeof window.rest.select === 'function' && typeof window.api === 'function') {
-                                window.rest.select("members", "?select=id,name,group_key").then(function(allM){
-                                    var _mid = null;
-                                    (allM||[]).forEach(function(mm){ if (String(mm.group_key)===String(currentGroup) && mm.name===loggedInMember) _mid = mm.id; });
-                                    if (!_mid) return;
-                                    window.api('/shares?member_id=eq.'+_mid+'&book_id=eq.'+encodeURIComponent(bId)+'&unit_index=gte.'+start+'&unit_index=lt.'+end, { method: 'DELETE', headers: { 'Prefer': 'return=minimal' } }).catch(function(){});
-                                }).catch(function(){});
-                            }
-                        } catch(e){};
+                        var _relSB_ = (typeof window._sbReleaseRange === 'function') ? window._sbReleaseRange(bId, start, end) : Promise.resolve();
+                        _relSB_.then(function(){
+                          // Supabase onayladi; yereli temizle + kaydet
+                          for (var _z_ = start; _z_ < end; _z_++) { if (baseArray[_z_]) { baseArray[_z_].owner=''; baseArray[_z_].isRead=false; baseArray[_z_].readDate=undefined; baseArray[_z_].readTime=undefined; baseArray[_z_].takeDate=undefined; baseArray[_z_].takeTime=undefined; } }
+                          saveGroupData();
+                          if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel(); if (typeof renderGrupTakipPanel === 'function') renderGrupTakipPanel();
+                          if (typeof window.showToast === 'function') showToast('\u274c Hisseden vazge\u00e7ildi.', 'error');
+                        }).catch(function(err){
+                          renderBooks();
+                          if (typeof window.showToast === 'function') showToast('Supabase hatasi: ' + ((err&&err.message)||err), 'error');
+                        });
                         if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel(); if (typeof renderGrupTakipPanel === 'function') renderGrupTakipPanel();
                         showToast(`❌ Hisseden vazgeçildi.`, 'error');
                     });
@@ -5725,6 +5725,16 @@ _sbMemberDetail = function (name, groupKey) {
       if (!mid) throw new Error('Uye Supabase`te yok');
       var body = { is_read: !!isRead, read_date: isRead ? now : null, read_time: isRead ? time : null };
       return window.api('/shares?member_id=eq.' + mid + '&book_id=eq.' + encodeURIComponent(bId) + '&unit_index=gte.' + start + '&unit_index=lt.' + end, { method: 'PATCH', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify(body) });
+    });
+  };
+
+  window._sbReleaseRange = function (bId, start, end) {
+    if (typeof window.api !== 'function') return Promise.reject(new Error('api yok'));
+    var gk = (typeof currentGroup !== 'undefined' && currentGroup && String(currentGroup).trim()) ? String(currentGroup) : (String(loggedInMember).toLowerCase().trim());
+    return window.api('/members?select=id&group_key=eq.' + encodeURIComponent(gk) + '&name=eq.' + encodeURIComponent(loggedInMember)).then(function (mm) {
+      mm = mm || []; var mid = mm.length ? mm[0].id : null;
+      if (!mid) throw new Error('Uye Supabase`te yok');
+      return window.api('/shares?member_id=eq.' + mid + '&book_id=eq.' + encodeURIComponent(bId) + '&unit_index=gte.' + start + '&unit_index=lt.' + end, { method: 'DELETE', headers: { 'Prefer': 'return=minimal' } });
     });
   };
   window._sbRenameOwner = function (oldName, newName, group) {
