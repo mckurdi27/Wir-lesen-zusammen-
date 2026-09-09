@@ -17,7 +17,14 @@
   4) Yeni agent sohbetinde: "veriler bayat/eski" sikayeti gelirse once
      Supabase'teki gercek veriyi kontrol et, localStorage'i senkronla.
   5) Eser PDF sayfa/bab eslemesi (bookSectionPages) global localStorage
+     anahtarinda ('hatim_bookpages') saklanir - grup bazli degil.  5) Eser PDF sayfa/bab eslemesi (bookSectionPages) global localStorage
      anahtarinda ('hatim_bookpages') saklanir - grup bazli degil.
+  6) HER GRUP KENDI ICINDE BAGIMSIZDIR: ayni eserin ayni birimi farkli
+     gruplarda ayri uyeler tarafindan sahiplenilebilir (grup ici paylasim).
+     Bir (eser, birim) cakismasi yalnizca AYNI GRUP icinde gecersizdir.
+  7) Hisse/hisseci kaydi ne olursa olsun SUPABASE'e yazilmak zorundadir;
+     kaynak Supabase'tir, kayip yoktur. Bir grup ayni birimi almak istedigi
+     anda DB'de baska grupta dolu olmasi ONAYLANIR bir durumdur (409 degil).
 =====================================================================
 -->
 
@@ -5391,11 +5398,11 @@ window._origSetItem = origSetItem;
               if (!seen[slot]) { seen[slot] = true; conflicts.push({ ownerName: idName[cur] || "baska uye", book_id: bid, unit_index: idx }); }
               return;
             }
-            rows.push({ member_id: nameId[p.owner], book_id: bid, unit_index: idx, is_read: !!p.isRead, read_date: p.readDate || null, read_time: p.readTime || null, take_date: p.takeDate || null, take_time: p.takeTime || null });
+            rows.push({ group_key: String(groupKey), member_id: nameId[p.owner], book_id: bid, unit_index: idx, is_read: !!p.isRead, read_date: p.readDate || null, read_time: p.readTime || null, take_date: p.takeDate || null, take_time: p.takeTime || null });
           });
         });
         if (conflicts.length) { try { if (typeof window.showToast === 'function') { var _ow = conflicts.map(function(c){ return c.ownerName; }).filter(function(v,i,a){ return a.indexOf(v)===i; }).join(", "); window.showToast('⚠️ ' + conflicts.length + ' hisse zaten alınmış (' + _ow + '): ilk alan korundu.', 'error'); } } catch(_e){ console.warn('conflict toast', _e); } }
-        var write = rows.length ? api("/shares?on_conflict=member_id,book_id,unit_index", { method: "POST", headers: { "Prefer": "resolution=merge-duplicates" }, body: JSON.stringify(rows) }).then(function (resp) {
+        var write = rows.length ? api("/shares?on_conflict=group_key,book_id,unit_index", { method: "POST", headers: { "Prefer": "resolution=merge-duplicates" }, body: JSON.stringify(rows) }).then(function (resp) {
           // api, 409 (duplicate) JSON hata govdesini doner - eger cakisma varsa kullaniciya bildir
           if (resp && typeof resp === 'object' && (resp.code === '23505' || /duplicate|violates unique/i.test(resp.message || ''))) {
             try { if (typeof window.showToast === 'function') window.showToast('\u26a0\ufe0f Bu hisseler tam o anda baska uye tarafindan alindi: ilk alan korundu. Sayfa yenileniyor.', 'error'); } catch(_e){}
