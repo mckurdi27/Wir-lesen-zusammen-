@@ -3868,16 +3868,20 @@ window._grpGizli = function _grpGizli(gk){ if(!gk) return false; try{ var _d=JSO
                         <div style="font-size:12px; color:#27ae60; font-weight:bold; justify-self:center; text-align:center; min-width:0; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">&#128204; Seçili Grup: ${currentGroup.replace(/_/g,' ').toUpperCase()}${loggedInMember ? " — " + loggedInMember : ""}</div>
                         <div></div>
                     </div>
-                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
+                        <div style="margin-bottom: 12px;">
+                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
                             <label style="font-weight: bold; font-size: 13px; white-space: nowrap;">Grup:</label>
                             <select id="admin-group-select" style="padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); flex: 1; min-width: 120px; min-height: 44px; font-size: 14px;">${groupsHtml}</select>
-                            <button id="admin-add-group" style="background: #27ae60; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">+ Ekle</button>
-                            <button id="admin-edit-group" style="background: #f39c12; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">✏️ Düzenle</button>
-                            <button id="admin-delete-group" style="background: #e74c3c; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">🗑️ Sil</button>
-                            <button id="admin-set-password" style="background: #8e44ad; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">🔑 Şifre</button>
-                            
+                            </div>
+                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px;">
+<button id="admin-add-group" style="flex:1; min-width:0; background: #27ae60; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">+ Ekle</button>
+                            <button id="admin-edit-group" style="flex:1; min-width:0; background: #f39c12; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">✏️ Düzenle</button>
+                            <button id="admin-delete-group" style="flex:1; min-width:0; background: #e74c3c; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">🗑️ Sil</button>
+                            <button id="admin-set-password" style="flex:1; min-width:0; background: #8e44ad; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">🔑 Şifre</button>
+                            </div>
                         </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
                             <span style="font-weight: bold; font-size: 13px;">👤 Gruptaki Üyeler:</span>
                             <button id="admin-add-member" style="background: #2980b9; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 40px;">+ Üye Ekle</button>
                         </div>
