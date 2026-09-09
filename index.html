@@ -399,6 +399,11 @@
             grid-template-columns: 1fr;
             gap: 18px;
         }
+            #admin-bottom-section, #admin-message-section, .admin-section { max-width: 100%; min-width: 0; box-sizing: border-box; }
+            #admin-bottom-section { overflow-x: auto; }
+            .admin-section { overflow-x: auto; }
+            .admin-section table, .admin-section .bulk-share-area { max-width: 100%; }
+
         .admin-section {
             padding: 16px;
             border-radius: 8px;
@@ -3858,9 +3863,9 @@ window._grpGizli = function _grpGizli(gk){ if(!gk) return false; try{ var _d=JSO
 
                 let groupSectionHtml = `
                     <div class="admin-section group-section">
-                        <div style="display:grid; grid-template-columns:1fr auto 1fr; align-items:center; margin-bottom:8px;">
+                        <div style="display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:center; margin-bottom:8px;">
                         <h4 style="color: #2980b9; margin:0; justify-self:start;">&#128101; Grup ve Üye Yönetimi</h4>
-                        <div style="font-size:12px; color:#27ae60; font-weight:bold; justify-self:center; text-align:center;">&#128204; Seçili Grup: ${currentGroup.replace(/_/g,' ').toUpperCase()}${loggedInMember ? " — " + loggedInMember : ""}</div>
+                        <div style="font-size:12px; color:#27ae60; font-weight:bold; justify-self:center; text-align:center; min-width:0; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">&#128204; Seçili Grup: ${currentGroup.replace(/_/g,' ').toUpperCase()}${loggedInMember ? " — " + loggedInMember : ""}</div>
                         <div></div>
                     </div>
                         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
@@ -4043,9 +4048,9 @@ window.infoSortTable = function infoSortTable(col) {
 
                 let bulkSectionHtml = `
                     <div class="admin-section bulk-section">
-                        <div style="display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:8px; margin-bottom:8px;">
+                        <div style="display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:center; gap:8px; margin-bottom:8px;">
                             <h4 style="color: #8e44ad; margin:0; justify-self:start;">&#128229; Toplu Atama / Silme</h4>
-                            <div style="font-size:12px; color:#8e44ad; font-weight:bold; justify-self:center; text-align:center;">📌 Seçili Grup: ${currentGroup.replace(/_/g,' ').toUpperCase()}${loggedInMember ? " — " + loggedInMember : ""}</div>
+                            <div style="font-size:12px; color:#8e44ad; font-weight:bold; justify-self:center; text-align:center;"; min-width:0; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">📌 Seçili Grup: ${currentGroup.replace(/_/g,' ').toUpperCase()}${loggedInMember ? " — " + loggedInMember : ""}</div>
                             <div></div>
                         </div>
                         <div style="border-top: 1px solid var(--border-color); padding-top: 12px;">
