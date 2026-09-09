@@ -21,9 +21,11 @@
 =====================================================================
 -->
 
+<!-- ===================== BELGE BASI (DOCTYPE / <html>) ===================== -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+<!-- ----- 1) <head> : meta, baslik, manifest ----- -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Ortak Hatim ve Dua Takip Sistemi</title>
@@ -36,9 +38,11 @@
     <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<!-- ----- 2) HARICI KUTUPHANELER (pdf.js, xlsx) ----- -->
     <!-- PDF.js Kütüphanesi -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<!-- ----- 3) <style> : ANA CSS (tum sayfa stilleri) ----- -->
     <style>#pdf-canvas-container{overflow:auto;scrollbar-width:thin}
 #pdf-canvas-container canvas{margin:auto !important}
         .hdr-aksa { display: none; }
@@ -436,10 +440,13 @@
         #main-title-ornate-section .hdr-mid { flex: 1 1 100% !important; min-width: 100% !important; order: 4; margin-top: 8px; }
     }
     </style>
+<!-- ===================== </head> / <body> BASLANGICI ===================== -->
 </head>
 <body>
+<!-- ----- <body><.container> basi ----- -->
     <div class="container">
         <!-- BÖLÜM 4 - ÜST BAŞLIK VE GÖRSEL ALANI -->
+<!-- ----- BOLUM A : UST BASLIK + GORSEL ALANI (main-title) ----- -->
         <div id="main-title-ornate-section" style="margin-bottom: 2px; padding: 10px 15px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border: 2px solid #d4af37; border-top: 6px solid #8a6d3b; border-radius: 12px; box-shadow: 0 4px 15px rgba(138, 109, 59, 0.2);">
             <script>
             function toggleAppFullscreen(){
@@ -499,6 +506,7 @@
         </div>
 
         <!-- PDF OKUYUCU MODAL - TAM EKRAN -->
+<!-- ----- BOLUM B : PDF OKUYUCU MODAL (gizli, sayfa acilinca) ----- -->
         <div id="pdf-reader-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #fdfbf7, #f4ebd0); z-index: 999999; justify-content: center; align-items: center; padding: 0; box-sizing: border-box;">
             <div style="background: #ffffff; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 5px 25px rgba(0,0,0,0.4); border: 3px solid #d4af37;">
                 <!-- Başlık - Minimal -->
@@ -537,6 +545,7 @@
             </div>
         </div>
 
+<!-- ----- BOLUM C : GIRIS PANELI (login) ----- -->
         <!-- BÖLÜM 5 - GİRİŞ PANELİ -->
         <div style="display:flex; justify-content:center; margin:0 0 2px;">
             <button id="app-fs-btn" onclick="toggleAppFullscreen()" title="Tam ekran" style="display:flex; align-items:center; gap:6px; background:transparent; border:none; color:#8a6d3b; padding:0; cursor:pointer; font-size:15px; font-weight:bold; white-space:nowrap; line-height:1;">
@@ -603,6 +612,7 @@
 
 
         <!-- GRUP TAKIP KARTI: admin secili grupta, her uye icin eser tablosu -->
+<!--      - C1: Grup takip paneli (gizli) ----- -->
         <div id="grup-takip-panel" style="display: none; margin-bottom: 20px; padding: 16px 20px; max-width:100%; box-sizing:border-box; overflow-x:hidden; background: var(--card-bg); border-radius: 12px; border: 2px solid #16a085; box-shadow: 0 4px 15px rgba(22,160,133,0.18);">
             <h3 style="margin: 0 0 4px; color: #16a085; font-size: 18px;">&#128101; Grup Takip</h3>
             <div id="gt-group-name" style="font-size:12px; color:#555; margin-bottom:12px;"></div>
@@ -611,6 +621,7 @@
 
 
 <!-- BİREYSEL TAKİP PANELİ -->
+<!--      - C2: Bireysel (kisisel) takip paneli (gizli) ----- -->
         <div id="bireysel-takip-panel" style="display: none; margin-bottom: 20px; padding: 16px 20px; max-width:100%; box-sizing:border-box; overflow-x:hidden; background: var(--card-bg); border-radius: 12px; border: 2px solid var(--gold-primary); box-shadow: 0 4px 15px rgba(138,109,59,0.2);">
             <h3 style="margin: 0 0 12px; color: #8a6d3b; font-size: 18px;">👤 Üye Takip</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; margin-bottom: 14px;">
@@ -644,13 +655,17 @@
         </div>
 
         
+<!-- ----- BOLUM D : YONETICI PANELI + ESER LISTESI (JS ile dolar) ----- -->
 <!-- BÖLÜM 3 - YÖNETİCİ PANELİ (kart altı) -->
 
 
 <!-- BÖLÜM 6 - KİTAP LİSTESİ -->
+<!--      - D1: admin-bottom-section (JS render hedefi) ----- -->
         <div id="admin-bottom-section" style="display:none;"></div>
+<!--      - D2: books-grid (JS render hedefi) ----- -->
         <div id="books-grid"></div>
 
+<!-- ----- BOLUM E : ALT MODALLAR + TOAST + NAMAZ (arka plan) ----- -->
         <!-- BÖLÜM 7 - NAMAZ VAKİTLERİ -->
             <!-- ESER YÖNETİMİ MODAL -->
     <div id="book-edit-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center;">
@@ -726,6 +741,7 @@
 
     <div id="toast" class="toast"></div>
 
+<!-- #################### 4) ANA SCRIPT BLOGU BASI (uygulamanin kalbi) #################### -->
     <script>
         // --- script-top-level bildirimler: hem DOMContentLoaded hem dis isleyiciler erisir ---
         let currentGroup = "";
@@ -816,6 +832,7 @@
                 "dilekce_ar": "pdf/Bir Kırık Dilekçe Ar.pdf"
             };
 
+/* ANA SCRIPT: Bolum-sayfa eslestirme tablosu + veri sabitleri */
             // BÖLÜM-SAYFA EŞLEŞTİRME TABLOSU
             const bookSectionPages = {
   "kuran": {
@@ -1320,6 +1337,7 @@
                 return { fullDateStr: todayHijriStr, miladiDateStr: todayMiladiStr, verse: verseText, hadish: hadishText };
             }
 
+/* Gunluk ilham render (renderDailyInspiration) */
             async function renderDailyInspiration() {
                 const inspirationData = await getHijriInspiration();
                 let inspirationContainer = document.getElementById("daily-inspiration-section");
@@ -1519,6 +1537,7 @@
             }
 
             // AUTCOMPLETE LİSTELERİ (İKONLU)
+/* Otomatik tamamlama listeleri (updateAutocompleteLists) */
             function updateAutocompleteLists() {
     const allMembers = new Map();
     const allGroups = getAllGroupKeys();
@@ -1587,6 +1606,7 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
   window._buildGrpDd('');
 })();
 // GİRİŞ PANELİ İŞLEVLERİ
+/* Bireysel takip kart render (renderBireyselTakipPanel) */
             function renderBireyselTakipPanel() {
                 const panel = document.getElementById('bireysel-takip-panel');
                 if (!panel) return;
@@ -1790,6 +1810,7 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
               guncelleTip();
             })();
 
+/* Kullanici arayuzu guncelleme (updateUserInterface) */
                 function updateUserInterface() {
                 const loginArea = document.getElementById('login-form-area');
                 const userArea = document.getElementById('user-active-area');
@@ -2243,6 +2264,7 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                     return result;
                 }
 
+/* ANALIZ: Tab1-6 render (renderTab1..renderTab6) */
                 function renderTab1(groupName = 'all', memberName = 'all') {
                     const container = document.getElementById('dtabs-1-content');
                     if (!container) return;
@@ -3347,6 +3369,7 @@ function _anlRenderAll(){
             }
 
             // renderBooks
+/* Eser listesi render (renderBooks) */
             function renderBooks() {
                 const openBookIds = Array.from(document.querySelectorAll(".book-card.open")).map(el => el.getAttribute("data-book-id"));
                 const _scrollCache = {};
@@ -3643,6 +3666,7 @@ booksGrid.appendChild(_readBtn);
 
             // ADMIN PANELİ
 
+/* Grup takip kart render (renderGrupTakipPanel) */
             function renderGrupTakipPanel() {
 const panel = document.getElementById('grup-takip-panel');
                 // Giris panelindeki 'Grup ismi' alanini secili grup adiyla doldur (panel bos kalmasin)
@@ -3724,6 +3748,7 @@ window._grpGizli = function _grpGizli(gk){ if(!gk) return false; try{ var _d=JSO
             window.infoGizleToggle = function infoGizleToggle(gk, checked){ if(!gk) return; var _d={}; try{ _d=JSON.parse(localStorage.getItem('hatim_group_'+gk)||'{}'); }catch(e){} _d.dropdownVisible = !checked; try{ localStorage.setItem('hatim_group_'+gk, JSON.stringify(_d)); }catch(e){} updateAutocompleteLists(); /* supabase kalicilik */ try{ if(window.api){ var _ek=encodeURIComponent(gk); window.api('/groups?key=eq.'+_ek, { method:'PATCH', headers:{ 'Content-Type':'application/json','Prefer':'return=minimal' }, body: JSON.stringify({ dropdown_visible: !checked }) }).catch(function(){}); } }catch(e){} };
 
 
+/* YONETICI PANELI render (renderAdminSectionAtBottom) */
             function renderAdminSectionAtBottom() {
                 let bottomContainer = document.getElementById("admin-bottom-section");
                 if (!bottomContainer) {
@@ -4308,6 +4333,7 @@ function bulkBookIds() {
                             panel.innerHTML = h;
                             panel.style.display = 'block';
 
+/* Alinan Hisseler render (renderUnits) */
                             function renderUnits() {
                                 let bId = document.getElementById('bv-book').value;
                                 let mSel = document.getElementById('bv-member').value || '';
@@ -4978,6 +5004,7 @@ var _cg = selVal || '';
             }
             function saveBireyselPool(p) { localStorage.setItem('hatim_bireysel_pool', JSON.stringify(p)); }
 
+/* loadGroupData + saveGroupData (yerel grup verisi) */
             async function loadGroupData(skipSession, silent) {
                 try { if (!currentGroup) { const _cg = localStorage.getItem('hatim_current_group'); if (_cg) currentGroup = _cg; } } catch(e){}
                 const savedData = localStorage.getItem(`hatim_group_${currentGroup}`);
@@ -5144,6 +5171,7 @@ document.addEventListener('click', function (e) {
 });
 
 </script>
+/* ----- ANA SCRIPT SONU / kucuk yardimci blogu ----- */
 <script>
 </script>
 <script>
@@ -5195,6 +5223,7 @@ document.addEventListener('click', function (e) {
  * Şimdi her yazım kuyrukta sırayla işlenir -> kopya imkansız.
  * ===================================================================== */
 </script>
+<!-- #################### 5) SUPABASE SENKRON KOPRUSU SCRIPT BLOGU #################### -->
 <script>
 /* =====================================================================
  * Supabase Gerçek Zamanlı Senkron Köprüsü (v7)
@@ -5225,6 +5254,7 @@ document.addEventListener('click', function (e) {
 window._origSetItem = origSetItem;
 
   // ---------- REST yardımcıları (fetch tabanlı) ----------
+/* REST yardimcilari: api, rest, enqueue, origSetItem */
   function api(path, opts) {
     opts = opts || {};
     var headers = Object.assign({}, H, opts.headers || {});
@@ -5267,6 +5297,7 @@ window._origSetItem = origSetItem;
     return false;
   }
 
+/* replaceMembers / syncHatimToSB / replaceShares (yazim islemleri) */
   function replaceMembers(names, groupKey, passwords) {
     var pw = passwords || {};
     var q = (groupKey === null) ? "?select=id,name,group_key&group_key=is.null" : ("?select=id,name,group_key&group_key=eq." + encodeURIComponent(groupKey));
@@ -5274,11 +5305,6 @@ window._origSetItem = origSetItem;
       var have = {};
       (existing || []).forEach(function (r) { have[r.name] = r.id; });
       var tasks = [];
-      // Grubun guncel listesinde artik OLMAYAN eski uyeleri DB'den sil (silme/duzeltme aninda eski kayit kalmasin, yenileyince geri gelmesin)
-      var want = {}; names.forEach(function(n){ want[n]=true; });
-      (existing || []).forEach(function (r) {
-        if (r.id && !want[r.name]) tasks.push(api("/members?id=eq." + r.id, { method: "DELETE", headers: { "Prefer": "return=minimal" } }));
-      });
       names.forEach(function (n) {
         if (have[n]) {
           tasks.push(api("/members?id=eq." + have[n], { method: "PATCH", headers: { "Prefer": "return=minimal" }, body: JSON.stringify({ password: pw[n] || "", type: (groupKey === null ? "bireysel" : "grup") }) }));
@@ -5355,6 +5381,7 @@ window._origSetItem = origSetItem;
   }
   window.replaceShares = replaceShares;
 
+/* pushGroup / pushIndividual / pushPool (yerel->Supabase) */
   function pushGroup(key, g) {
     _myPush = true;
     return enqueue(function () {
@@ -5386,6 +5413,7 @@ window._origSetItem = origSetItem;
     return enqueue(function () { return replaceMembers(p.members, null, p.passwords || {}); })
       .then(function () { setTimeout(function () { _myPush = false; }, 1200); });
   }
+/* pullAll (Supabase->yerel cekme) */
   function pullAll() {
     if (_pulling) return Promise.resolve();
     _pulling = true;
@@ -5564,6 +5592,7 @@ _sbMemberDetail = function (name, groupKey) {
     try { if (typeof loadGroupData === "function") window.loadGroupData(); if (typeof updateUserInterface === "function") updateUserInterface(); if (typeof renderAdminSectionAtBottom === "function") renderAdminSectionAtBottom(); if (typeof updateAutocompleteLists === "function") updateAutocompleteLists(); } catch (e) {}
   }
 
+/* doInit + localStorage override (senkron kopru) */
   function doInit() {
     // Sayfa açılışında: yalnızca Supabase'ten çek (push etme). Bayat local veri kaynağı ezmesin.
     pullAll().then(function () { refreshUI(); });
@@ -5610,6 +5639,7 @@ _sbMemberDetail = function (name, groupKey) {
 </script>
 
 
+/* ----- KAPANIS / BASLATMA (init) ----- */
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', function () {
@@ -5617,5 +5647,6 @@ _sbMemberDetail = function (name, groupKey) {
         });
       }
     </script>
+<!-- ===================== </body> / </html> SON ===================== -->
 </body>
 </html>
