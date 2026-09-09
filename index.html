@@ -4901,24 +4901,25 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         if (!name || !name.trim()) return;
                         let key = name.trim().toLowerCase().replace(/\s+/g, '_');
                         if (key === _oldKey) { showToast("Ad aynı, değişiklik yok.", "info"); return; }
-                        window._origSetItem(`hatim_group_${key}`, JSON.stringify(appData));
-                        localStorage.removeItem(`hatim_group_${_oldKey}`);
-                        var _api2 = (typeof window.api === 'function') ? window.api : null;
-                        if (_api2) {
-                            var _oldEnc = encodeURIComponent(_oldKey);
-                            var _newEnc = encodeURIComponent(key);
-                            var _body = JSON.stringify({ key: key, name: name.trim(), password: (appData && appData.password) || "" });
-                            // Doğru sıra: önce YENİ grubu oluştur, sonra üyeleri taşı, en son eski grubu sil
-                            try { await _api2("/groups", { method: "POST", body: _body }); } catch(e){ console.warn('yeni grup', e); }
-                            try { await _api2("/members?group_key=eq." + _oldEnc, { method: "PATCH", headers: { "Content-Type": "application/json", "Prefer": "return=minimal" }, body: JSON.stringify({ group_key: key }) }); } catch(e){ console.warn('üye taşı', e); }
-                            try { await _api2("/groups?key=eq." + _oldEnc, { method: "DELETE" }); } catch(e){ console.warn('eski grup sil', e); }
+                        var _oldEnc2 = encodeURIComponent(_oldKey);
+                        var _apiE = (typeof window.api === 'function') ? window.api : null;
+                        if (!_apiE) { if (typeof window.showToast === 'function') window.showToast('Supabase baglantisi yok', 'error'); return; }
+                        // SUPABASE-ONCE: yeni grup -> uyeleri tasi -> eski grubu sil; tumu onaylaninca yerel guncelle
+                        try {
+                            await _apiE('/groups', { method: 'POST', headers: { 'Prefer': 'return=representation' }, body: JSON.stringify({ key: key, name: name.trim(), password: (appData && appData.password) || '', dropdown_visible: true }) });
+                            await _apiE('/members?group_key=eq.' + _oldEnc2, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }, body: JSON.stringify({ group_key: key }) });
+                            await _apiE('/groups?key=eq.' + _oldEnc2, { method: 'DELETE' });
+                            window._origSetItem(`hatim_group_${key}`, JSON.stringify(appData));
+                            try { localStorage.removeItem(`hatim_group_${_oldKey}`); } catch(e2){}
+                            currentGroup = key;
+                            await window.loadGroupData();
+                            await window.pullAll();
+                            window.refreshUI();
+                            renderAdminSectionAtBottom();
+                            if (typeof window.showToast === 'function') window.showToast('\u2705 Grup ad\u0131 g\u00fcncellendi!', 'success');
+                        } catch(err) {
+                            if (typeof window.showToast === 'function') window.showToast('Supabase hatasi: ' + ((err&&err.message)||err), 'error');
                         }
-                        currentGroup = key;
-                        await window.loadGroupData();
-                        await window.pullAll();
-                        window.refreshUI();
-                        renderAdminSectionAtBottom();
-                        showToast('✅ Grup adı güncellendi!', 'success');
                     });
 
                     document.getElementById("admin-delete-group").addEventListener("click", async () => {
@@ -4927,19 +4928,24 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                             if (_gkRaw) {
                                 var _gk = encodeURIComponent(_gkRaw);
                                 var _api = (typeof window.api === 'function') ? window.api : (typeof window._sbApi === 'function') ? window._sbApi : null;
-                                // Önce üyeleri, sonra grubu sil (FK bağımlılığı)
+                                // SUPABASE-ONCE: uyeleri sonra grubu sil (FK), tumu basariliysa yerel temizle
                                 if (_api) {
-                                    try { await _api("/members?group_key=eq." + _gk, { method: "DELETE" }); } catch(e){ console.warn('üye silme', e); }
-                                    try { await _api("/groups?key=eq." + _gk, { method: "DELETE" }); } catch(e){ console.warn('grup silme', e); }
+                                    try {
+                                        await _api('/members?group_key=eq.' + _gk, { method: 'DELETE' });
+                                        await _api('/groups?key=eq.' + _gk, { method: 'DELETE' });
+                                    } catch(err) {
+                                        if (typeof window.showToast === 'function') window.showToast('Supabase hatasi: ' + ((err&&err.message)||err), 'error');
+                                        return;
+                                    }
                                 }
                             }
-                            localStorage.removeItem(`hatim_group_${currentGroup}`);
+                            try { localStorage.removeItem(`hatim_group_${currentGroup}`); } catch(e){}
                             let keys = getAllGroupKeysForAdmin();
                             currentGroup = keys[0] || "";
                             await window.loadGroupData();
                             await window.pullAll();
                             window.refreshUI();
-                            showToast('🗑️ Grup silindi.', 'info');
+                            if (typeof window.showToast === 'function') window.showToast('\ud83d\uddd1\ufe0f Grup silindi.', 'info');
                         }
                     });
 
