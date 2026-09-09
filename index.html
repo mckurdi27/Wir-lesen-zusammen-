@@ -345,9 +345,6 @@
             font-size: 16px;
             min-height: 48px;
         }
-                .bulk-whatsapp-btn { flex: 2; }
-        .wa-app-btn { flex: 1; min-width:0; padding:10px; background:#128C7E; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-        .wa-app-btn:hover { background:#0e6f63; }
         .bulk-whatsapp-btn:hover { background: #1db958; }
 
 
@@ -671,10 +668,8 @@
             <div id="bt-member-books" style="overflow-x:auto;"></div>
         </div>
         <div id="bulk-share-area" class="bulk-share-area" style="display: none; margin-top:6px;">
-            <div style="display:flex; gap:8px; align-items:stretch;">
-                <button id="bulk-whatsapp-btn" class="bulk-whatsapp-btn">&#128172; Son Hisselerimi WhatsApp'ta Paylaş</button>
-                <button id="wa-app-btn" class="wa-app-btn">&#128172; Uygulama Paylaş</button>
-            </div>
+            <button id="bulk-whatsapp-btn" class="bulk-whatsapp-btn">&#128172; Tüm Seçtiklerimi WhatsApp'ta Paylaş</button>
+        </div>
 
         
 <!-- ----- BOLUM D : YONETICI PANELI + ESER LISTESI (JS ile dolar) ----- -->
@@ -2062,13 +2057,6 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                     }
                     let msg = `*[${currentGroup.replace(/_/g, ' ').toUpperCase()}] ${loggedInMember} Hisseleri*\n\n` + summary.join("\n");
                     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
-                }
-            });
-            document.addEventListener('click', function(e){
-                if (e.target && e.target.id === 'wa-app-btn') {
-                    var _appMsg = '*Wir Lesen Zusammen*\n\nOrtak Hatim ve Dua takip uygulamasi. Katil:';
-                    var _link = 'https://mckurdi27.github.io/Wir-lesen-zusammen-/';
-                    window.open('https://wa.me/?text=' + encodeURIComponent(_appMsg + ' ' + _link), '_blank');
                 }
             });
 
