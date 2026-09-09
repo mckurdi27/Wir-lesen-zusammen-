@@ -5345,7 +5345,12 @@ window._origSetItem = origSetItem;
         var arr = hist[bid] || [];
         arr.forEach(function (hh) {
           if (!hh) return;
-          hrRows.push({ group_key: key, book_id: bid, eser: hh.eser || "", hatim_no: (hh.hatimNo != null ? hh.hatimNo : 1), baslangic: hh.baslangic || "", bitis: hh.bitis || "", tamamlandi: hh.tamamlandi || null });
+          // book_history.tamamlandi NOT NULL (timestamptz): gecerli bir zaman ver.
+          var _tt = hh.tamamlandi;
+          if (!_tt) { var _db = new Date(hh.bitis || ''); if (!isNaN(_db.getTime())) _tt = _db.toISOString(); }
+          if (!_tt) { var _ds = new Date(hh.baslangic || ''); if (!isNaN(_ds.getTime())) _tt = _ds.toISOString(); }
+          if (!_tt) return; // zaman yoksa bu kaydi gonderme (null NOT-NULL kiraci olur)
+          hrRows.push({ group_key: key, book_id: bid, eser: hh.eser || "", hatim_no: (hh.hatimNo != null ? hh.hatimNo : 1), baslangic: hh.baslangic || "", bitis: hh.bitis || "", tamamlandi: _tt });
         });
       });
       var tasks = [];
