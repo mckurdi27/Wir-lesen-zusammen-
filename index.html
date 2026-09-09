@@ -4452,6 +4452,7 @@ function bulkBookIds() {
                                 if (!tpages) return;
                                 let cnt = 0;
                                 let remCnt = 0;
+                                var _remRanges = [];
                                 // 1a) Kaldirilan tik (bos kutu): o blok seçili uyenin sahipliğindeyse geri al
                                 panel.querySelectorAll('.bv-unit:not(:checked)').forEach(cb => {
                                     if (cb.disabled) return; // baskasina ait, dokunma
@@ -4463,6 +4464,8 @@ function bulkBookIds() {
                                     for (let i = s; i < en; i++) {
                                         if (tpages[i] && tpages[i].owner === m) { tpages[i].owner=''; tpages[i].isRead=false; tpages[i].readDate=null; tpages[i].readTime=null; tpages[i].takeDate=null; tpages[i].takeTime=null; remCnt++; }
                                     }
+                                    if (typeof _remRanges === 'undefined') _remRanges = [];
+                                    _remRanges.push({ bid: bId, s: s, en: en });
                                 });
                                 panel.querySelectorAll('.bv-unit:checked').forEach(cb => {
                                     let s = parseInt(cb.getAttribute('data-start'));
@@ -4495,6 +4498,21 @@ function bulkBookIds() {
                                 });
                                 if (cnt > 0 || remCnt > 0 || readChanged > 0) {
                                     bulkSave(targetData);
+                                    // Geri alinan (tik kaldirilan) hisseleri Supabase'ten de sil - yoksa sayfa yenilenince geri gelir
+                                    if (_remRanges.length && typeof window.api === 'function') {
+                                        var _gk = (targetData && targetData.gKey) ? String(targetData.gKey) : (t === 'bireysel' ? String(m).toLowerCase() : (data && data.gKey ? String(data.gKey) : String(currentGroup||'')));
+                                        if (_gk) {
+                                            try { window.rest.select("members", "?select=id&name=eq." + encodeURIComponent(m) + "&group_key=eq." + encodeURIComponent(_gk)).then(function(ms){
+                                                var _mid = (ms && ms[0]) ? ms[0].id : null;
+                                                if (!_mid) return;
+                                                var delP = [];
+                                                _remRanges.forEach(function(rr){
+                                                    delP.push(window.api('/shares?group_key=eq.'+encodeURIComponent(_gk)+'&member_id=eq.'+_mid+'&book_id=eq.'+encodeURIComponent(rr.bid)+'&unit_index=gte.'+rr.s+'&unit_index=lt.'+rr.en, { method: 'DELETE', headers: { 'Prefer': 'return=minimal' } }).catch(function(){}));
+                                                });
+                                                return Promise.all(delP);
+                                            }).catch(function(){}); } catch(e){}
+                                        }
+                                    }
                                     if (cnt > 0 && remCnt > 0) showToast('\u2705 ' + cnt + ' hisse atand\u0131, ' + remCnt + ' geri al\u0131nd\u0131.', 'success');
                                     else if (cnt > 0) showToast('\u2705 ' + cnt + ' hisse ' + m + ' \u00fcyesine atand\u0131.', 'success');
                                     else if (remCnt > 0) showToast('\u21a9\ufe0f ' + remCnt + ' hisse ' + m + ' \u00fcyesinden geri al\u0131nd\u0131.', 'success');
