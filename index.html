@@ -3577,10 +3577,34 @@ booksGrid.appendChild(_readBtn);
                             range: rangeName,
                             count: end - start
                         });
-                        saveGroupData();
-                        renderBooks();
-                        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel(); if (typeof renderGrupTakipPanel === 'function') renderGrupTakipPanel();
-                        showToast(`✅ ${rangeName} hissesi alındı!`, 'success');
+                        // DOGRUDAN Supabase'e hedefli yaz (tam-grup snapshot degil). Supabase onaylayinca yerel guncellenir.
+                        var _gk_ = (currentGroup && String(currentGroup).trim()) ? String(currentGroup) : String(loggedInMember).toLowerCase().trim();
+                        var _rows_ = [];
+                        for (var _k_ = start; _k_ < end; _k_++) { _rows_.push({ group_key: _gk_, book_id: bId, unit_index: _k_, is_read: false, take_date: takeNow, take_time: takeClock }); }
+                        var _doSB_ = function(){
+                          if (typeof window.api !== 'function') return Promise.reject(new Error('api yok'));
+                          return window.api('/members?select=id&group_key=eq.'+encodeURIComponent(_gk_)+'&name=eq.'+encodeURIComponent(loggedInMember)).then(function(mm){
+                            mm = mm || []; var _mid_ = (mm.length ? mm[0].id : null);
+                            if (!_mid_) throw new Error('Uye Supabase`te yok');
+                            _rows_.forEach(function(r){ r.member_id = _mid_; });
+                            return window.api('/shares?on_conflict=member_id,book_id,unit_index', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: JSON.stringify(_rows_) }).then(function(resp){
+                              if (resp && typeof resp === 'object' && (resp.code === '23505' || /duplicate|violates unique/i.test(resp.message || ''))) throw new Error('duplicate');
+                              return resp;
+                            });
+                          });
+                        };
+                        _doSB_().then(function(){
+                          saveGroupData();
+                          renderBooks();
+                          if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel(); if (typeof renderGrupTakipPanel === 'function') renderGrupTakipPanel();
+                          showToast('✅ ' + rangeName + ' hissesi alındı!', 'success');
+                        }).catch(function(err){
+                          for (var _u_ = start; _u_ < end; _u_++) { if (baseArray[_u_]) { baseArray[_u_].owner = ''; baseArray[_u_].isRead = false; baseArray[_u_].takeDate = undefined; baseArray[_u_].takeTime = undefined; } }
+                          renderBooks();
+                          var _m_ = (err && err.message) || String(err);
+                          var _txt_ = (/duplicate/i.test(_m_) || /23505/.test(_m_)) ? '⚠️ Bu hisseler tam o anda baska uye tarafindan alindi: ilk alan korundu.' : ('Supabase hatasi: ' + _m_);
+                          if (typeof window.showToast === 'function') showToast(_txt_, 'error');
+                        });
                     });
                 });
 
