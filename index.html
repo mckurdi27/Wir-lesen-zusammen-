@@ -2040,32 +2040,52 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
             document.addEventListener('click', function(e) {
                 if (e.target && e.target.id === 'bulk-whatsapp-btn') {
                     if (!loggedInMember) {
-                        showToast('Lütfen önce isminizi seçin.', 'error');
+                        showToast('L\u00fctfen \u00f6nce isminizi se\u00e7in.', 'error');
                         return;
                     }
-                    let summary = [];
+                    function _hisseTs(dt, tm) {
+                        if (!dt) return 0;
+                        var p = String(dt).split('.');
+                        var d = (p.length === 3) ? (p[2] + '-' + (p[1].length<2?'0'+p[1]:p[1]) + '-' + (p[0].length<2?'0'+p[0]:p[0])) : dt;
+                        var t = tm || '00:00';
+                        var x = new Date(d + 'T' + t);
+                        return isNaN(x.getTime()) ? 0 : x.getTime();
+                    }
+                    let lines = [];
                     appData.books.forEach(book => {
                         let baseArray = appData.bookPages[book.id];
+                        if (!baseArray) return;
                         let defModes = bookModesDefs[book.id];
                         let primaryKey = book.type === "bab" ? "on_bab" : "yirmi_sayfa";
                         if (!defModes[primaryKey]) primaryKey = Object.keys(defModes)[0];
                         let taken = [];
                         defModes[primaryKey].getItems().forEach(pi => {
                             let st = getRangeStatus(baseArray, pi.start, pi.end);
-                            if (st.owner === loggedInMember) taken.push(pi.name);
+                            if (st.owner === loggedInMember) taken.push({ name: pi.name, st: st });
                         });
-                        if (taken.length > 0) summary.push(`• ${book.name}: *${taken.join(", ")}*`);
+                        if (taken.length === 0) return;
+                        let lastTaken = taken.reduce((mx, t) => (_hisseTs(t.st.takeDate, t.st.takeTime) > _hisseTs(mx.st.takeDate, mx.st.takeTime)) ? t : mx, taken[0]);
+                        let readOnes = taken.filter(t => t.st.isRead);
+                        let lastRead = readOnes.length ? readOnes.reduce((mx, t) => (_hisseTs(t.st.readDate, t.st.readTime) > _hisseTs(mx.st.readDate, mx.st.readTime)) ? t : mx, readOnes[0]) : null;
+                        let tmS = lastTaken.st.takeTime ? ' ' + lastTaken.st.takeTime : '';
+                        let ln = "\u{1F4D6} " + book.name + ":\n   Al\u0131nan: " + lastTaken.name + " (" + (lastTaken.st.takeDate || '-') + tmS + ")";
+                        if (lastRead) {
+                            let tmR = lastRead.st.readTime ? ' ' + lastRead.st.readTime : '';
+                            ln += "\n   Okunan: " + lastRead.name + " (" + (lastRead.st.readDate || '-') + tmR + ")";
+                        } else {
+                            ln += "\n   Okunan: -";
+                        }
+                        lines.push(ln);
                     });
-                    if (summary.length === 0) {
-                        showToast('Üzerinizde hisse bulunmuyor.', 'info');
+                    if (lines.length === 0) {
+                        showToast('\u00dczerinizde hisse bulunmuyor.', 'info');
                         return;
                     }
-                    let msg = `*[${currentGroup.replace(/_/g, ' ').toUpperCase()}] ${loggedInMember} Hisseleri*\n\n` + summary.join("\n");
-                    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+                    let msg = "*[" + currentGroup.replace(/_/g, ' ').toUpperCase() + "] " + loggedInMember + " Hisseleri*\n\n" + lines.join("\n\n");
+                    window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
                 }
             });
-
-            // ============================================================
+// ============================================================
             // PDF.JS OKUYUCU - OLAY DİNLEYİCİLERİNİ BAŞLAT
             // ============================================================
             initPdfReaderEvents();
