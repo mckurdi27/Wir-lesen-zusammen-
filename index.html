@@ -5598,12 +5598,12 @@ _sbMemberDetail = function (name, groupKey) {
         var g; try { g = JSON.parse(value); } catch (e) { return; }
         if (!g) return;
         var gkey = key.replace("hatim_group_", "");
-        if (isIndividualGroup(g, gkey)) pushIndividual(g, gkey); else pushGroup(gkey, g);
+        var _pPush = (isIndividualGroup(g, gkey)) ? pushIndividual(g, gkey) : pushGroup(gkey, g); try { if (_pPush && _pPush.catch) _pPush.catch(function(er){ try { if (typeof window.showToast==='function') window.showToast('Supabase push hatasi: ' + (er&&er.message||er), 'error'); } catch(_e){} console.error('push', er); }); } catch(_e2){}
       } else if (key === "hatim_bireysel_pool") {
         var p; try { p = JSON.parse(value); } catch (e) { return; }
         if (p) pushPool(p);
       }
-    } catch (e) {}
+    } catch (e) { try { if (typeof window.showToast === 'function') window.showToast('Senkron hatasi: ' + (e && e.message || e), 'error'); } catch(_e){} console.error('senkron kopru', e); }
   };
 
   function refreshUI() {
