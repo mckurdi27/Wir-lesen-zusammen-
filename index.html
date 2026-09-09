@@ -3621,29 +3621,35 @@ booksGrid.appendChild(_readBtn);
                             baseArray[i].readDate = now;
                             baseArray[i].readTime = time;
                         }
-                        saveGroupData();
-                        // Hatim tamamlandiysa kaydet (grup bazli)
-                        try {
+                        var _rdSB_ = (typeof window._sbMarkRange === 'function') ? window._sbMarkRange(bId, start, end, true, now, time) : Promise.resolve();
+                        _rdSB_.then(function(){
+                          saveGroupData(); // Supabase onayladi; yerel onbellegi guncelle
+                          // Hatim tamamlandiysa kaydet (grup bazli)
+                          try {
                             if (appData && appData.bookPages && appData.bookPages[bId]) {
-                                var _bp2 = appData.bookPages[bId];
-                                var _tamam = _bp2.length > 0 && _bp2.every(function(pp){ return pp.owner && pp.isRead; });
-                                if (_tamam) {
-                                    if (!appData.bookHistory) appData.bookHistory = {};
-                                    if (!appData.bookHistory[bId]) appData.bookHistory[bId] = [];
-                                    var _b = (appData.books||[]).find(function(x){ return x.id===bId; });
-                                    var _h = appData.bookHatims && appData.bookHatims[bId];
-                                    var _hn = _h ? (_h.hatimNo||1) : 1;
-                                    var _var = appData.bookHistory[bId].some(function(hh){ return hh.grup===currentGroup && hh.hatimNo===_hn; });
-                                    if (!_var) {
-                                        appData.bookHistory[bId].push({ grup: currentGroup, eser: _b?(_b.name||bId):bId, hatimNo: _hn, baslangic: _h?(_h.startDate||''):'', bitis: now, tamamlandi: new Date().toISOString() });
-                                        saveGroupData();
-                                    }
+                              var _bp2 = appData.bookPages[bId];
+                              var _tamam = _bp2.length > 0 && _bp2.every(function(pp){ return pp.owner && pp.isRead; });
+                              if (_tamam) {
+                                if (!appData.bookHistory) appData.bookHistory = {};
+                                if (!appData.bookHistory[bId]) appData.bookHistory[bId] = [];
+                                var _b = (appData.books||[]).find(function(x){ return x.id===bId; });
+                                var _h = appData.bookHatims && appData.bookHatims[bId];
+                                var _hn = _h ? (_h.hatimNo||1) : 1;
+                                var _var = appData.bookHistory[bId].some(function(hh){ return hh.grup===currentGroup && hh.hatimNo===_hn; });
+                                if (!_var) {
+                                  appData.bookHistory[bId].push({ grup: currentGroup, eser: _b?(_b.name||bId):bId, hatimNo: _hn, baslangic: _h?(_h.startDate||''):'', bitis: now, tamamlandi: new Date().toISOString() });
+                                  saveGroupData();
                                 }
+                              }
                             }
-                        } catch(e){}
-                        renderBooks();
-                        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel(); if (typeof renderGrupTakipPanel === 'function') renderGrupTakipPanel();
-                        showToast(`✅ Bölüm okundu olarak işaretlendi!`, 'success');
+                          } catch(e){}
+                          renderBooks();
+                          if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel(); if (typeof renderGrupTakipPanel === 'function') renderGrupTakipPanel();
+                          showToast('\u2705 B\u00f6l\u00fcm okundu olarak i\u015faretlendi!', 'success');
+                        }).catch(function(err){
+                          renderBooks();
+                          if (typeof window.showToast === 'function') showToast('Supabase hatasi: ' + ((err&&err.message)||err), 'error');
+                        });
                     });
                 });
 
@@ -3658,10 +3664,16 @@ booksGrid.appendChild(_readBtn);
                             baseArray[i].readDate = undefined;
                             baseArray[i].readTime = undefined;
                         }
-                        saveGroupData();
-                        renderBooks();
-                        if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel(); if (typeof renderGrupTakipPanel === 'function') renderGrupTakipPanel();
-                        showToast(`↩️ Bölüm okunmadı olarak işaretlendi.`, 'info');
+                        var _rdSB_ = (typeof window._sbMarkRange === 'function') ? window._sbMarkRange(bId, start, end, false, null, null) : Promise.resolve();
+                        _rdSB_.then(function(){
+                          saveGroupData();
+                          renderBooks();
+                          if (typeof renderBireyselTakipPanel === 'function') renderBireyselTakipPanel(); if (typeof renderGrupTakipPanel === 'function') renderGrupTakipPanel();
+                          if (typeof window.showToast === 'function') showToast('\u21a9\ufe0f B\u00f6l\u00fcm okunmad\u0131 olarak i\u015faretlendi.', 'info');
+                        }).catch(function(err){
+                          renderBooks();
+                          if (typeof window.showToast === 'function') showToast('Supabase hatasi: ' + ((err&&err.message)||err), 'error');
+                        });
                     });
                 });
 
@@ -5692,6 +5704,17 @@ _sbMemberDetail = function (name, groupKey) {
       // Bireysel uyeler kendi adiyla group_key'e sahiptir; ad degisince grup anahtarini da tasi (yoksa yeni uye gibi gorunur)
       if (String(target.group_key || "").toLowerCase().trim() === String(oldName).toLowerCase().trim()) { _body.group_key = String(newName).toLowerCase().trim(); }
       return api("/members?id=eq." + target.id, { method: "PATCH", headers: { "Prefer": "return=representation" }, body: JSON.stringify(_body) });
+    });
+  };
+
+  window._sbMarkRange = function (bId, start, end, isRead, now, time) {
+    if (typeof window.api !== 'function') return Promise.reject(new Error('api yok'));
+    var gk = (typeof currentGroup !== 'undefined' && currentGroup && String(currentGroup).trim()) ? String(currentGroup) : (String(loggedInMember).toLowerCase().trim());
+    return window.api('/members?select=id&group_key=eq.' + encodeURIComponent(gk) + '&name=eq.' + encodeURIComponent(loggedInMember)).then(function (mm) {
+      mm = mm || []; var mid = mm.length ? mm[0].id : null;
+      if (!mid) throw new Error('Uye Supabase`te yok');
+      var body = { is_read: !!isRead, read_date: isRead ? now : null, read_time: isRead ? time : null };
+      return window.api('/shares?member_id=eq.' + mid + '&book_id=eq.' + encodeURIComponent(bId) + '&unit_index=gte.' + start + '&unit_index=lt.' + end, { method: 'PATCH', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify(body) });
     });
   };
   window._sbRenameOwner = function (oldName, newName, group) {
