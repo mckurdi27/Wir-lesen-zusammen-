@@ -475,6 +475,15 @@
         #zikirmatikSection .zk-dots { position: absolute; inset: 0; }
         #zikirmatikSection .zk-dot { position: absolute; opacity: 0; transition: opacity .18s, transform .18s, filter .18s; }
         #zikirmatikSection .zk-dot svg { display: block; width: 100%; height: 100%; }
+        #zikirmatikSection .zk-haci { display: block; width: 100%; height: 100%; position: relative; animation: zkGovde .78s ease-in-out infinite; }
+        #zikirmatikSection .zk-dot svg { overflow: visible; }
+        @keyframes zkBacak  { 0%,100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
+        @keyframes zkBacakT { 0%,100% { transform: rotate(8deg); } 50% { transform: rotate(-8deg); } }
+        @keyframes zkKol    { 0%,100% { transform: rotate(8deg); } 50% { transform: rotate(-8deg); } }
+        @keyframes zkKolT   { 0%,100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
+        @keyframes zkGovde  { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-0.6px); } }
+        #zikirmatikSection .zk-dot svg { overflow: visible; }
+        #zikirmatikSection .zk-dot svg { overflow: visible; }
         #zikirmatikSection .zk-dot .zk-yuru { display: block; width: 100%; height: 100%; position: relative; }
         #zikirmatikSection .zk-dot .zk-yuru svg { position: absolute; inset: 0; width: 100%; height: 100%; }
         #zikirmatikSection .zk-dot.on { opacity: 1; transform: scale(1.04); }
@@ -1024,92 +1033,89 @@
     // Tavaf eden hacilar - gercekci oranli, dolu siluet (bas/yuz profili, omuz,
     // ihram veya entari, kollar, bacaklar). Yandan yuruyus pozu.
     var ZK_HACI_TEN = [
-        // 0) ERKEK - ihram, sag omuz acik, yuruyus
-        '<path d="M10.4 4.05c0-1.35 1.0-2.35 2.3-2.35 1.25 0 2.2.95 2.2 2.25 0 .35-.06.65-.18.95.5.75.75 1.7.75 2.6 0 .55-.08 1.05-.25 1.5-.45 1.15-1.5 1.85-2.72 1.85-1.55 0-2.75-1.1-2.75-2.75 0-1.5.85-2.7 2.1-3.15-.6-.35-1.0-.9-1.0-1.5z"/><path d="M14.55 6.35c.5.15.85.5.95.95-.35.3-.85.4-1.35.25z"/><path d="M14.9 5.55c.35-.2.7-.15.95.1-.15.35-.5.55-.9.5z"/><path d="M11.5 7.9c.35.25.75.35 1.15.3"/><path d="M11.6 5.4h1.6v1.3h-1.6z"/><path d="M14.3 8.6 16.0 10.7 16.9 12.4" stroke-width="1.75"/><circle cx="16.95" cy="12.5" r="0.8"/><path d="M9.9 8.8 8.4 11.0 7.7 12.7" stroke-width="1.75"/><circle cx="7.65" cy="12.8" r="0.8"/><path d="M13.0 15.6 15.2 18.4 15.05 20.4" stroke-width="2.0"/><ellipse cx="15.15" cy="20.6" rx="0.95" ry="0.5"/><path d="M11.2 15.7 9.3 18.7 7.75 20.1" stroke-width="2.0"/><ellipse cx="7.4" cy="20.35" rx="0.95" ry="0.5"/>',
-        // 1) KADIN - basortusu, uzun entari
-        '<path d="M10.5 4.2c0-1.3.95-2.3 2.2-2.3 1.2 0 2.15.9 2.15 2.2 0 .35-.06.65-.18.95.5.75.75 1.7.75 2.6 0 .55-.08 1.05-.25 1.5-.45 1.15-1.5 1.85-2.7 1.85-1.5 0-2.7-1.1-2.7-2.7 0-1.5.85-2.7 2.1-3.15-.6-.35-1.0-.9-1.0-1.5z"/><path d="M14.4 6.5c.5.15.85.5.95.95-.35.3-.85.4-1.35.25z"/><path d="M11.4 8.0c.35.25.75.35 1.15.3"/><path d="M14.6 9.4 15.35 11.6 14.5 13.3" stroke-width="1.55"/><circle cx="14.45" cy="13.45" r="0.72"/><path d="M9.6 9.5 8.85 11.7 9.7 13.4" stroke-width="1.55"/><circle cx="9.8" cy="13.55" r="0.72"/><ellipse cx="11.1" cy="20.75" rx="0.75" ry="0.45"/><ellipse cx="13.15" cy="20.75" rx="0.75" ry="0.45"/>',
-        // 2) YASLI - egik sirt, baston
-        '<path d="M9.7 4.5c0-1.3.95-2.25 2.15-2.25 1.2 0 2.1.9 2.1 2.15 0 .35-.06.65-.18.95.5.75.75 1.7.75 2.6 0 .55-.08 1.05-.25 1.5-.45 1.15-1.5 1.85-2.65 1.85-1.5 0-2.65-1.1-2.65-2.7 0-1.5.85-2.7 2.05-3.1-.55-.35-.9-.9-.9-1.5z"/><path d="M13.6 6.8c.5.15.85.5.95.95-.35.3-.85.4-1.35.25z"/><path d="M10.6 8.3c.35.25.75.35 1.15.3"/><path d="M10.7 5.95h1.4v1.25h-1.4z"/><path d="M13.2 9.2 14.6 11.2 15.35 12.4" stroke-width="1.7"/><circle cx="15.4" cy="12.5" r="0.75"/><path d="M9.3 9.4 7.9 11.6 7.25 13.1" stroke-width="1.7"/><circle cx="7.2" cy="13.2" r="0.75"/><path d="M11.6 15.3 12.6 18.3 12.3 20.3" stroke-width="1.95"/><ellipse cx="12.35" cy="20.5" rx="0.9" ry="0.48"/><path d="M10.2 15.4 9.0 18.5 7.7 20.0" stroke-width="1.95"/><ellipse cx="7.35" cy="20.25" rx="0.9" ry="0.48"/><path d="M15.3 12.8 16.3 21.0" stroke-width="0.6"/>',
-        // 3) GENC - ince, uzun adim
-        '<path d="M10.6 3.9c0-1.3 1.0-2.3 2.25-2.3 1.2 0 2.15.95 2.15 2.2 0 .35-.06.65-.18.95.5.75.75 1.7.75 2.6 0 .55-.08 1.05-.25 1.5-.45 1.15-1.5 1.85-2.7 1.85-1.5 0-2.7-1.1-2.7-2.7 0-1.5.85-2.7 2.1-3.15-.6-.35-1.0-.9-1.0-1.5z"/><path d="M14.6 6.2c.5.15.85.5.95.95-.35.3-.85.4-1.35.25z"/><path d="M11.5 7.7c.35.25.75.35 1.15.3"/><path d="M11.65 5.35h1.35v1.25h-1.35z"/><path d="M14.5 8.4 16.4 10.5 17.35 12.3" stroke-width="1.65"/><circle cx="17.4" cy="12.4" r="0.75"/><path d="M10.1 8.6 8.5 10.9 7.85 12.7" stroke-width="1.65"/><circle cx="7.8" cy="12.8" r="0.75"/><path d="M13.2 15.4 15.6 18.3 15.4 20.4" stroke-width="1.95"/><ellipse cx="15.5" cy="20.6" rx="0.9" ry="0.48"/><path d="M11.4 15.5 9.4 18.6 7.7 20.1" stroke-width="1.95"/><ellipse cx="7.35" cy="20.35" rx="0.9" ry="0.48"/>',
-        // 4) ERKEK - tam beyaz ihram, kollar asagi
-        '<path d="M10.2 4.2c0-1.35 1.0-2.35 2.3-2.35 1.25 0 2.2.95 2.2 2.25 0 .35-.06.65-.18.95.5.75.75 1.7.75 2.6 0 .55-.08 1.05-.25 1.5-.45 1.15-1.5 1.85-2.72 1.85-1.55 0-2.75-1.1-2.75-2.75 0-1.5.85-2.7 2.1-3.15-.6-.35-1.0-.9-1.0-1.5z"/><path d="M14.35 6.5c.5.15.85.5.95.95-.35.3-.85.4-1.35.25z"/><path d="M14.7 5.7c.35-.2.7-.15.95.1-.15.35-.5.55-.9.5z"/><path d="M11.3 8.05c.35.25.75.35 1.15.3"/><path d="M11.4 5.55h1.6v1.3h-1.6z"/><path d="M14.2 8.7 15.6 11.6 15.5 15.0" stroke-width="1.7"/><circle cx="15.5" cy="15.15" r="0.78"/><path d="M10.0 8.9 8.6 11.8 8.7 15.2" stroke-width="1.7"/><circle cx="8.7" cy="15.35" r="0.78"/><path d="M13.1 15.5 14.3 18.3 14.2 20.5" stroke-width="1.95"/><ellipse cx="14.25" cy="20.7" rx="0.95" ry="0.5"/><path d="M11.1 15.6 9.9 18.4 10.0 20.6" stroke-width="1.95"/><ellipse cx="9.95" cy="20.75" rx="0.95" ry="0.5"/>',
-        // 5) KADIN - tam beyaz, kollar kavusmus
-        '<path d="M10.4 4.25c0-1.3.95-2.3 2.2-2.3 1.2 0 2.15.9 2.15 2.2 0 .35-.06.65-.18.95.5.75.75 1.7.75 2.6 0 .55-.08 1.05-.25 1.5-.45 1.15-1.5 1.85-2.7 1.85-1.5 0-2.7-1.1-2.7-2.7 0-1.5.85-2.7 2.1-3.15-.6-.35-1.0-.9-1.0-1.5z"/><path d="M14.3 6.55c.5.15.85.5.95.95-.35.3-.85.4-1.35.25z"/><path d="M11.3 8.05c.35.25.75.35 1.15.3"/><path d="M13.9 9.5 12.9 11.9 12.4 13.6" stroke-width="1.5"/><circle cx="12.35" cy="13.75" r="0.7"/><path d="M10.3 9.6 11.1 12.0 11.6 13.5" stroke-width="1.5"/><circle cx="11.65" cy="13.65" r="0.7"/><ellipse cx="11.0" cy="20.8" rx="0.75" ry="0.45"/><ellipse cx="13.05" cy="20.8" rx="0.75" ry="0.45"/>',
-        // 6) YASLI - tam beyaz ihram, hafif egik
-        '<path d="M9.9 4.55c0-1.3.95-2.25 2.15-2.25 1.2 0 2.1.9 2.1 2.15 0 .35-.06.65-.18.95.5.75.75 1.7.75 2.6 0 .55-.08 1.05-.25 1.5-.45 1.15-1.5 1.85-2.65 1.85-1.5 0-2.65-1.1-2.65-2.7 0-1.5.85-2.7 2.05-3.1-.55-.35-.9-.9-.9-1.5z"/><path d="M13.75 6.85c.5.15.85.5.95.95-.35.3-.85.4-1.35.25z"/><path d="M10.8 8.35c.35.25.75.35 1.15.3"/><path d="M10.9 6.0h1.4v1.25h-1.4z"/><path d="M13.4 9.3 14.7 12.1 14.6 15.2" stroke-width="1.65"/><circle cx="14.6" cy="15.35" r="0.75"/><path d="M9.6 9.5 8.4 12.3 8.5 15.4" stroke-width="1.65"/><circle cx="8.5" cy="15.55" r="0.75"/><path d="M11.9 15.3 12.8 18.3 12.5 20.4" stroke-width="1.9"/><ellipse cx="12.5" cy="20.6" rx="0.9" ry="0.48"/><path d="M10.5 15.4 9.4 18.5 8.1 20.0" stroke-width="1.9"/><ellipse cx="7.75" cy="20.25" rx="0.9" ry="0.48"/><path d="M15.2 12.9 16.1 21.0" stroke-width="0.6"/>',
-        // 7) GENC - tam beyaz, uzun adim
-        '<path d="M10.5 4.0c0-1.3 1.0-2.3 2.25-2.3 1.2 0 2.15.95 2.15 2.2 0 .35-.06.65-.18.95.5.75.75 1.7.75 2.6 0 .55-.08 1.05-.25 1.5-.45 1.15-1.5 1.85-2.7 1.85-1.5 0-2.7-1.1-2.7-2.7 0-1.5.85-2.7 2.1-3.15-.6-.35-1.0-.9-1.0-1.5z"/><path d="M14.5 6.3c.5.15.85.5.95.95-.35.3-.85.4-1.35.25z"/><path d="M11.4 7.8c.35.25.75.35 1.15.3"/><path d="M11.55 5.45h1.35v1.25h-1.35z"/><path d="M14.4 8.5 16.6 11.2 17.9 13.5" stroke-width="1.6"/><circle cx="17.95" cy="13.6" r="0.72"/><path d="M10.2 8.7 8.2 11.5 6.9 13.8" stroke-width="1.6"/><circle cx="6.85" cy="13.9" r="0.72"/><path d="M13.3 15.3 15.9 18.2 15.7 20.4" stroke-width="1.9"/><ellipse cx="15.75" cy="20.6" rx="0.9" ry="0.48"/><path d="M11.3 15.4 9.2 18.6 7.5 20.0" stroke-width="1.9"/><ellipse cx="7.15" cy="20.25" rx="0.9" ry="0.48"/>',
+        // 0) ERKEK ihram
+        '<path d="M8.05 0.70 C9.790000000000001 0.70 9.790000000000001 1.60 9.790000000000001 2.58 C9.790000000000001 3.58 9.790000000000001 4.28 8.05 4.28 C6.3100000000000005 4.28 6.3100000000000005 3.58 6.3100000000000005 2.58 C6.3100000000000005 1.60 6.3100000000000005 0.70 8.05 0.70 Z"/><path class="zk-uzuv zk-bacak-on" style="transform-box:view-box;transform-origin:8.85px 12.55px;animation:zkBacak .78s ease-in-out infinite;animation-delay:__D__" d="M8.85 12.55 L10.20 16.30 L11.35 20.40 L12.85 21.05" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"/><path class="zk-uzuv zk-kol-on" style="transform-box:view-box;transform-origin:9.8px 6.0px;animation:zkKolT .78s ease-in-out infinite;animation-delay:__D__" d="M9.80 6.00 L11.10 9.00 L11.65 11.80" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>',
+        // 1) KADIN basortulu
+        '<path d="M8.05 0.48 C10.010000000000002 0.48 10.010000000000002 1.40 10.010000000000002 2.42 C10.010000000000002 3.52 10.010000000000002 4.32 8.05 4.52 C6.090000000000001 4.32 6.090000000000001 3.52 6.090000000000001 2.42 C6.090000000000001 1.40 6.090000000000001 0.48 8.05 0.48 Z"/><path class="zk-uzuv zk-bacak-on" style="transform-box:view-box;transform-origin:8.7px 12.6px;animation:zkBacak .78s ease-in-out infinite;animation-delay:__D__" d="M8.70 12.60 L9.80 16.35 L10.85 20.35 L12.25 21.00" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/><path class="zk-uzuv zk-kol-on" style="transform-box:view-box;transform-origin:9.75px 6.05px;animation:zkKolT .78s ease-in-out infinite;animation-delay:__D__" d="M9.75 6.05 L10.40 9.35 L9.80 11.90" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>',
+        // 2) YASLI bastonlu
+        '<path d="M8.05 0.70 C9.75 0.70 9.75 1.60 9.75 2.58 C9.75 3.58 9.75 4.28 8.05 4.28 C6.3500000000000005 4.28 6.3500000000000005 3.58 6.3500000000000005 2.58 C6.3500000000000005 1.60 6.3500000000000005 0.70 8.05 0.70 Z"/><path d="M5.05 12.75 L4.70 20.90 L5.35 21.05" fill="none" stroke="#c9a06a" stroke-width="0.55" stroke-linecap="round"/><path class="zk-uzuv zk-bacak-on" style="transform-box:view-box;transform-origin:8.8px 12.5px;animation:zkBacak .78s ease-in-out infinite;animation-delay:__D__" d="M8.80 12.50 L9.85 16.30 L10.80 20.35 L12.15 21.00" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path class="zk-uzuv zk-kol-on" style="transform-box:view-box;transform-origin:9.85px 6.0px;animation:zkKolT .78s ease-in-out infinite;animation-delay:__D__" d="M9.85 6.00 L10.90 9.10 L11.35 11.90" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>',
+        // 3) GENC uzun adim
+        '<path d="M8.05 0.70 C9.83 0.70 9.83 1.60 9.83 2.58 C9.83 3.58 9.83 4.28 8.05 4.28 C6.2700000000000005 4.28 6.2700000000000005 3.58 6.2700000000000005 2.58 C6.2700000000000005 1.60 6.2700000000000005 0.70 8.05 0.70 Z"/><path class="zk-uzuv zk-bacak-on" style="transform-box:view-box;transform-origin:8.95px 12.6px;animation:zkBacak .78s ease-in-out infinite;animation-delay:__D__" d="M8.95 12.60 L10.60 16.45 L12.10 20.55 L13.45 21.05" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><path class="zk-uzuv zk-kol-on" style="transform-box:view-box;transform-origin:9.85px 5.95px;animation:zkKolT .78s ease-in-out infinite;animation-delay:__D__" d="M9.85 5.95 L11.30 9.05 L11.95 11.85" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>',
+        // 4) ERKEK ihram - tam beyaz
+        '<path d="M8.05 0.70 C9.790000000000001 0.70 9.790000000000001 1.60 9.790000000000001 2.58 C9.790000000000001 3.58 9.790000000000001 4.28 8.05 4.28 C6.3100000000000005 4.28 6.3100000000000005 3.58 6.3100000000000005 2.58 C6.3100000000000005 1.60 6.3100000000000005 0.70 8.05 0.70 Z"/><path class="zk-uzuv zk-bacak-on" style="transform-box:view-box;transform-origin:8.85px 12.55px;animation:zkBacak .78s ease-in-out infinite;animation-delay:__D__" d="M8.85 12.55 L10.20 16.30 L11.35 20.40 L12.85 21.05" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"/><path class="zk-uzuv zk-kol-on" style="transform-box:view-box;transform-origin:9.8px 6.0px;animation:zkKolT .78s ease-in-out infinite;animation-delay:__D__" d="M9.80 6.00 L11.10 9.00 L11.65 11.80" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>',
+        // 5) KADIN basortulu - tam beyaz
+        '<path d="M8.05 0.48 C10.010000000000002 0.48 10.010000000000002 1.40 10.010000000000002 2.42 C10.010000000000002 3.52 10.010000000000002 4.32 8.05 4.52 C6.090000000000001 4.32 6.090000000000001 3.52 6.090000000000001 2.42 C6.090000000000001 1.40 6.090000000000001 0.48 8.05 0.48 Z"/><path class="zk-uzuv zk-bacak-on" style="transform-box:view-box;transform-origin:8.7px 12.6px;animation:zkBacak .78s ease-in-out infinite;animation-delay:__D__" d="M8.70 12.60 L9.80 16.35 L10.85 20.35 L12.25 21.00" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/><path class="zk-uzuv zk-kol-on" style="transform-box:view-box;transform-origin:9.75px 6.05px;animation:zkKolT .78s ease-in-out infinite;animation-delay:__D__" d="M9.75 6.05 L10.40 9.35 L9.80 11.90" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>',
+        // 6) YASLI bastonlu - tam beyaz
+        '<path d="M8.05 0.70 C9.75 0.70 9.75 1.60 9.75 2.58 C9.75 3.58 9.75 4.28 8.05 4.28 C6.3500000000000005 4.28 6.3500000000000005 3.58 6.3500000000000005 2.58 C6.3500000000000005 1.60 6.3500000000000005 0.70 8.05 0.70 Z"/><path d="M5.05 12.75 L4.70 20.90 L5.35 21.05" fill="none" stroke="#c9a06a" stroke-width="0.55" stroke-linecap="round"/><path class="zk-uzuv zk-bacak-on" style="transform-box:view-box;transform-origin:8.8px 12.5px;animation:zkBacak .78s ease-in-out infinite;animation-delay:__D__" d="M8.80 12.50 L9.85 16.30 L10.80 20.35 L12.15 21.00" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path class="zk-uzuv zk-kol-on" style="transform-box:view-box;transform-origin:9.85px 6.0px;animation:zkKolT .78s ease-in-out infinite;animation-delay:__D__" d="M9.85 6.00 L10.90 9.10 L11.35 11.90" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>',
+        // 7) GENC uzun adim - tam beyaz
+        '<path d="M8.05 0.70 C9.83 0.70 9.83 1.60 9.83 2.58 C9.83 3.58 9.83 4.28 8.05 4.28 C6.2700000000000005 4.28 6.2700000000000005 3.58 6.2700000000000005 2.58 C6.2700000000000005 1.60 6.2700000000000005 0.70 8.05 0.70 Z"/><path class="zk-uzuv zk-bacak-on" style="transform-box:view-box;transform-origin:8.95px 12.6px;animation:zkBacak .78s ease-in-out infinite;animation-delay:__D__" d="M8.95 12.60 L10.60 16.45 L12.10 20.55 L13.45 21.05" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><path class="zk-uzuv zk-kol-on" style="transform-box:view-box;transform-origin:9.85px 5.95px;animation:zkKolT .78s ease-in-out infinite;animation-delay:__D__" d="M9.85 5.95 L11.30 9.05 L11.95 11.85" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>'
     ];
     var ZK_HACI_GIYSI = [
-        // 0) ERKEK - ihram, sag omuz acik, yuruyus
-        '<path d="M10.45 3.3a1.8 1.8 0 0 1 3.4 0z"/><path d="M12.1 6.7c-2.1 0-3.8 1.55-3.9 3.55l-.2 4.2c0 .55.35.95.85.95h6.5c.5 0 .85-.4.85-.95l-.2-4.2C15.9 8.25 14.2 6.7 12.1 6.7z"/><path d="M9.0 7.2 8.35 11.6" stroke-width="1.0"/>',
-        // 1) KADIN - basortusu, uzun entari
-        '<path d="M12.1 1.5c-1.95 0-3.5 1.45-3.5 3.25 0 1.0.32 1.85.85 2.5-1.45.8-2.4 2.25-2.5 4.0l-.28 2.9h10.86l-.28-2.9c-.1-1.75-1.05-3.2-2.5-4 .53-.65.85-1.5.85-2.5C15.6 2.95 14.05 1.5 12.1 1.5z"/><path d="M12.1 8.6c-1.55 0-2.85.95-3.2 2.35-.45 1.7-.75 5.05-.9 8.15-.03.55.4 1 .95 1h6.3c.55 0 .98-.45.95-1-.15-3.1-.45-6.45-.9-8.15-.35-1.4-1.65-2.35-3.2-2.35z"/>',
-        // 2) YASLI - egik sirt, baston
-        '<path d="M9.7 3.85a1.7 1.7 0 0 1 3.2 0z"/><path d="M11.3 7.2c-2.0 0-3.6 1.5-3.7 3.4l-.2 4.0c0 .5.35.9.8.9h6.1c.45 0 .8-.4.8-.9l-.2-4.0c-.1-1.9-1.6-3.4-3.6-3.4z"/>',
-        // 3) GENC - ince, uzun adim
-        '<path d="M12.3 6.5c-1.95 0-3.5 1.45-3.6 3.3l-.2 4.15c0 .5.35.9.8.9h6.0c.45 0 .8-.4.8-.9l-.2-4.15c-.1-1.85-1.65-3.3-3.6-3.3z"/><path d="M9.5 7.1 8.9 11.4" stroke-width="1.0"/>',
-        // 4) ERKEK - tam beyaz ihram, kollar asagi
-        '<path d="M10.3 3.45a1.8 1.8 0 0 1 3.4 0z"/><path d="M12.0 6.85c-2.1 0-3.8 1.55-3.9 3.55l-.2 4.2c0 .55.35.95.85.95h6.5c.5 0 .85-.4.85-.95l-.2-4.2C15.8 8.4 14.1 6.85 12.0 6.85z"/><path d="M8.9 7.35 8.25 11.75" stroke-width="1.0"/>',
-        // 5) KADIN - tam beyaz, kollar kavusmus
-        '<path d="M12.0 1.6c-1.95 0-3.5 1.45-3.5 3.25 0 1.0.32 1.85.85 2.5-1.45.8-2.4 2.25-2.5 4.0l-.28 2.9h10.86l-.28-2.9c-.1-1.75-1.05-3.2-2.5-4 .53-.65.85-1.5.85-2.5C15.5 3.05 13.95 1.6 12.0 1.6z"/><path d="M12.0 8.7c-1.55 0-2.85.95-3.2 2.35-.45 1.7-.75 5.05-.9 8.15-.03.55.4 1 .95 1h6.3c.55 0 .98-.45.95-1-.15-3.1-.45-6.45-.9-8.15-.35-1.4-1.65-2.35-3.2-2.35z"/>',
-        // 6) YASLI - tam beyaz ihram, hafif egik
-        '<path d="M9.8 4.0a1.7 1.7 0 0 1 3.2 0z"/><path d="M11.4 7.35c-2.0 0-3.6 1.5-3.7 3.4l-.2 4.0c0 .5.35.9.8.9h6.1c.45 0 .8-.4.8-.9l-.2-4.0c-.1-1.9-1.6-3.4-3.6-3.4z"/>',
-        // 7) GENC - tam beyaz, uzun adim
-        '<path d="M12.4 6.6c-1.95 0-3.5 1.45-3.6 3.3l-.2 4.15c0 .5.35.9.8.9h6.0c.45 0 .8-.4.8-.9l-.2-4.15c-.1-1.85-1.65-3.3-3.6-3.3z"/><path d="M9.6 7.2 9.0 11.5" stroke-width="1.0"/>',
+        // 0) ERKEK ihram
+        '<path class="zk-uzuv zk-bacak-arka" style="transform-box:view-box;transform-origin:7.35px 12.55px;animation:zkBacakT .78s ease-in-out infinite;animation-delay:__D__" d="M7.35 12.55 L6.05 16.35 L4.85 20.35 L3.55 21.00" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"/><path class="zk-uzuv zk-kol-arka" style="transform-box:view-box;transform-origin:6.6px 6.15px;animation:zkKol .78s ease-in-out infinite;animation-delay:__D__" d="M6.60 6.15 L5.30 9.10 L4.80 11.90" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.05 3.95 C5.42 4.45 5.64 5.45 5.64 6.75 L5.43 13.40 C5.53 13.90 5.98 13.90 6.38 13.90 L9.72 13.90 C10.12 13.90 10.57 13.90 10.67 13.40 L10.46 6.75 C10.46 5.45 10.68 4.45 8.05 3.95 Z"/>',
+        // 1) KADIN basortulu
+        '<path class="zk-uzuv zk-bacak-arka" style="transform-box:view-box;transform-origin:7.45px 12.6px;animation:zkBacakT .78s ease-in-out infinite;animation-delay:__D__" d="M7.45 12.60 L6.35 16.40 L5.25 20.30 L4.00 20.95" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/><path class="zk-uzuv zk-kol-arka" style="transform-box:view-box;transform-origin:6.65px 6.2px;animation:zkKol .78s ease-in-out infinite;animation-delay:__D__" d="M6.65 6.20 L6.00 9.40 L6.55 11.95" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.05 3.95 C5.59 4.45 5.81 5.45 5.81 6.75 L5.26 14.05 C5.36 14.55 5.81 14.55 6.21 14.55 L9.90 14.55 C10.29 14.55 10.75 14.55 10.85 14.05 L10.29 6.75 C10.29 5.45 10.51 4.45 8.05 3.95 Z"/>',
+        // 2) YASLI bastonlu
+        '<path class="zk-uzuv zk-bacak-arka" style="transform-box:view-box;transform-origin:7.55px 12.5px;animation:zkBacakT .78s ease-in-out infinite;animation-delay:__D__" d="M7.55 12.50 L6.45 16.35 L5.40 20.30 L4.15 20.95" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path class="zk-uzuv zk-kol-arka" style="transform-box:view-box;transform-origin:6.8px 6.15px;animation:zkKol .78s ease-in-out infinite;animation-delay:__D__" d="M6.80 6.15 L5.80 9.25 L5.35 12.00" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.05 3.95 C5.55 4.45 5.77 5.45 5.77 6.75 L5.38 13.50 C5.48 14.00 5.93 14.00 6.33 14.00 L9.77 14.00 C10.17 14.00 10.62 14.00 10.72 13.50 L10.33 6.75 C10.33 5.45 10.55 4.45 8.05 3.95 Z"/>',
+        // 3) GENC uzun adim
+        '<path class="zk-uzuv zk-bacak-arka" style="transform-box:view-box;transform-origin:7.3px 12.6px;animation:zkBacakT .78s ease-in-out infinite;animation-delay:__D__" d="M7.30 12.60 L5.75 16.65 L4.25 20.55 L2.90 21.05" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><path class="zk-uzuv zk-kol-arka" style="transform-box:view-box;transform-origin:6.55px 6.1px;animation:zkKol .78s ease-in-out infinite;animation-delay:__D__" d="M6.55 6.10 L5.10 9.20 L4.50 12.00" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.05 3.95 C5.51 4.45 5.73 5.45 5.73 6.75 L5.47 13.25 C5.57 13.75 6.02 13.75 6.42 13.75 L9.68 13.75 C10.08 13.75 10.53 13.75 10.63 13.25 L10.37 6.75 C10.37 5.45 10.59 4.45 8.05 3.95 Z"/>',
+        // 4) ERKEK ihram - tam beyaz
+        '<path class="zk-uzuv zk-bacak-arka" style="transform-box:view-box;transform-origin:7.35px 12.55px;animation:zkBacakT .78s ease-in-out infinite;animation-delay:__D__" d="M7.35 12.55 L6.05 16.35 L4.85 20.35 L3.55 21.00" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"/><path class="zk-uzuv zk-kol-arka" style="transform-box:view-box;transform-origin:6.6px 6.15px;animation:zkKol .78s ease-in-out infinite;animation-delay:__D__" d="M6.60 6.15 L5.30 9.10 L4.80 11.90" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.05 3.95 C5.42 4.45 5.64 5.45 5.64 6.75 L5.43 13.40 C5.53 13.90 5.98 13.90 6.38 13.90 L9.72 13.90 C10.12 13.90 10.57 13.90 10.67 13.40 L10.46 6.75 C10.46 5.45 10.68 4.45 8.05 3.95 Z"/>',
+        // 5) KADIN basortulu - tam beyaz
+        '<path class="zk-uzuv zk-bacak-arka" style="transform-box:view-box;transform-origin:7.45px 12.6px;animation:zkBacakT .78s ease-in-out infinite;animation-delay:__D__" d="M7.45 12.60 L6.35 16.40 L5.25 20.30 L4.00 20.95" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/><path class="zk-uzuv zk-kol-arka" style="transform-box:view-box;transform-origin:6.65px 6.2px;animation:zkKol .78s ease-in-out infinite;animation-delay:__D__" d="M6.65 6.20 L6.00 9.40 L6.55 11.95" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.05 3.95 C5.59 4.45 5.81 5.45 5.81 6.75 L5.26 14.05 C5.36 14.55 5.81 14.55 6.21 14.55 L9.90 14.55 C10.29 14.55 10.75 14.55 10.85 14.05 L10.29 6.75 C10.29 5.45 10.51 4.45 8.05 3.95 Z"/>',
+        // 6) YASLI bastonlu - tam beyaz
+        '<path class="zk-uzuv zk-bacak-arka" style="transform-box:view-box;transform-origin:7.55px 12.5px;animation:zkBacakT .78s ease-in-out infinite;animation-delay:__D__" d="M7.55 12.50 L6.45 16.35 L5.40 20.30 L4.15 20.95" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path class="zk-uzuv zk-kol-arka" style="transform-box:view-box;transform-origin:6.8px 6.15px;animation:zkKol .78s ease-in-out infinite;animation-delay:__D__" d="M6.80 6.15 L5.80 9.25 L5.35 12.00" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.05 3.95 C5.55 4.45 5.77 5.45 5.77 6.75 L5.38 13.50 C5.48 14.00 5.93 14.00 6.33 14.00 L9.77 14.00 C10.17 14.00 10.62 14.00 10.72 13.50 L10.33 6.75 C10.33 5.45 10.55 4.45 8.05 3.95 Z"/>',
+        // 7) GENC uzun adim - tam beyaz
+        '<path class="zk-uzuv zk-bacak-arka" style="transform-box:view-box;transform-origin:7.3px 12.6px;animation:zkBacakT .78s ease-in-out infinite;animation-delay:__D__" d="M7.30 12.60 L5.75 16.65 L4.25 20.55 L2.90 21.05" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><path class="zk-uzuv zk-kol-arka" style="transform-box:view-box;transform-origin:6.55px 6.1px;animation:zkKol .78s ease-in-out infinite;animation-delay:__D__" d="M6.55 6.10 L5.10 9.20 L4.50 12.00" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.05 3.95 C5.51 4.45 5.73 5.45 5.73 6.75 L5.47 13.25 C5.57 13.75 6.02 13.75 6.42 13.75 L9.68 13.75 C10.08 13.75 10.53 13.75 10.63 13.25 L10.37 6.75 C10.37 5.45 10.59 4.45 8.05 3.95 Z"/>'
     ];
     var ZK_HACI_DET = [
-        // 0) ERKEK - ihram, sag omuz acik, yuruyus
-        '<path d="M13.5 3.9c.35.35.35.95 0 1.3-.3.3-.75.4-1.15.3"/><path d="M10.9 7.6c.85.4 1.75.4 2.6 0"/>',
-        // 1) KADIN - basortusu, uzun entari
-        '<path d="M13.4 4.05c.35.35.35.95 0 1.3-.3.3-.75.4-1.15.3"/>',
-        // 2) YASLI - egik sirt, baston
-        '<path d="M12.7 4.65c.35.32.35.9 0 1.22-.28.3-.7.4-1.08.3"/>',
-        // 3) GENC - ince, uzun adim
-        '<path d="M13.3 3.7c.45.32.5 1 .12 1.4-.3.35-.75.5-1.18.42"/>',
-        // 4) ERKEK - tam beyaz ihram, kollar asagi
-        '<path d="M13.4 4.05c.35.35.35.95 0 1.3-.3.3-.75.4-1.15.3"/><path d="M10.8 7.75c.85.4 1.75.4 2.6 0"/>',
-        // 5) KADIN - tam beyaz, kollar kavusmus
-        '<path d="M13.3 4.1c.35.35.35.95 0 1.3-.3.3-.75.4-1.15.3"/>',
-        // 6) YASLI - tam beyaz ihram, hafif egik
-        '<path d="M12.6 4.7c.35.32.35.9 0 1.22-.28.3-.7.4-1.08.3"/>',
-        // 7) GENC - tam beyaz, uzun adim
-        '<path d="M13.2 3.8c.45.32.5 1 .12 1.4-.3.35-.75.5-1.18.42"/>',
+        // 0) ERKEK ihram
+        'M9.72 2.34 C10.10 2.58 10.20 3.06 9.94 3.42',
+        // 1) KADIN basortulu
+        'M9.70 2.48 C10.02 2.72 10.10 3.16 9.86 3.50',
+        // 2) YASLI bastonlu
+        'M9.70 2.39 C10.02 2.62 10.10 3.06 9.86 3.40',
+        // 3) GENC uzun adim
+        'M9.76 2.28 C10.14 2.52 10.24 3.00 9.98 3.36',
+        // 4) ERKEK ihram - tam beyaz
+        'M9.72 2.34 C10.10 2.58 10.20 3.06 9.94 3.42',
+        // 5) KADIN basortulu - tam beyaz
+        'M9.70 2.48 C10.02 2.72 10.10 3.16 9.86 3.50',
+        // 6) YASLI bastonlu - tam beyaz
+        'M9.70 2.39 C10.02 2.62 10.10 3.06 9.86 3.40',
+        // 7) GENC uzun adim - tam beyaz
+        'M9.76 2.28 C10.14 2.52 10.24 3.00 9.98 3.36'
     ];
     var ZK_HACI_KIVRIM = [
-        // 0) ERKEK - ihram, sag omuz acik, yuruyus
-        '<path d="M9.35 8.15c1.75 1.25 3.85 1.25 5.6 0"/><path d="M12.1 11.2v4.3"/><path d="M10.15 11.75 9.95 15.5"/><path d="M14.05 11.75 14.25 15.5"/><path d="M9.6 15.9c1.7.75 3.4.75 5.1 0"/><path d="M14.5 8.9c.5 1.3.75 2.75.7 4.2"/>',
-        // 1) KADIN - basortusu, uzun entari
-        '<path d="M9.2 8.3c1.85 1.25 4.05 1.25 5.9 0"/><path d="M12.1 12.0v4.6"/><path d="M10.0 12.6 9.7 16.6"/><path d="M14.2 12.6 14.5 16.6"/><path d="M9.4 16.9c1.8.8 3.6.8 5.4 0"/><path d="M10.6 18.6c1.0.4 2.0.4 3.0 0"/>',
-        // 2) YASLI - egik sirt, baston
-        '<path d="M8.6 8.7c1.65 1.2 3.6 1.2 5.25 0"/><path d="M11.35 11.6v4.2"/><path d="M9.5 12.1 9.3 15.7"/><path d="M13.2 12.1 13.4 15.7"/><path d="M8.9 16.1c1.6.75 3.2.75 4.8 0"/>',
-        // 3) GENC - ince, uzun adim
-        '<path d="M9.5 8.05c1.75 1.3 3.85 1.3 5.6 0"/><path d="M12.3 11.1v4.3"/><path d="M10.35 11.65 10.15 15.4"/><path d="M14.25 11.65 14.45 15.4"/><path d="M9.75 15.8c1.7.75 3.4.75 5.1 0"/><path d="M14.7 8.8c.55 1.35.8 2.85.75 4.35"/>',
-        // 4) ERKEK - tam beyaz ihram, kollar asagi
-        '<path d="M9.2 8.1c1.85 1.3 4.05 1.3 5.9 0"/><path d="M12.0 11.3v4.3"/><path d="M10.05 11.85 9.85 15.6"/><path d="M13.95 11.85 14.15 15.6"/><path d="M9.5 15.9c1.7.75 3.4.75 5.1 0"/><path d="M8.9 9.3c-.4 1.5-.6 3.1-.55 4.7"/><path d="M15.1 9.3c.4 1.5.6 3.1.55 4.7"/>',
-        // 5) KADIN - tam beyaz, kollar kavusmus
-        '<path d="M9.1 8.25c1.85 1.3 4.05 1.3 5.9 0"/><path d="M12.0 12.1v4.5"/><path d="M9.9 12.7 9.6 16.7"/><path d="M14.1 12.7 14.4 16.7"/><path d="M9.3 17.0c1.8.8 3.6.8 5.4 0"/><path d="M10.5 18.7c1.0.4 2.0.4 3.0 0"/>',
-        // 6) YASLI - tam beyaz ihram, hafif egik
-        '<path d="M8.8 8.75c1.65 1.2 3.6 1.2 5.25 0"/><path d="M11.45 11.7v4.2"/><path d="M9.6 12.2 9.4 15.8"/><path d="M13.3 12.2 13.5 15.8"/><path d="M9.0 16.2c1.6.75 3.2.75 4.8 0"/>',
-        // 7) GENC - tam beyaz, uzun adim
-        '<path d="M9.4 8.15c1.75 1.3 3.85 1.3 5.6 0"/><path d="M12.2 11.2v4.3"/><path d="M10.25 11.75 10.05 15.5"/><path d="M14.15 11.75 14.35 15.5"/><path d="M9.65 15.9c1.7.75 3.4.75 5.1 0"/><path d="M14.6 8.9c.55 1.35.8 2.85.75 4.35"/>',
+        // 0) ERKEK ihram
+        'M6.30 7.10 C7.45 7.75 9.60 7.75 10.75 7.10M6.10 9.55 C7.30 10.15 9.70 10.15 10.90 9.55M6.00 12.00 C7.25 12.55 9.75 12.55 11.00 12.00M6.95 4.55 C7.60 4.95 8.55 4.95 9.20 4.55',
+        // 1) KADIN basortulu
+        'M6.55 7.30 C7.60 7.90 9.45 7.90 10.50 7.30M6.35 9.80 C7.45 10.35 9.60 10.35 10.70 9.80M6.15 12.40 C7.35 12.95 9.70 12.95 10.90 12.40M8.35 8.60 L8.35 14.30',
+        // 2) YASLI bastonlu
+        'M6.45 7.20 C7.55 7.75 9.45 7.75 10.55 7.20M6.25 9.65 C7.40 10.20 9.60 10.20 10.75 9.65M6.10 12.15 C7.30 12.70 9.70 12.70 10.90 12.15M8.80 5.05 L8.30 12.20',
+        // 3) GENC uzun adim
+        'M6.20 7.05 C7.35 7.70 9.65 7.70 10.80 7.05M6.00 9.50 C7.25 10.10 9.75 10.10 11.00 9.50M5.90 11.95 C7.20 12.50 9.80 12.50 11.10 11.95M6.85 4.50 C7.50 4.90 8.50 4.90 9.15 4.50',
+        // 4) ERKEK ihram - tam beyaz
+        'M6.30 7.10 C7.45 7.75 9.60 7.75 10.75 7.10M6.10 9.55 C7.30 10.15 9.70 10.15 10.90 9.55M6.00 12.00 C7.25 12.55 9.75 12.55 11.00 12.00M6.95 4.55 C7.60 4.95 8.55 4.95 9.20 4.55',
+        // 5) KADIN basortulu - tam beyaz
+        'M6.55 7.30 C7.60 7.90 9.45 7.90 10.50 7.30M6.35 9.80 C7.45 10.35 9.60 10.35 10.70 9.80M6.15 12.40 C7.35 12.95 9.70 12.95 10.90 12.40M8.35 8.60 L8.35 14.30',
+        // 6) YASLI bastonlu - tam beyaz
+        'M6.45 7.20 C7.55 7.75 9.45 7.75 10.55 7.20M6.25 9.65 C7.40 10.20 9.60 10.20 10.75 9.65M6.10 12.15 C7.30 12.70 9.70 12.70 10.90 12.15M8.80 5.05 L8.30 12.20',
+        // 7) GENC uzun adim - tam beyaz
+        'M6.20 7.05 C7.35 7.70 9.65 7.70 10.80 7.05M6.00 9.50 C7.25 10.10 9.75 10.10 11.00 9.50M5.90 11.95 C7.20 12.50 9.80 12.50 11.10 11.95M6.85 4.50 C7.50 4.90 8.50 4.90 9.15 4.50'
     ];
-
-    // secilen haci icin tam svg (disaridan olcek verilir)
-    // sira: ten+uzuvlar -> ihram (tam beyaz, gri cizgi yok) -> oyma detay -> kivrim
+    // Tek figur: giysi (arka uzuvlar + entari) -> ten (bas + on uzuvlar)
+    // -> oyma detay -> kivrim. Uzuvlar eklem noktasinda doner: yuruyus.
     function zkHaciSvg(i){
         var k = i % ZK_HACI_TEN.length;
-        return '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.6" '
-            + 'stroke-linecap="round" stroke-linejoin="round">' + ZK_HACI_TEN[k] + '</svg>'
-            + '<svg viewBox="0 0 24 24" fill="#ffffff" stroke="#ffffff" stroke-width="0.9" '
-            + 'stroke-linecap="round" stroke-linejoin="round">' + ZK_HACI_GIYSI[k] + '</svg>'
-            + '<svg viewBox="0 0 24 24" fill="none" stroke="var(--zk-bg, #e8e0cf)" stroke-width="0.5" '
-            + 'stroke-linecap="round" stroke-linejoin="round">' + ZK_HACI_DET[k] + '</svg>'
-            + '<svg viewBox="0 0 24 24" fill="none" stroke="#e6dccb" stroke-opacity="0.95" stroke-width="0.6" '
-            + 'stroke-linecap="round" stroke-linejoin="round">' + ZK_HACI_KIVRIM[k] + '</svg>'
-            + '<svg viewBox="0 0 24 24" fill="none" stroke="#cbbca1" stroke-opacity="0.55" stroke-width="0.32" '
-            + 'stroke-linecap="round" stroke-linejoin="round" transform="translate(0.35,0.45)">' + ZK_HACI_KIVRIM[k] + '</svg>';
+        var gecikme = (-(i % 8) * 0.10).toFixed(2) + 's';
+        function d(x){ return x.split('__D__').join(gecikme); }
+        return '<i class="zk-haci">'
+            + '<svg viewBox="0 0 16 24" fill="#ffffff" stroke="#ffffff" stroke-width="0.85" stroke-linecap="round" stroke-linejoin="round">' + d(ZK_HACI_GIYSI[k]) + '</svg>'
+            + '<svg viewBox="0 0 16 24" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + d(ZK_HACI_TEN[k]) + '</svg>'
+            + '<svg viewBox="0 0 16 24" fill="none" stroke="var(--zk-bg, #e8e0cf)" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">' + d(ZK_HACI_DET[k]) + '</svg>'
+            + '<svg viewBox="0 0 16 24" fill="none" stroke="#e6dccb" stroke-opacity="0.9" stroke-width="0.40" stroke-linecap="round" stroke-linejoin="round">' + d(ZK_HACI_KIVRIM[k]) + '</svg>'
+            + '</i>';
     }
 
     function cizTavaf(){
