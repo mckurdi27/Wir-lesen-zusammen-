@@ -3558,7 +3558,7 @@ booksGrid.appendChild(_readBtn);
                     let modeButtonsHtml = modeKeys.map(mk => {
                         let mObj = defModes[mk];
                         let isActive = mk === book.currentMode;
-                        return `<button class="mode-btn ${isActive ? 'active' : ''}" data-book-id="${book.id}" data-mode="${mk}" style="padding: 10px 16px; font-size: 13px; border-radius: 6px; border: 1px solid var(--border-color); background: ${isActive ? 'var(--gold-primary)' : 'var(--card-bg)'}; color: ${isActive ? '#fff' : 'var(--text-main)'}; cursor: pointer; font-weight: bold; min-height: 44px; touch-action: manipulation;">${mObj.name}</button>`;
+                        return `<button class="mode-btn ${isActive ? 'active' : ''}" data-book-id="${book.id}" data-mode="${mk}" style="padding: 6px 10px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-color); background: ${isActive ? 'var(--gold-primary)' : 'var(--card-bg)'}; color: ${isActive ? '#fff' : 'var(--text-main)'}; margin-left: 0; cursor: pointer; font-weight: bold; min-height: 32px; touch-action: manipulation;">${mObj.name}</button>`;
                     }).join('');
 
                     let itemsHtml = items.map((pi, index) => {
@@ -3590,14 +3590,14 @@ booksGrid.appendChild(_readBtn);
                             pageNumber = pi.start + 1;
                         }
 
-                        let pdfBtn = `<button class="pdf-page-btn" data-book-id="${book.id}" data-page="${pageNumber}" style="padding: 8px 14px; background: #d4af37; color: #3e2723; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px; touch-action: manipulation;">📄 PDF ${pageNumber}</button>`;
+                        let pdfBtn = `<button class="pdf-page-btn" data-book-id="${book.id}" data-page="${pageNumber}" style="padding: 6px 10px; background: #d4af37; color: #3e2723; border: none; border-radius: 6px; margin-left: 0; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px; touch-action: manipulation;">📄 PDF ${pageNumber}</button>`;
 
                         if (loggedInMember) {
                             if (st.statusType === "free") {
                                 actionButtons = `
                                     <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: center; width: 100%;">
                                         ${pdfBtn}
-                                        <button class="take-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 10px 18px; background: #f39c12; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px; touch-action: manipulation;">Hisse Al</button>
+                                        <button class="take-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 6px 10px; background: #f39c12; color: #fff; border: none; border-radius: 6px; margin-left: 0; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px; touch-action: manipulation;">Hisse Al</button>
                                     </div>
                                 `;
                             } else if (isOwner) {
@@ -3605,16 +3605,16 @@ booksGrid.appendChild(_readBtn);
                                     actionButtons = `
                                         <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: center; width: 100%;">
                                             ${pdfBtn}
-                                            <button class="read-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 10px 18px; background: #27ae60; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px; touch-action: manipulation;">✅ Okundu</button>
-                                            <button class="release-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 10px 18px; background: #e74c3c; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px; touch-action: manipulation;">❌ Vazgeç</button>
+                                            <button class="read-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 6px 10px; background: #27ae60; color: #fff; border: none; border-radius: 6px; margin-left: 0; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px; touch-action: manipulation;">✅ Okundu</button>
+                                            <button class="release-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 6px 10px; background: #e74c3c; color: #fff; border: none; border-radius: 6px; margin-left: 0; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px; touch-action: manipulation;">❌ Vazgeç</button>
                                         </div>
                                     `;
                                 } else if (st.statusType === "read") {
                                     actionButtons = `
                                         <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: center; width: 100%;">
                                             ${pdfBtn}
-                                            <button class="unread-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 10px 18px; background: #e67e22; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px; touch-action: manipulation;">↩️ Okunmadı</button>
-                                            <button class="release-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 10px 18px; background: #e74c3c; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px; touch-action: manipulation;">❌ Vazgeç</button>
+                                            <button class="unread-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 6px 10px; background: #e67e22; color: #fff; border: none; border-radius: 6px; margin-left: 0; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px; touch-action: manipulation;">↩️ Okunmadı</button>
+                                            <button class="release-range-btn" data-book-id="${book.id}" data-start="${pi.start}" data-end="${pi.end}" style="padding: 6px 10px; background: #e74c3c; color: #fff; border: none; border-radius: 6px; margin-left: 0; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px; touch-action: manipulation;">❌ Vazgeç</button>
                                         </div>
                                     `;
                                 }
@@ -3636,8 +3636,8 @@ booksGrid.appendChild(_readBtn);
                         `;
                     }).join('');
 
-                    let headerPdfBtn = `<button class="pdf-book-btn" data-book-id="${book.id}" style="padding: 8px 16px; background: #d4af37; color: #3e2723; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: bold; min-height: 44px; touch-action: manipulation;">📄 PDF</button>`;
-                    let headerTocBtn = `<button class="toc-book-btn" data-book-id="${book.id}" style="padding: 8px 16px; background: var(--card-bg); color: var(--gold-dark); border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: bold; min-height: 44px; touch-action: manipulation;">📑 İçindekiler</button>`;
+                    let headerPdfBtn = `<button class="pdf-book-btn" data-book-id="${book.id}" style="padding: 6px 10px; background: #d4af37; color: #3e2723; border: none; border-radius: 6px; font-size: 12px; margin-left: 0; cursor: pointer; font-weight: bold; min-height: 32px; touch-action: manipulation;">📄 PDF</button>`;
+                    let headerTocBtn = `<button class="toc-book-btn" data-book-id="${book.id}" style="padding: 6px 10px; background: #27ae60; color: #fff; border: none; border-radius: 8px; font-size: 12px; font-weight: bold; min-height: 32px; margin-left: 0; cursor: pointer; touch-action: manipulation;">📑 İçindekiler</button>`;
 
                     card.innerHTML = `
                         <div class="book-header">
