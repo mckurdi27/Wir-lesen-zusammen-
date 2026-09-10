@@ -507,7 +507,12 @@
         #zikirmatikSection .zk-stats span { font-size: 11px; opacity: .65; }
         #zikirmatikSection .zk-turreset { border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--gold-dark); border-radius: 7px; font-size: 14px; line-height: 1.3; font-weight: 600; padding: 3px 4px; min-height: 0; margin: 0; cursor: pointer; white-space: nowrap; flex: 0 0 auto; }
 #zikirmatikSection .zk-turreset:active { background: var(--gold-primary); color: #fff; }
-#zikirmatikSection .zk-actions { display: flex; flex-wrap: nowrap; gap: 4px; margin-top: 8px; justify-content: center; align-items: center; font-size: 14px; }
+#zikirmatikSection .zk-actions { display: flex; flex-wrap: nowrap; gap: 4px; margin-top: 8px; justify-content: center; align-items: center; font-size: 14px; position: relative; }
+        #zikirmatikSection .zk-ses-menu { display: none; position: absolute; bottom: calc(100% + 6px); right: 0; z-index: 40; min-width: 180px; padding: 6px; border-radius: 10px; border: 1px solid var(--gold-primary); background: var(--card-bg); box-shadow: 0 8px 22px rgba(0,0,0,.22); }
+        #zikirmatikSection .zk-ses-menu.on { display: block; }
+        #zikirmatikSection .zk-ses-menu button { display: block; width: 100%; text-align: left; padding: 7px 10px; border: 0; border-radius: 7px; background: transparent; color: var(--text-main); font-size: 14px; line-height: 1.3; cursor: pointer; margin: 0; white-space: nowrap; }
+        #zikirmatikSection .zk-ses-menu button + button { margin-top: 2px; }
+        #zikirmatikSection .zk-ses-menu button.on { background: var(--gold-primary); color: #fff; }
         #zikirmatikSection .zk-actions button { padding: 3px 4px; border-radius: 7px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--text-main); font-size: 14px; line-height: 1.3; cursor: pointer; min-height: 0; margin-left: 0; white-space: nowrap; flex: 0 0 auto; }
         #zikirmatikSection .zk-actions button.on { background: var(--gold-primary); color: #fff; }
         #zikirmatikSection .zk-ar { font-size: 26px; line-height: 1.9; text-align: center; color: #000000; font-weight: 800; margin: 2px 0 8px; font-family: "Traditional Arabic", "Amiri", "Times New Roman", serif; }
@@ -784,6 +789,13 @@
                 <button type="button" id="zkResetBtn">Sıfırla</button>
                 <button type="button" id="zkVibBtn">Titreşim</button>
                 <button type="button" id="zkSesBtn">Ses</button>
+                <div class="zk-ses-menu" id="zkSesMenu">
+                    <button type="button" class="zk-sesopt" data-ses="hu.mp3">Hu</button>
+                    <button type="button" class="zk-sesopt" data-ses="tespih.wav">Tespih tıkırtısı</button>
+                    <button type="button" class="zk-sesopt" data-ses="adim.wav">Adım</button>
+                    <button type="button" class="zk-sesopt" data-ses="kalp.wav">Kalp atışı</button>
+                    <button type="button" class="zk-sesopt" data-ses="yumusak.wav">Yumuşak ton</button>
+                </div>
             </div>
             <!-- en alt : zikir adedi butonlari -->
             <div class="zk-adet" id="zkAdet">
@@ -945,7 +957,8 @@
     function zkMan(z){ var b = ZK_BILGI[z]; return b ? b.anlam : 'Özel zikir'; }
     var s = null;
     try { s = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e) { s = null; }
-    if (!s) s = { zikir: VARSAYILAN_ZIKIRLER[0], hedef: 33, sayi: 0, tur: 0, toplam: 0, gun: {}, vib: true, ses: false, ozel: [] };
+    if (!s) s = { zikir: VARSAYILAN_ZIKIRLER[0], hedef: 33, sayi: 0, tur: 0, toplam: 0, gun: {}, vib: true, ses: false, sesdosya: "hu.mp3", ozel: [] };
+    if (!s.sesdosya) s.sesdosya = "hu.mp3";
     if (!Array.isArray(s.ozel)) s.ozel = [];
 
     function tumZikirler(){ return VARSAYILAN_ZIKIRLER.concat(s.ozel); }
@@ -957,12 +970,19 @@
     function bugun(){ var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
     function kaydet(){ try { localStorage.setItem(KEY, JSON.stringify(s)); } catch(e){} }
 
-    var ZK_SES = "sound/hu.mp3";   // son "Allah hu" ifadesinden kirpilan sadece "hu"
+    var ZK_SES_DOSYA = "hu.mp3";   // varsayilan: "Allah hu" ifadesinden kirpilan "hu"
+    function zkSesYolu(){ return "sound/" + (s.sesdosya || ZK_SES_DOSYA); }
+    function zkSesYukle(){
+        try { beep.a = new Audio(zkSesYolu()); beep.a.preload = "auto"; beep.a.volume = 0.95; }
+        catch(e){ beep.a = null; }
+        beep.yol = zkSesYolu();
+    }
     function beep(){
         if (!s.ses) return;
         try {
             // ayni anda tek calma: onceki kopyayi basa al
-            if (!beep.a) { beep.a = new Audio(ZK_SES); beep.a.preload = "auto"; beep.a.volume = 0.95; }
+            if (!beep.a || beep.yol !== zkSesYolu()) zkSesYukle();
+            if (!beep.a) return;
             var a = beep.a;
             try { a.currentTime = 0; } catch(e){}
             var p = a.play();
@@ -971,8 +991,8 @@
     }
     function sesIsit(){
         // ilk kullanici dokunusunda sesi hazirla (mobil tarayici kurali)
-        if (beep.a) return;
-        try { beep.a = new Audio(ZK_SES); beep.a.preload = "auto"; beep.a.volume = 0.95; } catch(e){}
+        if (beep.a && beep.yol === zkSesYolu()) return;
+        zkSesYukle();
     }
 
     var ZK_RENK_SAYISI = 11;   // 11 farkli insan ikonu rengi
@@ -1150,6 +1170,8 @@
         cizTavaf();
         if ($('zkVibBtn')) $('zkVibBtn').classList.toggle('on', !!s.vib);
         if ($('zkSesBtn')) $('zkSesBtn').classList.toggle('on', !!s.ses);
+        var zkSesOpts = document.querySelectorAll('#zikirmatikSection .zk-sesopt');
+        for (var zi = 0; zi < zkSesOpts.length; zi++) zkSesOpts[zi].classList.toggle('on', zkSesOpts[zi].getAttribute('data-ses') === (s.sesdosya || ZK_SES_DOSYA));
         var sel = $('zkZikir');
         if (sel) {
             var opt = '', sonKat = null;
@@ -1244,7 +1266,45 @@
             }
         });
         if ($('zkVibBtn')) $('zkVibBtn').addEventListener('click', function(){ s.vib = !s.vib; kaydet(); ciz(); });
-        if ($('zkSesBtn')) $('zkSesBtn').addEventListener('click', function(){ s.ses = !s.ses; kaydet(); ciz(); });
+        (function(){
+            var b = $('zkSesBtn'), menu = $('zkSesMenu');
+            if (!b) return;
+            var zkSesTimer = null, zkSesUzun = false;
+            function zkSesMenuKapat(){ if (menu) menu.classList.remove('on'); }
+            function zkSesMenuAc(){ if (menu) menu.classList.add('on'); }
+            function zkSesBasla(){
+                zkSesUzun = false;
+                if (zkSesTimer) clearTimeout(zkSesTimer);
+                zkSesTimer = setTimeout(function(){ zkSesUzun = true; zkSesMenuAc(); }, 500);
+            }
+            function zkSesBitir(){ if (zkSesTimer) { clearTimeout(zkSesTimer); zkSesTimer = null; } }
+            b.addEventListener('pointerdown', zkSesBasla);
+            b.addEventListener('touchstart', zkSesBasla, {passive:true});
+            b.addEventListener('mousedown', zkSesBasla);
+            ['pointerup','pointerleave','pointercancel','touchend','touchcancel','mouseup','mouseleave','contextmenu'].forEach(function(ev){
+                b.addEventListener(ev, zkSesBitir);
+            });
+            b.addEventListener('click', function(){
+                if (zkSesUzun) { zkSesUzun = false; return; }
+                zkSesMenuKapat();
+                s.ses = !s.ses; kaydet(); ciz();
+            });
+            if (menu) {
+                menu.addEventListener('click', function(e){
+                    var t = e.target.closest('.zk-sesopt'); if (!t) return;
+                    e.stopPropagation();
+                    s.sesdosya = t.getAttribute('data-ses');
+                    s.ses = true;
+                    zkSesMenuKapat();
+                    kaydet(); ciz(); beep();
+                });
+            }
+            document.addEventListener('click', function(e){
+                if (!menu || !menu.classList.contains('on')) return;
+                if (e.target === b || b.contains(e.target) || menu.contains(e.target)) return;
+                zkSesMenuKapat();
+            });
+        })();
         if ($('zkAyarBtn')) $('zkAyarBtn').addEventListener('click', function(){
             var ay = $('zkAyar'); if (ay) ay.classList.toggle('on');
         });
