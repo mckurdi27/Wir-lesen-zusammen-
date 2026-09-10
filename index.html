@@ -475,20 +475,20 @@
         #zikirmatikSection .zk-dots { position: absolute; inset: 0; }
         #zikirmatikSection .zk-dot { position: absolute; opacity: 0; transition: opacity .18s, transform .18s, filter .18s; }
         #zikirmatikSection .zk-dot svg { display: block; width: 100%; height: 100%; }
-        #zikirmatikSection .zk-dot .zk-yuru { display: block; width: 100%; height: 100%; }
+        #zikirmatikSection .zk-dot .zk-yuru { display: block; width: 100%; height: 100%; position: relative; }
         #zikirmatikSection .zk-dot.on { opacity: 1; transform: scale(1.04); }
         #zikirmatikSection .zk-dot .zk-yuru { transform-origin: 50% 50%; }
-        #zikirmatikSection .zk-dot.c0 { color: #f6e0cf; }
-        #zikirmatikSection .zk-dot.c1 { color: #eec49f; }
-        #zikirmatikSection .zk-dot.c2 { color: #dfa672; }
-        #zikirmatikSection .zk-dot.c3 { color: #cb8a55; }
-        #zikirmatikSection .zk-dot.c4 { color: #b06f3d; }
-        #zikirmatikSection .zk-dot.c5 { color: #96582c; }
-        #zikirmatikSection .zk-dot.c6 { color: #7c451f; }
-        #zikirmatikSection .zk-dot.c7 { color: #9b5f4a; }
-        #zikirmatikSection .zk-dot.c8 { color: #6f3a24; }
-        #zikirmatikSection .zk-dot.c9 { color: #4a2415; }
-        #zikirmatikSection .zk-dot.c10 { color: #2b1409; }
+        #zikirmatikSection .zk-dot.c0 { color: #f6e0cf; --zk-bg: #eec49f; }
+        #zikirmatikSection .zk-dot.c1 { color: #eec49f; --zk-bg: #dfa672; }
+        #zikirmatikSection .zk-dot.c2 { color: #dfa672; --zk-bg: #cb8a55; }
+        #zikirmatikSection .zk-dot.c3 { color: #cb8a55; --zk-bg: #b06f3d; }
+        #zikirmatikSection .zk-dot.c4 { color: #b06f3d; --zk-bg: #96582c; }
+        #zikirmatikSection .zk-dot.c5 { color: #96582c; --zk-bg: #7c451f; }
+        #zikirmatikSection .zk-dot.c6 { color: #7c451f; --zk-bg: #9b5f4a; }
+        #zikirmatikSection .zk-dot.c7 { color: #9b5f4a; --zk-bg: #6f3a24; }
+        #zikirmatikSection .zk-dot.c8 { color: #6f3a24; --zk-bg: #4a2415; }
+        #zikirmatikSection .zk-dot.c9 { color: #4a2415; --zk-bg: #2b1409; }
+        #zikirmatikSection .zk-dot.c10 { color: #2b1409; --zk-bg: #4a2415; }
         #zikirmatikSection .zk-dot.on[class*="c0"] { filter: drop-shadow(0 0 3px rgba(0,0,0,.45)); }
         #zikirmatikSection .zk-count { text-align: center; font-size: 2.4rem; font-weight: 700; color: var(--gold-dark); line-height: 1; margin-top: 2px; }
         #zikirmatikSection .zk-sub { text-align: center; font-size: 12px; opacity: .7; margin-top: 4px; margin-bottom: 10px; }
@@ -940,50 +940,83 @@
     // Tavaf eden hacilar - DOLU (siluet) figurler, yandan yuruyus.
     // Bas ve govde dolu sekil; uzuvlar kalin yuvarlak cizgi.
     // stroke-width yazilan uzuvlar fill'i ezmez, ayri ayar icin birakildi.
+    // Tavaf eden hacilar - dolu siluet + ince detay (yuz, omuz, elbise kivrimi).
+    // Detaylar --zk-bg rengiyle cizilir -> siluetin icinde 'oyma' gibi gorunur.
     var ZK_HACILAR = [
         // 0) ERKEK - ihram, uzun adim
-        '<circle cx="12.2" cy="4.4" r="2.3"/>'
-        + '<path d="M12.2 7.1c-2.1 0-3.8 1.6-4 3.6l-.5 4.2c-.1.9.6 1.7 1.5 1.7h6c.9 0 1.6-.8 1.5-1.7l-.5-4.2c-.2-2-1.9-3.6-4-3.6z"/>'
-        + '<path d="M8.4 10.9 6.4 13.2" stroke-width="2.1"/>'
-        + '<path d="M12.6 10.4 15.2 12.4" stroke-width="2.1"/>'
-        + '<path d="M9.4 16.2 8.3 20.4" stroke-width="2.3"/>'
-        + '<path d="M11.6 16.2 14.2 19.6" stroke-width="2.3"/>'
-        + '<path d="M8.3 20.4 6.6 20.9" stroke-width="2.1"/>'
-        + '<path d="M14.2 19.6 16.2 20.0" stroke-width="2.1"/>',
+        '<circle cx="12.3" cy="4.3" r="2.35"/>'
+        + '<path d="M12.3 6.9c-2.3 0-4.1 1.7-4.3 3.9l-.5 4.4c-.1 1 .6 1.8 1.6 1.8h6.4c1 0 1.7-.8 1.6-1.8l-.5-4.4c-.2-2.2-2-3.9-4.3-3.9z"/>'
+        + '<path d="M8.3 10.7 6.2 13.1" stroke-width="2.2"/>'
+        + '<path d="M12.7 10.2 15.4 12.3" stroke-width="2.2"/>'
+        + '<path d="M9.3 16.6 8.2 20.5" stroke-width="2.4"/>'
+        + '<path d="M11.7 16.6 14.3 19.8" stroke-width="2.4"/>'
+        + '<path d="M8.2 20.5 6.4 21.0" stroke-width="2.2"/>'
+        + '<path d="M14.3 19.8 16.4 20.2" stroke-width="2.2"/>',
         // 1) KADIN - uzun etek, basortusu
-        '<circle cx="12.2" cy="4.4" r="2.3"/>'
-        + '<path d="M15.4 4.6c1.1 1.7.4 3.7-1.3 4.5"/>'
-        + '<path d="M12.2 7.1c-2.2 0-4 1.7-4.2 3.8l-.4 3.1h9.2l-.4-3.1c-.2-2.1-2-3.8-4.2-3.8z"/>'
-        + '<path d="M7.6 14h9.2l1.4 6.4c.1.5-.3 1-.8 1H7c-.5 0-.9-.5-.8-1z"/>'
-        + '<path d="M8.6 10.9 6.7 13.1" stroke-width="2.1"/>'
-        + '<path d="M12.4 10.4 14.8 12.3" stroke-width="2.1"/>',
+        '<circle cx="12.3" cy="4.3" r="2.35"/>'
+        + '<path d="M15.6 4.5c1.2 1.8.4 3.9-1.4 4.7"/>'
+        + '<path d="M12.3 6.9c-2.4 0-4.3 1.8-4.5 4.1l-.3 3.2h9.6l-.3-3.2c-.2-2.3-2.1-4.1-4.5-4.1z"/>'
+        + '<path d="M7.5 14.2h9.6l1.5 6.5c.1.6-.3 1.1-.9 1.1H6.9c-.6 0-1-.5-.9-1.1z"/>'
+        + '<path d="M8.5 10.7 6.5 13.0" stroke-width="2.2"/>'
+        + '<path d="M12.6 10.2 15.0 12.2" stroke-width="2.2"/>',
         // 2) YASLI - egik sirt, baston
-        '<circle cx="10.9" cy="5.0" r="2.2"/>'
-        + '<path d="M10.9 7.6c-2 0-3.6 1.5-3.8 3.4l-.4 3.6c-.1.8.5 1.5 1.3 1.5h5.6c.8 0 1.4-.7 1.3-1.5l-.4-3.6c-.2-1.9-1.8-3.4-3.6-3.4z"/>'
-        + '<path d="M7.4 11.1 5.6 13.3" stroke-width="2.0"/>'
-        + '<path d="M11.2 10.6 13.4 12.3" stroke-width="2.0"/>'
-        + '<path d="M8.5 16.1 7.9 19.9" stroke-width="2.1"/>'
-        + '<path d="M10.4 16.1 12.0 19.2" stroke-width="2.1"/>'
-        + '<path d="M7.9 19.9 6.5 20.4" stroke-width="1.9"/>'
-        + '<path d="M12.0 19.2 13.4 19.6" stroke-width="1.9"/>'
-        + '<path d="M16.2 9.6v10.6" stroke-width="1.9"/>'
-        + '<path d="M15.0 9.6h2.4" stroke-width="1.9"/>',
+        '<circle cx="10.9" cy="4.9" r="2.25"/>'
+        + '<path d="M10.9 7.4c-2.2 0-3.9 1.6-4.1 3.7l-.4 3.8c-.1.9.6 1.6 1.4 1.6h6c.9 0 1.5-.7 1.4-1.6l-.4-3.8c-.2-2.1-1.7-3.7-3.9-3.7z"/>'
+        + '<path d="M7.2 11.0 5.3 13.3" stroke-width="2.1"/>'
+        + '<path d="M11.4 10.5 13.6 12.3" stroke-width="2.1"/>'
+        + '<path d="M8.4 16.4 7.8 20.2" stroke-width="2.2"/>'
+        + '<path d="M10.5 16.4 12.1 19.5" stroke-width="2.2"/>'
+        + '<path d="M7.8 20.2 6.2 20.7" stroke-width="2.0"/>'
+        + '<path d="M12.1 19.5 13.6 19.9" stroke-width="2.0"/>'
+        + '<path d="M16.4 9.4v10.8" stroke-width="2.0"/>'
+        + '<path d="M15.1 9.4h2.6" stroke-width="2.0"/>',
         // 3) GENC - dik, ince, uzun adim
-        '<circle cx="12.4" cy="4.1" r="2.1"/>'
-        + '<path d="M12.4 6.7c-1.8 0-3.2 1.4-3.4 3.1l-.4 3.6c-.1.8.5 1.5 1.3 1.5h5c.8 0 1.4-.7 1.3-1.5l-.4-3.6c-.2-1.7-1.6-3.1-3.4-3.1z"/>'
-        + '<path d="M9.2 9.9 7.2 12.1" stroke-width="2.0"/>'
-        + '<path d="M12.8 9.5 15.6 11.5" stroke-width="2.0"/>'
-        + '<path d="M9.6 14.6 7.9 19.6" stroke-width="2.1"/>'
-        + '<path d="M11.4 14.6 14.8 18.4" stroke-width="2.1"/>'
-        + '<path d="M7.9 19.6 6.2 20.4" stroke-width="1.9"/>'
-        + '<path d="M14.8 18.4 16.8 19.2" stroke-width="1.9"/>'
+        '<circle cx="12.5" cy="4.0" r="2.15"/>'
+        + '<path d="M12.5 6.6c-1.9 0-3.4 1.5-3.6 3.3l-.4 3.8c-.1.9.5 1.6 1.4 1.6h5.2c.9 0 1.5-.7 1.4-1.6l-.4-3.8c-.2-1.8-1.7-3.3-3.6-3.3z"/>'
+        + '<path d="M9.1 9.8 7.0 12.0" stroke-width="2.1"/>'
+        + '<path d="M12.9 9.4 15.8 11.4" stroke-width="2.1"/>'
+        + '<path d="M9.5 14.8 7.8 19.7" stroke-width="2.2"/>'
+        + '<path d="M11.4 14.8 14.9 18.5" stroke-width="2.2"/>'
+        + '<path d="M7.8 19.7 6.0 20.5" stroke-width="2.0"/>'
+        + '<path d="M14.9 18.5 17.0 19.3" stroke-width="2.0"/>'
+    ];
+
+    // Detay katmani (siluetin uzerine oyulur) - ayni sirada
+    var ZK_HACI_DET = [
+        // ERKEK: boyun, omuz hatti, ihram kivrimlari
+        '<path d="M10.6 7.4c1.1.5 2.3.5 3.4 0"/>'
+        + '<path d="M9.0 9.6c2 1.4 4.6 1.4 6.6 0"/>'
+        + '<path d="M12.3 12.4v4.0"/>'
+        + '<path d="M9.7 12.8 9.3 16.2"/>'
+        + '<path d="M14.9 12.8 15.3 16.2"/>',
+        // KADIN: basortusu kenari, omuz, etek kivrimlari
+        '<path d="M8.9 6.6c1.9-.9 4.9-.9 6.8 0"/>'
+        + '<path d="M9.1 9.7c2 1.3 4.4 1.3 6.4 0"/>'
+        + '<path d="M12.3 12.6v4.2"/>'
+        + '<path d="M9.5 13.2 8.8 20.3"/>'
+        + '<path d="M15.1 13.2 15.8 20.3"/>',
+        // YASLI: boyun, omuz, baston tutamagi
+        '<path d="M8.6 7.6c1.5.5 3.1.5 4.6 0"/>'
+        + '<path d="M7.9 9.9c1.9 1.2 4.1 1.2 6 0"/>'
+        + '<path d="M10.9 12.8v4.0"/>'
+        + '<path d="M16.4 12.0h1.1"/>',
+        // GENC: boyun, omuz, kivrimlar
+        '<path d="M9.6 9.2c1.8 1.2 3.9 1.2 5.7 0"/>'
+        + '<path d="M12.5 12.1v3.8"/>'
+        + '<path d="M10.1 12.4 9.7 15.4"/>'
+        + '<path d="M14.9 12.4 15.3 15.4"/>'
     ];
 
     // secilen haci icin tam svg (disaridan olcek verilir)
     function zkHaciSvg(i){
+        var k = i % ZK_HACILAR.length;
         return '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" '
             + 'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'
-            + ZK_HACILAR[i % ZK_HACILAR.length] + '</svg>';
+            + ZK_HACILAR[k]
+            + '</svg><svg viewBox="0 0 24 24" fill="none" stroke="var(--zk-bg, #f7f1e6)" '
+            + 'stroke-width="0.55" stroke-linecap="round" stroke-linejoin="round" '
+            + 'style="position:absolute;inset:0">'
+            + ZK_HACI_DET[k] + '</svg>';
     }
 
     function cizTavaf(){
