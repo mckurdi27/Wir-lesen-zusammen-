@@ -3432,9 +3432,23 @@ function _anlRenderAll(){
 
             // renderBooks
 /* Eser listesi render (renderBooks) */
+            // ESER VARSAYILANLARI (tum gruplar icin gecerli; kullanici degistirince ustune yazilir)
+            var BOOK_SORT_DEFAULTS = { 'kuran': 1 };
+            var BOOK_SECTION_DEFAULTS = { 'kuran': {"1":{"name":"1. C\u00fcz","page":1},"2":{"name":"2. C\u00fcz","page":22},"3":{"name":"3. C\u00fcz","page":42},"4":{"name":"4. C\u00fcz","page":62},"5":{"name":"5. C\u00fcz","page":82},"6":{"name":"6. C\u00fcz","page":102},"7":{"name":"7. C\u00fcz","page":122},"8":{"name":"8. C\u00fcz","page":142},"9":{"name":"9. C\u00fcz","page":162},"10":{"name":"10. C\u00fcz","page":182},"11":{"name":"11. C\u00fcz","page":202},"12":{"name":"12. C\u00fcz","page":222},"13":{"name":"13. C\u00fcz","page":242},"14":{"name":"14. C\u00fcz","page":262},"15":{"name":"15. C\u00fcz","page":282},"16":{"name":"16. C\u00fcz","page":302},"17":{"name":"17. C\u00fcz","page":322},"18":{"name":"18. C\u00fcz","page":342},"19":{"name":"19. C\u00fcz","page":362},"20":{"name":"20. C\u00fcz","page":382},"21":{"name":"21. C\u00fcz","page":402},"22":{"name":"22. C\u00fcz","page":422},"23":{"name":"23. C\u00fcz","page":442},"24":{"name":"24. C\u00fcz","page":462},"25":{"name":"25. C\u00fcz","page":482},"26":{"name":"26. C\u00fcz","page":502},"27":{"name":"27. C\u00fcz","page":522},"28":{"name":"28. C\u00fcz","page":542},"29":{"name":"29. C\u00fcz","page":562},"30":{"name":"30. C\u00fcz","page":582},"31":{"name":"Dua","page":606}} };
+            function getBookSortMap(group) {
+                var m = {}; for (var k in BOOK_SORT_DEFAULTS) m[k] = BOOK_SORT_DEFAULTS[k];
+                try { var s = JSON.parse(localStorage.getItem('hatim_booksort_' + group) || '{}'); for (var k2 in s) m[k2] = s[k2]; } catch(e){}
+                return m;
+            }
+            function getBookSectionsMap(group) {
+                var m = {}; for (var k in BOOK_SECTION_DEFAULTS) m[k] = BOOK_SECTION_DEFAULTS[k];
+                try { var s = JSON.parse(localStorage.getItem('hatim_booksections_' + group) || '{}'); for (var k2 in s) m[k2] = s[k2]; } catch(e){}
+                return m;
+            }
+            window.getBookSectionsMap = getBookSectionsMap;
             function renderBooks() {
-                try { var _soR = JSON.parse(localStorage.getItem('hatim_booksort_' + currentGroup) || '{}'); if (Object.keys(_soR).length) appData.books.sort(function(a,b){ var x = (_soR[a.id] != null ? _soR[a.id] : 9999); var y = (_soR[b.id] != null ? _soR[b.id] : 9999); return x - y; }); } catch(e){}
-                try { var _secR = JSON.parse(localStorage.getItem('hatim_booksections_' + currentGroup) || '{}'); appData.books.forEach(function(b){ if (_secR[b.id]) b.sections = _secR[b.id]; }); } catch(e){}
+                try { var _soR = getBookSortMap(currentGroup); if (Object.keys(_soR).length) appData.books.sort(function(a,b){ var x = (_soR[a.id] != null ? _soR[a.id] : 9999); var y = (_soR[b.id] != null ? _soR[b.id] : 9999); return x - y; }); } catch(e){}
+                try { var _secR = getBookSectionsMap(currentGroup); appData.books.forEach(function(b){ if (_secR[b.id]) b.sections = _secR[b.id]; }); } catch(e){}
                 const openBookIds = Array.from(document.querySelectorAll(".book-card.open")).map(el => el.getAttribute("data-book-id"));
                 const _scrollCache = {};
                 document.querySelectorAll(".book-card.open").forEach(function(cd){
@@ -3612,7 +3626,7 @@ booksGrid.appendChild(_readBtn);
                         let bookObj = appData.books.find(b => b.id === bId);
                         if (!bookObj) return;
                         var _secMap = {};
-                        try { _secMap = JSON.parse(localStorage.getItem('hatim_booksections_' + currentGroup) || '{}')[bId] || {}; } catch(e){}
+                        try { _secMap = (typeof getBookSectionsMap === 'function' ? getBookSectionsMap(currentGroup) : {})[bId] || {}; } catch(e){}
                         var _rows = Object.keys(_secMap).map(function(k){ return { r: parseInt(k), n: _secMap[k].name, p: _secMap[k].page }; }).filter(function(x){ return x.n; }).sort(function(a,b){ return a.r - b.r; });
                         if (_rows.length) {
                             var _old = document.getElementById('toc-panel'); if (_old) _old.remove();
@@ -4881,10 +4895,10 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                             if (!_m20 || !Object.keys(_m20).length) _m20 = _modeFromBase(20);
                             _fillTable({ '1':_m1, '5':_m5, '10':_m10, '20':_m20 });
                             // Sira No
-                            try { var _soB = JSON.parse(localStorage.getItem('hatim_booksort_' + currentGroup) || '{}'); if (mSort && _soB[editId] != null) mSort.value = _soB[editId]; } catch(e){}
+                            try { var _soB = (typeof getBookSortMap === 'function' ? getBookSortMap(currentGroup) : {}); if (mSort && _soB[editId] != null) mSort.value = _soB[editId]; } catch(e){}
                             // Içindekiler (Bolum/sayfa)
                             try {
-                                var _secB = JSON.parse(localStorage.getItem('hatim_booksections_' + currentGroup) || '{}')[editId] || {};
+                                var _secB = (typeof getBookSectionsMap === 'function' ? getBookSectionsMap(currentGroup) : {})[editId] || {};
                                 mTable.querySelectorAll('input[data-sec-name]').forEach(function(inp){ var r = inp.getAttribute('data-sec-name'); var s = _secB[r]; if (s && s.name) inp.value = s.name; });
                                 mTable.querySelectorAll('input[data-sec-page]').forEach(function(inp){ var r = inp.getAttribute('data-sec-page'); var s = _secB[r]; if (s && s.page != null) inp.value = s.page; });
                             } catch(e){}
@@ -4991,6 +5005,8 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                             var _secS = JSON.parse(localStorage.getItem('hatim_booksections_' + currentGroup) || '{}');
                             _secS[id] = _secsNew;
                             localStorage.setItem('hatim_booksections_' + currentGroup, JSON.stringify(_secS));
+                            // kullanicinin kaydettigi bolumler varsayilani ezer
+                            if (typeof BOOK_SECTION_DEFAULTS !== 'undefined' && BOOK_SECTION_DEFAULTS[id] && !Object.keys(_secsNew).length) { _secS[id] = {}; localStorage.setItem('hatim_booksections_' + currentGroup, JSON.stringify(_secS)); }
                         } catch(e){}
                         var _sortNum = (mSort && (mSort.value || '').trim() !== '') ? parseInt(mSort.value) : ((appData.books && appData.books.length) ? appData.books.length : 1);
                         // SUPABASE-ONCE: eser tanimini books tablosuna yaz, onaylayinca yerel guncelle
