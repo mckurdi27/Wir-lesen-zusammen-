@@ -3451,7 +3451,14 @@ booksGrid.appendChild(_readBtn);
                     let baseArray = appData.bookPages[book.id];
                     let defModes = bookModesDefs[book.id] || createPageModes(book.totalUnits || 100);
                     let modeKeys = Object.keys(defModes);
-                    if (!modeKeys.includes(book.currentMode)) book.currentMode = modeKeys[0];
+                    // Siralama: 1 5 10 20 (kullanici istegi); bab eserlerde 1 5 10 20
+                    var _modeRank = { 'bir_sayfa': 1, 'bab': 1, 'bes_sayfa': 2, 'bes_bab': 2, 'on_sayfa': 3, 'on_bab': 3, 'yirmi_sayfa': 4, 'yirmi_bab': 4 };
+                    modeKeys.sort(function(a,b){ return (_modeRank[a]||9) - (_modeRank[b]||9); });
+                    // KALICI MOD: uyenin sectigi mod sabit kalir, oto 20'ye donmez.
+                    var _persistMode = null;
+                    try { var _pmAll = JSON.parse(localStorage.getItem('hatim_bookmode_' + currentGroup) || '{}'); _persistMode = _pmAll[book.id] || null; } catch(e){}
+                    if (_persistMode && modeKeys.includes(_persistMode)) book.currentMode = _persistMode;
+                    if (!modeKeys.includes(book.currentMode)) book.currentMode = (book.defaultMode && modeKeys.includes(book.defaultMode)) ? book.defaultMode : modeKeys[0];
                     let items = defModes[book.currentMode].getItems();
 
                     let takenCount = 0;
@@ -3548,6 +3555,7 @@ booksGrid.appendChild(_readBtn);
                     }).join('');
 
                     let headerPdfBtn = `<button class="pdf-book-btn" data-book-id="${book.id}" style="padding: 8px 16px; background: #d4af37; color: #3e2723; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: bold; min-height: 44px; touch-action: manipulation;">📄 PDF</button>`;
+                    let headerTocBtn = `<button class="toc-book-btn" data-book-id="${book.id}" style="padding: 8px 16px; background: var(--card-bg); color: var(--gold-dark); border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: bold; min-height: 44px; touch-action: manipulation;">📑 İçindekiler</button>`;
 
                     card.innerHTML = `
                         <div class="book-header">
@@ -3556,6 +3564,7 @@ booksGrid.appendChild(_readBtn);
                                 <div style="font-size: 12px; opacity: 0.8; margin-top: 3px;">🔁 Hatim No: ${hatimInfo.hatimNo} | 📊 İlerleme: %${percent} (${takenCount}/${book.totalUnits})</div>
                             </div>
                             <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                ${headerTocBtn}
                                 ${headerPdfBtn}
                                 <span style="font-size: 14px; font-weight: bold; color: var(--gold-dark); cursor: pointer;">${isOpen ? '▲ Gizle' : '▼ Göster'}</span>
                             </div>
@@ -3592,6 +3601,23 @@ booksGrid.appendChild(_readBtn);
                     });
                 });
 
+                document.querySelectorAll(".toc-book-btn").forEach(btn => {
+                    btn.addEventListener("click", function(e) {
+                        e.stopPropagation();
+                        let bId = this.getAttribute("data-book-id");
+                        let bookObj = appData.books.find(b => b.id === bId);
+                        if (!bookObj) return;
+                        var _defM2 = bookModesDefs[bId] || createPageModes(bookObj.totalUnits || 100);
+                        var _rank2 = { 'bir_sayfa': 1, 'bab': 1, 'bes_sayfa': 2, 'bes_bab': 2, 'on_sayfa': 3, 'on_bab': 3, 'yirmi_sayfa': 4, 'yirmi_bab': 4 };
+                        var _keys2 = Object.keys(_defM2).sort(function(a,b){ return (_rank2[a]||9) - (_rank2[b]||9); });
+                        bookObj.currentMode = _keys2[0];
+                        try { var _pmT = JSON.parse(localStorage.getItem('hatim_bookmode_' + currentGroup) || '{}'); _pmT[bId] = _keys2[0]; localStorage.setItem('hatim_bookmode_' + currentGroup, JSON.stringify(_pmT)); } catch(e){}
+                        if (!openBookIds.includes(bId)) openBookIds.push(bId);
+                        saveGroupData();
+                        renderBooks();
+                    });
+                });
+
                 document.querySelectorAll(".mode-btn").forEach(btn => {
                     btn.addEventListener("click", (e) => {
                         e.stopPropagation();
@@ -3600,6 +3626,8 @@ booksGrid.appendChild(_readBtn);
                         let bookObj = appData.books.find(b => b.id === bId);
                         if (bookObj) {
                             bookObj.currentMode = mKey;
+                            // KALICI: secimi kaydet ki Supabase gidis-donusu modu sifirlamasin
+                            try { var _pmB = JSON.parse(localStorage.getItem('hatim_bookmode_' + currentGroup) || '{}'); _pmB[bId] = mKey; localStorage.setItem('hatim_bookmode_' + currentGroup, JSON.stringify(_pmB)); } catch(e){}
                             saveGroupData();
                             renderBooks();
                         }
