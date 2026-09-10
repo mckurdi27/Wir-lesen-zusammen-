@@ -694,8 +694,10 @@
         <div style="background:#fff; width:92%; max-width:460px; max-height:90vh; overflow-y:auto; border-radius:12px; padding:16px; box-sizing:border-box;">
             <h3 id="book-modal-title" style="margin:0 0 12px; color:#27ae60; font-size:16px;">📚 Yeni Eser Ekle</h3>
             <input type="hidden" id="book-modal-id">
-            <label style="font-size:12px; color:#555; display:block;">Eser adı</label>
-            <input type="text" id="book-modal-name" style="width:100%; padding:8px; margin-bottom:10px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;">
+            <div style="display:flex; gap:8px; align-items:flex-end; margin-bottom:10px;">
+                <div style="flex:1;"><label style="font-size:12px; color:#555; display:block;">Eser adı</label><input type="text" id="book-modal-name" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;"></div>
+                <div style="width:84px;"><label style="font-size:12px; color:#555; display:block;">Sıra No</label><input type="number" id="book-modal-sort" min="1" placeholder="01" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;"></div>
+            </div>
             <div style="display:flex; gap:8px; margin-bottom:10px;">
                 <div style="flex:1;"><label style="font-size:12px; color:#555; display:block;">Birim sayısı</label><input type="number" id="book-modal-units" min="1" value="100" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;"></div>
                 <div style="flex:1;"><label style="font-size:12px; color:#555; display:block;">Eser tipi</label><select id="book-modal-type" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; font-size:12px;"><option value="page">Sayfa</option><option value="bab">Bab</option></select></div>
@@ -3431,6 +3433,8 @@ function _anlRenderAll(){
             // renderBooks
 /* Eser listesi render (renderBooks) */
             function renderBooks() {
+                try { var _soR = JSON.parse(localStorage.getItem('hatim_booksort_' + currentGroup) || '{}'); if (Object.keys(_soR).length) appData.books.sort(function(a,b){ var x = (_soR[a.id] != null ? _soR[a.id] : 9999); var y = (_soR[b.id] != null ? _soR[b.id] : 9999); return x - y; }); } catch(e){}
+                try { var _secR = JSON.parse(localStorage.getItem('hatim_booksections_' + currentGroup) || '{}'); appData.books.forEach(function(b){ if (_secR[b.id]) b.sections = _secR[b.id]; }); } catch(e){}
                 const openBookIds = Array.from(document.querySelectorAll(".book-card.open")).map(el => el.getAttribute("data-book-id"));
                 const _scrollCache = {};
                 document.querySelectorAll(".book-card.open").forEach(function(cd){
@@ -3607,6 +3611,20 @@ booksGrid.appendChild(_readBtn);
                         let bId = this.getAttribute("data-book-id");
                         let bookObj = appData.books.find(b => b.id === bId);
                         if (!bookObj) return;
+                        var _secMap = {};
+                        try { _secMap = JSON.parse(localStorage.getItem('hatim_booksections_' + currentGroup) || '{}')[bId] || {}; } catch(e){}
+                        var _rows = Object.keys(_secMap).map(function(k){ return { r: parseInt(k), n: _secMap[k].name, p: _secMap[k].page }; }).filter(function(x){ return x.n; }).sort(function(a,b){ return a.r - b.r; });
+                        if (_rows.length) {
+                            var _old = document.getElementById('toc-panel'); if (_old) _old.remove();
+                            var _pnl = document.createElement('div');
+                            _pnl.id = 'toc-panel';
+                            _pnl.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:99999; display:flex; align-items:center; justify-content:center; padding:16px;';
+                            var _rowsHtml = _rows.map(function(x, i){ return '<div style="display:flex; justify-content:space-between; padding:10px 12px; border-bottom:1px solid #eee;"><span style="font-weight:bold;">' + (i+1) + '. ' + x.n + '</span><span style="color:#8d6e63;">' + (x.p != null ? ('s. ' + x.p) : '') + '</span></div>'; }).join('');
+                            _pnl.innerHTML = '<div style="background:#fff; border-radius:10px; max-width:420px; width:100%; max-height:80vh; overflow:auto;"><div style="padding:14px; border-bottom:2px solid var(--gold-primary); font-weight:bold; font-size:16px;">' + bookObj.name + ' \u2014 \u0130\u00e7indekiler</div>' + _rowsHtml + '<div style="padding:12px; text-align:right;"><button id="toc-close" style="padding:8px 16px; border:none; border-radius:6px; background:var(--gold-primary); color:#fff; font-weight:bold; cursor:pointer;">Kapat</button></div></div>';
+                            document.body.appendChild(_pnl);
+                            _pnl.addEventListener('click', function(ev){ if (ev.target === _pnl || ev.target.id === 'toc-close') _pnl.remove(); });
+                            return;
+                        }
                         var _defM2 = bookModesDefs[bId] || createPageModes(bookObj.totalUnits || 100);
                         var _rank2 = { 'bir_sayfa': 1, 'bab': 1, 'bes_sayfa': 2, 'bes_bab': 2, 'on_sayfa': 3, 'on_bab': 3, 'yirmi_sayfa': 4, 'yirmi_bab': 4 };
                         var _keys2 = Object.keys(_defM2).sort(function(a,b){ return (_rank2[a]||9) - (_rank2[b]||9); });
@@ -4760,6 +4778,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         h += '<th style="border:1px solid #ccc; padding:4px; background:#f5eef8; color:#8e44ad;">5\'lik</th><th style="border:1px solid #ccc; padding:4px;">sayfa</th>';
                         h += '<th style="border:1px solid #ccc; padding:4px; background:#fdf2e9; color:#e67e22;">10\'luk</th><th style="border:1px solid #ccc; padding:4px;">sayfa</th>';
                         h += '<th style="border:1px solid #ccc; padding:4px;">20\'lik</th><th style="border:1px solid #ccc; padding:4px;">sayfa</th>';
+                        h += '<th style="border:1px solid #ccc; padding:4px; background:#fff8e1; color:#8d6e63;">Bölüm</th><th style="border:1px solid #ccc; padding:4px; background:#fff8e1; color:#8d6e63;">sayfa</th>';
                         h += '</tr></thead><tbody>';
                         for (let r = 0; r < units; r++) {
                             h += '<tr>';
@@ -4769,6 +4788,8 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                                 h += '<td style="border:1px solid #eee; padding:3px; text-align:center;">' + cell + '</td>';
                                 h += '<td style="border:1px solid #eee; padding:2px;"><input data-mode="' + st + '" data-row="' + r + '" type="number" min="1" style="width:44px; padding:2px; border:1px solid #ccc; border-radius:4px; font-size:11px; box-sizing:border-box;"></td>';
                             });
+                            h += '<td style="border:1px solid #eee; padding:2px;"><input data-sec-name="' + r + '" type="text" placeholder="Bölüm adı" style="width:120px; padding:2px; border:1px solid #ccc; border-radius:4px; font-size:11px; box-sizing:border-box;"></td>';
+                            h += '<td style="border:1px solid #eee; padding:2px;"><input data-sec-page="' + r + '" type="number" min="1" placeholder="s." style="width:52px; padding:2px; border:1px solid #ccc; border-radius:4px; font-size:11px; box-sizing:border-box;"></td>';
                             h += '</tr>';
                         }
                         h += '</tbody></table>';
@@ -4780,6 +4801,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         let mId = document.getElementById('book-modal-id');
                         let mName = document.getElementById('book-modal-name');
                         let mType = document.getElementById('book-modal-type');
+                        let mSort = document.getElementById('book-modal-sort');
                         let mUnits = document.getElementById('book-modal-units');
                         let mPpu = document.getElementById('book-modal-ppu');
                         let mStart = document.getElementById('book-modal-start');
@@ -4819,6 +4841,8 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                             mStart.value = startPage;
                             mPpu.value = ppu;
                             mTotal.value = (book.totalUnits || 100) * (ppu || 1);
+                            // ONEMLI: tabloyu eserin GERCEK birim sayisiyla kur, sifir/yanlis satir olmasin
+                            _buildBookTable(parseInt(mUnits.value) || 0);
                             // modlara gore satirlar: birim:sayfa
                             // Statik bab kitaplari (Tevhidname vb.) 'babs' kullanir (1-bazli babNo:sayfa)
                             function _babsToMap(sp2) {
@@ -4844,7 +4868,26 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                             let _m5 = (sp && sp.modes && (sp.modes['bes_sayfa'] || sp.modes['bes_bab'])) || _babsMap || {};
                             let _m10 = (sp && sp.modes && (sp.modes['on_sayfa'] || sp.modes['on_bab'])) || _babsMap || {};
                             let _m20 = (sp && sp.modes && (sp.modes['yirmi_sayfa'] || sp.modes['yirmi_bab'])) || _babsMap || {};
+                            // temel birim->sayfa haritasi (modlar yoksa da goster)
+                            var _baseMap = (sp && sp.pages) ? sp.pages : {};
+                            function _modeFromBase(step) {
+                                var mm = {};
+                                Object.keys(_baseMap).forEach(function(k){ var u = parseInt(k); if (!isNaN(u) && (u % step) === 0) mm[u] = _baseMap[u]; });
+                                return mm;
+                            }
+                            if (!_m1 || !Object.keys(_m1).length) _m1 = _modeFromBase(1);
+                            if (!_m5 || !Object.keys(_m5).length) _m5 = _modeFromBase(5);
+                            if (!_m10 || !Object.keys(_m10).length) _m10 = _modeFromBase(10);
+                            if (!_m20 || !Object.keys(_m20).length) _m20 = _modeFromBase(20);
                             _fillTable({ '1':_m1, '5':_m5, '10':_m10, '20':_m20 });
+                            // Sira No
+                            try { var _soB = JSON.parse(localStorage.getItem('hatim_booksort_' + currentGroup) || '{}'); if (mSort && _soB[editId] != null) mSort.value = _soB[editId]; } catch(e){}
+                            // Içindekiler (Bolum/sayfa)
+                            try {
+                                var _secB = JSON.parse(localStorage.getItem('hatim_booksections_' + currentGroup) || '{}')[editId] || {};
+                                mTable.querySelectorAll('input[data-sec-name]').forEach(function(inp){ var r = inp.getAttribute('data-sec-name'); var s = _secB[r]; if (s && s.name) inp.value = s.name; });
+                                mTable.querySelectorAll('input[data-sec-page]').forEach(function(inp){ var r = inp.getAttribute('data-sec-page'); var s = _secB[r]; if (s && s.page != null) inp.value = s.page; });
+                            } catch(e){}
                         }
                         m.style.display = 'flex';
                         if (mName && !editId) mName.focus();
@@ -4862,6 +4905,7 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         let mId = document.getElementById('book-modal-id');
                         let mName = document.getElementById('book-modal-name');
                         let mType = document.getElementById('book-modal-type');
+                        let mSort = document.getElementById('book-modal-sort');
                         let mUnits = document.getElementById('book-modal-units');
                         let mPpu = document.getElementById('book-modal-ppu');
                         let mStart = document.getElementById('book-modal-start');
@@ -4929,8 +4973,28 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         } else {
                             appData.bookPages[id] = Array(units).fill(null).map(() => ({ owner: '', isRead: false }));
                         }
+                        // Içindekiler sutunlarini topla
+                        var _secsNew = {};
+                        if (mTable) {
+                            mTable.querySelectorAll('input[data-sec-name]').forEach(function(inp){
+                                var r = inp.getAttribute('data-sec-name');
+                                var nm = (inp.value || '').trim();
+                                if (!nm) return;
+                                var pgEl = mTable.querySelector('input[data-sec-page="' + r + '"]');
+                                _secsNew[r] = { name: nm, page: pgEl ? (parseInt(pgEl.value) || null) : null };
+                            });
+                        }
+                        try {
+                            var _soS = JSON.parse(localStorage.getItem('hatim_booksort_' + currentGroup) || '{}');
+                            if (mSort && (mSort.value || '').trim() !== '') _soS[id] = parseInt(mSort.value);
+                            localStorage.setItem('hatim_booksort_' + currentGroup, JSON.stringify(_soS));
+                            var _secS = JSON.parse(localStorage.getItem('hatim_booksections_' + currentGroup) || '{}');
+                            _secS[id] = _secsNew;
+                            localStorage.setItem('hatim_booksections_' + currentGroup, JSON.stringify(_secS));
+                        } catch(e){}
+                        var _sortNum = (mSort && (mSort.value || '').trim() !== '') ? parseInt(mSort.value) : ((appData.books && appData.books.length) ? appData.books.length : 1);
                         // SUPABASE-ONCE: eser tanimini books tablosuna yaz, onaylayinca yerel guncelle
-                        var _bookRow = { id: id, name: name, total_units: units, type: bookType, default_mode: (bookType === 'bab' ? 'on_bab' : 'yirmi_sayfa'), sort_order: (appData.books && appData.books.length ? appData.books.length : 1) };
+                        var _bookRow = { id: id, name: name, total_units: units, type: bookType, default_mode: (bookType === 'bab' ? 'on_bab' : 'yirmi_sayfa'), sort_order: _sortNum };
                         var _bookSB_ = (typeof window.api === 'function') ? window.api('/books?on_conflict=id', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: JSON.stringify(_bookRow) }) : Promise.resolve();
                         _bookSB_.then(function(){
                             window.saveGroupData();
