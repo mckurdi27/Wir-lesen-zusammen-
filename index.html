@@ -471,9 +471,9 @@
         #zikirmatikSection .zk-picker { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
         #zikirmatikSection .zk-select { flex: 1; min-width: 130px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 14px; }
         #zikirmatikSection .zk-tavaf { position: relative; width: min(72vw, 270px); height: min(72vw, 270px); margin: 10px auto 8px; }
-        #zikirmatikSection .zk-kaaba { position: absolute; left: 50%; top: 50%; width: 68px; height: 68px; margin: -34px 0 0 -34px; background: #191919; border-radius: 5px; box-shadow: 0 0 0 1px rgba(0,0,0,.25), 0 8px 20px rgba(0,0,0,.3); }
-        #zikirmatikSection .zk-kaaba::before { content: ""; position: absolute; left: 0; right: 0; top: 16px; height: 7px; background: #c9a24b; }
-        #zikirmatikSection .zk-kaaba::after { content: ""; position: absolute; left: 50%; top: 33px; width: 18px; height: 21px; margin-left: -9px; background: #c9a24b; border-radius: 0 0 3px 3px; }
+        #zikirmatikSection .zk-kaaba { position: absolute; left: 50%; top: 50%; width: 99px; height: 99px; margin: -49.5px 0 0 -49.5px; background: #191919; border-radius: 5px; box-shadow: 0 0 0 1px rgba(0,0,0,.25), 0 8px 20px rgba(0,0,0,.3); }
+        #zikirmatikSection .zk-kaaba::before { content: ""; position: absolute; left: 0; right: 0; top: 23px; height: 10px; background: #c9a24b; }
+        #zikirmatikSection .zk-kaaba::after { content: ""; position: absolute; left: 50%; top: 48px; width: 26px; height: 31px; margin-left: -13px; background: #c9a24b; border-radius: 0 0 4px 4px; }
         #zikirmatikSection .zk-dots { position: absolute; inset: 0; }
         #zikirmatikSection .zk-dot { position: absolute; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: transparent; box-shadow: none; opacity: 0; transition: background .18s, transform .18s, box-shadow .18s, opacity .18s; }
         #zikirmatikSection .zk-dot.on { opacity: 1; transform: scale(1.35); }
@@ -495,6 +495,9 @@
         #zikirmatikSection .zk-ar { font-size: 26px; line-height: 1.9; text-align: center; color: var(--gold-dark); margin: 2px 0 8px; font-family: "Traditional Arabic", "Amiri", "Times New Roman", serif; }
         #zikirmatikSection .zk-oku { text-align: center; font-size: 16px; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
         #zikirmatikSection .zk-anlam { text-align: center; font-size: 13px; opacity: .75; color: var(--text-main); margin-bottom: 12px; }
+        #zikirmatikSection .zk-ayar { display: none; margin-bottom: 12px; }
+        #zikirmatikSection .zk-ayar.on { display: block; }
+        #zikirmatikSection .zk-actions .zk-hedef { flex: 0 0 auto; min-width: 78px; min-height: 34px; padding: 6px 8px; font-size: 13px; }
         #zikirmatikSection .zk-custom { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
         #zikirmatikSection .zk-input { flex: 1; min-width: 140px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 14px; box-sizing: border-box; }
         #zikirmatikSection .zk-mini { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--text-main); font-size: 13px; cursor: pointer; min-height: 34px; margin-left: 0; white-space: nowrap; }
@@ -731,14 +734,15 @@
             <h3 class="zk-title">&#128255; Zikirmatik</h3>
             <div class="zk-picker">
                 <select id="zkZikir" class="zk-select"></select>
-                <select id="zkHedef" class="zk-select">
-                    <option value="33">Hedef 33</option>
-                    <option value="99">Hedef 99</option>
-                    <option value="100">Hedef 100</option>
-                    <option value="500">Hedef 500</option>
-                    <option value="1000">Hedef 1000</option>
-                    <option value="0">Serbest</option>
-                </select>
+                <button type="button" id="zkAyarBtn" class="zk-mini" title="Ayarlar">&#9881;</button>
+            </div>
+            <!-- ayarlar paneli: ozel zikir ekle / sil -->
+            <div class="zk-ayar" id="zkAyar">
+                <div class="zk-custom">
+                    <input type="text" id="zkYeni" class="zk-input" placeholder="Özel zikir yazın (örn. Yâ Latîf)" maxlength="60">
+                    <button type="button" id="zkEkleBtn" class="zk-mini">+ Ekle</button>
+                    <button type="button" id="zkSilBtn" class="zk-mini">Sil</button>
+                </div>
             </div>
             <!-- 1. satir : Arapca metin -->
             <div class="zk-ar" id="zkAr" dir="rtl">&#8212;</div>
@@ -759,16 +763,18 @@
                 <div><b id="zkToplam">0</b><span>Toplam</span></div>
                 <div><b id="zkGunluk">0</b><span>Bug&#252;n</span></div>
             </div>
-            <!-- 4. satir : ozel zikir ekle / sil -->
-            <div class="zk-custom">
-                <input type="text" id="zkYeni" class="zk-input" placeholder="Özel zikir yazın (örn. Yâ Latîf)" maxlength="60">
-                <button type="button" id="zkEkleBtn" class="zk-mini">+ Ekle</button>
-                <button type="button" id="zkSilBtn" class="zk-mini">Sil</button>
-            </div>
             <!-- 5. satir : geri / sifirla / titresim / ses -->
             <div class="zk-actions">
                 <button type="button" id="zkUndoBtn">&#8617; Geri</button>
                 <button type="button" id="zkResetBtn">&#10226; Sıfırla</button>
+                <select id="zkHedef" class="zk-select zk-hedef" title="Sınır sayısı">
+                    <option value="33">33</option>
+                    <option value="99">99</option>
+                    <option value="100">100</option>
+                    <option value="500">500</option>
+                    <option value="1000">1000</option>
+                    <option value="0">Serbest</option>
+                </select>
                 <button type="button" id="zkVibBtn">Titreşim</button>
                 <button type="button" id="zkSesBtn">Ses</button>
             </div>
@@ -956,9 +962,10 @@
 
     function place(){
         var sec = document.getElementById('zikirmatikSection');
-        var msg = document.getElementById('admin-message-section');
         if (!sec) return;
-        // Zikirmatik sayfanin EN SONUNDA, yoneticiye mesaj bolumunun ALTINDA kalir
+        // Zikirmatik sayfanin EN SONUNDA kalir; zaten son elemansa DOKUNMA
+        // (aksi halde her 1.5 sn'de tasinip acik secim kutusunu kapatir)
+        if (sec.parentNode === document.body && document.body.lastElementChild === sec) return;
         document.body.appendChild(sec);
     }
 
@@ -978,6 +985,9 @@
         });
         if ($('zkVibBtn')) $('zkVibBtn').addEventListener('click', function(){ s.vib = !s.vib; kaydet(); ciz(); });
         if ($('zkSesBtn')) $('zkSesBtn').addEventListener('click', function(){ s.ses = !s.ses; kaydet(); ciz(); });
+        if ($('zkAyarBtn')) $('zkAyarBtn').addEventListener('click', function(){
+            var ay = $('zkAyar'); if (ay) ay.classList.toggle('on');
+        });
         if ($('zkEkleBtn')) $('zkEkleBtn').addEventListener('click', function(){
             var inp = $('zkYeni');
             var ad = (inp && inp.value ? inp.value : '').trim();
