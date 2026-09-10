@@ -495,17 +495,20 @@
         #zikirmatikSection .zk-sub { text-align: center; font-size: 12px; opacity: .7; margin-top: 4px; margin-bottom: 10px; }
         #zikirmatikSection .zk-tap { display: block; width: 100%; max-width: 340px; margin: 0 auto; padding: 16px; border-radius: 14px; border: 0; background: linear-gradient(180deg, #d4a02a, #b8860b); color: #fff; font-size: 16px; font-weight: 700; letter-spacing: .08em; cursor: pointer; box-shadow: 0 6px 18px rgba(184,134,11,.3); }
         #zikirmatikSection .zk-tap:active { transform: translateY(2px); }
-        #zikirmatikSection .zk-stats { display: flex; gap: 22px; margin: 14px 0 0; justify-content: center; text-align: center; }
+        #zikirmatikSection .zk-stats { display: flex; gap: 22px; margin: 14px 0 0; justify-content: center; text-align: center; flex-wrap: nowrap; white-space: nowrap; }
+#zikirmatikSection .zk-stats > div { flex: 0 0 auto; }
+#zikirmatikSection .zk-adet { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; justify-content: center; align-items: center; }
+#zikirmatikSection .zk-adetbtn { padding: 2px 9px; border-radius: 6px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--text-main); font-size: 11px; line-height: 1.3; font-weight: 600; cursor: pointer; min-height: 0; margin: 0; }
+#zikirmatikSection .zk-adetbtn.on { background: var(--gold-primary); color: #fff; }
         #zikirmatikSection .zk-stats b { display: block; font-size: 18px; color: var(--gold-dark); }
         #zikirmatikSection .zk-stats span { font-size: 11px; opacity: .65; }
-        #zikirmatikSection .zk-tur-row { display: inline-flex; align-items: center; gap: 3px; }
-#zikirmatikSection .zk-turreset { border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--gold-dark); border-radius: 5px; font-size: 10px; line-height: 1; padding: 1px 4px; min-height: 0; margin: 0; cursor: pointer; vertical-align: middle; }
+        #zikirmatikSection .zk-turreset { border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--gold-dark); border-radius: 6px; font-size: 11px; line-height: 1.25; font-weight: 600; padding: 1px 7px; min-height: 0; margin: 0; cursor: pointer; }
 #zikirmatikSection .zk-turreset:active { background: var(--gold-primary); color: #fff; }
 #zikirmatikSection .zk-actions { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; justify-content: center; align-items: center; font-size: 11px; }
         #zikirmatikSection .zk-actions button { padding: 1px 7px; border-radius: 6px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--text-main); font-size: 11px; line-height: 1.25; cursor: pointer; min-height: 0; margin-left: 0; }
         #zikirmatikSection .zk-actions button.on { background: var(--gold-primary); color: #fff; }
-        #zikirmatikSection .zk-ar { font-size: 26px; line-height: 1.9; text-align: center; color: var(--gold-dark); margin: 2px 0 8px; font-family: "Traditional Arabic", "Amiri", "Times New Roman", serif; }
-        #zikirmatikSection .zk-oku { text-align: center; font-size: 16px; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
+        #zikirmatikSection .zk-ar { font-size: 26px; line-height: 1.9; text-align: center; color: #0d6b4f; margin: 2px 0 8px; font-family: "Traditional Arabic", "Amiri", "Times New Roman", serif; }
+        #zikirmatikSection .zk-oku { text-align: center; font-size: 16px; font-weight: 600; color: #a0522d; margin-bottom: 4px; }
         #zikirmatikSection .zk-anlam { text-align: center; font-size: 13px; opacity: .75; color: var(--text-main); margin-bottom: 12px; }
         #zikirmatikSection .zk-ayar { display: none; margin-bottom: 12px; }
         #zikirmatikSection .zk-ayar.on { display: block; }
@@ -514,7 +517,7 @@
         #zikirmatikSection .zk-input { flex: 1; min-width: 140px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 14px; box-sizing: border-box; }
         #zikirmatikSection .zk-mini { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--text-main); font-size: 13px; cursor: pointer; min-height: 34px; margin-left: 0; white-space: nowrap; }
         #zikirmatikSection .zk-mini:active { background: var(--gold-primary); color: #fff; }
-        #zikirmatikSection .zk-sayi { display: none; width: 46px; padding: 1px 4px; border-radius: 6px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--text-main); font-size: 11px; line-height: 1.25; min-height: 0; box-sizing: border-box; text-align: center; }
+        #zikirmatikSection .zk-sayi { display: none; width: 52px; padding: 2px 4px; border-radius: 6px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--text-main); font-size: 11px; line-height: 1.25; min-height: 0; box-sizing: border-box; text-align: center; }
 
     </style>
 <!-- ===================== </head> / <body> BASLANGICI ===================== -->
@@ -772,22 +775,28 @@
             <div class="zk-sub" id="zkSub">Hedef: 33</div>
             <button class="zk-tap" id="zkTap">Z&#304;KRET</button>
             <div class="zk-stats">
-                <div><b id="zkTur">0</b><span class="zk-tur-row"><button type="button" id="zkTurResetBtn" class="zk-turreset" title="Tur sayacını sıfırla" aria-label="Tur sayacını sıfırla">&#10226;</button>Tur</span></div>
+                <div><b id="zkTur">0</b><span>Tur</span></div>
                 <div><b id="zkToplam">0</b><span>Toplam</span></div>
                 <div><b id="zkGunluk">0</b><span>Bug&#252;n</span></div>
             </div>
-            <!-- 5. satir : geri / sifirla / titresim / ses -->
+            <!-- 5. satir : geri / tur sifirla / sifirla / titresim / ses -->
             <div class="zk-actions">
                 <button type="button" id="zkUndoBtn">&#8617; Geri</button>
+                <button type="button" id="zkTurResetBtn" class="zk-turreset" title="Tur, toplam ve bugün sayacını sıfırla">&#10226; Tur Sıfırla</button>
                 <button type="button" id="zkResetBtn">&#10226; Sıfırla</button>
-                <select id="zkHedef" class="zk-select zk-hedef" title="Sınır sayısı">
-                    <option value="33">33</option>
-                    <option value="99">99</option>
-                    <option value="0">...</option>
-                </select>
-                <input type="number" id="zkSayi" class="zk-sayi zk-hedef" min="1" max="1000" inputmode="numeric" placeholder="1-1000" title="1 - 1000 arası sayı yaz">
                 <button type="button" id="zkVibBtn">Titreşim</button>
                 <button type="button" id="zkSesBtn">Ses</button>
+            </div>
+            <!-- en alt : zikir adedi butonlari -->
+            <div class="zk-adet" id="zkAdet">
+                <button type="button" class="zk-adetbtn" data-adet="3">3</button>
+                <button type="button" class="zk-adetbtn" data-adet="7">7</button>
+                <button type="button" class="zk-adetbtn" data-adet="11">11</button>
+                <button type="button" class="zk-adetbtn" data-adet="19">19</button>
+                <button type="button" class="zk-adetbtn" data-adet="33">33</button>
+                <button type="button" class="zk-adetbtn" data-adet="99">99</button>
+                <button type="button" class="zk-adetbtn" data-adet="0">elle gir</button>
+                <input type="number" id="zkSayi" class="zk-sayi" min="1" max="1000" inputmode="numeric" placeholder="1-1000" title="1 - 1000 arası sayı yaz">
             </div>
         </section>
 
@@ -1153,13 +1162,16 @@
         if ($('zkOku')) $('zkOku').textContent = zkOku(s.zikir) || '\u2014';
         if ($('zkAnlam')) $('zkAnlam').textContent = zkMan(s.zikir) || '\u2014';
         var ozel = !(s.hedef > 0);
-        if ($('zkHedef')) {
-            $('zkHedef').value = ozel ? '0' : String(s.hedef);
-            $('zkHedef').style.display = ozel ? 'none' : 'inline-block';
+        var ab = document.querySelectorAll('#zkAdet .zk-adetbtn');
+        for (var bi = 0; bi < ab.length; bi++) {
+            var bv = parseInt(ab[bi].getAttribute('data-adet'), 10) || 0;
+            ab[bi].classList.toggle('on', ozel ? (bv === 0) : (bv === s.hedef));
         }
         if ($('zkSayi')) {
             $('zkSayi').style.display = ozel ? 'inline-block' : 'none';
-            if (ozel) $('zkSayi').value = (s.serbest > 0) ? s.serbest : '';
+            if (ozel && document.activeElement !== $('zkSayi')) {
+                $('zkSayi').value = (s.serbest > 0) ? s.serbest : '';
+            }
         }
     }
 
@@ -1194,21 +1206,27 @@
         if (sel) sel.addEventListener('change', function(){
             s.zikir = this.value;
             var b = ZK_BILGI[s.zikir];
-            if (b && b.hedef > 0) { s.hedef = b.hedef; s.sayi = 0; }
+            if (b && b.hedef > 0) { s.hedef = b.hedef; s.serbest = 0; s.sayi = 0; }
             kaydet(); ciz();
         });
-        if ($('zkHedef')) $('zkHedef').addEventListener('change', function(){
-            s.hedef = parseInt(this.value, 10) || 0;
-            kaydet(); ciz();
-            if (s.hedef === 0 && $('zkSayi')) { try { $('zkSayi').focus(); } catch(e){} }
-        });
+        var zkAdetler = document.querySelectorAll('#zkAdet .zk-adetbtn');
+        for (var ai = 0; ai < zkAdetler.length; ai++) {
+            zkAdetler[ai].addEventListener('click', function(){
+                var v = parseInt(this.getAttribute('data-adet'), 10) || 0;
+                if (v === 0) {
+                    s.hedef = 0;
+                    if (!s.serbest || s.serbest < 1) s.serbest = s.sayi > 0 ? s.sayi : 1;
+                    kaydet(); ciz();
+                    if ($('zkSayi')) { try { $('zkSayi').focus(); } catch(e){} }
+                } else {
+                    s.hedef = v; s.serbest = 0; s.sayi = 0;
+                    kaydet(); ciz();
+                }
+            });
+        }
         if ($('zkSayi')) $('zkSayi').addEventListener('input', function(){
             var v = parseInt(this.value, 10);
-            if (!isNaN(v)) { if (v < 1) v = 1; if (v > 1000) v = 1000; s.serbest = v; kaydet(); ciz(); }
-        });
-        if ($('zkSayi')) $('zkSayi').addEventListener('blur', function(){
-            // bos birakilirsa 33'e don (secim kutusu geri gelir)
-            if (!this.value || !s.serbest || s.serbest < 1) { s.hedef = 33; s.serbest = 33; kaydet(); ciz(); }
+            if (!isNaN(v)) { if (v < 1) v = 1; if (v > 1000) v = 1000; s.serbest = v; s.hedef = 0; kaydet(); ciz(); }
         });
         if ($('zkUndoBtn')) $('zkUndoBtn').addEventListener('click', function(){
             if (s.sayi > 0) { s.sayi--; if (s.toplam > 0) s.toplam--; var k = bugun(); s.gun[k] = Math.max(0, (s.gun[k]||0) - 1); kaydet(); ciz(); }
