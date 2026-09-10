@@ -498,7 +498,7 @@
                         Grubunuzu seçin, İsminizi belirleyin ve<br>manevi iklimde ortak hatim halkamıza katılın.
                     </div>
                     <div style="background: rgba(255,255,255,0.85); padding: 4px 6px; border-radius: 6px; border: 1px solid #d4af37;" max-width: 220px; margin: 0 auto;">
-                        <div style="margin-bottom: 4px; display: flex; gap: 4px; justify-content: center; align-items: center;">
+                        <div style="margin-bottom: 4px; display: flex; gap: 8px; justify-content: center; align-items: center;">
                             <select id="citySelect" onchange="fetchPrayerTimes()" style="padding: 3px 5px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px; min-height: 28px;">
                                 <option value="Berlin">Berlin</option>                         
                                 <option value="Istanbul">İstanbul</option>
@@ -550,7 +550,7 @@
                     <div id="pdf-flip-overlay"></div>
                 </div>
                 <!-- Alt Kontroller -->
-                <div class="pdf-toolbar" style="background: linear-gradient(135deg, #fdfbf7, #f4ebd0); border-top: 2px solid #d4af37; padding: 6px 8px; display: flex; justify-content: center;"><div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                <div class="pdf-toolbar" style="background: linear-gradient(135deg, #fdfbf7, #f4ebd0); border-top: 2px solid #d4af37; padding: 6px 8px; display: flex; justify-content: center;"><div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                         <button id="pdf-prev-btn" style="background: #e0e0e0; color: #333; border: 1px solid #ccc; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; min-height: 32px;">◀</button>
                         <span style="font-size: 12px; color: #777;">Sayfa</span>
                         <input type="number" id="pdf-page-input" min="1" value="1" style="width: 45px; padding: 3px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; text-align: center; background: #fff; color: #333;">
@@ -3104,7 +3104,7 @@ started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo
                             </div>
                         </div>
 
-                        <div style="display: flex; gap: 4px; padding: 10px 15px 0 15px; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border-color); overflow-x: auto;">
+                        <div style="display: flex; gap: 8px; padding: 10px 15px 0 15px; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border-color); overflow-x: auto;">
                             <button class="d-tab-btn active" data-target="dtabs-1" style="padding: 10px 16px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; white-space: nowrap;">📊 Genel Özet</button>
                             <button class="d-tab-btn" data-target="dtabs-2" style="padding: 10px 16px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; white-space: nowrap;">🏆 Grup Sıralama</button>
                             <button class="d-tab-btn" data-target="dtabs-3" style="padding: 10px 16px; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; background: var(--card-bg); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; white-space: nowrap;">👥 Üye Analizi</button>
@@ -4023,9 +4023,9 @@ window._grpGizli = function _grpGizli(gk){ if(!gk) return false; try{ var _d=JSO
                                 let membersHtml = groupMembers.map(m => `
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; font-size: 14px; border: 1px solid var(--border-color);">
                         <span>• ${m}</span>
-                        <div style="display: flex; gap: 6px;">
+                        <div style="display: flex; gap: 8px; ">
                             <button class="admin-edit-member" data-name="${m}" style="flex: 1 1 auto; min-width: 0; background: #f39c12; color: #fff; border: none; padding: 8px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; min-height: 32px; margin-left: 0; cursor: pointer; white-space: nowrap;">Düzenle</button>
-                            <button class="admin-remove-member" data-name="${m}" style="flex: 1; min-width: 0; background: #e74c3c; color: #fff; border: none; padding: 8px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; min-height: 32px; margin-left: 0; cursor: pointer; white-space: nowrap;">Çıkart</button>
+                            <button class="admin-remove-member" data-name="${m}" style="flex: 1 1 auto; min-width: 0; background: #e74c3c; color: #fff; border: none; padding: 8px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; min-height: 32px; margin-left: 0; cursor: pointer; white-space: nowrap;">Sil</button>
                         </div>
                     </div>
                 `).join('');
@@ -4084,9 +4084,9 @@ window._grpGizli = function _grpGizli(gk){ if(!gk) return false; try{ var _d=JSO
                                 <span style="font-size: 11px; opacity: 0.7;">(${b.totalUnits} ${b.type === 'bab' ? 'Bab' : 'Sayfa'})</span>
                                 ${memberDetails ? `<div style="font-size: 11px; color: #555; margin-top: 2px;">📖 ${memberDetails}</div>` : '<div style="font-size: 11px; color: #999; margin-top: 2px;">📖 Henüz kimse almadı</div>'}
                             </div>
-                            <div style="display: flex; gap: 4px; ">
+                            <div style="display: flex; gap: 8px; ">
                                 <button class="admin-edit-book" data-id="${b.id}" style="flex: 1 1 auto; min-width: 0; background: #f39c12; color: #fff; border: none; padding: 8px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; min-height: 32px; margin-left: 0; cursor: pointer; white-space: nowrap;">Düzenle</button>
-                                <button class="admin-remove-book" data-id="${b.id}" style="flex: 1; min-width: 0; background: #e74c3c; color: #fff; border: none; padding: 8px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; min-height: 32px; margin-left: 0; cursor: pointer; white-space: nowrap;">Sil</button>
+                                <button class="admin-remove-book" data-id="${b.id}" style="flex: 1 1 auto; min-width: 0; background: #e74c3c; color: #fff; border: none; padding: 8px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; min-height: 32px; margin-left: 0; cursor: pointer; white-space: nowrap;">Sil</button>
                             </div>
                         </div>
                     `;
