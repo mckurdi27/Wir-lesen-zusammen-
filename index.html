@@ -470,26 +470,24 @@
         #zikirmatikSection .zk-title { font-size: 15px; font-weight: bold; color: var(--gold-dark); margin: 0 0 12px; }
         #zikirmatikSection .zk-picker { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
         #zikirmatikSection .zk-select { flex: 1; min-width: 130px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 14px; }
-        #zikirmatikSection .zk-tavaf { position: relative; width: 150px; height: 150px; margin: 10px auto 8px; }
+        #zikirmatikSection .zk-tavaf { position: relative; width: 290px; height: 290px; max-width: 92vw; max-height: 92vw; margin: 10px auto 8px; }
         #zikirmatikSection .zk-kaaba { position: absolute; left: 50%; top: 50%; width: 99px; height: 99px; margin: -49.5px 0 0 -49.5px; object-fit: contain; display: block; background: none; border-radius: 0; box-shadow: none; filter: drop-shadow(0 6px 12px rgba(0,0,0,.28)); pointer-events: none; }
         #zikirmatikSection .zk-dots { position: absolute; inset: 0; }
-        #zikirmatikSection .zk-dot { position: absolute; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: transparent; box-shadow: none; opacity: 0; transition: background .18s, transform .18s, box-shadow .18s, opacity .18s; }
-        #zikirmatikSection .zk-dot.on { opacity: 1; transform: scale(1.05); }
-        #zikirmatikSection .zk-dot.on.c0 { background: #fdece3; box-shadow: 0 0 0 1.5px rgba(0,0,0,.35), 0 0 7px rgba(255,255,255,.85); }
-        #zikirmatikSection .zk-dot.on.c1 { background: #f9dcc8; box-shadow: 0 0 0 1.5px rgba(0,0,0,.35), 0 0 7px rgba(255,255,255,.85); }
-        #zikirmatikSection .zk-dot.on.c2 { background: #f3c9a8; box-shadow: 0 0 0 1.5px rgba(0,0,0,.35), 0 0 7px rgba(255,255,255,.85); }
-        #zikirmatikSection .zk-dot.on.c3 { background: #eab68a; box-shadow: 0 0 0 1.5px rgba(0,0,0,.35), 0 0 7px rgba(255,255,255,.85); }
-        #zikirmatikSection .zk-dot.on.c4 { background: #e0a271; box-shadow: 0 0 0 1.5px rgba(0,0,0,.35), 0 0 7px rgba(255,255,255,.85); }
-        #zikirmatikSection .zk-dot.on.c5 { background: #d18c5a; box-shadow: 0 0 0 1.5px rgba(255,255,255,.45), 0 0 7px rgba(0,0,0,.35); }
-        #zikirmatikSection .zk-dot.on.c6 { background: #bd7745; box-shadow: 0 0 0 1.5px rgba(255,255,255,.45), 0 0 7px rgba(0,0,0,.35); }
-        #zikirmatikSection .zk-dot.on.c7 { background: #a96336; box-shadow: 0 0 0 1.5px rgba(255,255,255,.45), 0 0 7px rgba(0,0,0,.35); }
-        #zikirmatikSection .zk-dot.on.c8 { background: #8d4f2a; box-shadow: 0 0 0 1.5px rgba(255,255,255,.45), 0 0 7px rgba(0,0,0,.35); }
-        #zikirmatikSection .zk-dot.on.c9 { background: #7a4222; box-shadow: 0 0 0 1.5px rgba(255,255,255,.45), 0 0 7px rgba(0,0,0,.35); }
-        #zikirmatikSection .zk-dot.on.c10 { background: #63341a; box-shadow: 0 0 0 1.5px rgba(255,255,255,.45), 0 0 7px rgba(0,0,0,.35); }
-        #zikirmatikSection .zk-dot.on.c11 { background: #4d2713; box-shadow: 0 0 0 1.5px rgba(255,255,255,.45), 0 0 7px rgba(0,0,0,.35); }
-        #zikirmatikSection .zk-dot.on.c12 { background: #3a1d0f; box-shadow: 0 0 0 1.5px rgba(255,255,255,.45), 0 0 7px rgba(0,0,0,.35); }
-        #zikirmatikSection .zk-dot.on.c13 { background: #2a140b; box-shadow: 0 0 0 1.5px rgba(255,255,255,.45), 0 0 7px rgba(0,0,0,.35); }
-        #zikirmatikSection .zk-dot.on.c14 { background: #1a0c06; box-shadow: 0 0 0 1.5px rgba(255,255,255,.45), 0 0 7px rgba(0,0,0,.35); }
+        #zikirmatikSection .zk-dot { position: absolute; opacity: 0; transition: opacity .18s, transform .18s, filter .18s; }
+        #zikirmatikSection .zk-dot svg { display: block; width: 100%; height: 100%; fill: currentColor; }
+        #zikirmatikSection .zk-dot.on { opacity: 1; transform: scale(1.08); }
+        #zikirmatikSection .zk-dot.c0 { color: #f6e0cf; }
+        #zikirmatikSection .zk-dot.c1 { color: #eec49f; }
+        #zikirmatikSection .zk-dot.c2 { color: #dfa672; }
+        #zikirmatikSection .zk-dot.c3 { color: #cb8a55; }
+        #zikirmatikSection .zk-dot.c4 { color: #b06f3d; }
+        #zikirmatikSection .zk-dot.c5 { color: #96582c; }
+        #zikirmatikSection .zk-dot.c6 { color: #7c451f; }
+        #zikirmatikSection .zk-dot.c7 { color: #9b5f4a; }
+        #zikirmatikSection .zk-dot.c8 { color: #6f3a24; }
+        #zikirmatikSection .zk-dot.c9 { color: #4a2415; }
+        #zikirmatikSection .zk-dot.c10 { color: #2b1409; }
+        #zikirmatikSection .zk-dot.on[class*="c0"] { filter: drop-shadow(0 0 3px rgba(0,0,0,.45)); }
         #zikirmatikSection .zk-count { text-align: center; font-size: 2.4rem; font-weight: 700; color: var(--gold-dark); line-height: 1; margin-top: 2px; }
         #zikirmatikSection .zk-sub { text-align: center; font-size: 12px; opacity: .7; margin-top: 4px; margin-bottom: 10px; }
         #zikirmatikSection .zk-tap { display: block; width: 100%; max-width: 340px; margin: 0 auto; padding: 16px; border-radius: 14px; border: 0; background: linear-gradient(180deg, #d4a02a, #b8860b); color: #fff; font-size: 16px; font-weight: 700; letter-spacing: .08em; cursor: pointer; box-shadow: 0 6px 18px rgba(184,134,11,.3); }
@@ -776,12 +774,13 @@
                 <button type="button" id="zkUndoBtn">&#8617; Geri</button>
                 <button type="button" id="zkResetBtn">&#10226; Sıfırla</button>
                 <select id="zkHedef" class="zk-select zk-hedef" title="Sınır sayısı">
+                    <option value="7">7</option>
+                    <option value="9">9</option>
+                    <option value="11">11</option>
+                    <option value="13">13</option>
                     <option value="33">33</option>
                     <option value="99">99</option>
                     <option value="100">100</option>
-                    <option value="500">500</option>
-                    <option value="1000">1000</option>
-                    <option value="0">Serbest</option>
                 </select>
                 <button type="button" id="zkVibBtn">Titreşim</button>
                 <button type="button" id="zkSesBtn">Ses</button>
@@ -898,7 +897,7 @@
     function bugun(){ var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
     function kaydet(){ try { localStorage.setItem(KEY, JSON.stringify(s)); } catch(e){} }
 
-    var ZK_SES = "sound/allahu.mp3";   // "Allah hu" ifadesinin tamami
+    var ZK_SES = "sound/hu.mp3";   // son "Allah hu" ifadesinden kirpilan sadece "hu"
     function beep(){
         if (!s.ses) return;
         try {
@@ -916,31 +915,46 @@
         try { beep.a = new Audio(ZK_SES); beep.a.preload = "auto"; beep.a.volume = 0.95; } catch(e){}
     }
 
-    var ZK_RENK_SAYISI = 15;   // 15 insan ten rengi
-    var ZK_CEYREK = 4;         // saat gibi 4 ceyrek
-    var ZK_N = ZK_RENK_SAYISI * ZK_CEYREK;   // 60 nokta
-    var ZK_ARALIK = 16;        // Kabe ile halkanin ic kenari arasi (px) - 60 nokta cakismasin diye
+    var ZK_RENK_SAYISI = 11;   // 11 farkli insan ikonu rengi
+    var ZK_R = 132;            // halka yaricapi (px) - sabit
     var ZK_KABE = 99;          // Kabe kenari (px)
-    var ZK_NOKTA = 6;          // nokta capi (px) - 60 nokta sigacak sekilde
+    var ZK_IKON = 12;          // insan ikonu ust siniri (px)
+    function zkIkonBoyu(n){
+        // iki ikon merkezi arasi mesafenin %85'i kadar yer kaplasin -> cakisma olmaz
+        var aralik = 2 * Math.PI * ZK_R / n;
+        var b = Math.floor(aralik * 0.85);
+        if (b > ZK_IKON) b = ZK_IKON;
+        if (b < 5) b = 5;
+        return b;
+    }
+    function zkIkonSayisi(){ return Math.min(s.hedef > 0 ? s.hedef : 11, 100); }
+    // Tepeden bakinca insana benzeyen ikon: bas (daire) + govde (omuz yayi)
+    var ZK_INSAN = '<svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">'
+        + '<circle cx="12" cy="7" r="4"/>'
+        + '<path d="M12 12.5c-4.4 0-7.5 2.6-7.5 5.6 0 .8.6 1.4 1.4 1.4h12.2c.8 0 1.4-.6 1.4-1.4 0-3-3.1-5.6-7.5-5.6z"/>'
+        + '</svg>';
+
     function cizTavaf(){
         var wrap = $('zkDots'), tav = $('zkTavaf');
         if (!wrap || !tav) return;
-        if (wrap._n !== ZK_N) {
-            wrap._n = ZK_N;
-            // nokta merkez yaricapi: Kabe yaricapi + bosluk + nokta yaricapi
-            var R = ZK_KABE / 2 + ZK_ARALIK + ZK_NOKTA / 2;
+        var n = zkIkonSayisi();
+        if (wrap._n !== n) {
+            wrap._n = n;
             var cx = tav.clientWidth / 2, cy = tav.clientHeight / 2;
+            var boy = zkIkonBoyu(n), yari = boy / 2;
             var html = '';
-            for (var i = 0; i < ZK_N; i++) {
-                var a = (i / ZK_N) * Math.PI * 2 - Math.PI / 2;   // 12 yonunden, saat yonunde
-                var x = cx + Math.cos(a) * R, y = cy + Math.sin(a) * R;
-                html += '<span class="zk-dot c' + (i % ZK_RENK_SAYISI) + '" data-i="' + i + '" style="left:' + x.toFixed(1) + 'px;top:' + y.toFixed(1) + 'px"></span>';
+            for (var i = 0; i < n; i++) {
+                var a = (i / n) * Math.PI * 2 - Math.PI / 2;   // 12 yonunden, saat yonunde
+                var x = cx + Math.cos(a) * ZK_R, y = cy + Math.sin(a) * ZK_R;
+                html += '<span class="zk-dot c' + (i % ZK_RENK_SAYISI) + '" data-i="' + i + '" '
+                     +  'style="left:' + x.toFixed(1) + 'px;top:' + y.toFixed(1) + 'px;width:' + boy + 'px;height:' + boy
+                     +  'px;margin:' + (-yari) + 'px 0 0 ' + (-yari) + 'px">' + ZK_INSAN + '</span>';
             }
             wrap.innerHTML = html;
         }
-        var lit = s.hedef ? Math.round((s.sayi / s.hedef) * ZK_N) : (s.sayi % ZK_N);
+        var lit = s.hedef ? Math.round((s.sayi / s.hedef) * n) : (s.sayi % n);
         if (lit < 0) lit = 0;
-        if (lit > ZK_N) lit = ZK_N;
+        if (lit > n) lit = n;
         var dots = wrap.children;
         for (var j = 0; j < dots.length; j++) {
             dots[j].classList.toggle('on', j < lit);
