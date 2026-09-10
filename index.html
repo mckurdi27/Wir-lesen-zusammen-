@@ -1129,13 +1129,17 @@
     }
 
     var ZK_KAPASITE = 99;      // bir halkadaki en fazla ikon
+    var ZK_HALKA = 3;          // toplam halka sayisi (3 halka dolunca sifirlanir)
     function cizTavaf(){
         var wrap = $('zkDots'), tav = $('zkTavaf');
         if (!wrap || !tav) return;
         var n = zkIkonSayisi();
         var boy = zkIkonBoyu(n);
         // 99'dan sonra halka dolmaz, DISA dogru yeni bir halka acilir
-        var halkalar = Math.max(1, Math.ceil(n / ZK_KAPASITE));
+        // 3 halka dolar (297), sonra bastan baslar
+        var toplam = ZK_KAPASITE * ZK_HALKA;   // 297
+        var goster = ((n - 1) % toplam) + 1;
+        var halkalar = Math.max(1, Math.ceil(goster / ZK_KAPASITE));
         var adim = boy + 2;                       // halkalar arasi mesafe
         var enDis = ZK_R + (halkalar - 1) * adim; // en dis halka yaricapi
         // kapsayici kare alan: halkalar + ikonlar sigsin (ekranla sinirli)
@@ -1156,11 +1160,11 @@
             tav.style.height = kare + 'px';
             var cx = kare / 2, cy = kare / 2, yari = boy / 2;
             var html = '';
-            for (var i = 0; i < n; i++) {
+            for (var i = 0; i < goster; i++) {
                 var halka = Math.floor(i / ZK_KAPASITE);
                 var idx = i % ZK_KAPASITE;
                 var bas = halka * ZK_KAPASITE;
-                var adet = Math.min(ZK_KAPASITE, n - bas);     // bu halkadaki ikon sayisi
+                var adet = Math.min(ZK_KAPASITE, goster - bas);     // bu halkadaki ikon sayisi
                 var R = (ZK_R + halka * adim) * olcek;
                 // saat yonunde; son ikon (adet-1). adimda tam 1. ikonun uzerine gelir -> halka kapanir
                 var bol = (adet > 1) ? (adet - 1) : 1;
@@ -1178,12 +1182,11 @@
             }
             wrap.innerHTML = html;
         }
-        // sayi tamamlaninca halka sifirlanir ve bastan baslar
-        var dol = s.sayi % n;
-        if (dol === 0 && s.sayi > 0) dol = n;
-        var lit = dol;
+        // sayi tamamlaninca (3 halka = 297) sifirlanir ve bastan baslar
+        var lit = ((s.sayi - 1) % toplam) + 1;
+        if (s.sayi <= 0) lit = 0;
         if (lit < 0) lit = 0;
-        if (lit > n) lit = n;
+        if (lit > goster) lit = goster;
         var dots = wrap.children;
         for (var j = 0; j < dots.length; j++) {
             dots[j].classList.toggle('on', j < lit);
