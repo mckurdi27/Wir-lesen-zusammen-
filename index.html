@@ -1136,9 +1136,8 @@
         var n = zkIkonSayisi();
         var boy = zkIkonBoyu(n);
         // 99'dan sonra halka dolmaz, DISA dogru yeni bir halka acilir
-        // 3 halka dolar (297), sonra bastan baslar
-        var toplam = ZK_KAPASITE * ZK_HALKA;   // 297
-        var goster = ((n - 1) % toplam) + 1;
+        // serbest sayi ne ise o kadar ikon olur; sayi tamamlaninca sifirlanip bastan baslar
+        var goster = n;
         var halkalar = Math.max(1, Math.ceil(goster / ZK_KAPASITE));
         var adim = boy + 2;                       // halkalar arasi mesafe
         var enDis = ZK_R + (halkalar - 1) * adim; // en dis halka yaricapi
@@ -1182,8 +1181,8 @@
             }
             wrap.innerHTML = html;
         }
-        // sayi tamamlaninca (3 halka = 297) sifirlanir ve bastan baslar
-        var lit = ((s.sayi - 1) % toplam) + 1;
+        // sayi tamamlaninca (n) sifirlanir ve bastan baslar
+        var lit = ((s.sayi - 1) % n) + 1;
         if (s.sayi <= 0) lit = 0;
         if (lit < 0) lit = 0;
         if (lit > goster) lit = goster;
