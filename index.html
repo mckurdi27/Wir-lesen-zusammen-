@@ -497,6 +497,7 @@
         #zikirmatikSection .zk-dot .zk-yuru { display: block; width: 100%; height: 100%; position: relative; }
         #zikirmatikSection .zk-dot .zk-yuru svg { position: absolute; inset: 0; width: 100%; height: 100%; }
         #zikirmatikSection .zk-dot.on { opacity: 1; transform: scale(1.04); }
+        #zikirmatikSection .zk-dot.dagit { opacity: 0 !important; transform: translate(var(--dx,0),var(--dy,0)) scale(.3) rotate(var(--dr,0deg)) !important; transition: opacity .6s ease-out, transform .6s ease-out; }
         #zikirmatikSection .zk-dot .zk-yuru { transform-origin: 50% 50%; }
         #zikirmatikSection .zk-dot.c0 { color: #f6e0cf; --zk-bg: #eec49f; }
         #zikirmatikSection .zk-dot.c1 { color: #eec49f; --zk-bg: #dfa672; }
@@ -1136,8 +1137,9 @@
         var n = zkIkonSayisi();
         var boy = zkIkonBoyu(n);
         // 99'dan sonra halka dolmaz, DISA dogru yeni bir halka acilir
-        // serbest sayi ne ise o kadar ikon olur; sayi tamamlaninca sifirlanip bastan baslar
-        var goster = n;
+        // en fazla 3 halka (297 ikon); 3 halka dolunca ikonlar dagilir, sifirlanip bastan baslar
+        var toplam = ZK_KAPASITE * ZK_HALKA;
+        var goster = Math.min(n, toplam);
         var halkalar = Math.max(1, Math.ceil(goster / ZK_KAPASITE));
         var adim = boy + 2;                       // halkalar arasi mesafe
         var enDis = ZK_R + (halkalar - 1) * adim; // en dis halka yaricapi
@@ -1181,14 +1183,30 @@
             }
             wrap.innerHTML = html;
         }
-        // sayi tamamlaninca (n) sifirlanir ve bastan baslar
-        var lit = ((s.sayi - 1) % n) + 1;
+        // 3 halka (297) dolunca ikonlar etrafa dagilir, sonra sifirlanip bastan baslar
+        var tamamlandi = (s.sayi > 0 && s.sayi % toplam === 0);
+        var lit = ((s.sayi - 1) % toplam) + 1;
         if (s.sayi <= 0) lit = 0;
+        if (tamamlandi) lit = goster;
         if (lit < 0) lit = 0;
         if (lit > goster) lit = goster;
         var dots = wrap.children;
         for (var j = 0; j < dots.length; j++) {
             dots[j].classList.toggle('on', j < lit);
+        }
+        if (tamamlandi && wrap._dag !== s.sayi) {
+            wrap._dag = s.sayi;
+            for (var d2 = 0; d2 < dots.length; d2++) {
+                var aci2 = (Math.random() * 2 - 1) * 180;
+                var uzak = kare * (0.45 + Math.random() * 0.45);
+                dots[d2].style.setProperty('--dx', (Math.cos(aci2 * Math.PI / 180) * uzak).toFixed(0) + 'px');
+                dots[d2].style.setProperty('--dy', (Math.sin(aci2 * Math.PI / 180) * uzak).toFixed(0) + 'px');
+                dots[d2].style.setProperty('--dr', ((Math.random() * 2 - 1) * 300).toFixed(0) + 'deg');
+                dots[d2].classList.add('dagit');
+            }
+            setTimeout(function () {
+                for (var d3 = 0; d3 < dots.length; d3++) dots[d3].classList.remove('dagit');
+            }, 700);
         }
     }
 
