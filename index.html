@@ -919,7 +919,7 @@
     var ZK_RENK_SAYISI = 15;   // 15 insan ten rengi
     var ZK_CEYREK = 4;         // saat gibi 4 ceyrek
     var ZK_N = ZK_RENK_SAYISI * ZK_CEYREK;   // 60 nokta
-    var ZK_ARALIK = 13;        // Kabe ile halkanin ic kenari arasi (px)
+    var ZK_ARALIK = 16;        // Kabe ile halkanin ic kenari arasi (px) - 60 nokta cakismasin diye
     var ZK_KABE = 99;          // Kabe kenari (px)
     var ZK_NOKTA = 6;          // nokta capi (px) - 60 nokta sigacak sekilde
     function cizTavaf(){
@@ -938,9 +938,9 @@
             }
             wrap.innerHTML = html;
         }
-        var lit = s.hedef ? Math.round((s.sayi / s.hedef) * n) : (s.sayi % n);
+        var lit = s.hedef ? Math.round((s.sayi / s.hedef) * ZK_N) : (s.sayi % ZK_N);
         if (lit < 0) lit = 0;
-        if (lit > n) lit = n;
+        if (lit > ZK_N) lit = ZK_N;
         var dots = wrap.children;
         for (var j = 0; j < dots.length; j++) {
             dots[j].classList.toggle('on', j < lit);
