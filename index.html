@@ -3434,7 +3434,7 @@ function _anlRenderAll(){
 /* Eser listesi render (renderBooks) */
             // ESER VARSAYILANLARI (tum gruplar icin gecerli; kullanici degistirince ustune yazilir)
             var BOOK_SORT_DEFAULTS = { 'kuran': 1 };
-            var BOOK_SECTION_DEFAULTS = { 'kuran': {"1":{"name":"1. C\u00fcz","page":1},"2":{"name":"2. C\u00fcz","page":22},"3":{"name":"3. C\u00fcz","page":42},"4":{"name":"4. C\u00fcz","page":62},"5":{"name":"5. C\u00fcz","page":82},"6":{"name":"6. C\u00fcz","page":102},"7":{"name":"7. C\u00fcz","page":122},"8":{"name":"8. C\u00fcz","page":142},"9":{"name":"9. C\u00fcz","page":162},"10":{"name":"10. C\u00fcz","page":182},"11":{"name":"11. C\u00fcz","page":202},"12":{"name":"12. C\u00fcz","page":222},"13":{"name":"13. C\u00fcz","page":242},"14":{"name":"14. C\u00fcz","page":262},"15":{"name":"15. C\u00fcz","page":282},"16":{"name":"16. C\u00fcz","page":302},"17":{"name":"17. C\u00fcz","page":322},"18":{"name":"18. C\u00fcz","page":342},"19":{"name":"19. C\u00fcz","page":362},"20":{"name":"20. C\u00fcz","page":382},"21":{"name":"21. C\u00fcz","page":402},"22":{"name":"22. C\u00fcz","page":422},"23":{"name":"23. C\u00fcz","page":442},"24":{"name":"24. C\u00fcz","page":462},"25":{"name":"25. C\u00fcz","page":482},"26":{"name":"26. C\u00fcz","page":502},"27":{"name":"27. C\u00fcz","page":522},"28":{"name":"28. C\u00fcz","page":542},"29":{"name":"29. C\u00fcz","page":562},"30":{"name":"30. C\u00fcz","page":582},"31":{"name":"Dua","page":606}} };
+            var BOOK_SECTION_DEFAULTS = {'kuran': {"0":{"name":"1. C\u00fcz","page":1},"1":{"name":"2. C\u00fcz","page":22},"2":{"name":"3. C\u00fcz","page":42},"3":{"name":"4. C\u00fcz","page":62},"4":{"name":"5. C\u00fcz","page":82},"5":{"name":"6. C\u00fcz","page":102},"6":{"name":"7. C\u00fcz","page":122},"7":{"name":"8. C\u00fcz","page":142},"8":{"name":"9. C\u00fcz","page":162},"9":{"name":"10. C\u00fcz","page":182},"10":{"name":"11. C\u00fcz","page":202},"11":{"name":"12. C\u00fcz","page":222},"12":{"name":"13. C\u00fcz","page":242},"13":{"name":"14. C\u00fcz","page":262},"14":{"name":"15. C\u00fcz","page":282},"15":{"name":"16. C\u00fcz","page":302},"16":{"name":"17. C\u00fcz","page":322},"17":{"name":"18. C\u00fcz","page":342},"18":{"name":"19. C\u00fcz","page":362},"19":{"name":"20. C\u00fcz","page":382},"20":{"name":"21. C\u00fcz","page":402},"21":{"name":"22. C\u00fcz","page":422},"22":{"name":"23. C\u00fcz","page":442},"23":{"name":"24. C\u00fcz","page":462},"24":{"name":"25. C\u00fcz","page":482},"25":{"name":"26. C\u00fcz","page":502},"26":{"name":"27. C\u00fcz","page":522},"27":{"name":"28. C\u00fcz","page":542},"28":{"name":"29. C\u00fcz","page":562},"29":{"name":"30. C\u00fcz","page":582},"30":{"name":"Dua","page":606}}};
             function getBookSortMap(group) {
                 var m = {}; for (var k in BOOK_SORT_DEFAULTS) m[k] = BOOK_SORT_DEFAULTS[k];
                 try { var s = JSON.parse(localStorage.getItem('hatim_booksort_' + group) || '{}'); for (var k2 in s) m[k2] = s[k2]; } catch(e){}
@@ -3633,9 +3633,25 @@ booksGrid.appendChild(_readBtn);
                             var _pnl = document.createElement('div');
                             _pnl.id = 'toc-panel';
                             _pnl.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:99999; display:flex; align-items:center; justify-content:center; padding:16px;';
-                            var _rowsHtml = _rows.map(function(x, i){ var _lbl = String(x.n).replace(/^\s*\d+\s*[\.\)]?\s*/, ''); if (!_lbl) _lbl = x.n; return '<div style="display:flex; justify-content:space-between; padding:10px 12px; border-bottom:1px solid #eee;"><span style="font-weight:bold;">' + (i+1) + '. ' + _lbl + '</span><span style="color:#8d6e63;">' + (x.p != null ? ('s. ' + x.p) : '') + '</span></div>'; }).join('');
+                            var _rowsHtml = _rows.map(function(x, i){
+                                var _lbl = String(x.n).replace(/^\s*\d+\s*[\.\)]?\s*/, ''); if (!_lbl) _lbl = x.n;
+                                var _pdfBt = (x.p != null) ? ('<button data-toc-pdf="' + x.p + '" style="padding:6px 10px; background:#d4af37; color:#3e2723; border:none; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; white-space:nowrap;">\ud83d\udcc4 PDF</button>') : '';
+                                return '<div style="display:flex; align-items:center; gap:8px; padding:8px 12px; border-bottom:1px solid #eee;">'
+                                    + '<span style="flex:1; font-weight:bold;">' + (i+1) + '. ' + _lbl + '</span>'
+                                    + '<span style="color:#8d6e63; font-size:13px; white-space:nowrap;">' + (x.p != null ? ('s. ' + x.p) : '') + '</span>'
+                                    + _pdfBt
+                                    + '</div>';
+                            }).join('');
                             _pnl.innerHTML = '<div style="background:#fff; border-radius:10px; max-width:420px; width:100%; max-height:80vh; overflow:auto;"><div style="padding:14px; border-bottom:2px solid var(--gold-primary); font-weight:bold; font-size:16px;">' + bookObj.name + ' \u2014 \u0130\u00e7indekiler</div>' + _rowsHtml + '<div style="padding:12px; text-align:right;"><button id="toc-close" style="padding:8px 16px; border:none; border-radius:6px; background:var(--gold-primary); color:#fff; font-weight:bold; cursor:pointer;">Kapat</button></div></div>';
                             document.body.appendChild(_pnl);
+                            _pnl.querySelectorAll('[data-toc-pdf]').forEach(function(b){
+                                b.addEventListener('click', function(ev){
+                                    ev.stopPropagation();
+                                    var pg = parseInt(this.getAttribute('data-toc-pdf')) || 1;
+                                    _pnl.remove();
+                                    openPdfReader(bId, pg);
+                                });
+                            });
                             _pnl.addEventListener('click', function(ev){ if (ev.target === _pnl || ev.target.id === 'toc-close') _pnl.remove(); });
                             return;
                         }
