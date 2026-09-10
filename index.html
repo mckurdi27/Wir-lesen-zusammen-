@@ -1020,11 +1020,11 @@
     var ZK_IKON = 12;          // insan ikonu ust siniri (px)
     function zkIkonBoyu(n){
         // 33 -> 41px, 32 -> 39px, 31 -> 37px
-        // Yukarisi (34..100): her adimda 0.5px kucult.
+        // Yukarisi (34..70): her adimda 0.5px kucult, 70'te sabitlenir (~22px).
         // Asagisi (30 ve alti): her adimda 2px buyut (96px tavan, Kabe'yi ortmesin).
         if (n > 33) {
             var b = 41 - 0.5 * (n - 33);
-            if (b < 4) b = 4;
+            if (b < 22.5) b = 22.5;   // 70 ve uzeri: sabit alt sinir
             return b;
         }
         if (n >= 31) return 37 + 2 * (n - 31);
@@ -1128,21 +1128,27 @@
             + '</i>';
     }
 
+    var ZK_KAPASITE = 99;      // bir halkadaki en fazla ikon
     function cizTavaf(){
         var wrap = $('zkDots'), tav = $('zkTavaf');
         if (!wrap || !tav) return;
         var n = zkIkonSayisi();
         var boy = zkIkonBoyu(n);
-        // kapsayici kare alan: halka + ikonlar sigsin (ekranla sinirli)
+        // 99'dan sonra halka dolmaz, DISA dogru yeni bir halka acilir
+        var halkalar = Math.max(1, Math.ceil(n / ZK_KAPASITE));
+        var adim = boy + 2;                       // halkalar arasi mesafe
+        var enDis = ZK_R + (halkalar - 1) * adim; // en dis halka yaricapi
+        // kapsayici kare alan: halkalar + ikonlar sigsin (ekranla sinirli)
         var vw = window.innerWidth || document.documentElement.clientWidth || 360;
         var lim = Math.min(Math.floor(vw * 0.94), 380);
-        var kare = Math.ceil(2 * (ZK_R + boy / 2 + 6));
+        var kare = Math.ceil(2 * (enDis + boy / 2 + 6));
         if (kare > lim) kare = lim;
         if (kare < 200) kare = 200;
-        // dar ekranda halka ve ikon da uyarlanir
-        var R = ZK_R;
-        if (R > kare / 2 - boy / 2 - 6) R = Math.max(30, kare / 2 - boy / 2 - 6);
-        if (boy > kare / 2 - R - 6) boy = Math.max(5, Math.floor(2 * (kare / 2 - R - 6)));
+        // dar ekranda halkalar da uyarlanir
+        var olcek = 1;
+        var yariAlan = kare / 2 - boy / 2 - 6;
+        if (enDis > yariAlan && enDis > 0) olcek = yariAlan / enDis;
+        if (olcek < 0.2) olcek = 0.2;
         var anahtar = n + ':' + boy + ':' + kare;
         if (wrap._k !== anahtar) {
             wrap._k = anahtar;
@@ -1151,14 +1157,19 @@
             var cx = kare / 2, cy = kare / 2, yari = boy / 2;
             var html = '';
             for (var i = 0; i < n; i++) {
-                // 12 yonunden saat yonunde; son ikon (n-1). adimda tam 1. ikonun uzerine gelir
-                var bol = (n > 1) ? (n - 1) : 1;
-                var a = (i / bol) * Math.PI * 2 - Math.PI / 2;
+                var halka = Math.floor(i / ZK_KAPASITE);
+                var idx = i % ZK_KAPASITE;
+                var bas = halka * ZK_KAPASITE;
+                var adet = Math.min(ZK_KAPASITE, n - bas);     // bu halkadaki ikon sayisi
+                var R = (ZK_R + halka * adim) * olcek;
+                // saat yonunde; son ikon (adet-1). adimda tam 1. ikonun uzerine gelir -> halka kapanir
+                var bol = (adet > 1) ? (adet - 1) : 1;
+                var a = (idx / bol) * Math.PI * 2 - Math.PI / 2;
                 var x = cx + Math.cos(a) * R, y = cy + Math.sin(a) * R;
-                var _r = (i % ZK_RENK_SAYISI);
-                if (i === n - 1 && n > 1) _r = 0;   // son ikon ilk ikonla ayni renk -> halka kapanir
+                var _r = (idx % ZK_RENK_SAYISI);
+                if (idx === adet - 1 && adet > 1) _r = 0;   // son ikon ilk ikonla ayni renk -> halka kapanir
                 // yuruyus yonu = cemberin tegeti (saat yonu); figurler hep ayni yone yurur
-                var aci = (i / bol) * 360;   // figurler cemberin tegetine donuk (hep ayni yone yurur)
+                var aci = (idx / bol) * 360;
                 html += '<span class="zk-dot c' + _r + '" data-i="' + i + '" '
                      +  'style="left:' + x.toFixed(1) + 'px;top:' + y.toFixed(1) + 'px;width:' + boy + 'px;height:' + boy
                      +  'px;margin:' + (-yari) + 'px 0 0 ' + (-yari) + 'px">'
@@ -1167,7 +1178,10 @@
             }
             wrap.innerHTML = html;
         }
-        var lit = s.hedef ? Math.round((s.sayi / s.hedef) * n) : (s.sayi % n);
+        // sayi tamamlaninca halka sifirlanir ve bastan baslar
+        var dol = s.sayi % n;
+        if (dol === 0 && s.sayi > 0) dol = n;
+        var lit = dol;
         if (lit < 0) lit = 0;
         if (lit > n) lit = n;
         var dots = wrap.children;
@@ -1179,7 +1193,7 @@
     function ciz(){
         if (!$('zkCount')) return;
         $('zkCount').textContent = s.sayi;
-        $('zkSub').textContent = s.hedef ? ('Hedef: ' + s.hedef) : 'Serbest';
+        $('zkSub').textContent = s.hedef ? ('Hedef: ' + s.hedef) : ('Serbest (' + zkIkonSayisi() + ')');
         $('zkTur').textContent = s.tur;
         $('zkToplam').textContent = s.toplam;
         $('zkGunluk').textContent = s.gun[bugun()] || 0;
