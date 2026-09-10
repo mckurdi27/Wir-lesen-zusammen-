@@ -1979,6 +1979,11 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                         if (!appData.cities) appData.cities = {};
                         if (loginRegion) appData.regions[userName] = loginRegion;
                         if (loginCity) appData.cities[userName] = loginCity;
+                        // SUPABASE-ONCE (kural 8a): bireysel uyeyi once Supabase'e yaz.
+                        // (Onceden localStorage koprusu push ediyordu; kopru artik salt-cache.)
+                        if (typeof window._sbUpsertIndividual === 'function') {
+                            try { window._sbUpsertIndividual(userName, userPassword || ''); } catch(_le){}
+                        }
                         saveGroupData();
                         showToast("✅ " + userName + " kişisel grup ile giriş yaptı (grup: " + currentGroup.toUpperCase() + ")", 'success');
                         updateUserInterface();
@@ -3679,6 +3684,9 @@ booksGrid.appendChild(_readBtn);
                                 var _var = appData.bookHistory[bId].some(function(hh){ return hh.grup===currentGroup && hh.hatimNo===_hn; });
                                 if (!_var) {
                                   appData.bookHistory[bId].push({ grup: currentGroup, eser: _b?(_b.name||bId):bId, hatimNo: _hn, baslangic: _h?(_h.startDate||''):'', bitis: now, tamamlandi: new Date().toISOString() });
+                                  // SUPABASE-ONCE (kural 8a): hatim tamamlanma kaydini Supabase'e yaz.
+                                  // (Onceden localStorage koprusu push ediyordu; kopru artik salt-cache.)
+                                  try { if (typeof window.syncHatimToSB === 'function') window.syncHatimToSB(currentGroup, appData); } catch(_shE){}
                                   saveGroupData();
                                 }
                               }
@@ -4995,13 +5003,23 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         }
                     });
 
-                    document.getElementById("admin-set-password").addEventListener("click", () => {
-                        let pwd = prompt("Yeni şifre (boş bırakırsanız kaldırılır):", appData.password || "");
+                    document.getElementById("admin-set-password").addEventListener("click", async () => {
+                        let pwd = prompt("Yeni \u015fifre (bo\u015f b\u0131rak\u0131rsan\u0131z kald\u0131r\u0131l\u0131r):", appData.password || "");
                         if (pwd !== null) {
-                            appData.password = pwd.trim();
+                            var _np = pwd.trim();
+                            // SUPABASE-ONCE (kural 8a): grup \u015fifresini ONCE Supabase'e yaz.
+                            try {
+                                if (currentGroup && typeof window.api === 'function') {
+                                    await window.api('/groups?key=eq.' + encodeURIComponent(currentGroup), { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }, body: JSON.stringify({ password: _np }) });
+                                }
+                            } catch (err) {
+                                if (typeof window.showToast === 'function') window.showToast('Supabase hatas\u0131: ' + ((err && err.message) || err), 'error');
+                                return; // reddedildiyse yerele DOKUNMA
+                            }
+                            appData.password = _np;
                             window.saveGroupData();
                             window.loadGroupData();
-                            showToast(appData.password ? '🔒 Şifre tanımlandı!' : '🔓 Şifre kaldırıldı!', 'info');
+                            showToast(_np ? '\ud83d\udd12 \u015eifre tan\u0131mland\u0131!' : '\ud83d\udd13 \u015eifre kald\u0131r\u0131ld\u0131!', 'info');
                         }
                     });
 
@@ -5073,21 +5091,6 @@ var _cg = selVal || '';
                         }
                     });
 
-                    document.querySelectorAll(".admin-remove-bireysel").forEach(btn => {
-                        btn.addEventListener("click", async (e) => {
-                            let name = e.target.getAttribute("data-name");
-                            if (!confirm(name + " bireysel üye silinsin mi?")) return;
-                            let pool = getBireyselPool();
-                            pool.members = pool.members.filter(mm => mm !== name);
-                            if (pool.memberTypes) delete pool.memberTypes[name];
-                            if (pool.passwords) delete pool.passwords[name];
-                            saveBireyselPool(pool);
-                            localStorage.removeItem('hatim_group_' + name.toLowerCase());
-                            showToast('✅ ' + name + ' bireysel üye silindi.', 'success');
-                            renderAdminSectionAtBottom();
-                            updateAutocompleteLists();
-                        });
-                    });
 
                     document.querySelectorAll(".admin-remove-member").forEach(btn => {
                         btn.addEventListener("click", async (e) => {
@@ -5140,18 +5143,28 @@ var _cg = selVal || '';
                     document.querySelectorAll(".admin-remove-bireysel").forEach(btn => {
                         btn.addEventListener("click", async (e) => {
                             let name = e.target.getAttribute("data-name");
-                            if (confirm(`"${name}" bireysel üye silinsin mi?`)) {
-                                let pool = getBireyselPool();
-                                pool.members = pool.members.filter(m => m !== name);
-                                if (pool.memberTypes) delete pool.memberTypes[name];
-                                if (pool.passwords) delete pool.passwords[name];
-                                saveBireyselPool(pool);
-                                // ayrıca bu üyenin grup anahtarını (okuma verisi) temizle
-                                let bKey = "hatim_group_" + name.toLowerCase();
-                                if (localStorage.getItem(bKey)) localStorage.removeItem(bKey);
-                                await window.loadGroupData();
-                                showToast(`❌ ${name} bireysel üye silindi.`, 'info');
+                            if (!confirm(`"${name}" bireysel uüye silinsin mi?`)) return;
+                            // SUPABASE-ONCE (kural 8a): bireysel uyeyi ONCE Supabase'ten sil.
+                            // replaceMembers yalnizca ekler/gunceller, SILMEZ; hedefli DELETE sart,
+                            // yoksa uye bir sonraki pullAll'da geri gelir.
+                            try {
+                                if (typeof window.api === 'function') {
+                                    await window.api("/members?name=eq." + encodeURIComponent(name) + "&group_key=is.null", { method: "DELETE", headers: { "Prefer": "return=minimal" } });
+                                }
+                            } catch (err) {
+                                if (typeof window.showToast === 'function') window.showToast('Supabase hatas\u0131: ' + ((err && err.message) || err), 'error');
+                                return; // reddedildiyse yerele DOKUNMA
                             }
+                            let pool = getBireyselPool();
+                            pool.members = pool.members.filter(m => m !== name);
+                            if (pool.memberTypes) delete pool.memberTypes[name];
+                            if (pool.passwords) delete pool.passwords[name];
+                            saveBireyselPool(pool);
+                            let bKey = "hatim_group_" + name.toLowerCase();
+                            try { localStorage.removeItem(bKey); } catch(_e2){}
+                            await window.pullAll();
+                            window.refreshUI();
+                            if (typeof window.showToast === 'function') window.showToast('❌ ' + name + ' bireysel uüye silindi.', 'info');
                         });
                     });
 
@@ -5512,6 +5525,15 @@ window._origSetItem = origSetItem;
   }
 
 /* replaceMembers / syncHatimToSB / replaceShares (yazim islemleri) */
+  // Bireysel uye upsert: hedefli Supabase yazimi (kural 8a). Bireysel uyeler
+  // group_key = ad.toLowerCase() ile tek-kisilik grup olarak tutulur.
+  window._sbUpsertIndividual = function (name, pwd) {
+    var key = String(name || '').toLowerCase();
+    if (!key) return Promise.resolve();
+    return rest.upsert("groups", [{ key: key, name: String(name), password: '' }])
+      .then(function () { return replaceMembers([name], key, (function () { var o = {}; o[name] = pwd || ''; return o; })()); });
+  };
+
   function replaceMembers(names, groupKey, passwords) {
     var pw = passwords || {};
     var q = (groupKey === null) ? "?select=id,name,group_key&group_key=is.null" : ("?select=id,name,group_key&group_key=eq." + encodeURIComponent(groupKey));
@@ -5623,37 +5645,8 @@ window._origSetItem = origSetItem;
   }  window.replaceShares = replaceShares;
 
 /* pushGroup / pushIndividual / pushPool (yerel->Supabase) */
-  function pushGroup(key, g) {
-    _myPush = true;
-    return enqueue(function () {
-      return rest.upsert("groups", [{ key: key, name: (g && g.name) || String(key).replace(/_/g, " "), password: (g && g.password) || "" }])
-        .then(function () {
-          var memArr = (g && g.members) || [];
-          var allNames = Array.from(new Set(memArr));
-          return replaceMembers(allNames, key, (g && g.passwords) || {}).then(function () { return replaceShares(g, key); }).then(function () { return syncHatimToSB(key, g); });
-        });
-    }).then(function () { setTimeout(function () { _myPush = false; }, 1200); });
-  }
 
-  function pushIndividual(g, key) {
-    _myPush = true;
-    return enqueue(function () {
-      var memArr = (g && g.members) || [];
-      // Otomatik uye URETME: sadece gercek uyeler yazilir. ownersOf (hisse sahibi) otomatik uye yaratmaz.
-      var allNames = Array.from(new Set(memArr));
-      if (!allNames.length && key) allNames.push(key);
-      var gk = key || "bireysel";
-      return rest.upsert("groups", [{ key: gk, name: (g && g.name) || String(gk).replace(/_/g, " "), password: (g && g.password) || "" }])
-        .then(function () { return replaceMembers(allNames, gk, (g && g.passwords) || {}).then(function () { return replaceShares(g, gk); }).then(function () { return syncHatimToSB(gk, g); }); });
-    }).then(function () { setTimeout(function () { _myPush = false; }, 1200); });
-  }
 
-  function pushPool(p) {
-    if (!p || !p.members) return Promise.resolve();
-    _myPush = true;
-    return enqueue(function () { return replaceMembers(p.members, null, p.passwords || {}); })
-      .then(function () { setTimeout(function () { _myPush = false; }, 1200); });
-  }
 /* pullAll (Supabase->yerel cekme) */
   function pullAll() {
     if (_pulling) return Promise.resolve();
@@ -5842,18 +5835,12 @@ _sbMemberDetail = function (name, groupKey) {
 
   localStorage.setItem = function (key, value) {
     origSetItem(key, value);
-    try {
-      if (!_initDone || !_userTouched) return; // yenileme/geri yükleme sırasında bayat local veri Supabase'e push edilmesin // açılış/geri yükleme sırasında Supabase'e bayat veri push edilmesin
-      if (key && key.indexOf("hatim_group_") === 0 && key !== "hatim_bireysel_pool") {
-        var g; try { g = JSON.parse(value); } catch (e) { return; }
-        if (!g) return;
-        var gkey = key.replace("hatim_group_", "");
-        var _pPush = (isIndividualGroup(g, gkey)) ? pushIndividual(g, gkey) : pushGroup(gkey, g); try { if (_pPush && _pPush.catch) _pPush.catch(function(er){ try { if (typeof window.showToast==='function') window.showToast('Supabase push hatasi: ' + (er&&er.message||er), 'error'); } catch(_e){} console.error('push', er); }); } catch(_e2){}
-      } else if (key === "hatim_bireysel_pool") {
-        var p; try { p = JSON.parse(value); } catch (e) { return; }
-        if (p) pushPool(p);
-      }
-    } catch (e) { try { if (typeof window.showToast === 'function') window.showToast('Senkron hatasi: ' + (e && e.message || e), 'error'); } catch(_e){} console.error('senkron kopru', e); }
+    // KURAL 8d: localStorage koprusu SALT CACHE'tir - Supabase'e PUSH ETMEZ.
+    // Her yazma islemi kendi HEDEFLI Supabase cagrisini yapar (kural 8a) ve
+    // yalnizca onay sonrasi cache'i gunceller. Tam-grup snapshot push'u
+    // (pushGroup/pushIndividual/pushPool) kaldirildi: replaceMembers "yoksa POST"
+    // mantigi isim degisikliginde/silmede hayalet-yeni uye uretiyordu ve bayat
+    // yerel veri canli Supabase kaydini ezebiliyordu.
   };
 
   function refreshUI() {
