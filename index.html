@@ -5162,48 +5162,32 @@ var _cg = selVal || '';
                             let newName = prompt("Yeni ad:", old);
                             if (!newName || !newName.trim()) { showToast('\u274c Ad bo\u015f olamaz!', 'error'); return; }
                             let clean = newName.trim();
-                            let newPw = prompt('\u015eifre' + (curPw ? ' (mevcut: '+curPw+')' : ''), curPw);
+                            let newPw = prompt('\u015eifre' + (curPw ? ' (mevcut: ' + curPw + ')' : ''), curPw);
                             if (newPw === null) return;
                             let cleanPw = newPw.trim();
-                            let changed = false;
+                            if (clean === old && (!cleanPw || cleanPw === curPw)) { showToast('\u2139\ufe0f De\u011fi\u015fiklik yok.', 'info'); return; }
+                            if (typeof window._sbUpdateName !== 'function') { showToast('\u274c Supabase ba\u011flant\u0131s\u0131 yok', 'error'); return; }
+                            // SUPABASE-ONCE + HEDEFL\u0130 yaz\u0131m (kural 8d): tam-grup snapshot push YASAK.
+                            // Tam-grup push (replaceMembers) ad\u0131 de\u011fi\u015fmi\u015f \u00fcyeyi bulamay\u0131nca
+                            // "yoksa POST" mant\u0131\u011f\u0131yla HAYALET / YEN\u0130 \u00dcYE \u00fcretir.
+                            var chain = Promise.resolve();
                             if (clean !== old) {
-                                let idx = appData.members.indexOf(old);
-                                if (idx !== -1) {
-                                    appData.members[idx] = clean;
-                                    Object.keys(appData.bookPages).forEach(bId => {
-                                        appData.bookPages[bId].forEach(pp => { if (pp.owner === old) pp.owner = clean; });
-                                    });
-                                    if (appData.readingLogs) {
-                                        appData.readingLogs.forEach(ll => { if (ll.member === old) ll.member = clean; });
-                                    }
-                                    if (!appData.passwords) appData.passwords = {};
-                                    if (appData.passwords[old] !== undefined) { appData.passwords[clean] = appData.passwords[old]; delete appData.passwords[old]; }
-                                    changed = true;
-                                }
+                                chain = chain.then(function () { return window._sbUpdateName(old, clean, currentGroup); });
                             }
-                            if (cleanPw) {
-                                if (!appData.passwords) appData.passwords = {};
-                                appData.passwords[clean] = cleanPw;
-                                changed = true;
+                            if (cleanPw && cleanPw !== curPw) {
+                                chain = chain.then(function () { return (typeof window._sbUpdatePassword === 'function') ? window._sbUpdatePassword(clean, cleanPw, currentGroup) : Promise.resolve(); });
                             }
-                            if (changed) {
-                                // SUPABASE-ONCE: once hedefli PATCH (ad+owner), Supabase onaylayinca yerel cache kaydet
-                                var sbName = (typeof window._sbUpdateName === 'function');
-                                var doSB = function(){
-                                    var p = sbName ? window._sbUpdateName(old, clean, currentGroup).then(function(){ return window._sbRenameOwner(old, clean, currentGroup); }) : Promise.resolve();
-                                    return p;
-                                };
-                                doSB().then(function(){
-                                    window.saveGroupData();
-                                    if (typeof window.loadGroupData === 'function') return window.loadGroupData();
-                                }).then(function(){
-                                    showToast('\u2705 G\u00fcncellendi: ' + clean, 'success');
-                                }).catch(function(err){
-                                    // Supabase basarisizsa yerel degisikligi geri al (localStorage eski halde)
-                                    if (typeof window.loadGroupData === 'function') window.loadGroupData();
-                                    showToast('\u274c Supabase hatas\u0131: ' + ((err&&err.message)||err), 'error');
-                                });
-                            }
+                            chain.then(function () {
+                                // Supabase do\u011fruluk kayna\u011f\u0131: taze \u00e7ek (localStorage + appData yenilenir)
+                                if (typeof window.pullAll === 'function') return window.pullAll();
+                            }).then(function () {
+                                if (typeof window.refreshUI === 'function') window.refreshUI();
+                                if (typeof renderAdminSectionAtBottom === 'function') renderAdminSectionAtBottom();
+                                if (typeof updateAutocompleteLists === 'function') updateAutocompleteLists();
+                                showToast('\u2705 G\u00fcncellendi: ' + clean, 'success');
+                            }).catch(function (err) {
+                                showToast('\u274c Supabase hatas\u0131: ' + ((err && err.message) || err), 'error');
+                            });
                         });
                     });
                 }
