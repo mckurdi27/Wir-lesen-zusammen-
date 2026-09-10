@@ -461,6 +461,28 @@
         #main-title-ornate-section .hdr-right { order: 3; }
         #main-title-ornate-section .hdr-mid { flex: 1 1 100% !important; min-width: 100% !important; order: 4; margin-top: 8px; }
     }
+        /* ===== ZIKIRMATIK PANELI (eklenti) ===== */
+        #zikirmatikSection {
+            margin: 20px 0; padding: 18px; border-radius: 12px;
+            border: 2px solid var(--gold-primary); background: var(--card-bg);
+            color: var(--text-main); box-sizing: border-box;
+        }
+        #zikirmatikSection .zk-title { font-size: 15px; font-weight: bold; color: var(--gold-dark); margin: 0 0 12px; }
+        #zikirmatikSection .zk-picker { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+        #zikirmatikSection .zk-select { flex: 1; min-width: 130px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 14px; }
+        #zikirmatikSection .zk-ring { position: relative; width: min(60vw, 220px); height: min(60vw, 220px); margin: 6px auto 12px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: conic-gradient(var(--gold-primary) 0deg, #e9dcbd 0deg); transition: background .2s; }
+        #zikirmatikSection .zk-ring::after { content: ""; position: absolute; inset: 12px; border-radius: 50%; background: var(--card-bg); }
+        #zikirmatikSection .zk-count { position: relative; font-size: 2.6rem; font-weight: 700; color: var(--gold-dark); line-height: 1; }
+        #zikirmatikSection .zk-sub { position: relative; font-size: 12px; opacity: .7; margin-top: 4px; }
+        #zikirmatikSection .zk-tap { display: block; width: 100%; max-width: 340px; margin: 0 auto; padding: 16px; border-radius: 14px; border: 0; background: linear-gradient(180deg, #d4a02a, #b8860b); color: #fff; font-size: 16px; font-weight: 700; letter-spacing: .08em; cursor: pointer; box-shadow: 0 6px 18px rgba(184,134,11,.3); }
+        #zikirmatikSection .zk-tap:active { transform: translateY(2px); }
+        #zikirmatikSection .zk-stats { display: flex; gap: 22px; margin: 14px 0 0; justify-content: center; text-align: center; }
+        #zikirmatikSection .zk-stats b { display: block; font-size: 18px; color: var(--gold-dark); }
+        #zikirmatikSection .zk-stats span { font-size: 11px; opacity: .65; }
+        #zikirmatikSection .zk-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; justify-content: center; }
+        #zikirmatikSection .zk-actions button { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--text-main); font-size: 13px; cursor: pointer; min-height: 34px; margin-left: 0; }
+        #zikirmatikSection .zk-actions button.on { background: var(--gold-primary); color: #fff; }
+
     </style>
 <!-- ===================== </head> / <body> BASLANGICI ===================== -->
 </head>
@@ -687,6 +709,39 @@
 <!--      - D2: books-grid (JS render hedefi) ----- -->
         <div id="books-grid"></div>
 
+        <!-- ===== BOLUM F : ZIKIRMATIK PANELI (mesaj panelinin oncesi) ===== -->
+        <section id="zikirmatikSection">
+            <h3 class="zk-title">&#128255; Zikirmatik</h3>
+            <div class="zk-picker">
+                <select id="zkZikir" class="zk-select"></select>
+                <select id="zkHedef" class="zk-select">
+                    <option value="33">Hedef 33</option>
+                    <option value="99">Hedef 99</option>
+                    <option value="100">Hedef 100</option>
+                    <option value="500">Hedef 500</option>
+                    <option value="1000">Hedef 1000</option>
+                    <option value="0">Serbest</option>
+                </select>
+            </div>
+            <div class="zk-ring" id="zkRing">
+                <div class="zk-count" id="zkCount">0</div>
+                <div class="zk-sub" id="zkSub">Hedef: 33</div>
+            </div>
+            <button class="zk-tap" id="zkTap">ZİKRET</button>
+            <div class="zk-stats">
+                <div><b id="zkTur">0</b><span>Tur</span></div>
+                <div><b id="zkToplam">0</b><span>Toplam</span></div>
+                <div><b id="zkGunluk">0</b><span>Bugün</span></div>
+            </div>
+            <div class="zk-actions">
+                <button type="button" id="zkUndoBtn">&#8617; Geri</button>
+                <button type="button" id="zkResetBtn">&#10226; Sıfırla</button>
+                <button type="button" id="zkVibBtn">Titreşim</button>
+                <button type="button" id="zkSesBtn">Ses</button>
+            </div>
+        </section>
+
+
 <!-- ----- BOLUM E : ALT MODALLAR + TOAST + NAMAZ (arka plan) ----- -->
         <!-- BÖLÜM 7 - NAMAZ VAKİTLERİ -->
             <!-- ESER YÖNETİMİ MODAL -->
@@ -764,6 +819,102 @@
     </div>
 
     <div id="toast" class="toast"></div>
+
+
+<!-- ===== ZIKIRMATIK (eklenti) : sayac mantigi ===== -->
+<script>
+(function(){
+    var KEY = 'zikirmatik_v1';
+    var ZIKIRLER = ['Sübhânallah','Elhamdülillah','Allâhu Ekber','Lâ ilâhe illallah','Estağfirullah','Salavât-ı Şerîfe','Bismillah'];
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e) { s = null; }
+    if (!s) s = { zikir: ZIKIRLER[0], hedef: 33, sayi: 0, tur: 0, toplam: 0, gun: {}, vib: true, ses: false };
+    if (!s.gun) s.gun = {};
+
+    function $(id){ return document.getElementById(id); }
+    function bugun(){ var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+    function kaydet(){ try { localStorage.setItem(KEY, JSON.stringify(s)); } catch(e){} }
+
+    function beep(){
+        if (!s.ses) return;
+        try {
+            var AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) return;
+            if (!beep.ac) beep.ac = new AC();
+            var c = beep.ac, o = c.createOscillator(), g = c.createGain();
+            o.frequency.value = 620; o.connect(g); g.connect(c.destination);
+            g.gain.setValueAtTime(0.06, c.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.09);
+            o.start(); o.stop(c.currentTime + 0.1);
+        } catch(e){}
+    }
+
+    function ciz(){
+        if (!$('zkCount')) return;
+        $('zkCount').textContent = s.sayi;
+        $('zkSub').textContent = s.hedef ? ('Hedef: ' + s.hedef) : 'Serbest';
+        $('zkTur').textContent = s.tur;
+        $('zkToplam').textContent = s.toplam;
+        $('zkGunluk').textContent = s.gun[bugun()] || 0;
+        var p = s.hedef ? Math.min(s.sayi / s.hedef, 1) : 0;
+        var ring = $('zkRing');
+        if (ring) ring.style.background = 'conic-gradient(var(--gold-primary) ' + (p*360) + 'deg, #e9dcbd ' + (p*360) + 'deg)';
+        if ($('zkVibBtn')) $('zkVibBtn').classList.toggle('on', !!s.vib);
+        if ($('zkSesBtn')) $('zkSesBtn').classList.toggle('on', !!s.ses);
+        if ($('zkZikir')) $('zkZikir').value = s.zikir;
+        if ($('zkHedef')) $('zkHedef').value = s.hedef;
+    }
+
+    function tik(){
+        s.sayi++; s.toplam++;
+        s.gun[bugun()] = (s.gun[bugun()] || 0) + 1;
+        if (s.vib && navigator.vibrate) { try { navigator.vibrate(18); } catch(e){} }
+        beep();
+        if (s.hedef && s.sayi >= s.hedef) {
+            s.tur++; s.sayi = 0;
+            if (s.vib && navigator.vibrate) { try { navigator.vibrate([40,60,40]); } catch(e){} }
+        }
+        kaydet(); ciz();
+    }
+
+    function place(){
+        var sec = document.getElementById('zikirmatikSection');
+        var msg = document.getElementById('admin-message-section');
+        if (!sec) return;
+        if (msg && msg.parentNode === document.body) {
+            if (sec.parentNode) sec.parentNode.removeChild(sec);
+            document.body.insertBefore(sec, msg);
+        }
+    }
+
+    function init(){
+        var sec = document.getElementById('zikirmatikSection');
+        if (!sec || sec._zk) return;
+        sec._zk = true;
+        var sel = $('zkZikir');
+        if (sel) sel.innerHTML = ZIKIRLER.map(function(z){ return '<option' + (z===s.zikir ? ' selected' : '') + '>' + z + '</option>'; }).join('');
+        if ($('zkTap')) $('zkTap').addEventListener('click', tik);
+        if (sel) sel.addEventListener('change', function(){ s.zikir = this.value; kaydet(); });
+        if ($('zkHedef')) $('zkHedef').addEventListener('change', function(){ s.hedef = parseInt(this.value,10); kaydet(); ciz(); });
+        if ($('zkUndoBtn')) $('zkUndoBtn').addEventListener('click', function(){
+            if (s.sayi > 0) { s.sayi--; if (s.toplam > 0) s.toplam--; var k = bugun(); s.gun[k] = Math.max(0, (s.gun[k]||0) - 1); kaydet(); ciz(); }
+        });
+        if ($('zkResetBtn')) $('zkResetBtn').addEventListener('click', function(){
+            if (window.confirm('Sayaç sıfırlansın mı? (Tur ve toplam korunur)')) { s.sayi = 0; kaydet(); ciz(); }
+        });
+        if ($('zkVibBtn')) $('zkVibBtn').addEventListener('click', function(){ s.vib = !s.vib; kaydet(); ciz(); });
+        if ($('zkSesBtn')) $('zkSesBtn').addEventListener('click', function(){ s.ses = !s.ses; kaydet(); ciz(); });
+        ciz();
+    }
+
+    window.zk = { init: init, place: place, open: init, close: function(){} };
+
+    document.addEventListener('DOMContentLoaded', function(){ init(); place(); });
+    window.addEventListener('load', function(){ init(); place(); });
+    // mesaj paneli her render sonrasi yeniden sona tasindigi icin periyodik konum kontrolu
+    setInterval(place, 1500);
+})();
+</script>
 
 <!-- #################### 4) ANA SCRIPT BLOGU BASI (uygulamanin kalbi) #################### -->
     <script>
@@ -4314,6 +4465,8 @@ window.infoSortTable = function infoSortTable(col) {
                 msgContainer.innerHTML = messageSectionHtml;
                 // Y\u00f6neticiye mesaj b\u00f6l\u00fcm\u00fc her zaman en altta kals\u0131n
                 document.body.appendChild(msgContainer);
+                // Zikirmatik paneli mesaj panelinin hemen oncesinde kals\u0131n
+                if (window.zk && typeof window.zk.place === 'function') { try { window.zk.place(); } catch(e){} }
 
                 if (isAdmin) {
                     const analysisBtn = document.getElementById("admin-open-detailed-analysis");
