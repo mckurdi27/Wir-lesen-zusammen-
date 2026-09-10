@@ -470,10 +470,20 @@
         #zikirmatikSection .zk-title { font-size: 15px; font-weight: bold; color: var(--gold-dark); margin: 0 0 12px; }
         #zikirmatikSection .zk-picker { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
         #zikirmatikSection .zk-select { flex: 1; min-width: 130px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 14px; }
-        #zikirmatikSection .zk-ring { position: relative; width: min(60vw, 220px); height: min(60vw, 220px); margin: 6px auto 12px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: conic-gradient(var(--gold-primary) 0deg, #e9dcbd 0deg); transition: background .2s; }
-        #zikirmatikSection .zk-ring::after { content: ""; position: absolute; inset: 12px; border-radius: 50%; background: var(--card-bg); }
-        #zikirmatikSection .zk-count { position: relative; font-size: 2.6rem; font-weight: 700; color: var(--gold-dark); line-height: 1; }
-        #zikirmatikSection .zk-sub { position: relative; font-size: 12px; opacity: .7; margin-top: 4px; }
+        #zikirmatikSection .zk-tavaf { position: relative; width: min(64vw, 230px); height: min(64vw, 230px); margin: 8px auto 6px; }
+        #zikirmatikSection .zk-kaaba { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; margin: -23px 0 0 -23px; background: #191919; border-radius: 4px; box-shadow: 0 0 0 1px rgba(0,0,0,.25), 0 6px 16px rgba(0,0,0,.28); }
+        #zikirmatikSection .zk-kaaba::before { content: ""; position: absolute; left: 0; right: 0; top: 11px; height: 5px; background: #c9a24b; }
+        #zikirmatikSection .zk-kaaba::after { content: ""; position: absolute; left: 50%; top: 22px; width: 12px; height: 14px; margin-left: -6px; background: #c9a24b; border-radius: 0 0 3px 3px; }
+        #zikirmatikSection .zk-dots { position: absolute; inset: 0; }
+        #zikirmatikSection .zk-dot { position: absolute; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: #ddd3bb; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); transition: background .18s, transform .18s, box-shadow .18s; }
+        #zikirmatikSection .zk-dot.on { transform: scale(1.35); }
+        #zikirmatikSection .zk-dot.on.c0 { background: #e0a92c; box-shadow: 0 0 8px rgba(224,169,44,.75); }
+        #zikirmatikSection .zk-dot.on.c1 { background: #27ae60; box-shadow: 0 0 8px rgba(39,174,96,.7); }
+        #zikirmatikSection .zk-dot.on.c2 { background: #c0392b; box-shadow: 0 0 8px rgba(192,57,43,.7); }
+        #zikirmatikSection .zk-dot.on.c3 { background: #2980b9; box-shadow: 0 0 8px rgba(41,128,185,.7); }
+        #zikirmatikSection .zk-dot.on.c4 { background: #8e44ad; box-shadow: 0 0 8px rgba(142,68,173,.7); }
+        #zikirmatikSection .zk-count { text-align: center; font-size: 2.4rem; font-weight: 700; color: var(--gold-dark); line-height: 1; margin-top: 2px; }
+        #zikirmatikSection .zk-sub { text-align: center; font-size: 12px; opacity: .7; margin-top: 4px; margin-bottom: 10px; }
         #zikirmatikSection .zk-tap { display: block; width: 100%; max-width: 340px; margin: 0 auto; padding: 16px; border-radius: 14px; border: 0; background: linear-gradient(180deg, #d4a02a, #b8860b); color: #fff; font-size: 16px; font-weight: 700; letter-spacing: .08em; cursor: pointer; box-shadow: 0 6px 18px rgba(184,134,11,.3); }
         #zikirmatikSection .zk-tap:active { transform: translateY(2px); }
         #zikirmatikSection .zk-stats { display: flex; gap: 22px; margin: 14px 0 0; justify-content: center; text-align: center; }
@@ -736,10 +746,13 @@
             <div class="zk-oku" id="zkOku">&#8212;</div>
             <!-- 3. satir : Anlami -->
             <div class="zk-anlam" id="zkAnlam">&#8212;</div>
-            <div class="zk-ring" id="zkRing">
-                <div class="zk-count" id="zkCount">0</div>
-                <div class="zk-sub" id="zkSub">Hedef: 33</div>
+            <!-- Kabe ortada, zikir arttikca renkli noktalar dolar (flip.html tavaf gibi) -->
+            <div class="zk-tavaf" id="zkTavaf">
+                <div class="zk-kaaba"></div>
+                <div class="zk-dots" id="zkDots"></div>
             </div>
+            <div class="zk-count" id="zkCount">0</div>
+            <div class="zk-sub" id="zkSub">Hedef: 33</div>
             <button class="zk-tap" id="zkTap">Z&#304;KRET</button>
             <div class="zk-stats">
                 <div><b id="zkTur">0</b><span>Tur</span></div>
@@ -885,6 +898,32 @@
         } catch(e){}
     }
 
+    var ZK_RENK = ['c0','c1','c2','c3','c4'];
+    function zkNoktaSayisi(){ return (s.hedef >= 2 && s.hedef <= 60) ? s.hedef : 33; }
+    function cizTavaf(){
+        var wrap = $('zkDots'), tav = $('zkTavaf');
+        if (!wrap || !tav) return;
+        var n = zkNoktaSayisi();
+        if (wrap._n !== n) {
+            wrap._n = n;
+            var r = tav.clientWidth / 2 - 12;
+            var html = '';
+            for (var i = 0; i < n; i++) {
+                var a = (i / n) * Math.PI * 2 - Math.PI / 2;
+                var x = r + Math.cos(a) * r, y = r + Math.sin(a) * r;
+                html += '<span class="zk-dot ' + ZK_RENK[i % ZK_RENK.length] + '" data-i="' + i + '" style="left:' + x.toFixed(1) + 'px;top:' + y.toFixed(1) + 'px"></span>';
+            }
+            wrap.innerHTML = html;
+        }
+        var lit = s.hedef ? Math.round((s.sayi / s.hedef) * n) : (s.sayi % n);
+        if (lit < 0) lit = 0;
+        if (lit > n) lit = n;
+        var dots = wrap.children;
+        for (var j = 0; j < dots.length; j++) {
+            dots[j].classList.toggle('on', j < lit);
+        }
+    }
+
     function ciz(){
         if (!$('zkCount')) return;
         $('zkCount').textContent = s.sayi;
@@ -892,9 +931,7 @@
         $('zkTur').textContent = s.tur;
         $('zkToplam').textContent = s.toplam;
         $('zkGunluk').textContent = s.gun[bugun()] || 0;
-        var p = s.hedef ? Math.min(s.sayi / s.hedef, 1) : 0;
-        var ring = $('zkRing');
-        if (ring) ring.style.background = 'conic-gradient(var(--gold-primary) ' + (p*360) + 'deg, #e9dcbd ' + (p*360) + 'deg)';
+        cizTavaf();
         if ($('zkVibBtn')) $('zkVibBtn').classList.toggle('on', !!s.vib);
         if ($('zkSesBtn')) $('zkSesBtn').classList.toggle('on', !!s.ses);
         var sel = $('zkZikir');
@@ -961,6 +998,7 @@
             }
         });
         ciz();
+        window.addEventListener('resize', function(){ var w = $('zkDots'); if (w) w._n = -1; cizTavaf(); });
     }
 
     window.zk = { init: init, place: place, open: init, close: function(){} };
