@@ -482,6 +482,10 @@
         #zikirmatikSection .zk-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; justify-content: center; }
         #zikirmatikSection .zk-actions button { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--text-main); font-size: 13px; cursor: pointer; min-height: 34px; margin-left: 0; }
         #zikirmatikSection .zk-actions button.on { background: var(--gold-primary); color: #fff; }
+        #zikirmatikSection .zk-custom { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+        #zikirmatikSection .zk-input { flex: 1; min-width: 140px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 14px; box-sizing: border-box; }
+        #zikirmatikSection .zk-mini { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--text-main); font-size: 13px; cursor: pointer; min-height: 34px; margin-left: 0; white-space: nowrap; }
+        #zikirmatikSection .zk-mini:active { background: var(--gold-primary); color: #fff; }
 
     </style>
 <!-- ===================== </head> / <body> BASLANGICI ===================== -->
@@ -723,6 +727,11 @@
                     <option value="0">Serbest</option>
                 </select>
             </div>
+            <div class="zk-custom">
+                <input type="text" id="zkYeni" class="zk-input" placeholder="Özel zikir yazın (örn. Yâ Latîf)" maxlength="60">
+                <button type="button" id="zkEkleBtn" class="zk-mini">+ Ekle</button>
+                <button type="button" id="zkSilBtn" class="zk-mini">Sil</button>
+            </div>
             <div class="zk-ring" id="zkRing">
                 <div class="zk-count" id="zkCount">0</div>
                 <div class="zk-sub" id="zkSub">Hedef: 33</div>
@@ -825,10 +834,14 @@
 <script>
 (function(){
     var KEY = 'zikirmatik_v1';
-    var ZIKIRLER = ['Sübhânallah','Elhamdülillah','Allâhu Ekber','Lâ ilâhe illallah','Estağfirullah','Salavât-ı Şerîfe','Bismillah'];
+    var VARSAYILAN_ZIKIRLER = ['Sübhânallah','Elhamdülillah','Allâhu Ekber','Lâ ilâhe illallah','Estağfirullah','Salavât-ı Şerîfe','Bismillah'];
     var s = null;
     try { s = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e) { s = null; }
-    if (!s) s = { zikir: ZIKIRLER[0], hedef: 33, sayi: 0, tur: 0, toplam: 0, gun: {}, vib: true, ses: false };
+    if (!s) s = { zikir: VARSAYILAN_ZIKIRLER[0], hedef: 33, sayi: 0, tur: 0, toplam: 0, gun: {}, vib: true, ses: false, ozel: [] };
+    if (!Array.isArray(s.ozel)) s.ozel = [];
+
+    function tumZikirler(){ return VARSAYILAN_ZIKIRLER.concat(s.ozel); }
+    function varsayilanMi(z){ return VARSAYILAN_ZIKIRLER.indexOf(z) !== -1; }
     if (!s.gun) s.gun = {};
 
     function $(id){ return document.getElementById(id); }
@@ -861,7 +874,8 @@
         if (ring) ring.style.background = 'conic-gradient(var(--gold-primary) ' + (p*360) + 'deg, #e9dcbd ' + (p*360) + 'deg)';
         if ($('zkVibBtn')) $('zkVibBtn').classList.toggle('on', !!s.vib);
         if ($('zkSesBtn')) $('zkSesBtn').classList.toggle('on', !!s.ses);
-        if ($('zkZikir')) $('zkZikir').value = s.zikir;
+        var sel = $('zkZikir');
+        if (sel) { sel.innerHTML = tumZikirler().map(function(z){ return '<option' + (z===s.zikir ? ' selected' : '') + '>' + z + '</option>'; }).join(''); }
         if ($('zkHedef')) $('zkHedef').value = s.hedef;
     }
 
@@ -892,7 +906,6 @@
         if (!sec || sec._zk) return;
         sec._zk = true;
         var sel = $('zkZikir');
-        if (sel) sel.innerHTML = ZIKIRLER.map(function(z){ return '<option' + (z===s.zikir ? ' selected' : '') + '>' + z + '</option>'; }).join('');
         if ($('zkTap')) $('zkTap').addEventListener('click', tik);
         if (sel) sel.addEventListener('change', function(){ s.zikir = this.value; kaydet(); });
         if ($('zkHedef')) $('zkHedef').addEventListener('change', function(){ s.hedef = parseInt(this.value,10); kaydet(); ciz(); });
@@ -904,6 +917,23 @@
         });
         if ($('zkVibBtn')) $('zkVibBtn').addEventListener('click', function(){ s.vib = !s.vib; kaydet(); ciz(); });
         if ($('zkSesBtn')) $('zkSesBtn').addEventListener('click', function(){ s.ses = !s.ses; kaydet(); ciz(); });
+        if ($('zkEkleBtn')) $('zkEkleBtn').addEventListener('click', function(){
+            var inp = $('zkYeni');
+            var ad = (inp && inp.value ? inp.value : '').trim();
+            if (!ad) { if (inp) inp.focus(); return; }
+            if (tumZikirler().indexOf(ad) !== -1) { window.alert('Bu zikir listede zaten var.'); return; }
+            s.ozel.push(ad); s.zikir = ad; if (inp) inp.value = '';
+            kaydet(); ciz();
+        });
+        if ($('zkYeni')) $('zkYeni').addEventListener('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); if ($('zkEkleBtn')) $('zkEkleBtn').click(); } });
+        if ($('zkSilBtn')) $('zkSilBtn').addEventListener('click', function(){
+            if (varsayilanMi(s.zikir)) { window.alert('Varsayilan zikirler silinemez. Sadece eklediginiz ozel zikirleri silebilirsiniz.'); return; }
+            if (window.confirm('"' + s.zikir + '" listeden silinsin mi?')) {
+                s.ozel = s.ozel.filter(function(z){ return z !== s.zikir; });
+                s.zikir = tumZikirler()[0] || '';
+                kaydet(); ciz();
+            }
+        });
         ciz();
     }
 
