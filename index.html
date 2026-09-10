@@ -2142,7 +2142,7 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                     
                     allGMembers.forEach(m => {
                         if (!allMembers.find(a => a.name === m && a.groups[0] === gKey)) {
-                            allMembers.push({ name: m, groups: [gKey], type: (gData.memberTypes && gData.memberTypes[m]) ? gData.memberTypes[m] : "grup" });
+                            allMembers.push({ name: m, groups: [gKey], type: (gData.memberTypes && gData.memberTypes[m]) ? gData.memberTypes[m] : "grup", region: (gData.regions && gData.regions[m]) || "", city: (gData.cities && gData.cities[m]) || "" });
                         }
                     });
                 });
@@ -2151,7 +2151,7 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                 let _pool = getBireyselPool();
                 (_pool.members || []).forEach(pm => {
                     if (!allMembers.find(a => a.name === pm)) {
-                        allMembers.push({ name: pm, groups: ['bireysel'], type: 'bireysel' });
+                        allMembers.push({ name: pm, groups: ['bireysel'], type: 'bireysel', region: (_pool.regions && _pool.regions[pm]) || "", city: (_pool.cities && _pool.cities[pm]) || "" });
                     }
                 });
 
@@ -2209,6 +2209,29 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                     return h;
                 }
 
+                function _anlUniqueVals(field) {
+                    var seen = {}, out = [];
+                    (typeof allMembers !== 'undefined' ? allMembers : []).forEach(function(m){
+                        var v = (m && m[field]) || '';
+                        if (v && !seen[v]) { seen[v] = 1; out.push(v); }
+                    });
+                    out.sort(function(a,b){ return a.localeCompare(b, 'tr'); });
+                    return out;
+                }
+                function getRegionSelectHtml() {
+                    var html = '<option value="all">T\u00fcm B\u00f6lgeler</option>';
+                    _anlUniqueVals('region').forEach(function(v){ html += '<option value="' + v + '">' + v + '</option>'; });
+                    return html;
+                }
+                function getCitySelectHtml() {
+                    var html = '<option value="all">T\u00fcm \u015eehirler</option>';
+                    _anlUniqueVals('city').forEach(function(v){ html += '<option value="' + v + '">' + v + '</option>'; });
+                    return html;
+                }
+                window.getRegionSelectHtml = getRegionSelectHtml;
+                window.getCitySelectHtml = getCitySelectHtml;
+                function getAnlRegionSel() { var e = document.getElementById('analysis-region-select'); return e ? e.value : 'all'; }
+                function getAnlCitySel() { var e = document.getElementById('analysis-city-select'); return e ? e.value : 'all'; }
                 function getMemberSelectHtml(groupNames = 'all', selected = 'all') {
                     let members = [];
                     if (groupNames === 'all') {
@@ -2229,6 +2252,12 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                             });
                         }
                     }
+                    // Bolge/Sehir filtresi (varsa daralt)
+                    try {
+                        var _rF = getAnlRegionSel(), _cF = getAnlCitySel();
+                        if (_rF && _rF !== 'all') members = members.filter(function(mm){ return (mm.region || '') === _rF; });
+                        if (_cF && _cF !== 'all') members = members.filter(function(mm){ return (mm.city || '') === _cF; });
+                    } catch(e){}
                     let html = `<option value="all">👥 Tüm Üyeler</option>`;
                     members.forEach(m => {
                         let _g2 = (m.groups && m.groups[0]) || '';
@@ -3044,8 +3073,14 @@ started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo
                             </div>
                         </div>
                         <div style="padding: 12px 20px; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border-color);">
-                            <div style="font-size:13px; font-weight:bold; color:var(--gold-dark); margin-bottom:8px;">🔍 FİLTRE</div>
-                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px;">
+                                <div style="font-size:13px; font-weight:bold; color:var(--gold-dark);">🔍 FİLTRE</div>
+                                <div id="analysis-selected-group-col" style="display:flex; align-items:center; gap:6px;">
+                                    <span style="font-weight:bold; font-size:12px; color:#555;">📌 Seçili Grup:</span>
+                                    <span id="analysis-selected-group-name" style="padding:4px 8px; border-radius:6px; background: rgba(39,174,96,0.12); border: 1px solid #27ae60; color:#1e7e46; font-weight:bold; font-size:12px; display:flex; align-items:center; word-break:break-word;">Tüm Gruplar</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;">
                             <div style="flex: 1; min-width: 150px;">
                                 <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">📁 Grup Seç:</label>
                                 <select id="analysis-group-select" multiple style="display:none;" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px;">
@@ -3061,15 +3096,23 @@ started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo
 <div id="anl-box-m" class="anl-chkbox"></div>
                             </div>
                             <div style="flex: 1; min-width: 150px;">
+                                <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">🌍 Bölge:</label>
+                                <select id="analysis-region-select" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px;">
+                                    ${getRegionSelectHtml()}
+                                </select>
+                            </div>
+                            <div style="flex: 1; min-width: 150px;">
+                                <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">🏙️ Şehir:</label>
+                                <select id="analysis-city-select" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px;">
+                                    ${getCitySelectHtml()}
+                                </select>
+                            </div>
+                            <div style="flex: 1; min-width: 150px;">
                                 <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">📚 Kitap Seç:</label>
                                 <select id="analysis-book-select" multiple style="display:none;" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 13px;">
                                     ${getBookSelectHtml()}
                                 </select>
 <div id="anl-box-b" class="anl-chkbox"></div>
-                            </div>
-                            <div id="analysis-selected-group-col" style="flex: 1; min-width: 150px; align-self: center;">
-                                <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">📌 Seçili Grup:</label>
-                                <div id="analysis-selected-group-name" style="padding: 6px 8px; border-radius: 6px; background: rgba(39,174,96,0.12); border: 1px solid #27ae60; color: #1e7e46; font-weight: bold; font-size: 13px; display: flex; align-items: center; word-break: break-word;">Tüm Gruplar</div>
                             </div>
                         </div>
 
@@ -3281,6 +3324,21 @@ function _anlRenderAll(){
                     updateAllTabs();
                 });
 
+                ['analysis-region-select','analysis-city-select'].forEach(function(_rid){
+                    var _re = document.getElementById(_rid);
+                    if (!_re) return;
+                    _re.addEventListener('change', function() {
+                        var _grp = 'all';
+                        var _gs = document.getElementById('analysis-group-select');
+                        if (_gs) { var _s = [].slice.call(_gs.selectedOptions).map(function(x){ return x.value; }); _grp = (_s.indexOf('all') > -1 || !_s.length) ? 'all' : _s; }
+                        var _ms = document.getElementById('analysis-member-select');
+                        if (_ms) {
+                            var _cur = [].slice.call(_ms.selectedOptions).map(function(x){ return x.value; });
+                            _ms.innerHTML = getMemberSelectHtml(_grp);
+                            try { _anlRenderBox('analysis-member-select','anl-box-m','\u00dcye'); } catch(e){}
+                        }
+                    });
+                });
                 document.getElementById('analysis-group-select').addEventListener('change', function() {
                     var _o2 = [].slice.call(this.selectedOptions).map(function(x){ return x.value; });
                     var _gsel = (_o2.length && _o2.indexOf('all')===-1) ? _o2 : ['all'];
