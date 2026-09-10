@@ -508,6 +508,7 @@
         #zikirmatikSection .zk-input { flex: 1; min-width: 140px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 14px; box-sizing: border-box; }
         #zikirmatikSection .zk-mini { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--text-main); font-size: 13px; cursor: pointer; min-height: 34px; margin-left: 0; white-space: nowrap; }
         #zikirmatikSection .zk-mini:active { background: var(--gold-primary); color: #fff; }
+        #zikirmatikSection .zk-sayi { display: none; width: 76px; padding: 8px 8px; border-radius: 8px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--text-main); font-size: 13px; min-height: 34px; box-sizing: border-box; text-align: center; }
 
     </style>
 <!-- ===================== </head> / <body> BASLANGICI ===================== -->
@@ -774,14 +775,12 @@
                 <button type="button" id="zkUndoBtn">&#8617; Geri</button>
                 <button type="button" id="zkResetBtn">&#10226; Sıfırla</button>
                 <select id="zkHedef" class="zk-select zk-hedef" title="Sınır sayısı">
-                    <option value="7">7</option>
-                    <option value="9">9</option>
-                    <option value="11">11</option>
-                    <option value="13">13</option>
+                    <option value="0">Boş (elle yaz)</option>
                     <option value="33">33</option>
                     <option value="99">99</option>
                     <option value="100">100</option>
                 </select>
+                <input type="number" id="zkSayi" class="zk-sayi" min="1" max="100" inputmode="numeric" placeholder="sayı" title="İkon sayısı">
                 <button type="button" id="zkVibBtn">Titreşim</button>
                 <button type="button" id="zkSesBtn">Ses</button>
             </div>
@@ -892,6 +891,7 @@
     function tumZikirler(){ return VARSAYILAN_ZIKIRLER.concat(s.ozel); }
     function varsayilanMi(z){ return VARSAYILAN_ZIKIRLER.indexOf(z) !== -1; }
     if (!s.gun) s.gun = {};
+    if (!s.serbest) s.serbest = 11;   // "Bos (elle yaz)" icin uyenin girdigi sayi
 
     function $(id){ return document.getElementById(id); }
     function bugun(){ var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
@@ -920,16 +920,20 @@
     var ZK_KABE = 99;          // Kabe kenari (px)
     var ZK_IKON = 12;          // insan ikonu ust siniri (px)
     function zkIkonBoyu(n){
-        // 33 ve altinda ikonlar iri: aralarinda bosluk kalmasin, tavaf eden
-        // insanlar gibi sik dursun. Kalabalikta mesafeye gore kuculur.
+        // 33 -> 21px, 32 -> 26px, 31 -> 31px ... her azalan zikirde +5px.
+        // Boylece aralarinda bosluk kalmaz, tavaf eden insanlar gibi sik durur.
+        if (n <= 33) {
+            var b = 21 + (33 - n) * 5;
+            if (b > 96) b = 96;      // Kabe'yi ortmesin
+            return b;
+        }
         var aralik = 2 * Math.PI * ZK_R / n;
-        var tavan = (n <= 33) ? 84 : 12;
-        var b = Math.floor(aralik * 0.82);
-        if (b > tavan) b = tavan;
-        if (b < 5) b = 5;
-        return b;
+        var b2 = Math.floor(aralik * 0.9);
+        if (b2 > 12) b2 = 12;
+        if (b2 < 5) b2 = 5;
+        return b2;
     }
-    function zkIkonSayisi(){ return Math.min(s.hedef > 0 ? s.hedef : 11, 100); }
+    function zkIkonSayisi(){ var h = s.hedef > 0 ? s.hedef : (s.serbest > 0 ? s.serbest : 11); return Math.min(h, 100); }
     // Tepeden bakinca insana benzeyen ikon: bas (daire) + govde (omuz yayi)
     var ZK_INSAN = '<svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">'
         + '<circle cx="12" cy="7" r="4"/>'
@@ -961,7 +965,9 @@
             for (var i = 0; i < n; i++) {
                 var a = (i / n) * Math.PI * 2 - Math.PI / 2;   // 12 yonunden, saat yonunde
                 var x = cx + Math.cos(a) * R, y = cy + Math.sin(a) * R;
-                html += '<span class="zk-dot c' + (i % ZK_RENK_SAYISI) + '" data-i="' + i + '" '
+                var _r = (i % ZK_RENK_SAYISI);
+                if (i === n - 1 && n > 1) _r = 0;   // son ikon ilk ikonla ayni renk -> halka kapanir
+                html += '<span class="zk-dot c' + _r + '" data-i="' + i + '" '
                      +  'style="left:' + x.toFixed(1) + 'px;top:' + y.toFixed(1) + 'px;width:' + boy + 'px;height:' + boy
                      +  'px;margin:' + (-yari) + 'px 0 0 ' + (-yari) + 'px">' + ZK_INSAN + '</span>';
             }
@@ -991,7 +997,11 @@
         if ($('zkAr')) $('zkAr').textContent = zkAnlam(s.zikir) || '\u2014';
         if ($('zkOku')) $('zkOku').textContent = zkOku(s.zikir) || '\u2014';
         if ($('zkAnlam')) $('zkAnlam').textContent = zkMan(s.zikir) || '\u2014';
-        if ($('zkHedef')) $('zkHedef').value = s.hedef;
+        if ($('zkHedef')) $('zkHedef').value = String(s.hedef);
+        if ($('zkSayi')) {
+            $('zkSayi').style.display = (s.hedef > 0) ? 'none' : 'inline-block';
+            $('zkSayi').value = (s.serbest > 0) ? s.serbest : '';
+        }
     }
 
     function tik(){
@@ -1023,7 +1033,12 @@
         var sel = $('zkZikir');
         if ($('zkTap')) $('zkTap').addEventListener('click', tik);
         if (sel) sel.addEventListener('change', function(){ s.zikir = this.value; kaydet(); });
-        if ($('zkHedef')) $('zkHedef').addEventListener('change', function(){ s.hedef = parseInt(this.value,10); kaydet(); ciz(); });
+        if ($('zkHedef')) $('zkHedef').addEventListener('change', function(){ s.hedef = parseInt(this.value,10) || 0; kaydet(); ciz(); });
+        if ($('zkSayi')) $('zkSayi').addEventListener('input', function(){
+            var v = parseInt(this.value, 10);
+            if (isNaN(v)) { s.serbest = 11; } else { if (v < 1) v = 1; if (v > 100) v = 100; s.serbest = v; }
+            kaydet(); ciz();
+        });
         if ($('zkUndoBtn')) $('zkUndoBtn').addEventListener('click', function(){
             if (s.sayi > 0) { s.sayi--; if (s.toplam > 0) s.toplam--; var k = bugun(); s.gun[k] = Math.max(0, (s.gun[k]||0) - 1); kaydet(); ciz(); }
         });
