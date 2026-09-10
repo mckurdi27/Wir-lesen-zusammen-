@@ -2,7 +2,7 @@
    Amac: sitenin Chrome'da "Uygulama olarak kur" / tam ekran (standalone)
    olarak calisabilmesini saglamak. Veri Supabase/localStorage'da oldugu icin
    burada AGRESIF onbellegi yok; ag-oncelikli, calisma-zamani geri donus. */
-const CACHE = "hatim-v20";
+const CACHE = "hatim-v21";
 
 self.addEventListener("install", (e) => {
   self.skipWaiting();
