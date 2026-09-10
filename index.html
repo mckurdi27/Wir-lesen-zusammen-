@@ -3435,14 +3435,18 @@ function _anlRenderAll(){
             // ESER VARSAYILANLARI (tum gruplar icin gecerli; kullanici degistirince ustune yazilir)
             var BOOK_SORT_DEFAULTS = { 'kuran': 1 };
             var BOOK_SECTION_DEFAULTS = {'kuran': {"0":{"name":"1. C\u00fcz","page":1},"1":{"name":"2. C\u00fcz","page":22},"2":{"name":"3. C\u00fcz","page":42},"3":{"name":"4. C\u00fcz","page":62},"4":{"name":"5. C\u00fcz","page":82},"5":{"name":"6. C\u00fcz","page":102},"6":{"name":"7. C\u00fcz","page":122},"7":{"name":"8. C\u00fcz","page":142},"8":{"name":"9. C\u00fcz","page":162},"9":{"name":"10. C\u00fcz","page":182},"10":{"name":"11. C\u00fcz","page":202},"11":{"name":"12. C\u00fcz","page":222},"12":{"name":"13. C\u00fcz","page":242},"13":{"name":"14. C\u00fcz","page":262},"14":{"name":"15. C\u00fcz","page":282},"15":{"name":"16. C\u00fcz","page":302},"16":{"name":"17. C\u00fcz","page":322},"17":{"name":"18. C\u00fcz","page":342},"18":{"name":"19. C\u00fcz","page":362},"19":{"name":"20. C\u00fcz","page":382},"20":{"name":"21. C\u00fcz","page":402},"21":{"name":"22. C\u00fcz","page":422},"22":{"name":"23. C\u00fcz","page":442},"23":{"name":"24. C\u00fcz","page":462},"24":{"name":"25. C\u00fcz","page":482},"25":{"name":"26. C\u00fcz","page":502},"26":{"name":"27. C\u00fcz","page":522},"27":{"name":"28. C\u00fcz","page":542},"28":{"name":"29. C\u00fcz","page":562},"29":{"name":"30. C\u00fcz","page":582},"30":{"name":"Dua","page":606}}};
+            // Supabase'ten gelen eser meta (sort + bolumler) - cihazlar arasi ortak
+            window.BOOK_META_SB = window.BOOK_META_SB || {};
             function getBookSortMap(group) {
                 var m = {}; for (var k in BOOK_SORT_DEFAULTS) m[k] = BOOK_SORT_DEFAULTS[k];
                 try { var s = JSON.parse(localStorage.getItem('hatim_booksort_' + group) || '{}'); for (var k2 in s) m[k2] = s[k2]; } catch(e){}
+                try { var sb = window.BOOK_META_SB || {}; for (var k3 in sb) { if (sb[k3] && sb[k3].sort != null) m[k3] = sb[k3].sort; } } catch(e){}
                 return m;
             }
             function getBookSectionsMap(group) {
                 var m = {}; for (var k in BOOK_SECTION_DEFAULTS) m[k] = BOOK_SECTION_DEFAULTS[k];
                 try { var s = JSON.parse(localStorage.getItem('hatim_booksections_' + group) || '{}'); for (var k2 in s) m[k2] = s[k2]; } catch(e){}
+                try { var sb = window.BOOK_META_SB || {}; for (var k3 in sb) { if (sb[k3] && sb[k3].sections && Object.keys(sb[k3].sections).length) m[k3] = sb[k3].sections; } } catch(e){}
                 return m;
             }
             window.getBookSectionsMap = getBookSectionsMap;
@@ -5028,7 +5032,12 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         // SUPABASE-ONCE: eser tanimini books tablosuna yaz, onaylayinca yerel guncelle
                         var _bookRow = { id: id, name: name, total_units: units, type: bookType, default_mode: (bookType === 'bab' ? 'on_bab' : 'yirmi_sayfa'), sort_order: _sortNum };
                         var _bookSB_ = (typeof window.api === 'function') ? window.api('/books?on_conflict=id', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: JSON.stringify(_bookRow) }) : Promise.resolve();
-                        _bookSB_.then(function(){
+                        // Eser meta (sira no + bolumler) Supabase'e yaz -> cihazlar arasi senkron
+                        var _metaBody = { key: 'book_meta_' + id, value: JSON.stringify({ sort: _sortNum, sections: _secsNew }) };
+                        var _metaSB_ = (typeof window.api === 'function') ? window.api('/settings?on_conflict=key', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: JSON.stringify(_metaBody) }) : Promise.resolve();
+                        window.BOOK_META_SB = window.BOOK_META_SB || {};
+                        window.BOOK_META_SB[id] = { sort: _sortNum, sections: _secsNew };
+                        _bookSB_.then(function(){ return _metaSB_; }).then(function(){
                             window.saveGroupData();
                             window.loadGroupData();
                             closeBookModal();
@@ -5781,9 +5790,45 @@ window._origSetItem = origSetItem;
   function pullAll() {
     if (_pulling) return Promise.resolve();
     _pulling = true;
-    return Promise.all([rest.select("groups"), rest.select("members"), rest.select("shares", "?select=member_id,book_id,unit_index,is_read,read_date,read_time,take_date,take_time"), rest.select("books", "?select=id,name,total_units,type,default_mode,sort_order&order=sort_order"), rest.select("book_hatims"), rest.select("book_history")])
+    return Promise.all([rest.select("groups"), rest.select("members"), rest.select("shares", "?select=member_id,book_id,unit_index,is_read,read_date,read_time,take_date,take_time"), rest.select("books", "?select=id,name,total_units,type,default_mode,sort_order&order=sort_order"), rest.select("book_hatims"), rest.select("book_history"), rest.select("settings", "?select=key,value")])
       .then(function (res) {
-        var groups = res[0] || [], members = res[1] || [], shares = res[2] || [], books = res[3] || [], bhRows = res[4] || [], histRows = res[5] || [];
+        var groups = res[0] || [], members = res[1] || [], shares = res[2] || [], books = res[3] || [], bhRows = res[4] || [], histRows = res[5] || [], settingsRows = res[6] || [];
+        window.BOOK_META_SB = {};
+        settingsRows.forEach(function (r) {
+            if (!r || !r.key) return;
+            var k = String(r.key);
+            if (k.indexOf('book_meta_') !== 0) return;
+            var bid = k.slice(10);
+            try { window.BOOK_META_SB[bid] = JSON.parse(r.value || '{}'); } catch(e){}
+        });
+        // TEK SEFERLIK GOC: bu cihazdaki (ornegin telefon) bolum/sira kayitlari
+        // Supabase'te yoksa yukari tasi -> diger cihazlar da gorur.
+        try {
+            if (typeof window.api === 'function') {
+                var _lsSor = {}, _lsSec = {};
+                try { _lsSor = JSON.parse(localStorage.getItem('hatim_booksort_' + currentGroup) || '{}'); } catch(e){}
+                try { _lsSec = JSON.parse(localStorage.getItem('hatim_booksections_' + currentGroup) || '{}'); } catch(e){}
+                var _ids = {};
+                Object.keys(_lsSor).forEach(function(x){ _ids[x] = 1; });
+                Object.keys(_lsSec).forEach(function(x){ _ids[x] = 1; });
+                Object.keys(_ids).forEach(function(bid) {
+                    var hasLocalSec = _lsSec[bid] && Object.keys(_lsSec[bid]).length;
+                    var hasLocalSort = (_lsSor[bid] != null);
+                    if (!hasLocalSec && !hasLocalSort) return;
+                    var sb = window.BOOK_META_SB[bid] || {};
+                    var sbHasSec = sb.sections && Object.keys(sb.sections).length;
+                    var sbHasSort = (sb.sort != null);
+                    // Supabase'te yoksa yerelden doldur (varsayilani ezmesin)
+                    if (hasLocalSec && !sbHasSec) {
+                        window.api('/settings?on_conflict=key', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: JSON.stringify({ key: 'book_meta_' + bid, value: JSON.stringify({ sort: (sb.sort != null ? sb.sort : (_lsSor[bid] != null ? _lsSor[bid] : null)), sections: _lsSec[bid] }) }) }).catch(function(){});
+                        window.BOOK_META_SB[bid] = { sort: (sb.sort != null ? sb.sort : _lsSor[bid]), sections: _lsSec[bid] };
+                    } else if (hasLocalSort && !sbHasSort) {
+                        window.api('/settings?on_conflict=key', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: JSON.stringify({ key: 'book_meta_' + bid, value: JSON.stringify({ sort: _lsSor[bid], sections: (sb.sections || {}) }) }) }).catch(function(){});
+                        window.BOOK_META_SB[bid] = { sort: _lsSor[bid], sections: (sb.sections || {}) };
+                    }
+                });
+            }
+        } catch(e){}
         var bookDef = (books && books.length) ? books.map(function (x) { return { id: x.id, total_units: x.total_units }; }) : [];
         var bookFull = (books && books.length) ? books.map(function (x) { return { id: x.id, name: x.name, totalUnits: x.total_units, type: x.type || "page", defaultMode: x.default_mode || "yirmi_sayfa" }; }) : [];
         var byKey = {}; groups.forEach(function (g) { if (g.key == null || !String(g.key).trim()) return; byKey[g.key] = g; }); // bos-anahtarli hayalet grubu yok say
