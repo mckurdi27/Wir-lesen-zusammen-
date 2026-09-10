@@ -471,9 +471,7 @@
         #zikirmatikSection .zk-picker { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
         #zikirmatikSection .zk-select { flex: 1; min-width: 130px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 14px; }
         #zikirmatikSection .zk-tavaf { position: relative; width: min(72vw, 270px); height: min(72vw, 270px); margin: 10px auto 8px; }
-        #zikirmatikSection .zk-kaaba { position: absolute; left: 50%; top: 50%; width: 99px; height: 99px; margin: -49.5px 0 0 -49.5px; background: #191919; border-radius: 5px; box-shadow: 0 0 0 1px rgba(0,0,0,.25), 0 8px 20px rgba(0,0,0,.3); }
-        #zikirmatikSection .zk-kaaba::before { content: ""; position: absolute; left: 0; right: 0; top: 23px; height: 10px; background: #c9a24b; }
-        #zikirmatikSection .zk-kaaba::after { content: ""; position: absolute; left: 50%; top: 48px; width: 26px; height: 31px; margin-left: -13px; background: #c9a24b; border-radius: 0 0 4px 4px; }
+        #zikirmatikSection .zk-kaaba { position: absolute; left: 50%; top: 50%; width: 99px; height: 99px; margin: -49.5px 0 0 -49.5px; object-fit: contain; display: block; background: none; border-radius: 0; box-shadow: none; filter: drop-shadow(0 6px 12px rgba(0,0,0,.28)); pointer-events: none; }
         #zikirmatikSection .zk-dots { position: absolute; inset: 0; }
         #zikirmatikSection .zk-dot { position: absolute; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: transparent; box-shadow: none; opacity: 0; transition: background .18s, transform .18s, box-shadow .18s, opacity .18s; }
         #zikirmatikSection .zk-dot.on { opacity: 1; transform: scale(1.35); }
@@ -752,7 +750,7 @@
             <div class="zk-anlam" id="zkAnlam">&#8212;</div>
             <!-- Kabe ortada, zikir arttikca renkli noktalar dolar (flip.html tavaf gibi) -->
             <div class="zk-tavaf" id="zkTavaf">
-                <div class="zk-kaaba"></div>
+                <img class="zk-kaaba" src="img/kabe_ikon.png" alt="Kâbe" id="zkKabe">
                 <div class="zk-dots" id="zkDots"></div>
             </div>
             <div class="zk-count" id="zkCount">0</div>
@@ -890,18 +888,22 @@
     function bugun(){ var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
     function kaydet(){ try { localStorage.setItem(KEY, JSON.stringify(s)); } catch(e){} }
 
+    var ZK_SES = "sound/hu.mp3";   // "Allah hu" kaydindan kirpilan "hu" hecesi
     function beep(){
         if (!s.ses) return;
         try {
-            var AC = window.AudioContext || window.webkitAudioContext;
-            if (!AC) return;
-            if (!beep.ac) beep.ac = new AC();
-            var c = beep.ac, o = c.createOscillator(), g = c.createGain();
-            o.frequency.value = 620; o.connect(g); g.connect(c.destination);
-            g.gain.setValueAtTime(0.06, c.currentTime);
-            g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.09);
-            o.start(); o.stop(c.currentTime + 0.1);
+            // ayni anda tek calma: onceki kopyayi basa al
+            if (!beep.a) { beep.a = new Audio(ZK_SES); beep.a.preload = "auto"; beep.a.volume = 0.95; }
+            var a = beep.a;
+            try { a.currentTime = 0; } catch(e){}
+            var p = a.play();
+            if (p && p.catch) p.catch(function(){ /* ilk dokunusa kadar engellenmis olabilir */ });
         } catch(e){}
+    }
+    function sesIsit(){
+        // ilk kullanici dokunusunda sesi hazirla (mobil tarayici kurali)
+        if (beep.a) return;
+        try { beep.a = new Audio(ZK_SES); beep.a.preload = "auto"; beep.a.volume = 0.95; } catch(e){}
     }
 
     var ZK_RENK = ['c0','c1','c2','c3','c4']; // beyaz, sari, siyah, koyu beyaz, yesil
@@ -949,6 +951,7 @@
     }
 
     function tik(){
+        sesIsit();
         s.sayi++; s.toplam++;
         s.gun[bugun()] = (s.gun[bugun()] || 0) + 1;
         if (s.vib && navigator.vibrate) { try { navigator.vibrate(18); } catch(e){} }
