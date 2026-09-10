@@ -3633,7 +3633,7 @@ booksGrid.appendChild(_readBtn);
                             var _pnl = document.createElement('div');
                             _pnl.id = 'toc-panel';
                             _pnl.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:99999; display:flex; align-items:center; justify-content:center; padding:16px;';
-                            var _rowsHtml = _rows.map(function(x, i){ return '<div style="display:flex; justify-content:space-between; padding:10px 12px; border-bottom:1px solid #eee;"><span style="font-weight:bold;">' + (i+1) + '. ' + x.n + '</span><span style="color:#8d6e63;">' + (x.p != null ? ('s. ' + x.p) : '') + '</span></div>'; }).join('');
+                            var _rowsHtml = _rows.map(function(x, i){ var _lbl = String(x.n).replace(/^\s*\d+\s*[\.\)]?\s*/, ''); if (!_lbl) _lbl = x.n; return '<div style="display:flex; justify-content:space-between; padding:10px 12px; border-bottom:1px solid #eee;"><span style="font-weight:bold;">' + (i+1) + '. ' + _lbl + '</span><span style="color:#8d6e63;">' + (x.p != null ? ('s. ' + x.p) : '') + '</span></div>'; }).join('');
                             _pnl.innerHTML = '<div style="background:#fff; border-radius:10px; max-width:420px; width:100%; max-height:80vh; overflow:auto;"><div style="padding:14px; border-bottom:2px solid var(--gold-primary); font-weight:bold; font-size:16px;">' + bookObj.name + ' \u2014 \u0130\u00e7indekiler</div>' + _rowsHtml + '<div style="padding:12px; text-align:right;"><button id="toc-close" style="padding:8px 16px; border:none; border-radius:6px; background:var(--gold-primary); color:#fff; font-weight:bold; cursor:pointer;">Kapat</button></div></div>';
                             document.body.appendChild(_pnl);
                             _pnl.addEventListener('click', function(ev){ if (ev.target === _pnl || ev.target.id === 'toc-close') _pnl.remove(); });
@@ -4786,13 +4786,13 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                         if (!mTable) return;
                         units = units || 0;
                         if (units <= 0) { mTable.innerHTML = ''; return; }
-                        let h = '<table style="width:100%; border-collapse:collapse; font-size:11px;">';
+                        let h = '<table style="width:100%; table-layout:fixed; border-collapse:collapse; font-size:11px;">';
                         h += '<thead><tr>';
-                        h += '<th style="border:1px solid #ccc; padding:4px; background:#eafaf1; color:#27ae60;">1\'lik</th><th style="border:1px solid #ccc; padding:4px; background:#f0f8ff; color:#2980b9;">sayfa</th>';
-                        h += '<th style="border:1px solid #ccc; padding:4px; background:#f5eef8; color:#8e44ad;">5\'lik</th><th style="border:1px solid #ccc; padding:4px;">sayfa</th>';
-                        h += '<th style="border:1px solid #ccc; padding:4px; background:#fdf2e9; color:#e67e22;">10\'luk</th><th style="border:1px solid #ccc; padding:4px;">sayfa</th>';
-                        h += '<th style="border:1px solid #ccc; padding:4px;">20\'lik</th><th style="border:1px solid #ccc; padding:4px;">sayfa</th>';
-                        h += '<th style="border:1px solid #ccc; padding:4px; background:#fff8e1; color:#8d6e63;">Bölüm</th><th style="border:1px solid #ccc; padding:4px; background:#fff8e1; color:#8d6e63;">sayfa</th>';
+                        h += '<th style="border:1px solid #ccc; padding:4px; background:#eafaf1; color:#27ae60; width:38px;">1\'lik</th><th style="border:1px solid #ccc; padding:4px; background:#f0f8ff; color:#2980b9; width:46px;">sayfa</th>';
+                        h += '<th style="border:1px solid #ccc; padding:4px; background:#f5eef8; color:#8e44ad; width:38px;">5\'lik</th><th style="border:1px solid #ccc; padding:4px; width:46px;">sayfa</th>';
+                        h += '<th style="border:1px solid #ccc; padding:4px; background:#fdf2e9; color:#e67e22; width:38px;">10\'luk</th><th style="border:1px solid #ccc; padding:4px; width:46px;">sayfa</th>';
+                        h += '<th style="border:1px solid #ccc; padding:4px; width:38px;">20\'lik</th><th style="border:1px solid #ccc; padding:4px; width:46px;">sayfa</th>';
+                        h += '<th style="border:1px solid #ccc; padding:4px; background:#fff8e1; color:#8d6e63; width:120px;">Bölüm</th><th style="border:1px solid #ccc; padding:4px; background:#fff8e1; color:#8d6e63; width:52px;">sayfa</th>';
                         h += '</tr></thead><tbody>';
                         for (let r = 0; r < units; r++) {
                             h += '<tr>';
@@ -4800,10 +4800,10 @@ document.getElementById("admin-add-book-btn").addEventListener("click", () => {
                                 let blk = (r+1)*st;
                                 let cell = (blk <= units) ? blk : '';
                                 h += '<td style="border:1px solid #eee; padding:3px; text-align:center;">' + cell + '</td>';
-                                h += '<td style="border:1px solid #eee; padding:2px;"><input data-mode="' + st + '" data-row="' + r + '" type="number" min="1" style="width:44px; padding:2px; border:1px solid #ccc; border-radius:4px; font-size:11px; box-sizing:border-box;"></td>';
+                                h += '<td style="border:1px solid #eee; padding:2px;"><input data-mode="' + st + '" data-row="' + r + '" type="number" min="1" style="width:100%; padding:1px; border:1px solid #ccc; border-radius:4px; font-size:11px; box-sizing:border-box;"></td>';
                             });
-                            h += '<td style="border:1px solid #eee; padding:2px;"><input data-sec-name="' + r + '" type="text" placeholder="Bölüm adı" style="width:120px; padding:2px; border:1px solid #ccc; border-radius:4px; font-size:11px; box-sizing:border-box;"></td>';
-                            h += '<td style="border:1px solid #eee; padding:2px;"><input data-sec-page="' + r + '" type="number" min="1" placeholder="s." style="width:52px; padding:2px; border:1px solid #ccc; border-radius:4px; font-size:11px; box-sizing:border-box;"></td>';
+                            h += '<td style="border:1px solid #eee; padding:2px;"><input data-sec-name="' + r + '" type="text" placeholder="Bölüm adı" style="width:100%; padding:1px; border:1px solid #ccc; border-radius:4px; font-size:11px; box-sizing:border-box;"></td>';
+                            h += '<td style="border:1px solid #eee; padding:2px;"><input data-sec-page="' + r + '" type="number" min="1" placeholder="s." style="width:100%; padding:1px; border:1px solid #ccc; border-radius:4px; font-size:11px; box-sizing:border-box;"></td>';
                             h += '</tr>';
                         }
                         h += '</tbody></table>';
