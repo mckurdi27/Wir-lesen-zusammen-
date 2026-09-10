@@ -3097,9 +3097,11 @@ started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo
                                     <select id="analysis-city-select" style="display:none;">${getCitySelectHtml()}</select>
                                     <div id="anl-box-c" class="anl-chkbox" data-title="🏙️ Şehir Seç"></div>
                                 </div>
+                                <div class="anl-filter-col">
+                                    <select id="analysis-book-select" multiple style="display:none;">${getBookSelectHtml()}</select>
+                                    <div id="anl-box-b" class="anl-chkbox" data-title="📚 Kitap Seç"></div>
+                                </div>
                             </div>
-                            <select id="analysis-book-select" multiple style="display:none;">${getBookSelectHtml()}</select>
-                            <div id="anl-box-b" class="anl-chkbox" data-title="📚 Kitap Seç" style="display:none;"></div>
                         </div>
 
                         <div style="display: flex; gap: 4px; padding: 10px 15px 0 15px; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border-color); overflow-x: auto;">
@@ -3287,7 +3289,7 @@ function _anlRenderAll(){
   _anlRenderBox('analysis-member-select','anl-box-m','Üye');
   _anlRenderBox('analysis-region-select','anl-box-r','Bölge');
   _anlRenderBox('analysis-city-select','anl-box-c','Şehir');
-  var _bb=document.getElementById('anl-box-b'); if(_bb && _bb.offsetParent!==null) _anlRenderBox('analysis-book-select','anl-box-b','Kitap');
+  _anlRenderBox('analysis-book-select','anl-box-b','Kitap');
 }
 
                 function _curGroupArr(){
