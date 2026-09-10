@@ -498,20 +498,23 @@
         #zikirmatikSection .zk-stats { display: flex; gap: 22px; margin: 14px 0 0; justify-content: center; text-align: center; }
         #zikirmatikSection .zk-stats b { display: block; font-size: 18px; color: var(--gold-dark); }
         #zikirmatikSection .zk-stats span { font-size: 11px; opacity: .65; }
-        #zikirmatikSection .zk-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; justify-content: center; }
-        #zikirmatikSection .zk-actions button { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--text-main); font-size: 13px; cursor: pointer; min-height: 34px; margin-left: 0; }
+        #zikirmatikSection .zk-tur-row { display: inline-flex; align-items: center; gap: 3px; }
+#zikirmatikSection .zk-turreset { border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--gold-dark); border-radius: 5px; font-size: 10px; line-height: 1; padding: 1px 4px; min-height: 0; margin: 0; cursor: pointer; vertical-align: middle; }
+#zikirmatikSection .zk-turreset:active { background: var(--gold-primary); color: #fff; }
+#zikirmatikSection .zk-actions { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; justify-content: center; align-items: center; font-size: 11px; }
+        #zikirmatikSection .zk-actions button { padding: 1px 7px; border-radius: 6px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--text-main); font-size: 11px; line-height: 1.25; cursor: pointer; min-height: 0; margin-left: 0; }
         #zikirmatikSection .zk-actions button.on { background: var(--gold-primary); color: #fff; }
         #zikirmatikSection .zk-ar { font-size: 26px; line-height: 1.9; text-align: center; color: var(--gold-dark); margin: 2px 0 8px; font-family: "Traditional Arabic", "Amiri", "Times New Roman", serif; }
         #zikirmatikSection .zk-oku { text-align: center; font-size: 16px; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
         #zikirmatikSection .zk-anlam { text-align: center; font-size: 13px; opacity: .75; color: var(--text-main); margin-bottom: 12px; }
         #zikirmatikSection .zk-ayar { display: none; margin-bottom: 12px; }
         #zikirmatikSection .zk-ayar.on { display: block; }
-        #zikirmatikSection .zk-actions .zk-hedef { flex: 0 0 auto; min-width: 78px; min-height: 34px; padding: 6px 8px; font-size: 13px; }
+        #zikirmatikSection .zk-actions .zk-hedef { flex: 0 0 auto; min-width: 48px; min-height: 0; padding: 1px 4px; font-size: 11px; line-height: 1.25; }
         #zikirmatikSection .zk-custom { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
         #zikirmatikSection .zk-input { flex: 1; min-width: 140px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 14px; box-sizing: border-box; }
         #zikirmatikSection .zk-mini { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--text-main); font-size: 13px; cursor: pointer; min-height: 34px; margin-left: 0; white-space: nowrap; }
         #zikirmatikSection .zk-mini:active { background: var(--gold-primary); color: #fff; }
-        #zikirmatikSection .zk-sayi { display: none; width: 76px; padding: 8px 8px; border-radius: 8px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--text-main); font-size: 13px; min-height: 34px; box-sizing: border-box; text-align: center; }
+        #zikirmatikSection .zk-sayi { display: none; width: 46px; padding: 1px 4px; border-radius: 6px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--text-main); font-size: 11px; line-height: 1.25; min-height: 0; box-sizing: border-box; text-align: center; }
 
     </style>
 <!-- ===================== </head> / <body> BASLANGICI ===================== -->
@@ -769,7 +772,7 @@
             <div class="zk-sub" id="zkSub">Hedef: 33</div>
             <button class="zk-tap" id="zkTap">Z&#304;KRET</button>
             <div class="zk-stats">
-                <div><b id="zkTur">0</b><span>Tur</span></div>
+                <div><b id="zkTur">0</b><span class="zk-tur-row"><button type="button" id="zkTurResetBtn" class="zk-turreset" title="Tur sayacını sıfırla" aria-label="Tur sayacını sıfırla">&#10226;</button>Tur</span></div>
                 <div><b id="zkToplam">0</b><span>Toplam</span></div>
                 <div><b id="zkGunluk">0</b><span>Bug&#252;n</span></div>
             </div>
@@ -872,7 +875,9 @@
 <script>
 (function(){
     var KEY = 'zikirmatik_v1';
-    var VARSAYILAN_ZIKIRLER = ['Sübhânallah','Elhamdülillah','Allâhu Ekber','Lâ ilâhe illallah','Estağfirullah','Salavât-ı Şerîfe','Bismillah'];
+    // Zikir listesi once json/zikir.json'dan yuklenir; erisilemezse bu yerlesik yedek kullanilir.
+    var YEDEK_ZIKIRLER = ['Sübhânallah','Elhamdülillah','Allâhu Ekber','Lâ ilâhe illallah','Estağfirullah','Salavât-ı Şerîfe','Bismillah'];
+    var VARSAYILAN_ZIKIRLER = YEDEK_ZIKIRLER.slice();
     var ZK_BILGI = {
         'Sübhânallah': { ar: 'سُبْحَانَ اللَّهِ', ok: 'Sübhânallah', anlam: 'Allah’ı her türlü eksiklikten tenzih ederim.' },
         'Elhamdülillah': { ar: 'الْحَمْدُ لِلَّهِ', ok: 'Elhamdülillah', anlam: 'Hamd, Allah’a mahsustur.' },
@@ -882,6 +887,47 @@
         'Salavât-ı Şerîfe': { ar: 'اَللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ', ok: 'Allahümme salli alâ seyyidinâ Muhammed', anlam: 'Allah’ım, Efendimiz Muhammed’e rahmet et.' },
         'Bismillah': { ar: 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ', ok: 'Bismillâhirrahmânirrahîm', anlam: 'Rahmân ve Rahîm olan Allah’ın adıyla.' }
     };
+
+    // --- zikir.json : asil zikir kaynagi ---
+    var ZK_JSON = 'json/zikir.json';
+    var ZK_KATEGORI = {};
+    var zkJsonYuklendi = false;
+    function zkJsonUygula(d){
+        var arr = (d && d.zikirler) ? d.zikirler : null;
+        if (!arr || !arr.length) return false;
+        var bilgi = {}, adlar = [], kat = {};
+        for (var i = 0; i < arr.length; i++) {
+            var k = arr[i] || {};
+            var ad = (k.baslik || '').trim();
+            if (!ad) continue;
+            bilgi[ad] = { ar: k.arapca || '', ok: k.okunus || ad, anlam: k.anlam || '',
+                          hedef: parseInt(k.hedef, 10) || 0, kategori: k.kategori || '',
+                          kaynak: k.kaynak || '' };
+            kat[ad] = k.kategori || 'Zikirler';
+            adlar.push(ad);
+        }
+        if (!adlar.length) return false;
+        ZK_BILGI = bilgi; ZK_KATEGORI = kat;
+        VARSAYILAN_ZIKIRLER = adlar;
+        zkJsonYuklendi = true;
+        // mevcut secim JSON listesinde yoksa (yazim farki) ilk zikre gec
+        if (adlar.indexOf(s.zikir) === -1) {
+            var ozel = s.ozel || [];
+            if (ozel.indexOf(s.zikir) === -1) s.zikir = adlar[0];
+        }
+        if (ZK_BILGI[s.zikir] && ZK_BILGI[s.zikir].hedef > 0 && !s.sayi) {
+            // ilk acilista hedefi JSON'dan al (sadece sayac sifirken)
+            s.hedef = ZK_BILGI[s.zikir].hedef;
+        }
+        return true;
+    }
+    function zkYukle(){
+        return fetch(ZK_JSON, { cache: 'no-store' })
+            .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function(d){ if (!zkJsonUygula(d)) throw new Error('bos'); })
+            .catch(function(){ zkJsonYuklendi = false; });
+    }
+
     function zkAnlam(z){ var b = ZK_BILGI[z]; return b ? b.ar : ''; }
     function zkOku(z){ var b = ZK_BILGI[z]; return b ? b.ok : z; }
     function zkMan(z){ var b = ZK_BILGI[z]; return b ? b.anlam : 'Özel zikir'; }
@@ -1093,7 +1139,16 @@
         if ($('zkVibBtn')) $('zkVibBtn').classList.toggle('on', !!s.vib);
         if ($('zkSesBtn')) $('zkSesBtn').classList.toggle('on', !!s.ses);
         var sel = $('zkZikir');
-        if (sel) { sel.innerHTML = tumZikirler().map(function(z){ return '<option' + (z===s.zikir ? ' selected' : '') + '>' + z + '</option>'; }).join(''); }
+        if (sel) {
+            var opt = '', sonKat = null;
+            tumZikirler().forEach(function(z){
+                var kt = ZK_KATEGORI[z] || null;
+                if (kt && kt !== sonKat) { if (sonKat !== null) opt += '</optgroup>'; opt += '<optgroup label="' + kt.replace(/"/g,'&quot;') + '">'; sonKat = kt; }
+                opt += '<option' + (z===s.zikir ? ' selected' : '') + '>' + z + '</option>';
+            });
+            if (sonKat !== null) opt += '</optgroup>';
+            sel.innerHTML = opt;
+        }
         if ($('zkAr')) $('zkAr').textContent = zkAnlam(s.zikir) || '\u2014';
         if ($('zkOku')) $('zkOku').textContent = zkOku(s.zikir) || '\u2014';
         if ($('zkAnlam')) $('zkAnlam').textContent = zkMan(s.zikir) || '\u2014';
@@ -1136,7 +1191,12 @@
         sec._zk = true;
         var sel = $('zkZikir');
         if ($('zkTap')) $('zkTap').addEventListener('click', tik);
-        if (sel) sel.addEventListener('change', function(){ s.zikir = this.value; kaydet(); });
+        if (sel) sel.addEventListener('change', function(){
+            s.zikir = this.value;
+            var b = ZK_BILGI[s.zikir];
+            if (b && b.hedef > 0) { s.hedef = b.hedef; s.sayi = 0; }
+            kaydet(); ciz();
+        });
         if ($('zkHedef')) $('zkHedef').addEventListener('change', function(){
             s.hedef = parseInt(this.value, 10) || 0;
             kaydet(); ciz();
@@ -1155,6 +1215,11 @@
         });
         if ($('zkResetBtn')) $('zkResetBtn').addEventListener('click', function(){
             if (window.confirm('Sayaç sıfırlansın mı? (Tur ve toplam korunur)')) { s.sayi = 0; kaydet(); ciz(); }
+        });
+        if ($('zkTurResetBtn')) $('zkTurResetBtn').addEventListener('click', function(){
+            if (window.confirm('Tur sayac\u0131 s\u0131f\u0131rlans\u0131n m\u0131? (Tur ve toplam 0 olur)')) {
+                s.tur = 0; s.toplam = 0; s.sayi = 0; s.gun = {}; kaydet(); ciz();
+            }
         });
         if ($('zkVibBtn')) $('zkVibBtn').addEventListener('click', function(){ s.vib = !s.vib; kaydet(); ciz(); });
         if ($('zkSesBtn')) $('zkSesBtn').addEventListener('click', function(){ s.ses = !s.ses; kaydet(); ciz(); });
@@ -1179,6 +1244,7 @@
             }
         });
         ciz();
+        zkYukle().then(function(){ ciz(); });
         window.addEventListener('resize', function(){ var w = $('zkDots'); if (w) w._k = null; cizTavaf(); });
     }
 
