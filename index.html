@@ -3054,7 +3054,7 @@ started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo
                                 <h2 style="margin: 0; font-size: 20px; color: #8a6d3b;">📊 Detaylı Analiz Paneli</h2>
                                 <div style="font-size: 12px; opacity: 0.8;">Aktif Grup: ${currentGroup.replace(/_/g, ' ').toUpperCase()}</div>
                             </div>
-                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <div style="display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap;">
                                 <button id="modal-excel-btn" style="background: #27ae60; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px;">📊 Excel</button>
                                 <button id="modal-print-btn" style="background: #2980b9; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px;">🖨️ Yazdır</button>
                                 <button id="modal-close-btn" style="background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px;">✕ Kapat</button>
@@ -4024,8 +4024,8 @@ window._grpGizli = function _grpGizli(gk){ if(!gk) return false; try{ var _d=JSO
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; font-size: 14px; border: 1px solid var(--border-color);">
                         <span>• ${m}</span>
                         <div style="display: flex; gap: 6px;">
-                            <button class="admin-edit-member" data-name="${m}" style="background: #f39c12; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; min-height: 40px;">Düzelt</button>
-                            <button class="admin-remove-member" data-name="${m}" style="background: #e74c3c; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; min-height: 40px;">Çıkart</button>
+                            <button class="admin-edit-member" data-name="${m}" style="background: #f39c12; color: #fff; border: none; padding: 6px 10px; border-radius: 4px; font-size: 12px; cursor: pointer;">Düzelt</button>
+                            <button class="admin-remove-member" data-name="${m}" style="background: #e74c3c; color: #fff; border: none; padding: 6px 10px; border-radius: 4px; font-size: 12px; cursor: pointer;">Çıkart</button>
                         </div>
                     </div>
                 `).join('');
@@ -4039,15 +4039,15 @@ window._grpGizli = function _grpGizli(gk){ if(!gk) return false; try{ var _d=JSO
                     </div>
                         <div style="margin-bottom: 12px;">
                             <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
+                                <div style="display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap; margin-bottom: 12px;">
                             <label style="font-weight: bold; font-size: 13px; white-space: nowrap;">Grup:</label>
                             <select id="admin-group-select" style="padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); flex: 1; min-width: 120px; min-height: 44px; font-size: 14px;">${groupsHtml}</select>
                             </div>
-                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px;">
-<button id="admin-add-group" style="flex:1; min-width:0; background: #27ae60; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">+ Ekle</button>
-                            <button id="admin-edit-group" style="flex:1; min-width:0; background: #f39c12; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">✏️ Düzenle</button>
-                            <button id="admin-delete-group" style="flex:1; min-width:0; background: #e74c3c; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">🗑️ Sil</button>
-                            <button id="admin-set-password" style="flex:1; min-width:0; background: #8e44ad; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; min-height: 44px;">🔑 Şifre</button>
+                            <div style="display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap; margin-top: 8px;">
+<button id="admin-add-group" style="flex:1; min-width:0; background: #27ae60; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">+ Ekle</button>
+                            <button id="admin-edit-group" style="flex:1; min-width:0; background: #f39c12; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">Düzenle</button>
+                            <button id="admin-delete-group" style="flex:1; min-width:0; background: #e74c3c; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">Sil</button>
+                            <button id="admin-set-password" style="flex:1; min-width:0; background: #8e44ad; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;">Şifre</button>
                             </div>
                         </div>
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
@@ -4085,8 +4085,8 @@ window._grpGizli = function _grpGizli(gk){ if(!gk) return false; try{ var _d=JSO
                                 ${memberDetails ? `<div style="font-size: 11px; color: #555; margin-top: 2px;">📖 ${memberDetails}</div>` : '<div style="font-size: 11px; color: #999; margin-top: 2px;">📖 Henüz kimse almadı</div>'}
                             </div>
                             <div style="display: flex; gap: 4px; flex-wrap: wrap;">
-                                <button class="admin-edit-book" data-id="${b.id}" style="background: #f39c12; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; min-height: 40px;">Düzenle</button>
-                                <button class="admin-remove-book" data-id="${b.id}" style="background: #e74c3c; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; min-height: 40px;">Sil</button>
+                                <button class="admin-edit-book" data-id="${b.id}" style="background: #f39c12; color: #fff; border: none; padding: 6px 10px; border-radius: 4px; font-size: 12px; cursor: pointer;">Düzenle</button>
+                                <button class="admin-remove-book" data-id="${b.id}" style="background: #e74c3c; color: #fff; border: none; padding: 6px 10px; border-radius: 4px; font-size: 12px; cursor: pointer;">Sil</button>
                             </div>
                         </div>
                     `;
@@ -4248,13 +4248,13 @@ window.infoSortTable = function infoSortTable(col) {
                                     </div>
                                 </div>
                                 </div>
-                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                    <button id="admin-bulk-assign-btn" style="flex: 1; padding: 10px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; min-width: 80px;">📥 Atama</button>
-                                    <button id="admin-bulk-delete-btn" style="flex: 1; padding: 10px; background: #e74c3c; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; min-width: 80px;">🗑️ Sil</button>
-                                    <button id="admin-bulk-reset-btn" style="flex: 1; padding: 10px; background: #f39c12; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px; min-width: 80px;">🔄 Sıfırla</button>
+                                <div style="display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap;">
+                                    <button id="admin-bulk-assign-btn" style="flex: 1; padding: 6px 10px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; min-width: 70px;">Atama</button>
+                                    <button id="admin-bulk-delete-btn" style="flex: 1; padding: 6px 10px; background: #e74c3c; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; min-width: 70px;">Sil</button>
+                                    <button id="admin-bulk-reset-btn" style="flex: 1; padding: 6px 10px; background: #f39c12; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; min-width: 70px;">Sıfırla</button>
                                 </div>
                                 <div>
-                                    <button id="admin-bulk-view-btn" style="width: 100%; padding: 10px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; min-height: 44px;">👁️ Alınan Hisseleri Gör / Düzenle</button>
+                                    <button id="admin-bulk-view-btn" style="width: 100%; padding: 6px 10px; background: #8e44ad; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;">Alınan Hisseleri Gör / Düzenle</button>
                                 </div>
                                 <div id="admin-bulk-view-panel" style="display: none; border-top: 1px dashed var(--border-color); padding-top: 10px;">
                                 </div>
@@ -4269,9 +4269,9 @@ window.infoSortTable = function infoSortTable(col) {
                         
                     </div>
                     <textarea id="admin-msg-input" placeholder="Mesajınızı yazın..." style="width: 100%; height: 60px; padding: 12px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; margin-bottom: 10px; font-size: 14px; box-sizing: border-box; resize: vertical;"></textarea>
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        <button id="send-admin-msg-btn" style="flex: 1.4; min-width: 0; padding: 10px 12px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">💬 WhatsApp ile Gönder</button>
-                        <button id="wa-app-btn" class="wa-app-btn" title="Uygulamayı WhatsApp'ta paylaş" style="flex: 1; min-width: 0; padding: 10px 12px; background: #128C7E; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">📱 Uygulamayı Paylaş</button>
+                    <div style="display: flex; gap: 8px; align-items: stretch;">
+                        <button id="send-admin-msg-btn" style="flex: 1.4; min-width: 0; padding: 6px 10px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">WhatsApp ile Gönder</button>
+                        <button id="wa-app-btn" class="wa-app-btn" title="Uygulamayı WhatsApp'ta paylaş" style="flex: 1; min-width: 0; padding: 6px 10px; background: #128C7E; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Uygulamayı Paylaş</button>
                     </div>
                     <div style="font-size: 11px; color: #777; text-align: left; margin-top: 6px;">Arkadaşlarını bu uygulamaya WhatsApp ile davet et</div>
                 `;
@@ -4287,7 +4287,7 @@ window.infoSortTable = function infoSortTable(col) {
                                     Beni hatırla
                                 </label>
                             </div>
-                            <div style="display:flex; gap:10px; margin-bottom:14px;"><button id="admin-open-kontrol" title="Kontrol sayfasını aç" style="flex:1;background:#2980b9;color:#fff;border:none;padding:8px 10px;border-radius:8px;font-size:12px;font-weight:bold;min-height:32px;cursor:pointer;white-space:nowrap;">📋 Kontrol</button><button id="admin-open-detailed-analysis" style="flex:1;background:#8e44ad;color:#fff;border:none;padding:8px 10px;border-radius:8px;font-size:12px;font-weight:bold;min-height:32px;cursor:pointer;white-space:nowrap;">📊 Analiz</button></div>
+                            <div style="display:flex; gap:10px; align-items:stretch; margin-bottom:14px;"><button id="admin-open-kontrol" title="Kontrol sayfasını aç" style="flex:1;background:#2980b9;color:#fff;border:none;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:bold;cursor:pointer;white-space:nowrap;">Kontrol</button><button id="admin-open-detailed-analysis" style="flex:1;background:#8e44ad;color:#fff;border:none;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:bold;cursor:pointer;white-space:nowrap;">Analiz</button></div>
                                 
                             <div class="admin-panel-grid">
                                 ${groupSectionHtml}
@@ -4645,10 +4645,10 @@ function bulkBookIds() {
                                 </select>
                             </div>`;
                             h += `<div id="bv-units-wrap" style="max-height:220px; overflow-y:auto; border:1px solid var(--border-color); border-radius:6px; padding:8px; background:var(--card-bg);"></div>`;
-                            h += `<div style="margin-top:10px; display:flex; gap:12px; flex-wrap:wrap;">
-                                <button id="bv-save" style="flex:1; padding:8px; background:#27ae60; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:12px; min-height:44px;">💾 Kaydet</button>
-                                <button id="bv-clear-sel" style="flex:1; padding:8px; background:#e67e22; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:12px; min-height:44px;">Temizle</button>
-                                <button id="bv-clear-owner" style="flex:1; padding:8px; background:#e74c3c; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:12px; min-height:44px;">🗑️ Hisseleri Temizle</button>
+                            h += `<div style="margin-top:10px; display:flex; gap:12px; align-items:stretch; flex-wrap:wrap;">
+                                <button id="bv-save" style="flex:1; padding:6px 10px; background:#27ae60; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:12px;">Kaydet</button>
+                                <button id="bv-clear-sel" style="flex:1; padding:6px 10px; background:#e67e22; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:12px;">Temizle</button>
+                                <button id="bv-clear-owner" style="flex:1; padding:6px 10px; background:#e74c3c; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:12px;">Hisseleri Temizle</button>
                             </div>`;
                             panel.innerHTML = h;
                             panel.style.display = 'block';
