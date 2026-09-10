@@ -2964,6 +2964,12 @@ started.push({ grup: gKey, bid: bid, eser: bname[bid] || bid, hatimNo: h.hatimNo
                                     }
                                 }
                                 localStorage.setItem(key, JSON.stringify(g));
+                                // SUPABASE-ONCE (kural 8a): hatim degisikligini Supabase'e yaz.
+                                // (Onceden yalniz localStorage'a yaziliyordu; sayfa yenilenince
+                                //  Supabase'ten eski kayit geri geliyordu = silme/sifirlama kayboluyordu.)
+                                if (typeof window.syncHatimToSB === 'function') {
+                                    try { window.syncHatimToSB(gkey, g); } catch(_he){}
+                                }
                             } catch(e){}
                             renderTab6();
                         });
