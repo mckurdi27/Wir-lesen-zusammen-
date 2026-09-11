@@ -1273,19 +1273,13 @@
         $('zkCount').textContent = (s.tur > 0)
             ? (s.tur + '.' + ZK_BOSLUK + s.sayi)
             : String(s.sayi);
-        // Kabe alti: yazili (hazir) hedefte "Hedef: N", serbest hedefte "Serbest N"
+        // Kabe alti hedef yazisi (onceki surumdeki gibi her zaman gorunur)
         if ($('zkSub')) {
             var hazir = [7,11,33,66,99].indexOf(s.hedef) !== -1;
-            if (s.hedef > 0) {
-                $('zkSub').textContent = (hazir ? 'Hedef: ' : 'Serbest ') + s.hedef;
-                $('zkSub').style.display = '';
-            } else if (s.toplam > 0) {
-                $('zkSub').textContent = 'Serbest ' + s.toplam;
-                $('zkSub').style.display = '';
-            } else {
-                $('zkSub').textContent = '';
-                $('zkSub').style.display = 'none';
-            }
+            $('zkSub').textContent = (s.hedef > 0)
+                ? ((hazir ? 'Hedef: ' : 'Serbest ') + s.hedef)
+                : 'Hedef: 33';
+            $('zkSub').style.display = '';
         }
         if ($('zkNo')) $('zkNo').textContent = siraNo(s.zikir);
         $('zkTur').textContent = s.tur;
