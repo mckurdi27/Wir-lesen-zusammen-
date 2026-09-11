@@ -552,7 +552,14 @@
         #zikirmatikSection .zk-ar { font-size: 26px; line-height: 1.9; text-align: center; color: #000000; font-weight: 800; margin: 2px 0 8px; font-family: "Traditional Arabic", "Amiri", "Times New Roman", serif; }
         #zikirmatikSection .zk-oku { text-align: center; font-size: 16px; font-weight: 400; color: var(--gold-primary); margin-bottom: 6px; }
         #zikirmatikSection .zk-anlam { text-align: center; font-size: 13px; color: #0e6b3a; font-weight: 800; margin-bottom: 12px; }
-        #zikirmatikSection .zk-surekli { display: flex; align-items: center; gap: 5px; margin-top: 7px; font-size: 12px; }
+        #zikirmatikSection .zk-kayit-wrap { margin-top: 7px; max-height: 182px; overflow: auto; border: 1px solid var(--gold-primary); border-radius: 8px; background: var(--card-bg); }
+#zikirmatikSection .zk-kayit-tablo { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 430px; }
+#zikirmatikSection .zk-kayit-tablo th, #zikirmatikSection .zk-kayit-tablo td { padding: 3px 6px; text-align: left; white-space: nowrap; border-bottom: 1px solid rgba(0,0,0,.08); }
+#zikirmatikSection .zk-kayit-tablo thead th { position: sticky; top: 0; background: var(--card-bg); font-weight: 700; color: var(--gold-dark); z-index: 1; }
+#zikirmatikSection .zk-kayit-tablo .zk-k-bos { text-align: center; opacity: .6; }
+#zikirmatikSection .zk-k-sil { border: 1px solid #b3261e; background: var(--card-bg); color: #b3261e; border-radius: 6px; font-size: 11px; font-weight: 700; padding: 1px 6px; min-height: 0; cursor: pointer; }
+#zikirmatikSection #zkKayitFiltre { margin-top: 7px; width: 100%; }
+#zikirmatikSection .zk-surekli { display: flex; align-items: center; gap: 5px; margin-top: 7px; font-size: 12px; }
 #zikirmatikSection .zk-ayar { display: none; margin-bottom: 12px; }
         #zikirmatikSection .zk-ayar.on { display: block; }
         #zikirmatikSection .zk-actions .zk-hedef { flex: 0 0 auto; min-width: 48px; min-height: 0; padding: 1px 4px; font-size: 11px; line-height: 1.25; }
@@ -806,6 +813,13 @@
                     <button type="button" id="zkSilBtn" class="zk-mini">Sil</button>
                 </div>
                 <label class="zk-kk zk-surekli"><input type="checkbox" id="zkSurekliSes"><span>S&#252;rekli ses (saymadan bağımsız &#231;alar)</span></label>
+                <input type="text" id="zkKayitFiltre" class="zk-input" placeholder="Zikir ara / filtrele" maxlength="40" autocomplete="off">
+                <div class="zk-kayit-wrap">
+                    <table class="zk-kayit-tablo">
+                        <thead><tr><th>Zikir</th><th>Çekim (tarih / saat)</th><th>Hedef</th><th>Tur</th><th>Sil</th></tr></thead>
+                        <tbody id="zkKayitGovde"></tbody>
+                    </table>
+                </div>
             </div>
             <!-- 1. satir : Arapca metin -->
             <div class="zk-ar" id="zkAr" dir="rtl">&#8212;</div>
@@ -1432,6 +1446,7 @@
             var bv = parseInt(ab[bi].getAttribute('data-adet'), 10) || 0;
             if (bv > 0) ab[bi].classList.toggle('on', bv === s.hedef);
         }
+        zkKayitTablosu();
         // cekboks durumu: secili kaynak
         var kkBtns = document.querySelectorAll('#zkKaynak .zk-kk input');
         for (var ki = 0; ki < kkBtns.length; ki++) {
@@ -1446,6 +1461,44 @@
         }
     }
 
+    // --- KAYIT TABLOSU: uyenin cekmeye basladigi zikirler ---
+    function zkTarihSaat(iso){
+        if (!iso) return '\u2014';
+        var d = new Date(iso); if (isNaN(d.getTime())) return '\u2014';
+        function p2(n){ return (n < 10 ? '0' : '') + n; }
+        return p2(d.getDate()) + '.' + p2(d.getMonth()+1) + '.' + d.getFullYear()
+             + ' ' + p2(d.getHours()) + ':' + p2(d.getMinutes());
+    }
+    function zkKayitTablosu(){
+        var gov = $('zkKayitGovde'); if (!gov) return;
+        var filtre = (($('zkKayitFiltre') && $('zkKayitFiltre').value) || '').trim().toLocaleLowerCase('tr');
+        var satirlar = [];
+        var adlar = Object.keys(s.zk || {});
+        for (var i = 0; i < adlar.length; i++) {
+            var ad = adlar[i], r = s.zk[ad]; if (!r || typeof r !== 'object') continue;
+            if (!(r.toplam > 0) && !r.baslangic) continue;        // hic cekilmemis -> satir yok
+            if (filtre && ad.toLocaleLowerCase('tr').indexOf(filtre) === -1) continue;
+            satirlar.push({ ad: ad, r: r });
+        }
+        satirlar.sort(function(a,b){ return String(b.r.baslangic||'').localeCompare(String(a.r.baslangic||'')); });
+        var h = '';
+        if (!satirlar.length) {
+            h = '<tr><td class="zk-k-bos" colspan="5">' + (filtre ? 'Eşleşen kayıt yok' : 'Henüz zikir çekilmedi') + '</td></tr>';
+        } else {
+            for (var t = 0; t < satirlar.length; t++) {
+                var o = satirlar[t], rr = o.r;
+                h += '<tr>'
+                  +  '<td>' + String(o.ad).replace(/[<>&]/g, function(c){ return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c]; }) + '</td>'
+                  +  '<td>' + zkTarihSaat(rr.baslangic) + '</td>'
+                  +  '<td>' + (rr.hedef > 0 ? rr.hedef : '\u2014') + '</td>'
+                  +  '<td>' + (rr.tur || 0) + '</td>'
+                  +  '<td><button type="button" class="zk-k-sil" data-ad="' + String(o.ad).replace(/"/g,'&quot;') + '">Sil</button></td>'
+                  +  '</tr>';
+            }
+        }
+        gov.innerHTML = h;
+    }
+
     function tik(){
         sesIsit();
         // Hedef yazilmadan sayim baslamaz
@@ -1455,6 +1508,9 @@
         }
         // Tur, tamamlaninca degil BASLADIGINDA artar: yeni turun ilk tiklamasi
         if (s.sayi === 0) s.tur++;
+        // Cekmeye ilk baslama ani (kayit tablosunun tarih/saat sutunu)
+        var _k = zkKayit(s.zikir);
+        if (!_k.baslangic) _k.baslangic = new Date().toISOString();
         s.sayi++; s.toplam++;
         s.gun[bugun()] = (s.gun[bugun()] || 0) + 1;
         if (s.vib && navigator.vibrate) { try { navigator.vibrate(18); } catch(e){} }
@@ -1619,6 +1675,14 @@
                 else { kaydet(); ciz(); beep(); }
             };
             try { rd.readAsDataURL(f); } catch(err){}
+        });
+        if ($('zkKayitFiltre')) $('zkKayitFiltre').addEventListener('input', function(){ zkKayitTablosu(); });
+        if ($('zkKayitGovde')) $('zkKayitGovde').addEventListener('click', function(e){
+            var b = e.target.closest('.zk-k-sil'); if (!b) return;
+            var ad = b.getAttribute('data-ad');
+            if (!window.confirm(ad + ' kaydı silinsin mi? (sayaç sıfırlanır)')) return;
+            if (s.zk && s.zk[ad]) delete s.zk[ad];
+            kaydet(); ciz();
         });
         if ($('zkAyarBtn')) $('zkAyarBtn').addEventListener('click', function(){
             var ay = $('zkAyar'); if (ay) ay.classList.toggle('on');
