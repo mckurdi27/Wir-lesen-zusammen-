@@ -993,7 +993,7 @@
     var _eski = { sayi: s.sayi, tur: s.tur, toplam: s.toplam, gun: s.gun, hedef: s.hedef, serbest: s.serbest };
     function zkKayit(z){
         if (!z) z = s.zikir;
-        if (!s.zk[z] || typeof s.zk[z] !== 'object') s.zk[z] = { sayi: 0, tur: 0, toplam: 0, gun: {} };
+        if (!s.zk[z] || typeof s.zk[z] !== 'object') s.zk[z] = { sayi: 0, tur: 0, toplam: 0, gun: {}, hedef: 33 };
         var r = s.zk[z];
         if (!r.gun || typeof r.gun !== 'object') r.gun = {};
         return r;
@@ -1014,7 +1014,7 @@
     ['sayi','tur','toplam','gun','hedef','serbest'].forEach(function(alan){
         Object.defineProperty(s, alan, {
             enumerable: false, configurable: true,
-            get: function(){ var r = zkAktif(); return r[alan] === undefined ? (alan === 'gun' ? {} : (alan === 'serbest' ? 33 : 0)) : r[alan]; },
+            get: function(){ var r = zkAktif(); return r[alan] === undefined ? ((alan === 'gun') ? {} : ((alan === 'hedef' || alan === 'serbest') ? 33 : 0)) : r[alan]; },
             set: function(v){ zkAktif()[alan] = v; }
         });
     });
@@ -1266,16 +1266,10 @@
     }
 
     var ZK_BOSLUK = '\u00a0\u00a0\u00a0';
-    // Secilen zikrin hedefi (zikir.json) kutuya OTOMATIK yazilir.
-    // Uye kendi degerini yazdiysa o deger korunur.
-    function hedefSeed(){
-        if (s.hedef > 0) return false;
-        zkKayit(s.zikir).hedef = 33;   // tum zikirler 33 ile baslar
-        return true;
-    }   // Kabe sayacinda tur ile zikir arasi uc bosluk
+    // Her zikrin hedefi kendi kaydinda saklanir; hedefsiz kalmaz (varsayilan 33).   // Kabe sayacinda tur ile zikir arasi uc bosluk
     function ciz(){
         if (!$('zkCount')) return;
-        if (hedefSeed()) kaydet();
+        if (!(s.hedef > 0)) { zkKayit(s.zikir).hedef = 33; kaydet(); }
         // Kabe uzerindeki sayac: sayim baslamadiysa sadece zikir sayisi,
         // basladiysa "tur." + uc bosluk + zikir sayisi (or. "1.   23")
         $('zkCount').textContent = (s.tur > 0)
@@ -1292,10 +1286,7 @@
         $('zkToplam').textContent = s.toplam;
         $('zkGunluk').textContent = s.gun[bugun()] || 0;
         // Hedef kutusu: her zaman o zikrin kayitli hedefini gosterir (bos olabilir)
-        if ($('zkSayi')) {
-            var hv = (s.hedef > 0) ? s.hedef : '';
-            if (document.activeElement !== $('zkSayi')) $('zkSayi').value = hv;
-        }
+        if ($('zkSayi') && document.activeElement !== $('zkSayi')) $('zkSayi').value = s.hedef;
         cizTavaf();
         if ($('zkVibBtn')) $('zkVibBtn').classList.toggle('on', !!s.vib);
         if ($('zkSesBtn')) $('zkSesBtn').classList.toggle('on', !!s.ses);
@@ -1370,13 +1361,12 @@
             // Her zikrin hedefi ve sayaci kendi kaydinda saklanir; zikir degisince
             // hedef otomatik atanmaz — o zikrin kayitli hedefi (yoksa bos) gelir.
             s.zikir = this.value;
-            hedefSeed();
             kaydet(); ciz();
         });
         // Hedef belirlenince/degisince Tur-Toplam-Bugun sifirlanir; hedef sabit kalir
         function hedefUygula(v){
             v = parseInt(v, 10);
-            if (isNaN(v) || v < 1) v = 0;
+            if (isNaN(v) || v < 1) v = 33;
             if (v > 1000) v = 1000;
             if (v === (s.hedef || 0)) return;
             s.hedef = v;
