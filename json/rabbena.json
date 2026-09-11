@@ -1,0 +1,404 @@
+{
+  "rabbena_dualari": [
+    {
+      "id": 1,
+      "isim": "Hz. İbrahim ve Hz. İsmail'in Duası (Kabul)",
+      "gun": "Pazar",
+      "arapca": "رَبَّنَا تَقَبَّلْ مِنَّا إِنَّكَ أَنْتَ السَّمِيعُ الْعَلِيمُ",
+      "okunus": "Rabbenâ tekabbel minnâ inneke entes-Semîul-Alîm",
+      "anlam": "Rabbimiz! Bizden kabul buyur. Şüphesiz sen hakkıyla işitensin, hakkıyla bilensin.",
+      "hedef": 1,
+      "kaynak": "Bakara Suresi 127"
+    },
+    {
+      "id": 2,
+      "isim": "Hz. İbrahim ve Hz. İsmail'in Duası (Teslimiyet)",
+      "gun": "Pazartesi",
+      "arapca": "رَبَّنَا وَاجْعَلْنَا مُسْلِمَيْنِ لَكَ وَمِنْ ذُرِّيَّتِنَا أُمَّةً مُسْلِمَةً لَكَ وَأَرِنَا مَنَاسِكَنَا وَتُبْ عَلَيْنَا إِنَّكَ أَنْتَ التَّوَّابُ الرَّحِيمُ",
+      "okunus": "Rabbenâ vec'alnâ müslimîne leke ve min zürriyyetinâ ümmeten müslimeten leke ve erinâ menâsikenâ ve tüb aleynâ inneke entet-Tevvâbür-Rahîm",
+      "anlam": "Rabbimiz! Bizi sana teslim olmuş kimseler kıl. Soyumuzdan da sana teslim olmuş bir ümmet kıl. Bize ibadet yerlerimizi göster ve tevbemizi kabul et. Şüphesiz sen Tevvâb'sın, Rahîm'sin.",
+      "hedef": 1,
+      "kaynak": "Bakara Suresi 128"
+    },
+    {
+      "id": 3,
+      "isim": "Dünya ve Ahiret İyiliği Duası",
+      "gun": "Salı",
+      "arapca": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "okunus": "Rabbenâ âtinâ fid-dünyâ haseneten ve fil-âhirati haseneten ve kınâ azâben-nâr",
+      "anlam": "Rabbimiz! Bize dünyada da iyilik ver, âhirette de iyilik ver. Bizi cehennem azabından koru!",
+      "hedef": 1,
+      "kaynak": "Bakara Suresi 201"
+    },
+    {
+      "id": 4,
+      "isim": "Sabır ve Zafer Duası",
+      "gun": "Çarşamba",
+      "arapca": "رَبَّنَا أَفْرِغْ عَلَيْنَا صَبْرًا وَثَبِّتْ أَقْدَامَنَا وَانْصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ",
+      "okunus": "Rabbenâ efriğ aleynâ sabran ve sebbit akdâmenâ vensurnâ alel-kavmil-kâfirîn",
+      "anlam": "Rabbimiz! Üzerimize sabır yağdır, ayaklarımızı sağlam bastır ve şu kâfir kavme karşı bize yardım et.",
+      "hedef": 1,
+      "kaynak": "Bakara Suresi 250"
+    },
+    {
+      "id": 5,
+      "isim": "Bağışlanma Dileği",
+      "gun": "Perşembe",
+      "arapca": "غُفْرَانَكَ رَبَّنَا وَإِلَيْكَ الْمَصِيرُ",
+      "okunus": "Gufrâneke Rabbenâ ve ileykel-masîr",
+      "anlam": "Senden bağışlamanı dileriz Rabbimiz, dönüş ancak sanadır.",
+      "hedef": 1,
+      "kaynak": "Bakara Suresi 285"
+    },
+    {
+      "id": 6,
+      "isim": "Sorumluluk ve Yük Duası",
+      "gun": "Cuma",
+      "arapca": "رَبَّنَا لَا تُؤَاخِذْنَا إِنْ نَسِينَا أَوْ أَخْطَأْنَا رَبَّنَا وَلَا تَحْمِلْ عَلَيْنَا إِصْرًا كَمَا حَمَلْتَهُ عَلَى الَّذِينَ مِنْ قَبْلِنَا رَبَّنَا وَلَا تُحَمِّلْنَا مَا لَا طَاقَةَ لَنَا بِهِ وَاعْفُ عَنَّا وَاغْفِرْ لَنَا وَارْحَمْنَا أَنْتَ مَوْلَانَا فَانْصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ",
+      "okunus": "Rabbenâ lâ tüâhıznâ in nesînâ ev ahta'nâ Rabbenâ ve lâ tahmil aleynâ ısran kemâ hameltehû alellezîne min kablinâ Rabbenâ ve lâ tühammilnâ mâ lâ tâkate lenâ bih. Va'fü annâ vağfir lenâ verhamnâ ente Mevlânâ fensurnâ alel-kavmil-kâfirîn.",
+      "anlam": "Rabbimiz! Unutur veya hata edersek bizi sorumlu tutma. Rabbimiz! Bize, bizden öncekilere yüklediğin gibi ağır yük yükleme. Rabbimiz! Bize gücümüzün yetmeyeceği yükü de yükleme. Bizi affet, bizi bağışla, bize acı! Sen bizim Mevlamızsın. Kâfirler topluluğuna karşı bize yardım et.",
+      "hedef": 1,
+      "kaynak": "Bakara Suresi 286"
+    },
+    {
+      "id": 7,
+      "isim": "Kalplerin Kaymaması Duası",
+      "gun": "Cumartesi",
+      "arapca": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَدُنْكَ رَحْمَةً إِنَّكَ أَنْتَ الْوَهَّابُ",
+      "okunus": "Rabbenâ lâ tüziğ kulûbenâ ba'de iz hedeytenâ veheb lenâ min ledünke rahmeten inneke entel-Vehhâb",
+      "anlam": "Rabbimiz! Bizi hidayete erdirdikten sonra kalplerimizi eğriltme. Bize katından bir rahmet bahşet. Şüphesiz sen çok bahşedensin.",
+      "hedef": 1,
+      "kaynak": "Âl-i İmrân Suresi 8"
+    },
+    {
+      "id": 8,
+      "isim": "İnsanların Toplanacağı Gün Duası",
+      "gun": "Pazar",
+      "arapca": "رَبَّنَا إِنَّكَ جَامِعُ النَّاسِ لِيَوْمٍ لَا رَيْبَ فِيهِ إِنَّ اللَّهَ لَا يُخْلِفُ الْمِيعَادَ",
+      "okunus": "Rabbenâ inneke câmiun-nâsi li yevmin lâ raybe fîh innallâhe lâ yuhliful-mîâd",
+      "anlam": "Rabbimiz! Şüphesiz sen, hakkında hiçbir şüphe bulunmayan bir günde insanları toplayacaksın. Şüphesiz Allah sözünden dönmez.",
+      "hedef": 1,
+      "kaynak": "Âl-i İmrân Suresi 9"
+    },
+    {
+      "id": 9,
+      "isim": "İman ve Bağışlanma Duası",
+      "gun": "Pazartesi",
+      "arapca": "رَبَّنَا إِنَّنَا آمَنَّا فَاغْفِرْ لَنَا ذُنُوبَنَا وَقِنَا عَذَابَ النَّارِ",
+      "okunus": "Rabbenâ innenâ âmennâ fağfir lenâ zünûbenâ ve kınâ azâben-nâr",
+      "anlam": "Rabbimiz! Biz gerçekten iman ettik; günahlarımızı bağışla ve bizi ateş azabından koru.",
+      "hedef": 1,
+      "kaynak": "Âl-i İmrân Suresi 16"
+    },
+    {
+      "id": 10,
+      "isim": "Havârilerin Duası",
+      "gun": "Salı",
+      "arapca": "رَبَّنَا آمَنَّا بِمَا أَنْزَلْتَ وَاتَّبَعْنَا الرَّسُولَ فَاكْتُبْنَا مَعَ الشَّاهِدِينَ",
+      "okunus": "Rabbenâ âmennâ bimâ enzelte vetteba'ner-rasûle fektübnâ meaş-şâhidîn",
+      "anlam": "Rabbimiz! Senin indirdiğine iman ettik ve Peygamber'e uyduk. Artık bizi şahitlerle beraber yaz.",
+      "hedef": 1,
+      "kaynak": "Âl-i İmrân Suresi 53"
+    },
+    {
+      "id": 11,
+      "isim": "Bağışlanma ve Sebat Duası",
+      "gun": "Çarşamba",
+      "arapca": "رَبَّنَا اغْفِرْ لَنَا ذُنُوبَنَا وَإِسْرَافَنَا فِي أَمْرِنَا وَثَبِّتْ أَقْدَامَنَا وَانْصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ",
+      "okunus": "Rabbenâğfir lenâ zünûbenâ ve isrâfenâ fî emrinâ ve sebbit akdâmenâ vensurnâ alel-kavmil-kâfirîn",
+      "anlam": "Rabbimiz! Bizim günahlarımızı ve işlerimizdeki taşkınlıklarımızı bağışla, ayaklarımızı sağlam bastır ve kâfir kavme karşı bize yardım et.",
+      "hedef": 1,
+      "kaynak": "Âl-i İmrân Suresi 147"
+    },
+    {
+      "id": 12,
+      "isim": "Cehennemden Korunma Duası",
+      "gun": "Perşembe",
+      "arapca": "رَبَّنَا مَا خَلَقْتَ هَذَا بَاطِلًا سُبْحَانَكَ فَقِنَا عَذَابَ النَّارِ",
+      "okunus": "Rabbenâ mâ halakte hâzâ bâtılen sübhâneke fekınâ azâben-nâr",
+      "anlam": "Rabbimiz! Sen bunu boşuna yaratmadın. Seni tesbih ederiz. Bizi cehennem azabından koru!",
+      "hedef": 1,
+      "kaynak": "Âl-i İmrân Suresi 191"
+    },
+    {
+      "id": 13,
+      "isim": "Cehennemliklerin Durumu",
+      "gun": "Cuma",
+      "arapca": "رَبَّنَا إِنَّكَ مَنْ تُدْخِلِ النَّارَ فَقَدْ أَخْزَيْتَهُ وَمَا لِلظَّالِمِينَ مِنْ أَنْصَارٍ",
+      "okunus": "Rabbenâ inneke men tüdhılin-nâra fekad ahzeytehû ve mâ liz-zâlimîne min ensâr",
+      "anlam": "Rabbimiz! Şüphesiz sen kimi cehenneme koyarsan, artık onu perişan etmişsindir. Zalimlerin hiçbir yardımcısı yoktur.",
+      "hedef": 1,
+      "kaynak": "Âl-i İmrân Suresi 192"
+    },
+    {
+      "id": 14,
+      "isim": "İmanı Duyup Kabul Edenlerin Duası",
+      "gun": "Cumartesi",
+      "arapca": "رَبَّنَا إِنَّنَا سَمِعْنَا مُنَادِيًا يُنَادِي لِلْإِيمَانِ أَنْ آمِنُوا بِرَبِّكُمْ فَآمَنَّا",
+      "okunus": "Rabbenâ innenâ semi'nâ münâdiyen yünâdî lil-îmâni en âminû bi Rabbiküm fe âmennâ",
+      "anlam": "Rabbimiz! Şüphesiz biz, 'Rabbinize iman edin' diye imana çağıran bir davetçi işittik ve iman ettik.",
+      "hedef": 1,
+      "kaynak": "Âl-i İmrân Suresi 193"
+    },
+    {
+      "id": 15,
+      "isim": "Bağışlanma ve İyi Kullarla Beraber Olma Duası",
+      "gun": "Pazar",
+      "arapca": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "okunus": "Rabbenâ fağfir lenâ zünûbenâ ve keffir annâ seyyiâtinâ ve teveffenâ meal-ebrâr",
+      "anlam": "Rabbimiz! Günahlarımızı bağışla, kötülüklerimizi ört ve bizi iyi kullarınla beraber vefat ettir.",
+      "hedef": 1,
+      "kaynak": "Âl-i İmrân Suresi 193"
+    },
+    {
+      "id": 16,
+      "isim": "Vaad Edilenleri İsteme Duası",
+      "gun": "Pazartesi",
+      "arapca": "رَبَّنَا وَآتِنَا مَا وَعَدْتَنَا عَلَى رُسُلِكَ وَلَا تُخْزِنَا يَوْمَ الْقِيَامَةِ إِنَّكَ لَا تُخْلِفُ الْمِيعَادَ",
+      "okunus": "Rabbenâ ve âtinâ mâ veadtenâ alâ rusülike ve lâ tuhzinâ yevmel-kıyâmeti inneke lâ tuhliful-mîâd",
+      "anlam": "Rabbimiz! Peygamberlerin aracılığı ile bize va'dettiklerini ver ve kıyamet günü bizi rezil etme. Şüphesiz sen sözünden dönmezsin.",
+      "hedef": 1,
+      "kaynak": "Âl-i İmrân Suresi 194"
+    },
+    {
+      "id": 17,
+      "isim": "Zulme Uğrayanların Duası",
+      "gun": "Salı",
+      "arapca": "رَبَّنَا أَخْرِجْنَا مِنْ هَذِهِ الْقَرْيَةِ الظَّالِمِ أَهْلُهَا وَاجْعَلْ لَنَا مِنْ لَدُنْكَ وَلِيًّا وَاجْعَلْ لَنَا مِنْ لَدُنْكَ نَصِيرًا",
+      "okunus": "Rabbenâ ahricnâ min hâzihil-karyetiz-zâlimi ehlühâ vec'al lenâ min ledünke veliyyen vec'al lenâ min ledünke nasîrâ",
+      "anlam": "Rabbimiz! Halkı zulmeden şu şehirden bizi çıkar. Bize katından bir dost ver, bize katından bir yardımcı ver.",
+      "hedef": 1,
+      "kaynak": "Nisâ Suresi 75"
+    },
+    {
+      "id": 18,
+      "isim": "Hz. Adem ve Hz. Havva'nın Duası",
+      "gun": "Çarşamba",
+      "arapca": "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا وَإِنْ لَمْ تَغْفِرْ لَنَا وَتَرْحَمْنَا لَنَكُونَنَّ مِنَ الْخَاسِرِينَ",
+      "okunus": "Rabbenâ zalemnâ enfüsenâ ve in lem tağfir lenâ ve terhamnâ lenekûnenne minel-hâsirîn",
+      "anlam": "Rabbimiz! Biz kendimize zulmettik. Eğer bizi bağışlamaz ve bize acımazsan mutlaka ziyan edenlerden oluruz.",
+      "hedef": 1,
+      "kaynak": "A'râf Suresi 23"
+    },
+    {
+      "id": 19,
+      "isim": "Zalimlerden Uzak Tutma Duası",
+      "gun": "Perşembe",
+      "arapca": "رَبَّنَا لَا تَجْعَلْنَا مَعَ الْقَوْمِ الظَّالِمِينَ",
+      "okunus": "Rabbenâ lâ tec'alnâ meal-kavmiz-zâlimîn",
+      "anlam": "Rabbimiz! Bizi zalimler topluluğuyla beraber eyleme.",
+      "hedef": 1,
+      "kaynak": "A'râf Suresi 47"
+    },
+    {
+      "id": 20,
+      "isim": "Hz. Şuayb'ın Duası",
+      "gun": "Cuma",
+      "arapca": "رَبَّنَا افْتَحْ بَيْنَنَا وَبَيْنَ قَوْمِنَا بِالْحَقِّ وَأَنْتَ خَيْرُ الْفَاتِحِينَ",
+      "okunus": "Rabbenâftah beynenâ ve beyne kavminâ bil-hakkı ve ente hayrul-fâtihîn",
+      "anlam": "Rabbimiz! Bizimle kavmimiz arasında hak ile hükmet. Sen hükmedenlerin en hayırlısısın.",
+      "hedef": 1,
+      "kaynak": "A'râf Suresi 89"
+    },
+    {
+      "id": 21,
+      "isim": "Sabır ve Müslüman Olarak Ölme Duası",
+      "gun": "Cumartesi",
+      "arapca": "رَبَّنَا أَفْرِغْ عَلَيْنَا صَبْرًا وَتَوَفَّنَا مُسْلِمِينَ",
+      "okunus": "Rabbenâ efriğ aleynâ sabran ve teveffenâ müslimîn",
+      "anlam": "Rabbimiz! Üzerimize sabır yağdır ve bizi Müslüman olarak vefat ettir.",
+      "hedef": 1,
+      "kaynak": "A'râf Suresi 126"
+    },
+    {
+      "id": 22,
+      "isim": "Fitne ve Kâfirlerden Kurtulma Duası",
+      "gun": "Pazar",
+      "arapca": "رَبَّنَا لَا تَجْعَلْنَا فِتْنَةً لِلْقَوْمِ الظَّالِمِينَ وَنَجِّنَا بِرَحْمَتِكَ مِنَ الْقَوْمِ الْكَافِرِينَ",
+      "okunus": "Rabbenâ lâ tec'alnâ fitneten lil-kavmiz-zâlimîne ve neccinâ bi rahmetike minel-kavmil-kâfirîn",
+      "anlam": "Rabbimiz! Bizi zalimler topluluğuna fitne (hedef) kılma ve rahmetinle bizi kâfirler topluluğundan kurtar.",
+      "hedef": 1,
+      "kaynak": "Yûnus Suresi 85-86"
+    },
+    {
+      "id": 23,
+      "isim": "Hz. Nuh'un Duası",
+      "gun": "Pazartesi",
+      "arapca": "رَبِّ إِنِّي أَعُوذُ بِكَ أَنْ أَسْأَلَكَ مَا لَيْسَ لِي بِهِ عِلْمٌ وَإِلَّا تَغْفِرْ لِي وَتَرْحَمْنِي أَكُنْ مِنَ الْخَاسِرِينَ",
+      "okunus": "Rabbi innî e'ûzü bike en es'eleke mâ leyse lî bihî ilmün ve illâ tağfir lî ve terhamnî ekün minel-hâsirîn",
+      "anlam": "Rabbim! Hakkında bilgim olmayan şeyi istemekten sana sığınırım. Eğer beni bağışlamaz ve bana acımazsan ziyana uğrayanlardan olurum.",
+      "hedef": 1,
+      "kaynak": "Hûd Suresi 47"
+    },
+    {
+      "id": 24,
+      "isim": "Hz. İbrahim'in Duası (Zürriyet)",
+      "gun": "Salı",
+      "arapca": "رَبَّنَا إِنِّي أَسْكَنْتُ مِنْ ذُرِّيَّتِي بِوَادٍ غَيْرِ ذِي زَرْعٍ عِنْدَ بَيْتِكَ الْمُحَرَّمِ رَبَّنَا لِيُقِيمُوا الصَّلَاةَ فَاجْعَلْ أَفْئِدَةً مِنَ النَّاسِ تَهْوِي إِلَيْهِمْ وَارْزُقْهُمْ مِنَ الثَّمَرَاتِ لَعَلَّهُمْ يَشْكُرُونَ",
+      "okunus": "Rabbenâ innî eskentü min zürriyyetî bivâdin gayri zî zer'in inde beytikel-muharremi Rabbenâ liyükîmüs-salâte fec'al ef'ideten minen-nâsi tehvî ileyhim verzukhum mines-semârâti le'allehüm yeşkürûn",
+      "anlam": "Rabbimiz! Ben çocuklarımdan bir kısmını namazı dosdoğru kılmaları için Beyt-i Haram'ın yanındaki ekinsiz bir vadiye yerleştirdim. Rabbimiz! İnsanlardan bir kısmının gönüllerini onlara meylettir, onları ürünlerden rızıklandır; umulur ki şükrederler.",
+      "hedef": 1,
+      "kaynak": "İbrahim Suresi 37"
+    },
+    {
+      "id": 25,
+      "isim": "Hz. İbrahim'in Duası (Gizli-Açık)",
+      "gun": "Çarşamba",
+      "arapca": "رَبَّنَا إِنَّكَ تَعْلَمُ مَا نُخْفِي وَمَا نُعْلِنُ",
+      "okunus": "Rabbenâ inneke ta'lemü mâ nuhfî ve mâ nu'lin",
+      "anlam": "Rabbimiz! Şüphesiz sen gizlediğimizi de açığa vurduğumuzu da bilirsin.",
+      "hedef": 1,
+      "kaynak": "İbrahim Suresi 38"
+    },
+    {
+      "id": 26,
+      "isim": "Hz. İbrahim'in Duası (Namaz)",
+      "gun": "Perşembe",
+      "arapca": "رَبِّ اجْعَلْنِي مُقِيمَ الصَّلَاةِ وَمِنْ ذُرِّيَّتِي رَبَّنَا وَتَقَبَّلْ دُعَاءِ",
+      "okunus": "Rabbic'alnî mukîmes-salâti ve min zürriyyetî Rabbenâ ve tekabbel duâ'",
+      "anlam": "Rabbim! Beni ve soyumdan gelecek olanları namazı devamlı kılanlardan eyle; Rabbimiz, duamı kabul et.",
+      "hedef": 1,
+      "kaynak": "İbrahim Suresi 40"
+    },
+    {
+      "id": 27,
+      "isim": "Hesap Günü Bağışlanma Duası",
+      "gun": "Cuma",
+      "arapca": "رَبَّنَا اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "okunus": "Rabbenâğfir lî ve li-vâlideyye ve lil-mü'minîne yevme yekûmül-hisâb",
+      "anlam": "Rabbimiz! Hesap günü geldiğinde beni, anne-babamı ve müminleri bağışla.",
+      "hedef": 1,
+      "kaynak": "İbrahim Suresi 41"
+    },
+    {
+      "id": 28,
+      "isim": "Ashâb-ı Kehf'in Duası",
+      "gun": "Cumartesi",
+      "arapca": "رَبَّنَا آتِنَا مِنْ لَدُنْكَ رَحْمَةً وَهَيِّئْ لَنَا مِنْ أَمْرِنَا رَشَدًا",
+      "okunus": "Rabbenâ âtinâ min ledünke rahmeten ve heyyi' lenâ min emrinâ raşedâ",
+      "anlam": "Rabbimiz! Bize katından bir rahmet ver ve işimizde bize doğruyu göster.",
+      "hedef": 1,
+      "kaynak": "Kehf Suresi 10"
+    },
+    {
+      "id": 29,
+      "isim": "Hz. Musa ve Hz. Harun'un Duası",
+      "gun": "Pazar",
+      "arapca": "قَالَا رَبَّنَا إِنَّنَا نَخَافُ أَنْ يَفْرُطَ عَلَيْنَا أَوْ أَنْ يَطْغَى",
+      "okunus": "Kâlâ Rabbenâ innenâ nehâfü en yefruta aleynâ ev en yetğâ",
+      "anlam": "Musa ve Harun: 'Rabbimiz! Doğrusu onun bize fırsat vermeden saldırmasından veya büsbütün azgınlaşmasından endişe ediyoruz' dediler.",
+      "hedef": 1,
+      "kaynak": "Tâhâ Suresi 45"
+    },
+    {
+      "id": 30,
+      "isim": "Merhamet Duası",
+      "gun": "Pazartesi",
+      "arapca": "رَبَّنَا آمَنَّا فَاغْفِرْ لَنَا وَارْحَمْنَا وَأَنْتَ خَيْرُ الرَّاحِمِينَ",
+      "okunus": "Rabbenâ âmennâ fağfir lenâ verhamnâ ve ente hayrur-râhimîn",
+      "anlam": "Rabbimiz! İman ettik; bizi bağışla ve bize merhamet et. Sen merhametlilerin en hayırlısısın.",
+      "hedef": 1,
+      "kaynak": "Mü'minûn Suresi 109"
+    },
+    {
+      "id": 31,
+      "isim": "Hz. İsa'nın Sofra Duası",
+      "gun": "Salı",
+      "arapca": "رَبَّنَا أَنْزِلْ عَلَيْنَا مَائِدَةً مِنَ السَّمَاءِ",
+      "okunus": "Rabbenâ enzil aleynâ mâiden mines-semâi",
+      "anlam": "Rabbimiz! Bize gökten bir sofra indir.",
+      "hedef": 1,
+      "kaynak": "Mâide Suresi 114"
+    },
+    {
+      "id": 32,
+      "isim": "Ehl-i Kitaptan İman Edenlerin Duası",
+      "gun": "Çarşamba",
+      "arapca": "رَبَّنَا آمَنَّا فَاكْتُبْنَا مَعَ الشَّاهِدِينَ",
+      "okunus": "Rabbenâ âmennâ fektübnâ meaş-şâhidîn",
+      "anlam": "Rabbimiz! İman ettik, bizi de şahitlerden yaz.",
+      "hedef": 1,
+      "kaynak": "Mâide Suresi 83"
+    },
+    {
+      "id": 33,
+      "isim": "Cehennem Azabından Korunma Duası",
+      "gun": "Perşembe",
+      "arapca": "رَبَّنَا اصْرِفْ عَنَّا عَذَابَ جَهَنَّمَ إِنَّ عَذَابَهَا كَانَ غَرَامًا إِنَّهَا سَاءَتْ مُسْتَقَرًّا وَمُقَامًا",
+      "okunus": "Rabbenasrif annâ azâbe cehennem inne azâbehâ kâne garâmâ innehâ sâet müstekarren ve mukâmâ",
+      "anlam": "Rabbimiz! Cehennem azabını bizden uzaklaştır. Doğrusu onun azabı sürekli bir helâktir. Orası ne kötü bir durak ve ne kötü bir konaktır.",
+      "hedef": 1,
+      "kaynak": "Furkân Suresi 65-66"
+    },
+    {
+      "id": 34,
+      "isim": "Göz Aydınlığı Duası",
+      "gun": "Cuma",
+      "arapca": "رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ وَاجْعَلْنَا لِلْمُتَّقِينَ إِمَامًا",
+      "okunus": "Rabbenâ heb lenâ min ezvâcinâ ve zürriyyâtinâ kurrate a'yünin vec'alnâ lil-müttekîne imâmâ",
+      "anlam": "Rabbimiz! Bize eşlerimizden ve çocuklarımızdan göz aydınlığı ver ve bizi takva sahiplerine önder yap.",
+      "hedef": 1,
+      "kaynak": "Furkân Suresi 74"
+    },
+    {
+      "id": 35,
+      "isim": "Allah'ın Rahmet ve İlmi Duası",
+      "gun": "Cumartesi",
+      "arapca": "رَبَّنَا وَسِعْتَ كُلَّ شَيْءٍ رَحْمَةً وَعِلْمًا فَاغْفِرْ لِلَّذِينَ تَابُوا وَاتَّبَعُوا سَبِيلَكَ وَقِهِمْ عَذَابَ الْجَحِيمِ",
+      "okunus": "Rabbenâ vesi'te külle şey'in rahmeten ve ilmen fağfir lillezîne tâbû vettebeû sebîleke ve kıhim azâbel-cahîm",
+      "anlam": "Rabbimiz! Senin rahmetin ve ilmin her şeyi kuşatmıştır. O halde tevbe edenleri ve senin yoluna uyanları bağışla ve onları cehennem azabından koru.",
+      "hedef": 1,
+      "kaynak": "Mü'min Suresi 7"
+    },
+    {
+      "id": 36,
+      "isim": "Müminlerin Cennete Giriş Duası",
+      "gun": "Pazar",
+      "arapca": "رَبَّنَا وَأَدْخِلْهُمْ جَنَّاتِ عَدْنٍ الَّتِي وَعَدْتَهُمْ وَمَنْ صَلَحَ مِنْ آبَائِهِمْ وَأَزْوَاجِهِمْ وَذُرِّيَّاتِهِمْ إِنَّكَ أَنْتَ الْعَزِيزُ الْحَكِيمُ",
+      "okunus": "Rabbenâ ve edhilhüm cennâti adninilletî veadtehüm ve men salaha min âbâihim ve ezvâcihim ve zürriyyâtihim inneke entel-Azîzül-Hakîm",
+      "anlam": "Rabbimiz! Onları da, onların babalarından, eşlerinden ve çocuklarından salih olanları da, kendilerine vaad ettiğin Adn cennetlerine koy. Şüphesiz sen mutlak güç sahibisin, hüküm ve hikmet sahibisin.",
+      "hedef": 1,
+      "kaynak": "Mü'min Suresi 8"
+    },
+    {
+      "id": 37,
+      "isim": "Kardeşlik ve Bağışlanma Duası",
+      "gun": "Pazartesi",
+      "arapca": "رَبَّنَا اغْفِرْ لَنَا وَلِإِخْوَانِنَا الَّذِينَ سَبَقُونَا بِالْإِيمَانِ وَلَا تَجْعَلْ فِي قُلُوبِنَا غِلًّا لِلَّذِينَ آمَنُوا رَبَّنَا إِنَّكَ رَؤُوفٌ رَحِيمٌ",
+      "okunus": "Rabbenâğfir lenâ ve li-ihvâninellezîne sebekûnâ bil-îmâni ve lâ tec'al fî kulûbinâ gıllen lillezîne âmenû Rabbenâ inneke Raûfün Rahîm",
+      "anlam": "Rabbimiz! Bizi ve bizden önce iman etmiş olan kardeşlerimizi bağışla. Kalplerimizde iman edenlere karşı hiçbir kin bırakma! Rabbimiz! Şüphesiz sen çok şefkatlisin, çok merhametlisin.",
+      "hedef": 1,
+      "kaynak": "Haşr Suresi 10"
+    },
+    {
+      "id": 38,
+      "isim": "Tevekkül Duası",
+      "gun": "Salı",
+      "arapca": "رَبَّنَا عَلَيْكَ تَوَكَّلْنَا وَإِلَيْكَ أَنَبْنَا وَإِلَيْكَ الْمَصِيرُ",
+      "okunus": "Rabbenâ aleyke tevekkelnâ ve ileyke enebnâ ve ileykel-masîr",
+      "anlam": "Rabbimiz! Sana tevekkül ettik, sana yöneldik. Dönüş de sanadır.",
+      "hedef": 1,
+      "kaynak": "Mümtehine Suresi 4"
+    },
+    {
+      "id": 39,
+      "isim": "Fitne ve Zalimlerden Kurtulma Duası",
+      "gun": "Çarşamba",
+      "arapca": "رَبَّنَا لَا تَجْعَلْنَا فِتْنَةً لِلَّذِينَ كَفَرُوا وَاغْفِرْ لَنَا رَبَّنَا إِنَّكَ أَنْتَ الْعَزِيزُ الْحَكِيمُ",
+      "okunus": "Rabbenâ lâ tec'alnâ fitneten lillezîne keferû vağfir lenâ Rabbenâ inneke entel-Azîzül-Hakîm",
+      "anlam": "Rabbimiz! Bizi inkâr edenler için bir fitne (hedef) kılma! Bizi bağışla Rabbimiz! Şüphesiz sen mutlak güç sahibisin, hüküm ve hikmet sahibisin.",
+      "hedef": 1,
+      "kaynak": "Mümtehine Suresi 5"
+    },
+    {
+      "id": 40,
+      "isim": "Nur Duası",
+      "gun": "Perşembe",
+      "arapca": "رَبَّنَا أَتْمِمْ لَنَا نُورَنَا وَاغْفِرْ لَنَا إِنَّكَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+      "okunus": "Rabbenâ etmim lenâ nûranâ vağfir lenâ inneke alâ külli şey'in kadîr",
+      "anlam": "Rabbimiz! Nurumuzu tamamla ve bizi bağışla. Şüphesiz sen her şeye kadirsin.",
+      "hedef": 1,
+      "kaynak": "Tahrîm Suresi 8"
+    }
+  ]
+}
