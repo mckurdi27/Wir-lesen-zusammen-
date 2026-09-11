@@ -515,7 +515,7 @@
         #zikirmatikSection .zk-dot.c9 { color: #4a2415; --zk-bg: #2b1409; }
         #zikirmatikSection .zk-dot.c10 { color: #2b1409; --zk-bg: #4a2415; }
         #zikirmatikSection .zk-dot.on[class*="c0"] { filter: drop-shadow(0 0 3px rgba(0,0,0,.45)); }
-        #zikirmatikSection .zk-count { position: absolute; left: 0; right: 0; top: calc(50% - 84px); text-align: center; font-size: 2rem; font-weight: 800; color: var(--gold-dark); line-height: 1; margin: 0; pointer-events: none; }
+        #zikirmatikSection .zk-count { position: absolute; left: 0; right: 0; top: calc(50% - 84px); text-align: center; font-size: 1.55rem; font-weight: 800; color: var(--gold-dark); line-height: 1; margin: 0; pointer-events: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
         #zikirmatikSection .zk-sub { position: absolute; left: 0; right: 0; top: calc(50% + 56px); text-align: center; font-size: 12px; font-weight: 600; color: var(--gold-dark); opacity: .85; margin: 0; pointer-events: none; }
         #zikirmatikSection .zk-tap { display: block; width: 100%; max-width: 340px; margin: 0 auto; padding: 16px 14px; border-radius: 14px; border: 0; background: linear-gradient(180deg, #d4a02a, #b8860b); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; box-sizing: border-box; box-shadow: 0 6px 18px rgba(184,134,11,.3); text-align: center; }
 #zikirmatikSection .zk-tap-ar { display: block; direction: rtl; unicode-bidi: isolate; font-size: 21px; font-weight: 800; line-height: 1.5; letter-spacing: 0; }
@@ -832,6 +832,7 @@
                 <input type="number" id="zkSayi" class="zk-sayi" min="1" max="1000" inputmode="numeric" placeholder="" title="1 - 1000 arası sayı yaz">
             </div>
             <div class="zk-stats">
+                <div><b id="zkNo">1</b><span>Zikir</span></div>
                 <div><b id="zkTur">0</b><span>Tur</span></div>
                 <div><b id="zkToplam">0</b><span>Toplam</span></div>
                 <div><b id="zkGunluk">0</b><span>Bug&#252;n</span></div>
@@ -980,13 +981,47 @@
     function zkMan(z){ var b = ZK_BILGI[z]; return b ? b.anlam : 'Özel zikir'; }
     var s = null;
     try { s = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e) { s = null; }
-    if (!s) s = { zikir: VARSAYILAN_ZIKIRLER[0], hedef: 33, sayi: 0, tur: 0, toplam: 0, gun: {}, vib: true, ses: false, sesdosya: "hu.mp3", ozel: [] };
+    if (!s) s = { zikir: VARSAYILAN_ZIKIRLER[0], vib: true, ses: false, sesdosya: "hu.mp3", ozel: [], zk: {} };
     if (!s.sesdosya) s.sesdosya = "hu.mp3";
     if (!Array.isArray(s.ozel)) s.ozel = [];
+    if (!s.zk || typeof s.zk !== 'object') s.zk = {};
+
+    // --- HER ZIKIR KENDI SAYACINI TUTAR ---
+    // s.zk[zikir] = { sayi, tur, toplam, gun:{}, hedef, serbest }
+    // Eski surumdeki tek sayac (s.sayi/s.tur/s.toplam/s.gun/s.hedef/s.serbest)
+    // ilk acilista aktif zikrin kaydina tasinir.
+    var _eski = { sayi: s.sayi, tur: s.tur, toplam: s.toplam, gun: s.gun, hedef: s.hedef, serbest: s.serbest };
+    function zkKayit(z){
+        if (!z) z = s.zikir;
+        if (!s.zk[z] || typeof s.zk[z] !== 'object') s.zk[z] = { sayi: 0, tur: 0, toplam: 0, gun: {} };
+        var r = s.zk[z];
+        if (!r.gun || typeof r.gun !== 'object') r.gun = {};
+        return r;
+    }
+    function zkAktif(){ return zkKayit(s.zikir); }
+    (function(){
+        var hedefVar = _eski.sayi || _eski.tur || _eski.toplam || (_eski.gun && Object.keys(_eski.gun).length);
+        if (hedefVar && !s.zk[s.zikir]) {
+            var r = zkKayit(s.zikir);
+            r.sayi = _eski.sayi || 0; r.tur = _eski.tur || 0; r.toplam = _eski.toplam || 0; r.gun = _eski.gun || {};
+            if (_eski.hedef) r.hedef = _eski.hedef;
+            if (_eski.serbest) r.serbest = _eski.serbest;
+        }
+        try { delete s.sayi; delete s.tur; delete s.toplam; delete s.gun; delete s.hedef; delete s.serbest; } catch(e){}
+        // Tasi(y)ma hemen kalici olsun: uye hic tiklama yapmadan ciksa bile kayit korunur
+        try { kaydet(); } catch(e){}
+    })();
+    ['sayi','tur','toplam','gun','hedef','serbest'].forEach(function(alan){
+        Object.defineProperty(s, alan, {
+            enumerable: false, configurable: true,
+            get: function(){ var r = zkAktif(); return r[alan] === undefined ? (alan === 'gun' ? {} : (alan === 'serbest' ? 33 : 0)) : r[alan]; },
+            set: function(v){ zkAktif()[alan] = v; }
+        });
+    });
 
     function tumZikirler(){ return VARSAYILAN_ZIKIRLER.concat(s.ozel); }
     function varsayilanMi(z){ return VARSAYILAN_ZIKIRLER.indexOf(z) !== -1; }
-    if (!s.gun) s.gun = {};
+    function siraNo(z){ var i = tumZikirler().indexOf(z); return i === -1 ? 1 : i + 1; }
     if (!s.serbest) s.serbest = 33;   // "Bos (elle yaz)" icin uyenin girdigi sayi
 
     function $(id){ return document.getElementById(id); }
@@ -1230,10 +1265,13 @@
         }
     }
 
+    var ZK_BOSLUK = '\u00a0\u00a0\u00a0';   // Kabe sayacinda tur ile zikir arasi uc bosluk
     function ciz(){
         if (!$('zkCount')) return;
-        $('zkCount').textContent = s.sayi;
+        // Kabe uzerindeki sayac: "1." + uc bosluk + zikir sayisi
+        $('zkCount').textContent = s.tur + '.' + ZK_BOSLUK + s.sayi;
         $('zkSub').textContent = s.hedef ? ('Hedef: ' + s.hedef) : ('Serbest (' + zkIkonSayisi() + ')');
+        if ($('zkNo')) $('zkNo').textContent = siraNo(s.zikir);
         $('zkTur').textContent = s.tur;
         $('zkToplam').textContent = s.toplam;
         $('zkGunluk').textContent = s.gun[bugun()] || 0;
@@ -1244,11 +1282,12 @@
         for (var zi = 0; zi < zkSesOpts.length; zi++) zkSesOpts[zi].classList.toggle('on', zkSesOpts[zi].getAttribute('data-ses') === (s.sesdosya || ZK_SES_DOSYA));
         var sel = $('zkZikir');
         if (sel) {
-            var opt = '', sonKat = null;
+            var opt = '', sonKat = null, _no = 0;
             tumZikirler().forEach(function(z){
+                _no++;
                 var kt = ZK_KATEGORI[z] || null;
                 if (kt && kt !== sonKat) { if (sonKat !== null) opt += '</optgroup>'; opt += '<optgroup label="' + kt.replace(/"/g,'&quot;') + '">'; sonKat = kt; }
-                opt += '<option' + (z===s.zikir ? ' selected' : '') + '>' + z + '</option>';
+                opt += '<option value="' + z.replace(/"/g,'&quot;') + '"' + (z===s.zikir ? ' selected' : '') + '>' + _no + '. ' + z + '</option>';
             });
             if (sonKat !== null) opt += '</optgroup>';
             sel.innerHTML = opt;
@@ -6785,5 +6824,8 @@ _sbMemberDetail = function (name, groupKey) {
       }
     </script>
 <!-- ===================== </body> / </html> SON ===================== -->
+</body>
+</html>
+============= -->
 </body>
 </html>
