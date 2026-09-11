@@ -1354,8 +1354,10 @@
                 // UST yari (3 -> 9): sol kol one.  ALT yari (9 -> 3): sag kol one.
                 // Aynalama + aci isaretini cevirmek yonu korur, one gelen kolu degistirir.
                 var ustYari = (y <= cy);
+                // Bas DISARI, ayak ICERI (iki yarida da ayni): aci = -aci
+                // Ust yari sol kol, alt yari sag kol one gelir (aynalama farki)
                 var ytr = ustYari
-                    ? ('transform:rotate(' + aci.toFixed(1) + 'deg)')
+                    ? ('transform:rotate(' + (-aci).toFixed(1) + 'deg)')
                     : ('transform:rotate(' + (-aci).toFixed(1) + 'deg) scaleX(-1)');
                 html += '<span class="zk-dot c' + _r + '" data-i="' + i + '" '
                      +  'style="left:' + x.toFixed(1) + 'px;top:' + y.toFixed(1) + 'px;width:' + boy + 'px;height:' + boy
