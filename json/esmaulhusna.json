@@ -1,0 +1,896 @@
+{
+  "esmaul_husna": [
+    {
+      "id": 1,
+      "isim": "Allah",
+      "gun": "Pazar",
+      "arapca": "اللَّهُ",
+      "okunus": "Allah",
+      "anlam": "Eşi benzeri olmayan, bütün noksan sıfatlardan münezzeh tek ilah",
+      "hedef": 66
+    },
+    {
+      "id": 2,
+      "isim": "Er-Rahmân",
+      "gun": "Pazar",
+      "arapca": "الرَّحْمَٰنُ",
+      "okunus": "Er-Rahmân",
+      "anlam": "Dünyada bütün mahlükata merhamet eden, şefkat gösteren",
+      "hedef": 298
+    },
+    {
+      "id": 3,
+      "isim": "Er-Rahîm",
+      "gun": "Pazar",
+      "arapca": "الرَّحِيمُ",
+      "okunus": "Er-Rahîm",
+      "anlam": "Ahirette müminlere sonsuz ikram ve ihsanda bulunan",
+      "hedef": 258
+    },
+    {
+      "id": 4,
+      "isim": "El-Melik",
+      "gun": "Çarşamba",
+      "arapca": "الْمَلِكُ",
+      "okunus": "El-Melik",
+      "anlam": "Mülkün, kainatın sahibi, mülk ve saltanatı devamlı olan",
+      "hedef": 90
+    },
+    {
+      "id": 5,
+      "isim": "El-Kuddûs",
+      "gun": "Perşembe",
+      "arapca": "الْقُدُّوسُ",
+      "okunus": "El-Kuddûs",
+      "anlam": "Her noksanlıktan uzak ve her türlü takdise layık olan",
+      "hedef": 170
+    },
+    {
+      "id": 6,
+      "isim": "Es-Selâm",
+      "gun": "Pazar",
+      "arapca": "السَّلَامُ",
+      "okunus": "Es-Selâm",
+      "anlam": "Her türlü tehlikelerden selamete çıkaran",
+      "hedef": 131
+    },
+    {
+      "id": 7,
+      "isim": "El-Mü'min",
+      "gun": "Pazartesi",
+      "arapca": "الْمُؤْمِنُ",
+      "okunus": "El-Mü'min",
+      "anlam": "Güven veren, emin kılan, koruyan",
+      "hedef": 136
+    },
+    {
+      "id": 8,
+      "isim": "El-Müheymin",
+      "gun": "Perşembe",
+      "arapca": "الْمُهَيْمِنُ",
+      "okunus": "El-Müheymin",
+      "anlam": "Her şeyi görüp gözeten",
+      "hedef": 145
+    },
+    {
+      "id": 9,
+      "isim": "El-Azîz",
+      "gun": "Salı",
+      "arapca": "الْعَزِيزُ",
+      "okunus": "El-Azîz",
+      "anlam": "İzzet sahibi, her şeye galip olan",
+      "hedef": 94
+    },
+    {
+      "id": 10,
+      "isim": "El-Cebbâr",
+      "gun": "Salı",
+      "arapca": "الْجَبَّارُ",
+      "okunus": "El-Cebbâr",
+      "anlam": "Azamet ve kudret sahibi, dilediğini yapan ve yaptıran",
+      "hedef": 206
+    },
+    {
+      "id": 11,
+      "isim": "El-Mütekebbir",
+      "gun": "Perşembe",
+      "arapca": "الْمُتَكَبِّرُ",
+      "okunus": "El-Mütekebbir",
+      "anlam": "Büyüklükte eşi, benzeri olmayan",
+      "hedef": 662
+    },
+    {
+      "id": 12,
+      "isim": "El-Hâlık",
+      "gun": "Pazar",
+      "arapca": "الْخَالِقُ",
+      "okunus": "El-Hâlık",
+      "anlam": "Yaratan, yoktan var eden",
+      "hedef": 731
+    },
+    {
+      "id": 13,
+      "isim": "El-Bâri",
+      "gun": "Pazar",
+      "arapca": "الْبَارِئُ",
+      "okunus": "El-Bâri",
+      "anlam": "Her şeyi kusursuz ve uyumlu yaratan",
+      "hedef": 213
+    },
+    {
+      "id": 14,
+      "isim": "El-Musavvir",
+      "gun": "Pazartesi",
+      "arapca": "الْمُصَوِّرُ",
+      "okunus": "El-Musavvir",
+      "anlam": "Varlıklara şekil veren",
+      "hedef": 336
+    },
+    {
+      "id": 15,
+      "isim": "El-Gaffâr",
+      "gun": "Cuma",
+      "arapca": "الْغَفَّارُ",
+      "okunus": "El-Gaffâr",
+      "anlam": "Günahları örten ve çok mağfiret eden",
+      "hedef": 1281
+    },
+    {
+      "id": 16,
+      "isim": "El-Kahhâr",
+      "gun": "Salı",
+      "arapca": "الْقَهَّارُ",
+      "okunus": "El-Kahhâr",
+      "anlam": "Her şeye, her istediğini yapacak surette galip ve hakim olan",
+      "hedef": 306
+    },
+    {
+      "id": 17,
+      "isim": "El-Vehhâb",
+      "gun": "Cuma",
+      "arapca": "الْوَهَّابُ",
+      "okunus": "El-Vehhâb",
+      "anlam": "Karşılıksız hibeler veren, çok fazla ihsan eden",
+      "hedef": 14
+    },
+    {
+      "id": 18,
+      "isim": "Er-Rezzâk",
+      "gun": "Cuma",
+      "arapca": "الرَّزَّاقُ",
+      "okunus": "Er-Rezzâk",
+      "anlam": "Bütün mahlükatın rızkını veren ve ihtiyacını karşılayan",
+      "hedef": 308
+    },
+    {
+      "id": 19,
+      "isim": "El-Fettâh",
+      "gun": "Çarşamba",
+      "arapca": "الْفَتَّاحُ",
+      "okunus": "El-Fettâh",
+      "anlam": "Her türlü müşkülleri açan ve kolaylaştıran",
+      "hedef": 489
+    },
+    {
+      "id": 20,
+      "isim": "El-Alîm",
+      "gun": "Perşembe",
+      "arapca": "الْعَلِيمُ",
+      "okunus": "El-Alîm",
+      "anlam": "Gizli açık, geçmiş, gelecek her şeyi en ince detaylarına kadar bilen",
+      "hedef": 150
+    },
+    {
+      "id": 21,
+      "isim": "El-Kâbıd",
+      "gun": "Perşembe",
+      "arapca": "الْقَابِضُ",
+      "okunus": "El-Kâbıd",
+      "anlam": "Dilediğine darlık veren, sıkan, daraltan",
+      "hedef": 903
+    },
+    {
+      "id": 22,
+      "isim": "El-Bâsıt",
+      "gun": "Cuma",
+      "arapca": "الْبَاسِطُ",
+      "okunus": "El-Bâsıt",
+      "anlam": "Dilediğine bolluk veren, açan, genişleten",
+      "hedef": 72
+    },
+    {
+      "id": 23,
+      "isim": "El-Hâfıd",
+      "gun": "Pazar",
+      "arapca": "الْخَافِضُ",
+      "okunus": "El-Hâfıd",
+      "anlam": "Dereceleri alçaltan",
+      "hedef": 1482
+    },
+    {
+      "id": 24,
+      "isim": "Er-Râfi",
+      "gun": "Pazar",
+      "arapca": "الرَّافِعُ",
+      "okunus": "Er-Râfi",
+      "anlam": "Şeref verip yükselten",
+      "hedef": 351
+    },
+    {
+      "id": 25,
+      "isim": "El-Muizz",
+      "gun": "Pazar",
+      "arapca": "الْمُعِزُّ",
+      "okunus": "El-Muizz",
+      "anlam": "Dilediğini aziz eden, izzet veren",
+      "hedef": 117
+    },
+    {
+      "id": 26,
+      "isim": "El-Müzill",
+      "gun": "Salı",
+      "arapca": "الْمُذِلُّ",
+      "okunus": "El-Müzill",
+      "anlam": "Dilediğini zillete düşüren",
+      "hedef": 770
+    },
+    {
+      "id": 27,
+      "isim": "Es-Semî",
+      "gun": "Perşembe",
+      "arapca": "السَّمِيعُ",
+      "okunus": "Es-Semî",
+      "anlam": "Her şeyi en iyi işiten",
+      "hedef": 180
+    },
+    {
+      "id": 28,
+      "isim": "El-Basîr",
+      "gun": "Pazar",
+      "arapca": "الْبَصِيرُ",
+      "okunus": "El-Basîr",
+      "anlam": "Gizli açık her şeyi en iyi gören",
+      "hedef": 302
+    },
+    {
+      "id": 29,
+      "isim": "El-Hakem",
+      "gun": "Pazar",
+      "arapca": "الْحَكَمُ",
+      "okunus": "El-Hakem",
+      "anlam": "Mutlak hakim, hakkı batıldan ayıran",
+      "hedef": 68
+    },
+    {
+      "id": 30,
+      "isim": "El-Adl",
+      "gun": "Pazar",
+      "arapca": "الْعَدْلُ",
+      "okunus": "El-Adl",
+      "anlam": "Çok adaletli",
+      "hedef": 104
+    },
+    {
+      "id": 31,
+      "isim": "El-Latîf",
+      "gun": "Cuma",
+      "arapca": "اللَّطِيفُ",
+      "okunus": "El-Latîf",
+      "anlam": "En ince işlerin bütün inceliklerini bilen, kullarına iyilikler ulaştıran",
+      "hedef": 129
+    },
+    {
+      "id": 32,
+      "isim": "El-Habîr",
+      "gun": "Pazar",
+      "arapca": "الْخَبِيرُ",
+      "okunus": "El-Habîr",
+      "anlam": "Her şeyin iç yüzünden, gizli taraflarından haberdar olan",
+      "hedef": 812
+    },
+    {
+      "id": 33,
+      "isim": "El-Halîm",
+      "gun": "Cumartesi",
+      "arapca": "الْحَلِيمُ",
+      "okunus": "El-Halîm",
+      "anlam": "Acele ve kızgınlıkla muamele etmeyen, yumuşak davranan",
+      "hedef": 88
+    },
+    {
+      "id": 34,
+      "isim": "El-Azîm",
+      "gun": "Çarşamba",
+      "arapca": "الْعَظِيمُ",
+      "okunus": "El-Azîm",
+      "anlam": "Zatının ve sıfatlarının mahiyeti anlaşılamayacak kadar ulu olan",
+      "hedef": 1020
+    },
+    {
+      "id": 35,
+      "isim": "El-Gafûr",
+      "gun": "Pazar",
+      "arapca": "الْغَفُورُ",
+      "okunus": "El-Gafûr",
+      "anlam": "Çok affeden, mağfireti bol olan",
+      "hedef": 1286
+    },
+    {
+      "id": 36,
+      "isim": "Eş-Şekûr",
+      "gun": "Pazar",
+      "arapca": "الشَّكُورُ",
+      "okunus": "Eş-Şekûr",
+      "anlam": "Az iyiliğe çok mükafat veren",
+      "hedef": 526
+    },
+    {
+      "id": 37,
+      "isim": "El-Aliyy",
+      "gun": "Pazar",
+      "arapca": "الْعَلِيُّ",
+      "okunus": "El-Aliyy",
+      "anlam": "Yüceler yücesi, çok yüce olan",
+      "hedef": 110
+    },
+    {
+      "id": 38,
+      "isim": "El-Kebîr",
+      "gun": "Perşembe",
+      "arapca": "الْكَبِيرُ",
+      "okunus": "El-Kebîr",
+      "anlam": "Büyüklükte eşi olmayan",
+      "hedef": 232
+    },
+    {
+      "id": 39,
+      "isim": "El-Hafîz",
+      "gun": "Cumartesi",
+      "arapca": "الْحَفِيظُ",
+      "okunus": "El-Hafîz",
+      "anlam": "Her şeyi koruyup gözeten",
+      "hedef": 998
+    },
+    {
+      "id": 40,
+      "isim": "El-Mukît",
+      "gun": "Pazar",
+      "arapca": "الْمُقِيتُ",
+      "okunus": "El-Mukît",
+      "anlam": "Her canlının rızkını ve ihtiyacını karşılayan",
+      "hedef": 550
+    },
+    {
+      "id": 41,
+      "isim": "El-Hasîb",
+      "gun": "Cuma",
+      "arapca": "الْحَسِيبُ",
+      "okunus": "El-Hasîb",
+      "anlam": "Kullarının hesabını gören, kafî olan",
+      "hedef": 80
+    },
+    {
+      "id": 42,
+      "isim": "El-Celîl",
+      "gun": "Pazar",
+      "arapca": "الْجَلِيلُ",
+      "okunus": "El-Celîl",
+      "anlam": "Azamet sahibi, ululuk ve celal sahibi",
+      "hedef": 73
+    },
+    {
+      "id": 43,
+      "isim": "El-Kerîm",
+      "gun": "Cuma",
+      "arapca": "الْكَرِيمُ",
+      "okunus": "El-Kerîm",
+      "anlam": "Çok cömert, ikramı bol olan",
+      "hedef": 270
+    },
+    {
+      "id": 44,
+      "isim": "Er-Rakîb",
+      "gun": "Cuma",
+      "arapca": "الرَّقِيبُ",
+      "okunus": "Er-Rakîb",
+      "anlam": "Her şeyi gözetleyen, kontrolü altında tutan",
+      "hedef": 312
+    },
+    {
+      "id": 45,
+      "isim": "El-Mucîb",
+      "gun": "Perşembe",
+      "arapca": "الْمُجِيبُ",
+      "okunus": "El-Mucîb",
+      "anlam": "Kendisine dua edenlerin isteklerini veren",
+      "hedef": 55
+    },
+    {
+      "id": 46,
+      "isim": "El-Vâsi",
+      "gun": "Pazartesi",
+      "arapca": "الْوَاسِعُ",
+      "okunus": "El-Vâsi",
+      "anlam": "İlmi, rahmeti ve kudreti geniş olan",
+      "hedef": 137
+    },
+    {
+      "id": 47,
+      "isim": "El-Hakîm",
+      "gun": "Cuma",
+      "arapca": "الْحَكِيمُ",
+      "okunus": "El-Hakîm",
+      "anlam": "Her işi hikmetli olan, hikmet sahibi",
+      "hedef": 78
+    },
+    {
+      "id": 48,
+      "isim": "El-Vedûd",
+      "gun": "Pazartesi",
+      "arapca": "الْوَدُودُ",
+      "okunus": "El-Vedûd",
+      "anlam": "Kullarını çok seven, sevilmeye layık olan",
+      "hedef": 20
+    },
+    {
+      "id": 49,
+      "isim": "El-Mecîd",
+      "gun": "Cuma",
+      "arapca": "الْمَجِيدُ",
+      "okunus": "El-Mecîd",
+      "anlam": "Şanı büyük, şerefi yüce olan",
+      "hedef": 57
+    },
+    {
+      "id": 50,
+      "isim": "El-Bâis",
+      "gun": "Pazar",
+      "arapca": "الْبَاعِثُ",
+      "okunus": "El-Bâis",
+      "anlam": "Ölüleri dirilten, peygamber gönderen",
+      "hedef": 573
+    },
+    {
+      "id": 51,
+      "isim": "Eş-Şehîd",
+      "gun": "Perşembe",
+      "arapca": "الشَّهِيدُ",
+      "okunus": "Eş-Şehîd",
+      "anlam": "Her şeye hazır ve nazır olan, her şeyi bilen",
+      "hedef": 319
+    },
+    {
+      "id": 52,
+      "isim": "El-Hakk",
+      "gun": "Cuma",
+      "arapca": "الْحَقُّ",
+      "okunus": "El-Hakk",
+      "anlam": "Varlığı hiç değişmeden duran, gerçek olan",
+      "hedef": 108
+    },
+    {
+      "id": 53,
+      "isim": "El-Vekîl",
+      "gun": "Cuma",
+      "arapca": "الْوَكِيلُ",
+      "okunus": "El-Vekîl",
+      "anlam": "Kendisine tevekkül edenlerin işlerini en iyi neticeye ulaştıran",
+      "hedef": 66
+    },
+    {
+      "id": 54,
+      "isim": "El-Kaviyy",
+      "gun": "Salı",
+      "arapca": "الْقَوِيُّ",
+      "okunus": "El-Kaviyy",
+      "anlam": "Kudret ve kuvveti sonsuz olan",
+      "hedef": 116
+    },
+    {
+      "id": 55,
+      "isim": "El-Metîn",
+      "gun": "Cuma",
+      "arapca": "الْمَتِينُ",
+      "okunus": "El-Metîn",
+      "anlam": "Çok sağlam, kuvvetli ve dayanıklı olan",
+      "hedef": 500
+    },
+    {
+      "id": 56,
+      "isim": "El-Veliyy",
+      "gun": "Salı",
+      "arapca": "الْوَلِيُّ",
+      "okunus": "El-Veliyy",
+      "anlam": "Dost, yardımcı, müminlerin velisi",
+      "hedef": 46
+    },
+    {
+      "id": 57,
+      "isim": "El-Hamîd",
+      "gun": "Perşembe",
+      "arapca": "الْحَمِيدُ",
+      "okunus": "El-Hamîd",
+      "anlam": "Her türlü hamd ve övgüye layık olan",
+      "hedef": 62
+    },
+    {
+      "id": 58,
+      "isim": "El-Muhsî",
+      "gun": "Cuma",
+      "arapca": "الْمُحْصِي",
+      "okunus": "El-Muhsî",
+      "anlam": "Her şeyin sayısını bilen",
+      "hedef": 148
+    },
+    {
+      "id": 59,
+      "isim": "El-Mübdi",
+      "gun": "Perşembe",
+      "arapca": "الْمُبْدِئُ",
+      "okunus": "El-Mübdi",
+      "anlam": "Maddi ve manevi her şeyi ilk defa yaratan",
+      "hedef": 56
+    },
+    {
+      "id": 60,
+      "isim": "El-Muîd",
+      "gun": "Cumartesi",
+      "arapca": "الْمُعِيدُ",
+      "okunus": "El-Muîd",
+      "anlam": "Yarattıklarını yok edip sonra tekrar dirilten",
+      "hedef": 124
+    },
+    {
+      "id": 61,
+      "isim": "El-Muhyî",
+      "gun": "Cuma",
+      "arapca": "الْمُحْيِي",
+      "okunus": "El-Muhyî",
+      "anlam": "Can veren, dirilten, sağlık veren",
+      "hedef": 68
+    },
+    {
+      "id": 62,
+      "isim": "El-Mümît",
+      "gun": "Salı",
+      "arapca": "الْمُمِيتُ",
+      "okunus": "El-Mümît",
+      "anlam": "Her canlıya ölümü tattıran",
+      "hedef": 490
+    },
+    {
+      "id": 63,
+      "isim": "El-Hayy",
+      "gun": "Pazar",
+      "arapca": "الْحَيُّ",
+      "okunus": "El-Hayy",
+      "anlam": "Diri, canlı, ebedi hayat sahibi",
+      "hedef": 18
+    },
+    {
+      "id": 64,
+      "isim": "El-Kayyûm",
+      "gun": "Perşembe",
+      "arapca": "الْقَيُّومُ",
+      "okunus": "El-Kayyûm",
+      "anlam": "Her şeyi ayakta tutan, kendi kendine var olan",
+      "hedef": 156
+    },
+    {
+      "id": 65,
+      "isim": "El-Vâcid",
+      "gun": "Cuma",
+      "arapca": "الْوَاجِدُ",
+      "okunus": "El-Vâcid",
+      "anlam": "Dilediğini dilediği zaman bulan, hiçbir şeye muhtaç olmayan",
+      "hedef": 14
+    },
+    {
+      "id": 66,
+      "isim": "El-Mâcid",
+      "gun": "Cuma",
+      "arapca": "الْمَاجِدُ",
+      "okunus": "El-Mâcid",
+      "anlam": "Kadri ve şanı büyük olan",
+      "hedef": 48
+    },
+    {
+      "id": 67,
+      "isim": "El-Vâhid",
+      "gun": "Salı",
+      "arapca": "الْوَاحِدُ",
+      "okunus": "El-Vâhid",
+      "anlam": "Tek, bir olan, zatında ve sıfatlarında eşi olmayan",
+      "hedef": 19
+    },
+    {
+      "id": 68,
+      "isim": "El-Ehad",
+      "gun": "Cuma",
+      "arapca": "الْأَحَدُ",
+      "okunus": "El-Ehad",
+      "anlam": "Bölünmez, parçalanmaz tek varlık",
+      "hedef": 13
+    },
+    {
+      "id": 69,
+      "isim": "Es-Samed",
+      "gun": "Perşembe",
+      "arapca": "الصَّمَدُ",
+      "okunus": "Es-Samed",
+      "anlam": "Hiçbir şeye ihtiyacı olmayan, her şeyin kendisine muhtaç olduğu",
+      "hedef": 134
+    },
+    {
+      "id": 70,
+      "isim": "El-Kâdir",
+      "gun": "Pazar",
+      "arapca": "الْقَادِرُ",
+      "okunus": "El-Kâdir",
+      "anlam": "Her şeye gücü yeten, dilediğini yapan",
+      "hedef": 305
+    },
+    {
+      "id": 71,
+      "isim": "El-Muktedir",
+      "gun": "Cumartesi",
+      "arapca": "الْمُقْتَدِرُ",
+      "okunus": "El-Muktedir",
+      "anlam": "Kudret sahibi, dilediği gibi tasarruf eden",
+      "hedef": 744
+    },
+    {
+      "id": 72,
+      "isim": "El-Mukaddim",
+      "gun": "Cumartesi",
+      "arapca": "الْمُقَدِّمُ",
+      "okunus": "El-Mukaddim",
+      "anlam": "Dilediğini öne alan, öne geçiren",
+      "hedef": 184
+    },
+    {
+      "id": 73,
+      "isim": "El-Muahhir",
+      "gun": "Cumartesi",
+      "arapca": "الْمُؤَخِّرُ",
+      "okunus": "El-Muahhir",
+      "anlam": "Dilediğini geri bırakan, sona erteleyen",
+      "hedef": 84
+    },
+    {
+      "id": 74,
+      "isim": "El-Evvel",
+      "gun": "Pazar",
+      "arapca": "الْأَوَّلُ",
+      "okunus": "El-Evvel",
+      "anlam": "Başlangıcı olmayan, ilk olan",
+      "hedef": 37
+    },
+    {
+      "id": 75,
+      "isim": "El-Âhir",
+      "gun": "Cuma",
+      "arapca": "الْآخِرُ",
+      "okunus": "El-Âhir",
+      "anlam": "Sonu olmayan, her şey yok olduktan sonra baki kalan",
+      "hedef": 801
+    },
+    {
+      "id": 76,
+      "isim": "Ez-Zâhir",
+      "gun": "Cumartesi",
+      "arapca": "الظَّاهِرُ",
+      "okunus": "Ez-Zâhir",
+      "anlam": "Varlığı aşikar olan, eserleriyle apaçık görünen",
+      "hedef": 1106
+    },
+    {
+      "id": 77,
+      "isim": "El-Bâtın",
+      "gun": "Pazar",
+      "arapca": "الْبَاطِنُ",
+      "okunus": "El-Bâtın",
+      "anlam": "Gizli, akılların idrak edemeyeceği, gizlilikleri bilen",
+      "hedef": 62
+    },
+    {
+      "id": 78,
+      "isim": "El-Vâlî",
+      "gun": "Pazar",
+      "arapca": "الْوَالِي",
+      "okunus": "El-Vâlî",
+      "anlam": "Kainatı idare eden, her şeyi yöneten",
+      "hedef": 47
+    },
+    {
+      "id": 79,
+      "isim": "El-Müteâlî",
+      "gun": "Cumartesi",
+      "arapca": "الْمُتَعَالِي",
+      "okunus": "El-Müteâlî",
+      "anlam": "Yüceler yücesi, her türlü noksanlıktan uzak olan",
+      "hedef": 551
+    },
+    {
+      "id": 80,
+      "isim": "El-Berr",
+      "gun": "Cuma",
+      "arapca": "الْبَرُّ",
+      "okunus": "El-Berr",
+      "anlam": "İyiliği bol, kullarına karşı çok şefkatli olan",
+      "hedef": 202
+    },
+    {
+      "id": 81,
+      "isim": "Et-Tevvâb",
+      "gun": "Perşembe",
+      "arapca": "التَّوَّابُ",
+      "okunus": "Et-Tevvâb",
+      "anlam": "Tevbeleri kabul eden, tevbe kapısını açık tutan",
+      "hedef": 409
+    },
+    {
+      "id": 82,
+      "isim": "El-Müntekim",
+      "gun": "Salı",
+      "arapca": "الْمُنْتَقِمُ",
+      "okunus": "El-Müntekim",
+      "anlam": "Zalimlere hak ettiği cezayı veren",
+      "hedef": 630
+    },
+    {
+      "id": 83,
+      "isim": "El-Afüvv",
+      "gun": "Pazar",
+      "arapca": "الْعَفُوُّ",
+      "okunus": "El-Afüvv",
+      "anlam": "Affı çok olan, günahları silen",
+      "hedef": 156
+    },
+    {
+      "id": 84,
+      "isim": "Er-Raûf",
+      "gun": "Cumartesi",
+      "arapca": "الرَّءُوفُ",
+      "okunus": "Er-Raûf",
+      "anlam": "Çok şefkatli, çok esirgeyen",
+      "hedef": 287
+    },
+    {
+      "id": 85,
+      "isim": "Mâlikü'l-Mülk",
+      "gun": "Çarşamba",
+      "arapca": "مَالِكُ الْمُلْكِ",
+      "okunus": "Mâlikü'l-Mülk",
+      "anlam": "Mülkün ebedi sahibi, saltanatı sınırsız olan",
+      "hedef": 212
+    },
+    {
+      "id": 86,
+      "isim": "Zül-Celâli ve'l-İkrâm",
+      "gun": "Pazar",
+      "arapca": "ذُو الْجَلَالِ وَالْإِكْرَامِ",
+      "okunus": "Zül-Celâli ve'l-İkrâm",
+      "anlam": "Azamet ve ikram sahibi, ululuk ve cömertlik sahibi",
+      "hedef": 1098
+    },
+    {
+      "id": 87,
+      "isim": "El-Muksit",
+      "gun": "Perşembe",
+      "arapca": "الْمُقْسِطُ",
+      "okunus": "El-Muksit",
+      "anlam": "Adaletle hükmeden, adaleti tesis eden",
+      "hedef": 209
+    },
+    {
+      "id": 88,
+      "isim": "El-Câmi",
+      "gun": "Perşembe",
+      "arapca": "الْجَامِعُ",
+      "okunus": "El-Câmi",
+      "anlam": "Toplayan, bir araya getiren",
+      "hedef": 114
+    },
+    {
+      "id": 89,
+      "isim": "El-Ganî",
+      "gun": "Pazar",
+      "arapca": "الْغَنِيُّ",
+      "okunus": "El-Ganî",
+      "anlam": "Hiçbir şeye ihtiyacı olmayan, zengin olan",
+      "hedef": 1060
+    },
+    {
+      "id": 90,
+      "isim": "El-Mugnî",
+      "gun": "Cuma",
+      "arapca": "الْمُغْنِي",
+      "okunus": "El-Mugnî",
+      "anlam": "Dilediğini zengin eden, ihtiyaçtan kurtaran",
+      "hedef": 1100
+    },
+    {
+      "id": 91,
+      "isim": "El-Mâni",
+      "gun": "Cumartesi",
+      "arapca": "الْمَانِعُ",
+      "okunus": "El-Mâni",
+      "anlam": "Engelleyen, istemediği şeyin olmasına izin vermeyen",
+      "hedef": 161
+    },
+    {
+      "id": 92,
+      "isim": "Ed-Dârr",
+      "gun": "Salı",
+      "arapca": "الضَّارُّ",
+      "okunus": "Ed-Dârr",
+      "anlam": "Elem ve zarar verecek şeyleri yaratan",
+      "hedef": 1001
+    },
+    {
+      "id": 93,
+      "isim": "En-Nâfi",
+      "gun": "Cuma",
+      "arapca": "النَّافِعُ",
+      "okunus": "En-Nâfi",
+      "anlam": "Fayda veren, faydalı şeyleri yaratan",
+      "hedef": 201
+    },
+    {
+      "id": 94,
+      "isim": "En-Nûr",
+      "gun": "Cuma",
+      "arapca": "النُّورُ",
+      "okunus": "En-Nûr",
+      "anlam": "Alemleri nurlandıran, aydınlatan",
+      "hedef": 256
+    },
+    {
+      "id": 95,
+      "isim": "El-Hâdî",
+      "gun": "Pazar",
+      "arapca": "الْهَادِي",
+      "okunus": "El-Hâdî",
+      "anlam": "Hidayet veren, doğru yolu gösteren",
+      "hedef": 20
+    },
+    {
+      "id": 96,
+      "isim": "El-Bedî",
+      "gun": "Perşembe",
+      "arapca": "الْبَدِيعُ",
+      "okunus": "El-Bedî",
+      "anlam": "Örneksiz, eşsiz yaratan, hayret verici alemler yaratan",
+      "hedef": 86
+    },
+    {
+      "id": 97,
+      "isim": "El-Bâkî",
+      "gun": "Pazar",
+      "arapca": "الْبَاقِي",
+      "okunus": "El-Bâkî",
+      "anlam": "Varlığının sonu olmayan, ebedi olan",
+      "hedef": 113
+    },
+    {
+      "id": 98,
+      "isim": "El-Vâris",
+      "gun": "Cuma",
+      "arapca": "الْوَارِثُ",
+      "okunus": "El-Vâris",
+      "anlam": "Her şeyin gerçek sahibi, sonunda her şeyin kendisine kaldığı",
+      "hedef": 707
+    },
+    {
+      "id": 99,
+      "isim": "Er-Reşîd",
+      "gun": "Pazar",
+      "arapca": "الرَّشِيدُ",
+      "okunus": "Er-Reşîd",
+      "anlam": "İrşada muhtaç olmayan, her şeyi isabetle idare eden",
+      "hedef": 514
+    }
+  ]
+}
+```
