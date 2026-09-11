@@ -468,9 +468,7 @@
             color: var(--text-main); box-sizing: border-box;
         }
         #zikirmatikSection .zk-title { font-size: 15px; font-weight: bold; color: var(--gold-dark); margin: 0 0 12px; }
-        #zikirmatikSection .zk-kaynak { display: flex; gap: 14px; justify-content: center; align-items: center; margin: 0 0 8px; font-size: 13px; }
-#zikirmatikSection .zk-kk { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; font-weight: 600; color: var(--text-main); }
-#zikirmatikSection .zk-kk input { width: 15px; height: 15px; margin: 0; accent-color: #0e6b3a; }
+        #zikirmatikSection .zk-kk input { width: 15px; height: 15px; margin: 0; accent-color: #0e6b3a; }
 #zikirmatikSection .zk-picker { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
         #zikirmatikSection .zk-select { flex: 1; min-width: 130px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 14px; }
         #zikirmatikSection .zk-tavaf { position: relative; width: 290px; height: 290px; margin: 10px auto 8px; }
@@ -787,11 +785,6 @@
         <!-- ===== BOLUM F : ZIKIRMATIK PANELI (mesaj panelinin oncesi) ===== -->
         <section id="zikirmatikSection">
             <h3 class="zk-title">&#128255; Zikirmatik</h3>
-            <div class="zk-kaynak" id="zkKaynak">
-                <label class="zk-kk"><input type="checkbox" id="zkKaynakHepsi" data-kaynak="hepsi" checked><span>T&#252;m&#252;</span></label>
-                <label class="zk-kk"><input type="checkbox" id="zkKaynakEsma" data-kaynak="esma"><span>Esma</span></label>
-                <label class="zk-kk"><input type="checkbox" id="zkKaynakZikir" data-kaynak="zikir"><span>Zikir</span></label>
-            </div>
             <div class="zk-picker">
                 <select id="zkZikir" class="zk-select"></select>
                 <button type="button" id="zkAyarBtn" class="zk-mini" title="Ayarlar">&#9881;</button>
@@ -953,8 +946,7 @@
     var ZK_JSON = 'json/zikir.json';
     var ZK_JSON_ESMA = 'json/esmaulhusna.json';
     var ZK_KATEGORI = {};
-    var ZK_KAYNAK = 'hepsi';                 // 'hepsi' | 'esma' | 'zikir'  (tek secim)
-    // s.kaynak icinde kalici (asagida s yuklendikten sonra okunur)
+    var ZK_KAYNAK = 'hepsi';   // iki kaynak birlikte, her biri kendi JSON sirasinda
     var ZK_ESMA_ADLAR = [], ZK_ZIKIR_ADLAR = [];
     var zkJsonYuklendi = false;
 
@@ -1047,7 +1039,6 @@
     if (!s.sesdosya) s.sesdosya = "hu.mp3";
     if (!Array.isArray(s.ozel)) s.ozel = [];
     if (!s.zk || typeof s.zk !== 'object') s.zk = {};
-    if (s.kaynak === 'esma' || s.kaynak === 'zikir') ZK_KAYNAK = s.kaynak;
 
     // --- HER ZIKIR KENDI SAYACINI TUTAR ---
     // s.zk[zikir] = { sayi, tur, toplam, gun:{}, hedef, serbest }
@@ -1367,11 +1358,7 @@
                 var kt = ZK_KATEGORI[z] || null;
                 if (kt && kt !== sonKat) { if (sonKat !== null) opt += '</optgroup>'; opt += '<optgroup label="' + kt.replace(/"/g,'&quot;') + '">'; sonKat = kt; }
                 var b = ZK_BILGI[z] || {};
-                var etiket, orta, son;
-                if (b.tur === 'esma') { etiket = 'Esma\u00fcl H\u00fcsna'; orta = z; son = (b.gun ? (b.gun + ' g\u00fcn\u00fc') : (b.anlam || '')); }
-                else if (b.tur === 'zikir') { etiket = 'Zikir'; orta = (b.kategori || ''); son = z; }
-                else { etiket = (b.kategori || 'Zikir'); orta = ''; son = z; }
-                var etk = etiket + ' ' + _no + '. ' + (orta ? (orta + ', ') : '') + son;
+                var etk = _no + '. ' + z + (b.gun ? (', ' + b.gun) : '');
                 opt += '<option value="' + z.replace(/"/g,'&quot;') + '"' + (z===s.zikir ? ' selected' : '') + '>' + etk + '</option>';
             });
             if (sonKat !== null) opt += '</optgroup>';
@@ -1428,24 +1415,6 @@
         var sec = document.getElementById('zikirmatikSection');
         if (!sec || sec._zk) return;
         sec._zk = true;
-        // --- KAYNAK CEKBOKSLERI: tek secim (Tumu / Esma / Zikir) ---
-        function zkKaynakUygula(kaynak){
-            if (!kaynak) return;
-            if (ZK_KAYNAK === kaynak) return;
-            ZK_KAYNAK = kaynak;
-            s.kaynak = kaynak;                 // kalici: tekrar acilista geri gelir
-            VARSAYILAN_ZIKIRLER = zkAktifAdlar();
-            zkSecimDuzelt();
-            kaydet(); ciz();
-        }
-        var zkKaynaklar = document.querySelectorAll('#zkKaynak .zk-kk input');
-        for (var ci = 0; ci < zkKaynaklar.length; ci++) {
-            zkKaynaklar[ci].addEventListener('change', function(){
-                if (!this.checked) { this.checked = true; return; }   // tek secim: bos birakilamaz
-                zkKaynakUygula(this.getAttribute('data-kaynak'));
-            });
-        }
-
         var sel = $('zkZikir');
         if ($('zkTap')) $('zkTap').addEventListener('click', tik);
         if (sel) sel.addEventListener('change', function(){
