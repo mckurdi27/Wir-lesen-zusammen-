@@ -99,30 +99,30 @@
             min-height: var(--touch-target);
             min-width: var(--touch-target);
             padding: 10px 16px;
-            touch-action: manipulation;
-            /* PDF sayfa cevirme gecis animasyonu */
-            @keyframes pdfPageTurn {
-                0%   { transform: perspective(1400px) translateX(30px) rotateY(-14deg); opacity: 0.3; transform-origin: left center; }
-                55%  { transform: perspective(1400px) translateX(6px) rotateY(-5deg); opacity: 0.85; transform-origin: left center; }
-                100% { transform: none; opacity: 1; transform-origin: center; }
-            }
-            #pdf-canvas.sb-page-turn { animation: pdfPageTurn 0.28s ease-out; }
-            /* Flipbook sayfa cevirme katmani */
-            #pdf-flip-overlay {
-                position: absolute; top: 0; left: 0;
-                transform-origin: left center;
-                box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-                pointer-events: none; z-index: 5;
-                background: #fff;
-                display: none;
-            }
-            #pdf-flip-overlay.sb-flipping { animation: pdfFlip 0.5s ease-in-out forwards; }
-            @keyframes pdfFlip {
-                0%   { transform: perspective(1800px) rotateY(0deg); opacity: 1; }
-                100% { transform: perspective(1800px) rotateY(-180deg); opacity: 0.25; }
-            }
             border-radius: 8px;
             font-size: 14px;
+            touch-action: manipulation;
+        }
+        /* PDF sayfa cevirme gecis animasyonu */
+        @keyframes pdfPageTurn {
+            0%   { transform: perspective(1400px) translateX(30px) rotateY(-14deg); opacity: 0.3; transform-origin: left center; }
+            55%  { transform: perspective(1400px) translateX(6px) rotateY(-5deg); opacity: 0.85; transform-origin: left center; }
+            100% { transform: none; opacity: 1; transform-origin: center; }
+        }
+        #pdf-canvas.sb-page-turn { animation: pdfPageTurn 0.28s ease-out; }
+        /* Flipbook sayfa cevirme katmani */
+        #pdf-flip-overlay {
+            position: absolute; top: 0; left: 0;
+            transform-origin: left center;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+            pointer-events: none; z-index: 5;
+            background: #fff;
+            display: none;
+        }
+        #pdf-flip-overlay.sb-flipping { animation: pdfFlip 0.5s ease-in-out forwards; }
+        @keyframes pdfFlip {
+            0%   { transform: perspective(1800px) rotateY(0deg); opacity: 1; }
+            100% { transform: perspective(1800px) rotateY(-180deg); opacity: 0.25; }
         }
         .book-card {
             border: 2px solid var(--gold-primary);
@@ -186,7 +186,7 @@
             /* eser karti aksiyon butonlari: mobilde ortala + yari genislik */
             .book-body .read-range-btn, .book-body .unread-range-btn, .book-body .release-range-btn {
                 flex: 0 1 auto !important; min-width: 0 !important; white-space: nowrap !important; text-align: center !important; font-size: 11px !important; line-height: 1 !important; padding: 4px 8px !important; height: auto !important; min-height: 24px !important; border-radius: 5px !important; }
-            .book-body .take-range-btn, .book-body .pdf-page-btn, .book-header .pdf-book-btn {
+            .book-body .take-range-btn, .book-body .pdf-page-btn, .book-header .pdf-book-btn, .book-header .toc-book-btn {
                 flex: 0 0 auto !important; width: auto !important; max-width: none !important;
                 min-height: 0 !important; height: auto !important; padding: 6px 14px !important;
                 white-space: nowrap !important; }
@@ -948,7 +948,6 @@
         }
         document.addEventListener("DOMContentLoaded", fetchPrayerTimes);
         </script>
-    </div>
 
     <div id="toast" class="toast"></div>
 
@@ -4589,8 +4588,8 @@ booksGrid.appendChild(_readBtn);
                         `;
                     }).join('');
 
-                    let headerPdfBtn = `<button class="pdf-book-btn" data-book-id="${book.id}" style="padding: 6px 10px; background: #d4af37; color: #3e2723; border: none; border-radius: 6px; font-size: 12px; margin-left: 0; cursor: pointer; font-weight: bold; min-height: 32px; touch-action: manipulation;">📄 PDF</button>`;
-                    let headerTocBtn = `<button class="toc-book-btn" data-book-id="${book.id}" style="padding: 6px 10px; background: #27ae60; color: #fff; border: none; border-radius: 8px; font-size: 12px; font-weight: bold; min-height: 32px; margin-left: 0; cursor: pointer; touch-action: manipulation;">📑 İçindekiler</button>`;
+                    let headerPdfBtn = `<button class="pdf-book-btn" data-book-id="${book.id}" style="padding: 3px 9px; background: #d4af37; color: #3e2723; border: none; border-radius: 6px; font-size: 11px; line-height: 16px; height: 24px; min-height: 24px; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; margin-left: 0; cursor: pointer; font-weight: bold; touch-action: manipulation;">PDF</button>`;
+                    let headerTocBtn = `<button class="toc-book-btn" data-book-id="${book.id}" style="padding: 3px 9px; background: #27ae60; color: #fff; border: none; border-radius: 6px; font-size: 11px; line-height: 16px; height: 24px; min-height: 24px; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; margin-left: 0; cursor: pointer; font-weight: bold; touch-action: manipulation;">İçindekiler</button>`;
 
                     card.innerHTML = `
                         <div class="book-header">
@@ -7094,8 +7093,5 @@ _sbMemberDetail = function (name, groupKey) {
       }
     </script>
 <!-- ===================== </body> / </html> SON ===================== -->
-</body>
-</html>
-============= -->
 </body>
 </html>
