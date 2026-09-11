@@ -836,7 +836,9 @@
                     <button type="button" class="zk-sesopt" data-ses="yumusak.wav">Yumuşak ton</button>
                     <button type="button" class="zk-sesopt" data-ses="Allah hu.mp3">Allah hu</button>
                     <button type="button" class="zk-sesopt" data-ses="page-flip.mp3">Sayfa çevirme</button>
+                    <button type="button" class="zk-sesopt" id="zkSesYerel">Telefondan seç…</button>
                 </div>
+                <input type="file" id="zkSesDosya" accept="audio/*" style="display:none">
             </div>
             <!-- en alt : zikir adedi butonlari -->
             <div class="zk-adet" id="zkAdet">
@@ -1050,6 +1052,7 @@
     if (!s) s = { zikir: VARSAYILAN_ZIKIRLER[0], vib: true, ses: false, sesdosya: "hu.mp3", ozel: [], zk: {} };
     if (!s.sesdosya) s.sesdosya = "hu.mp3";
     if (typeof s.surekli !== 'boolean') s.surekli = false;   // surekli ses modu (varsayilan kapali)
+    if (s.sesYerelData && typeof s.sesYerelData !== 'string') s.sesYerelData = '';
     if (!Array.isArray(s.ozel)) s.ozel = [];
     if (!s.zk || typeof s.zk !== 'object') s.zk = {};
     if (s.kaynak === 'esma' || s.kaynak === 'zikir') ZK_KAYNAK = s.kaynak;
@@ -1098,7 +1101,16 @@
     function kaydet(){ try { localStorage.setItem(KEY, JSON.stringify(s)); } catch(e){} }
 
     var ZK_SES_DOSYA = "hu.mp3";   // varsayilan: "Allah hu" ifadesinden kirpilan "hu"
-    function zkSesYolu(){ return "sound/" + (s.sesdosya || ZK_SES_DOSYA); }
+    var YEREL_ANAHTAR = '__yerel__';   // secilen yerel dosya icin ozel ses anahtari
+    function zkSesYolu(){
+        if (s.sesdosya === YEREL_ANAHTAR) return s.sesYerelData || '';
+        return "sound/" + (s.sesdosya || ZK_SES_DOSYA);
+    }
+    function zkSesEtiket(){
+        if (s.sesdosya === YEREL_ANAHTAR) return (s.sesYerelAd || 'Telefondan seçilen');
+        var t = document.querySelector('#zkSesMenu .zk-sesopt[data-ses="' + String(s.sesdosya||'').replace(/"/g,'\\"') + '"]');
+        return t ? t.textContent.trim() : (s.sesdosya || ZK_SES_DOSYA);
+    }
     function zkSesYukle(){
         try { beep.a = new Audio(zkSesYolu()); beep.a.preload = "auto"; beep.a.volume = 0.95; }
         catch(e){ beep.a = null; }
@@ -1390,7 +1402,13 @@
         if ($('zkSurekliSes')) $('zkSurekliSes').checked = !!s.surekli;
         zkSurekliCal();
         var zkSesOpts = document.querySelectorAll('#zikirmatikSection .zk-sesopt');
-        for (var zi = 0; zi < zkSesOpts.length; zi++) zkSesOpts[zi].classList.toggle('on', zkSesOpts[zi].getAttribute('data-ses') === (s.sesdosya || ZK_SES_DOSYA));
+        var yerelMi = (s.sesdosya === YEREL_ANAHTAR);
+        for (var zi = 0; zi < zkSesOpts.length; zi++) {
+            var op = zkSesOpts[zi];
+            if (op.id === 'zkSesYerel') { op.classList.toggle('on', yerelMi); continue; }
+            op.classList.toggle('on', !yerelMi && op.getAttribute('data-ses') === (s.sesdosya || ZK_SES_DOSYA));
+        }
+        if (yerelMi && s.sesYerelAd && $('zkSesYerel')) $('zkSesYerel').textContent = s.sesYerelAd;
         var sel = $('zkZikir');
         if (sel) {
             var opt = '', sonKat = null, _no = 0;
@@ -1562,7 +1580,13 @@
                 menu.addEventListener('click', function(e){
                     var t = e.target.closest('.zk-sesopt'); if (!t) return;
                     e.stopPropagation();
-                    s.sesdosya = t.getAttribute('data-ses');
+                    if (t.id === 'zkSesYerel') {          // telefondan ses sec
+                        var fi = $('zkSesDosya');
+                        if (fi) { try { fi.value = ''; fi.click(); } catch(err){} }
+                        return;
+                    }
+                    var ds = t.getAttribute('data-ses'); if (!ds) return;
+                    s.sesdosya = ds;
                     s.ses = true;
                     zkSesMenuKapat();
                     if (s.surekli) { zkSurekliDurdur(); zkSurekliYol = ''; kaydet(); ciz(); }
@@ -1580,6 +1604,21 @@
             if (s.surekli) { s.ses = true; }   // surekli mod sesin acik olmasini gerektirir
             else { zkSurekliDurdur(); }
             kaydet(); ciz();
+        });
+        if ($('zkSesDosya')) $('zkSesDosya').addEventListener('change', function(){
+            var f = this.files && this.files[0]; if (!f) return;
+            var rd = new FileReader();
+            rd.onload = function(){
+                s.sesYerelData = String(rd.result || '');
+                s.sesYerelAd = f.name || 'Telefondan seçilen';
+                s.sesdosya = YEREL_ANAHTAR;
+                s.ses = true;
+                var mn = $('zkSesMenu'); if (mn) mn.classList.remove('on');
+                zkSesYukle();
+                if (s.surekli) { zkSurekliDurdur(); zkSurekliYol = ''; kaydet(); ciz(); }
+                else { kaydet(); ciz(); beep(); }
+            };
+            try { rd.readAsDataURL(f); } catch(err){}
         });
         if ($('zkAyarBtn')) $('zkAyarBtn').addEventListener('click', function(){
             var ay = $('zkAyar'); if (ay) ay.classList.toggle('on');
