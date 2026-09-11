@@ -516,7 +516,7 @@
         #zikirmatikSection .zk-dot.c10 { color: #2b1409; --zk-bg: #4a2415; }
         #zikirmatikSection .zk-dot.on[class*="c0"] { filter: drop-shadow(0 0 3px rgba(0,0,0,.45)); }
         #zikirmatikSection .zk-count { position: absolute; left: 0; right: 0; top: calc(50% - 84px); text-align: center; font-size: 1.55rem; font-weight: 800; color: var(--gold-dark); line-height: 1; margin: 0; pointer-events: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
-        #zikirmatikSection .zk-sub { position: absolute; left: 0; right: 0; top: calc(50% + 56px); text-align: center; font-size: 12px; font-weight: 600; color: var(--gold-dark); opacity: .85; margin: 0; pointer-events: none; }
+        #zikirmatikSection .zk-sub { position: absolute; left: 0; right: 0; top: calc(50% + 52px); text-align: center; font-size: 13px; font-weight: 700; color: var(--gold-dark); opacity: .95; margin: 0; pointer-events: none; }
         #zikirmatikSection .zk-tap { display: block; width: 100%; max-width: 340px; margin: 0 auto; padding: 16px 14px; border-radius: 14px; border: 0; background: linear-gradient(180deg, #d4a02a, #b8860b); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; box-sizing: border-box; box-shadow: 0 6px 18px rgba(184,134,11,.3); text-align: center; }
 #zikirmatikSection .zk-tap-ar { display: block; direction: rtl; unicode-bidi: isolate; font-size: 21px; font-weight: 800; line-height: 1.5; letter-spacing: 0; }
 #zikirmatikSection .zk-tap-an { display: block; direction: ltr; font-size: 14px; font-weight: 600; line-height: 1.35; opacity: .95; margin-top: 4px; letter-spacing: 0; }
@@ -834,11 +834,11 @@
                 <button type="button" id="zkAdetBos" class="zk-adetbtn zk-adetbos" data-adet="0" title="elle yaz" aria-label="elle yaz"></button>
             </div>
             <div class="zk-stats">
-                <span class="zk-stat"><b id="zkNo">1</b><span class="zk-lbl">Zikir</span></span>
-                <span class="zk-stat"><input type="number" id="zkSayi" class="zk-sayi" min="1" max="1000" inputmode="numeric" placeholder="&#8211;" title="Hedef: 1 - 1000 arası sayı yaz"><span class="zk-lbl">Hedef</span></span>
-                <span class="zk-stat"><b id="zkTur">0</b><span class="zk-lbl">Tur</span></span>
-                <span class="zk-stat"><b id="zkToplam">0</b><span class="zk-lbl">Toplam</span></span>
-                <span class="zk-stat"><b id="zkGunluk">0</b><span class="zk-lbl">Bug&#252;n</span></span>
+                <span class="zk-stat"><span class="zk-lbl">Zikir:</span><b id="zkNo">1</b></span>
+                <span class="zk-stat"><span class="zk-lbl">Hedef:</span><input type="number" id="zkSayi" class="zk-sayi" min="1" max="1000" inputmode="numeric" placeholder="&#8211;" title="Hedef: 1 - 1000 arası sayı yaz"></span>
+                <span class="zk-stat"><span class="zk-lbl">Tur:</span><b id="zkTur">0</b></span>
+                <span class="zk-stat"><span class="zk-lbl">Toplam:</span><b id="zkToplam">0</b></span>
+                <span class="zk-stat"><span class="zk-lbl">Bug&#252;n:</span><b id="zkGunluk">0</b></span>
             </div>
         </section>
 
@@ -1273,7 +1273,20 @@
         $('zkCount').textContent = (s.tur > 0)
             ? (s.tur + '.' + ZK_BOSLUK + s.sayi)
             : String(s.sayi);
-        if ($('zkSub')) { $('zkSub').textContent = ''; $('zkSub').style.display = 'none'; }
+        // Kabe alti: yazili (hazir) hedefte "Hedef: N", serbest hedefte "Serbest N"
+        if ($('zkSub')) {
+            var hazir = [7,11,33,66,99].indexOf(s.hedef) !== -1;
+            if (s.hedef > 0) {
+                $('zkSub').textContent = (hazir ? 'Hedef: ' : 'Serbest ') + s.hedef;
+                $('zkSub').style.display = '';
+            } else if (s.toplam > 0) {
+                $('zkSub').textContent = 'Serbest ' + s.toplam;
+                $('zkSub').style.display = '';
+            } else {
+                $('zkSub').textContent = '';
+                $('zkSub').style.display = 'none';
+            }
+        }
         if ($('zkNo')) $('zkNo').textContent = siraNo(s.zikir);
         $('zkTur').textContent = s.tur;
         $('zkToplam').textContent = s.toplam;
@@ -1321,7 +1334,10 @@
     function tik(){
         sesIsit();
         // Hedef yazilmadan sayim baslamaz
-        if (!(s.hedef > 0)) { if ($('zkSayi')) { try { $('zkSayi').focus(); $('zkSayi').select(); } catch(e){} } return; }
+        if (!(s.hedef > 0)) {
+            if ($('zkSayi')) { try { $('zkSayi').focus(); $('zkSayi').select(); } catch(e){} }
+            return;
+        }
         // Tur, tamamlaninca degil BASLADIGINDA artar: yeni turun ilk tiklamasi
         if (s.sayi === 0) s.tur++;
         s.sayi++; s.toplam++;
