@@ -1008,6 +1008,8 @@
             if (_eski.serbest) r.serbest = _eski.serbest;
         }
         try { delete s.sayi; delete s.tur; delete s.toplam; delete s.gun; delete s.hedef; delete s.serbest; } catch(e){}
+        // Tasi(y)ma hemen kalici olsun: uye hic tiklama yapmadan ciksa bile kayit korunur
+        try { kaydet(); } catch(e){}
     })();
     ['sayi','tur','toplam','gun','hedef','serbest'].forEach(function(alan){
         Object.defineProperty(s, alan, {
