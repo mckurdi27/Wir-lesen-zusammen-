@@ -1270,9 +1270,7 @@
     // Uye kendi degerini yazdiysa o deger korunur.
     function hedefSeed(){
         if (s.hedef > 0) return false;
-        var b = ZK_BILGI[s.zikir], jh = b ? parseInt(b.hedef, 10) : 0;
-        if (!(jh > 0)) return false;
-        zkKayit(s.zikir).hedef = jh;
+        zkKayit(s.zikir).hedef = 33;   // tum zikirler 33 ile baslar
         return true;
     }   // Kabe sayacinda tur ile zikir arasi uc bosluk
     function ciz(){
@@ -1285,8 +1283,7 @@
             : String(s.sayi);
         // Kabe alti: zikrin hedefi "Hedef: N"; uye kendi degerini yazdiysa "Serbest N"
         if ($('zkSub')) {
-            var hazir = ([7,11,33,66,99].indexOf(s.hedef) !== -1)
-                     || (parseInt((ZK_BILGI[s.zikir]||{}).hedef, 10) === s.hedef);
+            var hazir = [7,11,33,66,99].indexOf(s.hedef) !== -1;
             $('zkSub').textContent = (s.hedef > 0) ? ((hazir ? 'Hedef: ' : 'Serbest ') + s.hedef) : '';
             $('zkSub').style.display = '';
         }
