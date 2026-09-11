@@ -1265,20 +1265,29 @@
         }
     }
 
-    var ZK_BOSLUK = '\u00a0\u00a0\u00a0';   // Kabe sayacinda tur ile zikir arasi uc bosluk
+    var ZK_BOSLUK = '\u00a0\u00a0\u00a0';
+    // Secilen zikrin hedefi (zikir.json) kutuya OTOMATIK yazilir.
+    // Uye kendi degerini yazdiysa o deger korunur.
+    function hedefSeed(){
+        if (s.hedef > 0) return false;
+        var b = ZK_BILGI[s.zikir], jh = b ? parseInt(b.hedef, 10) : 0;
+        if (!(jh > 0)) return false;
+        zkKayit(s.zikir).hedef = jh;
+        return true;
+    }   // Kabe sayacinda tur ile zikir arasi uc bosluk
     function ciz(){
         if (!$('zkCount')) return;
+        if (hedefSeed()) kaydet();
         // Kabe uzerindeki sayac: sayim baslamadiysa sadece zikir sayisi,
         // basladiysa "tur." + uc bosluk + zikir sayisi (or. "1.   23")
         $('zkCount').textContent = (s.tur > 0)
             ? (s.tur + '.' + ZK_BOSLUK + s.sayi)
             : String(s.sayi);
-        // Kabe alti hedef yazisi (onceki surumdeki gibi her zaman gorunur)
+        // Kabe alti: zikrin hedefi "Hedef: N"; uye kendi degerini yazdiysa "Serbest N"
         if ($('zkSub')) {
-            var hazir = [7,11,33,66,99].indexOf(s.hedef) !== -1;
-            $('zkSub').textContent = (s.hedef > 0)
-                ? ((hazir ? 'Hedef: ' : 'Serbest ') + s.hedef)
-                : 'Hedef: 33';
+            var hazir = ([7,11,33,66,99].indexOf(s.hedef) !== -1)
+                     || (parseInt((ZK_BILGI[s.zikir]||{}).hedef, 10) === s.hedef);
+            $('zkSub').textContent = (s.hedef > 0) ? ((hazir ? 'Hedef: ' : 'Serbest ') + s.hedef) : '';
             $('zkSub').style.display = '';
         }
         if ($('zkNo')) $('zkNo').textContent = siraNo(s.zikir);
@@ -1364,6 +1373,7 @@
             // Her zikrin hedefi ve sayaci kendi kaydinda saklanir; zikir degisince
             // hedef otomatik atanmaz — o zikrin kayitli hedefi (yoksa bos) gelir.
             s.zikir = this.value;
+            hedefSeed();
             kaydet(); ciz();
         });
         // Hedef belirlenince/degisince Tur-Toplam-Bugun sifirlanir; hedef sabit kalir
