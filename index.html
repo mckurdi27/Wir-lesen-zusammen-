@@ -497,7 +497,7 @@
         #zikirmatikSection .zk-dot .zk-yuru { display: block; width: 100%; height: 100%; position: relative; }
         #zikirmatikSection .zk-dot .zk-yuru svg { position: absolute; inset: 0; width: 100%; height: 100%; }
         #zikirmatikSection .zk-dot.on { opacity: 1; transform: scale(1.04); }
-        #zikirmatikSection .zk-dot.dagit { opacity: 0 !important; transform: translate(var(--dx,0),var(--dy,0)) scale(.3) rotate(var(--dr,0deg)) !important; transition: opacity .6s ease-out, transform .6s ease-out; }
+        #zikirmatikSection .zk-dot.dagit { opacity: 0 !important; transform: translate(var(--dx,0),var(--dy,0)) scale(.18) rotate(var(--dr,0deg)) !important; transition: opacity 1.5s cubic-bezier(.22,.61,.36,1), transform 1.8s cubic-bezier(.22,.61,.36,1), filter 1.5s ease-out; filter: blur(1.2px) drop-shadow(0 0 6px rgba(255,215,140,.55)); }
         #zikirmatikSection .zk-dot .zk-yuru { transform-origin: 50% 50%; }
         #zikirmatikSection .zk-dot.c0 { color: #f6e0cf; --zk-bg: #eec49f; }
         #zikirmatikSection .zk-dot.c1 { color: #eec49f; --zk-bg: #dfa672; }
@@ -1183,9 +1183,10 @@
             }
             wrap.innerHTML = html;
         }
-        // 3 halka (297) dolunca ikonlar etrafa dagilir, sonra sifirlanip bastan baslar
-        var tamamlandi = (s.sayi > 0 && s.sayi % toplam === 0);
-        var lit = ((s.sayi - 1) % toplam) + 1;
+        // ekrandaki tum ikonlar (goster) dolunca dagilir; her zikirde gecerli
+        // 3 -> 3, 7 -> 7, 11 -> 11, 33 -> 33, 99 -> 99, serbest -> en fazla 297 (3 halka)
+        var tamamlandi = (s.sayi > 0 && s.sayi % goster === 0);
+        var lit = ((s.sayi - 1) % goster) + 1;
         if (s.sayi <= 0) lit = 0;
         if (tamamlandi) lit = goster;
         if (lit < 0) lit = 0;
@@ -1196,17 +1197,26 @@
         }
         if (tamamlandi && wrap._dag !== s.sayi) {
             wrap._dag = s.sayi;
+            // ikonlar halkadan disa dogru, kademeli olarak savrulur
             for (var d2 = 0; d2 < dots.length; d2++) {
-                var aci2 = (Math.random() * 2 - 1) * 180;
-                var uzak = kare * (0.45 + Math.random() * 0.45);
-                dots[d2].style.setProperty('--dx', (Math.cos(aci2 * Math.PI / 180) * uzak).toFixed(0) + 'px');
-                dots[d2].style.setProperty('--dy', (Math.sin(aci2 * Math.PI / 180) * uzak).toFixed(0) + 'px');
-                dots[d2].style.setProperty('--dr', ((Math.random() * 2 - 1) * 300).toFixed(0) + 'deg');
-                dots[d2].classList.add('dagit');
+                var el = dots[d2];
+                var bx = parseFloat(el.style.left) - kare / 2;
+                var by = parseFloat(el.style.top) - kare / 2;
+                var baci = Math.atan2(by, bx);
+                var sapma = (Math.random() * 2 - 1) * 0.55;
+                var uzak = kare * (0.55 + Math.random() * 0.5);
+                el.style.setProperty('--dx', (Math.cos(baci + sapma) * uzak).toFixed(0) + 'px');
+                el.style.setProperty('--dy', (Math.sin(baci + sapma) * uzak).toFixed(0) + 'px');
+                el.style.setProperty('--dr', ((Math.random() * 2 - 1) * 160).toFixed(0) + 'deg');
+                el.style.transitionDelay = (d2 * 4) + 'ms';
+                el.classList.add('dagit');
             }
             setTimeout(function () {
-                for (var d3 = 0; d3 < dots.length; d3++) dots[d3].classList.remove('dagit');
-            }, 700);
+                for (var d3 = 0; d3 < dots.length; d3++) {
+                    dots[d3].classList.remove('dagit');
+                    dots[d3].style.transitionDelay = '';
+                }
+            }, 2100);
         }
     }
 
