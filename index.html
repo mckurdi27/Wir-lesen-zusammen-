@@ -501,7 +501,7 @@
         #zikirmatikSection .zk-dot .zk-yuru { display: block; width: 100%; height: 100%; position: relative; }
         #zikirmatikSection .zk-dot .zk-yuru svg { position: absolute; inset: 0; width: 100%; height: 100%; }
         #zikirmatikSection .zk-dot.on { opacity: 1; transform: scale(1.04); }
-        #zikirmatikSection .zk-dot.dagit { opacity: 0 !important; transform: translate(var(--dx,0),var(--dy,0)) scale(.18) rotate(var(--dr,0deg)) !important; transition: opacity 1.5s cubic-bezier(.22,.61,.36,1), transform 1.8s cubic-bezier(.22,.61,.36,1), filter 1.5s ease-out; filter: blur(1.2px) drop-shadow(0 0 6px rgba(255,215,140,.55)); }
+        #zikirmatikSection .zk-dot.dagit { opacity: 0 !important; transform: translate(var(--dx,0),var(--dy,0)) scale(.34) rotate(var(--dr,0deg)) !important; transition: opacity 1.9s cubic-bezier(.25,.6,.35,1), transform 2.2s cubic-bezier(.25,.6,.35,1), filter 1.9s ease-out; filter: blur(1.6px) drop-shadow(0 0 9px rgba(255,215,140,.65)); }
         #zikirmatikSection .zk-dot .zk-yuru { transform-origin: 50% 50%; }
         #zikirmatikSection .zk-dot.c0 { color: #f6e0cf; --zk-bg: #eec49f; }
         #zikirmatikSection .zk-dot.c1 { color: #eec49f; --zk-bg: #dfa672; }
@@ -823,11 +823,10 @@
             </div>
             <!-- en alt : zikir adedi butonlari -->
             <div class="zk-adet" id="zkAdet">
-                <button type="button" class="zk-adetbtn" data-adet="3">3</button>
                 <button type="button" class="zk-adetbtn" data-adet="7">7</button>
                 <button type="button" class="zk-adetbtn" data-adet="11">11</button>
-                <button type="button" class="zk-adetbtn" data-adet="19">19</button>
                 <button type="button" class="zk-adetbtn" data-adet="33">33</button>
+                <button type="button" class="zk-adetbtn" data-adet="66">66</button>
                 <button type="button" class="zk-adetbtn" data-adet="99">99</button>
                 <button type="button" id="zkAdetBos" class="zk-adetbtn zk-adetbos" data-adet="0" title="elle yaz" aria-label="elle yaz"></button>
                 <input type="number" id="zkSayi" class="zk-sayi" min="1" max="1000" inputmode="numeric" placeholder="" title="1 - 1000 arası sayı yaz">
@@ -1135,6 +1134,7 @@
 
     var ZK_KAPASITE = 99;      // bir halkadaki en fazla ikon
     var ZK_HALKA = 3;          // toplam halka sayisi (3 halka dolunca sifirlanir)
+    var zkBitti = false;       // hedef tamamlandi -> tek dagilma animasyonu
     function cizTavaf(){
         var wrap = $('zkDots'), tav = $('zkTavaf');
         if (!wrap || !tav) return;
@@ -1191,8 +1191,10 @@
             }
             wrap.innerHTML = html;
         }
-        // ekrandaki tum ikonlar (goster) dolunca dagilir; her zikirde/dilimde gecerli
-        var tamamlandi = (s.sayi > 0 && lit === goster);
+        // hedef tamamlandi: hedef sayidan bagimsiz, hepsinde AYNI belirgin animasyon
+        var bitis = (zkBitti || (s.sayi > 0 && lit === goster));
+        if (bitis) lit = goster;   // dagilma gorunur olsun diye tum ikonlar yanik kalir
+        var tamamlandi = bitis;
         if (lit < 0) lit = 0;
         if (lit > goster) lit = goster;
         var dots = wrap.children;
@@ -1200,28 +1202,31 @@
             dots[j].classList.toggle('on', j < lit);
             if (!tamamlandi) { dots[j].classList.remove('dagit'); dots[j].style.transitionDelay = ''; }
         }
-        if (tamamlandi && wrap._dag !== s.sayi) {
-            wrap._dag = s.sayi;
-            // ikonlar halkadan disa dogru, kademeli olarak savrulur
+        var dagToken = s.tur + ':' + s.sayi + ':' + goster;
+        if (tamamlandi && wrap._dag !== dagToken) {
+            wrap._dag = dagToken;
+            // hedef tamamlandi: ikonlar halkadan disa dogru yuruyerek savrulur
+            var adimMs = dots.length > 1 ? Math.min(26, 900 / dots.length) : 0;
             for (var d2 = 0; d2 < dots.length; d2++) {
                 var el = dots[d2];
                 var bx = parseFloat(el.style.left) - kare / 2;
                 var by = parseFloat(el.style.top) - kare / 2;
                 var baci = Math.atan2(by, bx);
-                var sapma = (Math.random() * 2 - 1) * 0.55;
-                var uzak = kare * (0.55 + Math.random() * 0.5);
+                var sapma = (Math.random() * 2 - 1) * 0.5;
+                var uzak = kare * (0.85 + Math.random() * 0.6);
                 el.style.setProperty('--dx', (Math.cos(baci + sapma) * uzak).toFixed(0) + 'px');
                 el.style.setProperty('--dy', (Math.sin(baci + sapma) * uzak).toFixed(0) + 'px');
-                el.style.setProperty('--dr', ((Math.random() * 2 - 1) * 160).toFixed(0) + 'deg');
-                el.style.transitionDelay = (d2 * 4) + 'ms';
+                el.style.setProperty('--dr', ((Math.random() * 2 - 1) * 240).toFixed(0) + 'deg');
+                el.style.transitionDelay = Math.round(d2 * adimMs) + 'ms';
                 el.classList.add('dagit');
             }
+            zkBitti = false;
             setTimeout(function () {
                 for (var d3 = 0; d3 < dots.length; d3++) {
                     dots[d3].classList.remove('dagit');
                     dots[d3].style.transitionDelay = '';
                 }
-            }, 2100);
+            }, 2600);
         }
     }
 
@@ -1273,7 +1278,7 @@
         if (s.vib && navigator.vibrate) { try { navigator.vibrate(18); } catch(e){} }
         beep();
         if (s.hedef && s.sayi >= s.hedef) {
-            s.tur++; s.sayi = 0;
+            s.tur++; s.sayi = 0; zkBitti = true;
             if (s.vib && navigator.vibrate) { try { navigator.vibrate([40,60,40]); } catch(e){} }
         }
         kaydet(); ciz();
