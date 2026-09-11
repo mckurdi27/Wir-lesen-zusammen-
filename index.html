@@ -520,6 +520,8 @@
         #zikirmatikSection .zk-dot.c10 { color: #2b1409; --zk-bg: #4a2415; }
         #zikirmatikSection .zk-dot.on { filter: drop-shadow(0 0 3px rgba(0,0,0,.45)); }
         #zikirmatikSection .zk-count { position: absolute; left: 0; right: 0; top: calc(50% - 84px); text-align: center; font-size: 1.55rem; font-weight: 800; color: var(--gold-dark); line-height: 1; margin: 0; pointer-events: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
+#zikirmatikSection .zk-count .zk-tur-sayi { font-size: .5em; font-weight: 800; }
+#zikirmatikSection .zk-count .zk-bosluk { display: inline-block; width: .3em; }
         #zikirmatikSection .zk-sub { position: absolute; left: 0; right: 0; top: calc(50% + 52px); text-align: center; font-size: 13px; font-weight: 700; color: var(--gold-dark); opacity: .95; margin: 0; pointer-events: none; }
         #zikirmatikSection .zk-tap { display: block; width: 100%; max-width: 340px; margin: 0 auto; padding: 16px 14px; border-radius: 14px; border: 0; background: linear-gradient(180deg, #d4a02a, #b8860b); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; box-sizing: border-box; box-shadow: 0 6px 18px rgba(184,134,11,.3); text-align: center; }
 #zikirmatikSection .zk-tap-ar { display: block; direction: rtl; unicode-bidi: isolate; font-size: 21px; font-weight: 800; line-height: 1.5; letter-spacing: 0; }
@@ -981,6 +983,7 @@
             var ad = (k.isim || '').trim();
             if (!ad) continue;
             ZK_BILGI[ad] = { ar: k.arapca || '', ok: k.okunus || ad, anlam: k.anlam || '',
+                             gun: k.gun || '',
                              hedef: parseInt(k.hedef, 10) || 0, kategori: 'Esma-\u00fcl H\u00fcsna',
                              kaynak: (k.gun ? ('Esma \u00b7 ' + k.gun) : 'Esma'), tur: 'esma' };
             kat[ad] = 'Esma-\u00fcl H\u00fcsna';
@@ -1273,12 +1276,13 @@
                 var R = (ZK_R + halka * adim) * olcek;
                 // saat yonunde; son ikon (adet-1). adimda tam 1. ikonun uzerine gelir -> halka kapanir
                 var bol = (adet > 1) ? (adet - 1) : 1;
-                var a = (idx / bol) * Math.PI * 2 - Math.PI / 2;
+                // saat yonu TERSI: aci azalir -> figur sola bakar
+                var a = -(idx / bol) * Math.PI * 2 - Math.PI / 2;
                 var x = cx + Math.cos(a) * R, y = cy + Math.sin(a) * R;
                 var _r = (idx % ZK_RENK_SAYISI);
                 if (idx === adet - 1 && adet > 1) _r = 0;   // son ikon ilk ikonla ayni renk -> halka kapanir
                 // yuruyus yonu = cemberin tegeti (saat yonu); figurler hep ayni yone yurur
-                var aci = (idx / bol) * 360;
+                var aci = 180 - (idx / bol) * 360;   // ayaklar sola, yuruyus saat yonu tersi
                 html += '<span class="zk-dot c' + _r + '" data-i="' + i + '" '
                      +  'style="left:' + x.toFixed(1) + 'px;top:' + y.toFixed(1) + 'px;width:' + boy + 'px;height:' + boy
                      +  'px;margin:' + (-yari) + 'px 0 0 ' + (-yari) + 'px">'
@@ -1333,8 +1337,8 @@
         if (!(s.hedef > 0)) { zkKayit(s.zikir).hedef = zkVarsayilanHedef(s.zikir); kaydet(); }
         // Kabe uzerindeki sayac: sayim baslamadiysa sadece zikir sayisi,
         // basladiysa "tur." + uc bosluk + zikir sayisi (or. "1.   23")
-        $('zkCount').textContent = (s.tur > 0)
-            ? (s.tur + '.' + ZK_BOSLUK + s.sayi)
+        $('zkCount').innerHTML = (s.tur > 0)
+            ? ('<span class="zk-tur-sayi">' + s.tur + '.</span><span class="zk-bosluk"></span>' + s.sayi)
             : String(s.sayi);
         // Kabe alti: zikrin hedefi "Hedef: N"; uye kendi degerini yazdiysa "Serbest N"
         if ($('zkSub')) {
@@ -1362,7 +1366,13 @@
                 _no++;
                 var kt = ZK_KATEGORI[z] || null;
                 if (kt && kt !== sonKat) { if (sonKat !== null) opt += '</optgroup>'; opt += '<optgroup label="' + kt.replace(/"/g,'&quot;') + '">'; sonKat = kt; }
-                opt += '<option value="' + z.replace(/"/g,'&quot;') + '"' + (z===s.zikir ? ' selected' : '') + '>' + _no + '. ' + z + '</option>';
+                var b = ZK_BILGI[z] || {};
+                var etiket, orta, son;
+                if (b.tur === 'esma') { etiket = 'Esma\u00fcl H\u00fcsna'; orta = z; son = (b.gun ? (b.gun + ' g\u00fcn\u00fc') : (b.anlam || '')); }
+                else if (b.tur === 'zikir') { etiket = 'Zikir'; orta = (b.kategori || ''); son = z; }
+                else { etiket = (b.kategori || 'Zikir'); orta = ''; son = z; }
+                var etk = etiket + ' ' + _no + '. ' + (orta ? (orta + ', ') : '') + son;
+                opt += '<option value="' + z.replace(/"/g,'&quot;') + '"' + (z===s.zikir ? ' selected' : '') + '>' + etk + '</option>';
             });
             if (sonKat !== null) opt += '</optgroup>';
             sel.innerHTML = opt;
