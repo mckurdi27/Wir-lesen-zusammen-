@@ -552,7 +552,8 @@
         #zikirmatikSection .zk-ar { font-size: 26px; line-height: 1.9; text-align: center; color: #000000; font-weight: 800; margin: 2px 0 8px; font-family: "Traditional Arabic", "Amiri", "Times New Roman", serif; }
         #zikirmatikSection .zk-oku { text-align: center; font-size: 16px; font-weight: 400; color: var(--gold-primary); margin-bottom: 6px; }
         #zikirmatikSection .zk-anlam { text-align: center; font-size: 13px; color: #0e6b3a; font-weight: 800; margin-bottom: 12px; }
-        #zikirmatikSection .zk-ayar { display: none; margin-bottom: 12px; }
+        #zikirmatikSection .zk-surekli { display: flex; align-items: center; gap: 5px; margin-top: 7px; font-size: 12px; }
+#zikirmatikSection .zk-ayar { display: none; margin-bottom: 12px; }
         #zikirmatikSection .zk-ayar.on { display: block; }
         #zikirmatikSection .zk-actions .zk-hedef { flex: 0 0 auto; min-width: 48px; min-height: 0; padding: 1px 4px; font-size: 11px; line-height: 1.25; }
         #zikirmatikSection .zk-custom { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
@@ -804,6 +805,7 @@
                     <button type="button" id="zkEkleBtn" class="zk-mini">+ Ekle</button>
                     <button type="button" id="zkSilBtn" class="zk-mini">Sil</button>
                 </div>
+                <label class="zk-kk zk-surekli"><input type="checkbox" id="zkSurekliSes"><span>S&#252;rekli ses (saymadan bağımsız &#231;alar)</span></label>
             </div>
             <!-- 1. satir : Arapca metin -->
             <div class="zk-ar" id="zkAr" dir="rtl">&#8212;</div>
@@ -832,6 +834,8 @@
                     <button type="button" class="zk-sesopt" data-ses="adim.wav">Adım</button>
                     <button type="button" class="zk-sesopt" data-ses="kalp.wav">Kalp atışı</button>
                     <button type="button" class="zk-sesopt" data-ses="yumusak.wav">Yumuşak ton</button>
+                    <button type="button" class="zk-sesopt" data-ses="Allah hu.mp3">Allah hu</button>
+                    <button type="button" class="zk-sesopt" data-ses="page-flip.mp3">Sayfa çevirme</button>
                 </div>
             </div>
             <!-- en alt : zikir adedi butonlari -->
@@ -1045,6 +1049,7 @@
     try { s = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e) { s = null; }
     if (!s) s = { zikir: VARSAYILAN_ZIKIRLER[0], vib: true, ses: false, sesdosya: "hu.mp3", ozel: [], zk: {} };
     if (!s.sesdosya) s.sesdosya = "hu.mp3";
+    if (typeof s.surekli !== 'boolean') s.surekli = false;   // surekli ses modu (varsayilan kapali)
     if (!Array.isArray(s.ozel)) s.ozel = [];
     if (!s.zk || typeof s.zk !== 'object') s.zk = {};
     if (s.kaynak === 'esma' || s.kaynak === 'zikir') ZK_KAYNAK = s.kaynak;
@@ -1099,8 +1104,33 @@
         catch(e){ beep.a = null; }
         beep.yol = zkSesYolu();
     }
+    // --- SUREKLI SES: sayma butonundan bagimsiz, durdurulana kadar dongu halinde calar ---
+    var zkSurekliA = null, zkSurekliYol = '';
+    function zkSurekliDurdur(){
+        if (!zkSurekliA) return;
+        try { zkSurekliA.pause(); } catch(e){}
+    }
+    function zkSurekliCal(){
+        if (!(s.ses && s.surekli)) { zkSurekliDurdur(); return; }
+        var yol = zkSesYolu();
+        try {
+            if (!zkSurekliA || zkSurekliYol !== yol) {
+                zkSurekliDurdur();
+                zkSurekliA = new Audio(yol);
+                zkSurekliA.loop = true;
+                zkSurekliA.preload = 'auto';
+                zkSurekliA.volume = 0.95;
+                zkSurekliYol = yol;
+            }
+            if (zkSurekliA.paused) {
+                var pp = zkSurekliA.play();
+                if (pp && pp.catch) pp.catch(function(){});
+            }
+        } catch(e){}
+    }
     function beep(){
         if (!s.ses) return;
+        if (s.surekli) return;   // surekli modda tiklamada ses cikmaz
         try {
             // ayni anda tek calma: onceki kopyayi basa al
             if (!beep.a || beep.yol !== zkSesYolu()) zkSesYukle();
@@ -1357,6 +1387,8 @@
         cizTavaf();
         if ($('zkVibBtn')) $('zkVibBtn').classList.toggle('on', !!s.vib);
         if ($('zkSesBtn')) $('zkSesBtn').classList.toggle('on', !!s.ses);
+        if ($('zkSurekliSes')) $('zkSurekliSes').checked = !!s.surekli;
+        zkSurekliCal();
         var zkSesOpts = document.querySelectorAll('#zikirmatikSection .zk-sesopt');
         for (var zi = 0; zi < zkSesOpts.length; zi++) zkSesOpts[zi].classList.toggle('on', zkSesOpts[zi].getAttribute('data-ses') === (s.sesdosya || ZK_SES_DOSYA));
         var sel = $('zkZikir');
@@ -1522,7 +1554,9 @@
             b.addEventListener('click', function(){
                 if (zkSesUzun) { zkSesUzun = false; return; }
                 zkSesMenuKapat();
-                s.ses = !s.ses; kaydet(); ciz();
+                s.ses = !s.ses;
+                if (s.ses && s.surekli) { zkSurekliCal(); } else { zkSurekliDurdur(); }
+                kaydet(); ciz();
             });
             if (menu) {
                 menu.addEventListener('click', function(e){
@@ -1531,7 +1565,8 @@
                     s.sesdosya = t.getAttribute('data-ses');
                     s.ses = true;
                     zkSesMenuKapat();
-                    kaydet(); ciz(); beep();
+                    if (s.surekli) { zkSurekliDurdur(); zkSurekliYol = ''; kaydet(); ciz(); }
+                    else { kaydet(); ciz(); beep(); }
                 });
             }
             document.addEventListener('click', function(e){
@@ -1540,6 +1575,12 @@
                 zkSesMenuKapat();
             });
         })();
+        if ($('zkSurekliSes')) $('zkSurekliSes').addEventListener('change', function(){
+            s.surekli = this.checked;
+            if (s.surekli) { s.ses = true; }   // surekli mod sesin acik olmasini gerektirir
+            else { zkSurekliDurdur(); }
+            kaydet(); ciz();
+        });
         if ($('zkAyarBtn')) $('zkAyarBtn').addEventListener('click', function(){
             var ay = $('zkAyar'); if (ay) ay.classList.toggle('on');
         });
