@@ -3052,37 +3052,40 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                         showToast('L\u00fctfen \u00f6nce isminizi se\u00e7in.', 'error');
                         return;
                     }
-                    function _hisseTs(dt, tm) {
+                    function _trTarih(dt, tm) {
+                        if (!dt) return '';
+                        var d = String(dt).split('T')[0].split(' ')[0].trim();
+                        var p = d.split('.');
+                        if (p.length === 3 && p[0].length <= 2) d = p[0] + '.' + p[1] + '.' + p[2];
+                        var t = (tm || '').toString().slice(0, 5);
+                        return d + (t ? ' ' + t : '');
+                    }
+                    function _trTs(dt, tm) {
                         if (!dt) return 0;
-                        var p = String(dt).split('.');
-                        var d = (p.length === 3) ? (p[2] + '-' + (p[1].length<2?'0'+p[1]:p[1]) + '-' + (p[0].length<2?'0'+p[0]:p[0])) : dt;
-                        var t = tm || '00:00';
-                        var x = new Date(d + 'T' + t);
+                        var d = String(dt).split('T')[0].split(' ')[0].trim();
+                        var p = d.split('.');
+                        if (p.length === 3 && p[0].length <= 2) d = p[2] + '-' + p[1] + '-' + p[0];
+                        var x = new Date(d + 'T' + ((tm || '00:00').toString().slice(0, 5)));
                         return isNaN(x.getTime()) ? 0 : x.getTime();
                     }
                     let lines = [];
-                    appData.books.forEach(book => {
-                        let baseArray = appData.bookPages[book.id];
-                        if (!baseArray) return;
-                        let defModes = bookModesDefs[book.id];
-                        let primaryKey = book.type === "bab" ? "on_bab" : "yirmi_sayfa";
-                        if (!defModes[primaryKey]) primaryKey = Object.keys(defModes)[0];
-                        let taken = [];
-                        defModes[primaryKey].getItems().forEach(pi => {
-                            let st = getRangeStatus(baseArray, pi.start, pi.end);
-                            if (st.owner === loggedInMember) taken.push({ name: pi.name, st: st });
-                        });
-                        if (taken.length === 0) return;
-                        let lastTaken = taken.reduce((mx, t) => (_hisseTs(t.st.takeDate, t.st.takeTime) > _hisseTs(mx.st.takeDate, mx.st.takeTime)) ? t : mx, taken[0]);
-                        let readOnes = taken.filter(t => t.st.isRead);
-                        let lastRead = readOnes.length ? readOnes.reduce((mx, t) => (_hisseTs(t.st.readDate, t.st.readTime) > _hisseTs(mx.st.readDate, mx.st.readTime)) ? t : mx, readOnes[0]) : null;
-                        let tmS = lastTaken.st.takeTime ? ' ' + lastTaken.st.takeTime : '';
-                        let ln = "\u{1F4D6} " + book.name + ":\n   Al\u0131nan: " + lastTaken.name + " (" + (lastTaken.st.takeDate || '-') + tmS + ")";
+                    (appData.books || []).forEach(book => {
+                        let units = (appData.bookPages || {})[book.id] || [];
+                        let taken = units.filter(u => u && u.owner === loggedInMember);
+                        if (!taken.length) return;
+                        let read = taken.filter(u => u.isRead);
+                        let lastTake = taken.reduce((mx, u) =>
+                            _trTs(u.takeDate, u.takeTime) > _trTs(mx.takeDate, mx.takeTime) ? u : mx, taken[0]);
+                        let lastRead = read.length ? read.reduce((mx, u) =>
+                            _trTs(u.readDate, u.readTime) > _trTs(mx.readDate, mx.readTime) ? u : mx, read[0]) : null;
+                        let ln = "\u{1F4D6} " + book.name + ":\n"
+                            + "   Al\u0131nan: " + taken.length + " hisse";
+                        let _ta = _trTarih(lastTake.takeDate, lastTake.takeTime);
+                        if (_ta) ln += " (" + _ta + ")";
+                        ln += "\n   Okunan: " + read.length + " hisse";
                         if (lastRead) {
-                            let tmR = lastRead.st.readTime ? ' ' + lastRead.st.readTime : '';
-                            ln += "\n   Okunan: " + lastRead.name + " (" + (lastRead.st.readDate || '-') + tmR + ")";
-                        } else {
-                            ln += "\n   Okunan: -";
+                            let _ro = _trTarih(lastRead.readDate, lastRead.readTime);
+                            if (_ro) ln += " (" + _ro + ")";
                         }
                         lines.push(ln);
                     });
