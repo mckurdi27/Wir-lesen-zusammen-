@@ -3063,6 +3063,15 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                     function _tk(u) { return String(u.takeDate || '') + ' ' + String(u.takeTime || ''); }
                     function _rd(u) { return String(u.readDate || '') + ' ' + String(u.readTime || ''); }
                     function _lbl(b) { return b.type === 'bab' ? 'Bab' : 'Sayfa'; }
+                    // Kur'an icin cuz: icindekiler tablosuna gore 20'lik bloklar
+                    function _cuz(b, no) {
+                        try {
+                            var sp = (typeof bookSectionPages !== 'undefined') && bookSectionPages[b.id];
+                            if (!sp || sp.type !== 'cuz') return '';
+                        } catch (err) { return ''; }
+                        var c = Math.ceil(no / 20);
+                        return c + '.C\u00fcz / ';
+                    }
                     function _rng(a, c, b) {
                         return a === c ? (a + '. ' + _lbl(b)) : (a + '-' + c + '. ' + _lbl(b));
                     }
@@ -3096,6 +3105,7 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                             if (mx >= best) { best = mx; lastTakeRun = r; }
                         });
                         var ln = "\u{1F4D6} " + b.name + ":\n   Al\u0131nan: "
+                            + _cuz(b, lastTakeRun[0].no)
                             + _rng(lastTakeRun[0].no, lastTakeRun[lastTakeRun.length - 1].no, b);
                         var _ta = _wt(lastTakeRun[lastTakeRun.length - 1].u.takeDate, lastTakeRun[lastTakeRun.length - 1].u.takeTime);
                         if (_ta) ln += " (" + _ta + ")";
@@ -3112,7 +3122,8 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                                 r.forEach(function (it) { if (_rd(it.u) > mx) mx = _rd(it.u); });
                                 if (mx >= rbest) { rbest = mx; lastReadRun = r; }
                             });
-                            rTxt = _rng(lastReadRun[0].no, lastReadRun[lastReadRun.length - 1].no, b);
+                            rTxt = _cuz(b, lastReadRun[0].no)
+                                 + _rng(lastReadRun[0].no, lastReadRun[lastReadRun.length - 1].no, b);
                             var li = lastReadRun[lastReadRun.length - 1].u;
                             rDate = _wt(li.readDate, li.readTime);
                         }
