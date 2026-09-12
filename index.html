@@ -3413,6 +3413,8 @@ var rows = [];
                         if (analysisSortKey==='taken'){ av=a.alinan||0; bv=b.alinan||0; }
                         if (analysisSortKey==='read'){ av=a.okunan||0; bv=b.okunan||0; }
                         if (analysisSortKey==='pct'){ av=a.pct||0; bv=b.pct||0; }
+                    if (analysisSortKey==='tip'){ av=(a.tip==='grup'?'Grup':'Bireysel'); bv=(b.tip==='grup'?'Grup':'Bireysel');
+                        return analysisSortDir==='az' ? String(av).localeCompare(String(bv),'tr') : String(bv).localeCompare(String(av),'tr'); }
                         return analysisSortDir==='az' ? av-bv : bv-av;
                     });
                     if (rows.length === 0) {
@@ -3422,7 +3424,7 @@ var rows = [];
                     var html = '<div class="d-tab-scroll"><table style="width:100%;border-collapse:collapse;font-size:13px;">'
                         + '<thead><tr style="background:#f1f3f5;">'
                         + '<th data-sortkey="name" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="Sırala">İsim &#8693;</th>'
-                        + '<th style="padding:8px;border:1px solid var(--border-color);text-align:left;">Tip</th>'
+                        + '<th data-sortkey="tip" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="Sırala">Tip &#8693;</th>'
                         + '<th data-sortkey="members" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="Sırala">Üye &#8693;</th>'
                         + '<th data-sortkey="taken" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="Sırala">Alınan &#8693;</th>'
                         + '<th data-sortkey="read" style="padding:8px;border:1px solid var(--border-color);text-align:left;cursor:pointer;" title="Sırala">Okunan &#8693;</th>'
