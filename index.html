@@ -467,7 +467,10 @@
             border: 2px solid var(--gold-primary); background: var(--card-bg);
             color: var(--text-main); box-sizing: border-box;
         }
-        #zikirmatikSection .zk-title { font-size: 15px; font-weight: bold; color: var(--gold-dark); margin: 0 0 12px; }
+        #zikirmatikSection .zk-head { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; }
+        #zikirmatikSection .zk-title { font-size: 15px; font-weight: bold; color: var(--gold-dark); margin: 0; }
+        #zikirmatikSection .zk-gear { background: none; border: 0; padding: 0; margin: 0 0 0 auto; font-size: 18px; line-height: 1; color: var(--gold-dark); cursor: pointer; }
+        #zikirmatikSection .zk-full { display: block; width: 100%; box-sizing: border-box; margin: 0 0 8px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--gold-dark); border-radius: 7px; font-size: 14px; line-height: 1.3; font-weight: 600; padding: 3px 8px; min-height: 0; }
         #zikirmatikSection .zk-kk input { width: 15px; height: 15px; margin: 0; accent-color: #0e6b3a; }
 #zikirmatikSection .zk-kaynak { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; margin: 0 0 8px; font-size: 12px; }
 #zikirmatikSection .zk-kk { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; font-weight: 600; color: var(--text-main); }
@@ -795,18 +798,18 @@
 
         <!-- ===== BOLUM F : ZIKIRMATIK PANELI (mesaj panelinin oncesi) ===== -->
         <section id="zikirmatikSection">
-            <h3 class="zk-title">&#128255; Zikirmatik</h3>
-            <div class="zk-kaynak" id="zkKaynak">
-                <label class="zk-kk"><input type="checkbox" id="zkKaynakHepsi" data-kaynak="hepsi" checked><span>T&#252;m&#252;</span></label>
-                <label class="zk-kk"><input type="checkbox" id="zkKaynakEsma" data-kaynak="esma"><span>Esma&#252;l H&#252;sna</span></label>
-                <label class="zk-kk"><input type="checkbox" id="zkKaynakZikir" data-kaynak="zikir"><span>Zikir</span></label>
-                <label class="zk-kk"><input type="checkbox" id="zkKaynakKuran" data-kaynak="kuran"><span>Peygamber Dualar&#305;</span></label>
-                <label class="zk-kk"><input type="checkbox" id="zkKaynakRabbena" data-kaynak="rabbena"><span>Rabben&#226; Dualar&#305;</span></label>
+            <div class="zk-head">
+                <h3 class="zk-title">&#128255; Zikirmatik</h3>
+                <button type="button" id="zkAyarBtn" class="zk-gear" title="Ayarlar">&#9881;</button>
             </div>
-            <div class="zk-picker">
-                <select id="zkZikir" class="zk-select"></select>
-                <button type="button" id="zkAyarBtn" class="zk-mini" title="Ayarlar">&#9881;</button>
-            </div>
+            <select id="zkKaynak" class="zk-full">
+                <option value="hepsi">T&#252;m&#252;</option>
+                <option value="esma">Esma&#252;l H&#252;sna</option>
+                <option value="zikir">Zikir</option>
+                <option value="kuran">Peygamber Dualar&#305;</option>
+                <option value="rabbena">Rabben&#226; Dualar&#305;</option>
+            </select>
+            <select id="zkZikir" class="zk-full"></select>
             <!-- ayarlar paneli: ozel zikir ekle / sil -->
             <div class="zk-ayar" id="zkAyar">
                 <div class="zk-custom">
@@ -1448,8 +1451,7 @@
             $('zkSub').textContent = (s.hedef > 0) ? ((hazir ? 'Hedef: ' : 'Serbest ') + s.hedef) : '';
             $('zkSub').style.display = '';
         }
-        var kb = document.querySelectorAll('#zkKaynak .zk-kk input');
-        for (var ki = 0; ki < kb.length; ki++) kb[ki].checked = (kb[ki].getAttribute('data-kaynak') === ZK_KAYNAK);
+        if ($('zkKaynak')) $('zkKaynak').value = ZK_KAYNAK;
         if ($('zkNo')) $('zkNo').textContent = siraNo(s.zikir);
         $('zkTur').textContent = s.tur;
         $('zkToplam').textContent = s.toplam;
@@ -1493,11 +1495,8 @@
             if (bv > 0) ab[bi].classList.toggle('on', bv === s.hedef);
         }
         zkKayitTablosu();
-        // cekboks durumu: secili kaynak
-        var kkBtns = document.querySelectorAll('#zkKaynak .zk-kk input');
-        for (var ki = 0; ki < kkBtns.length; ki++) {
-            kkBtns[ki].checked = (kkBtns[ki].getAttribute('data-kaynak') === ZK_KAYNAK);
-        }
+        // bolum menusu: secili kaynak
+        if ($('zkKaynak')) $('zkKaynak').value = ZK_KAYNAK;
         if ($('zkAdetBos')) {
             $('zkAdetBos').classList.toggle('on', ozel);
             $('zkAdetBos').style.display = '';
@@ -1593,15 +1592,7 @@
             zkSecimDuzelt();
             kaydet(); ciz();
         }
-        var zkKaynaklar = document.querySelectorAll('#zkKaynak .zk-kk input');
-        for (var ci = 0; ci < zkKaynaklar.length; ci++) {
-            zkKaynaklar[ci].addEventListener('change', (function(inp){
-                return function(){
-                    if (!inp.checked) { inp.checked = true; return; }
-                    zkKaynakUygula(inp.getAttribute('data-kaynak'));
-                };
-            })(zkKaynaklar[ci]));
-        }
+        if ($('zkKaynak')) $('zkKaynak').addEventListener('change', function(){ zkKaynakUygula(this.value); });
 
         var sel = $('zkZikir');
         if ($('zkTap')) $('zkTap').addEventListener('click', tik);
