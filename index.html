@@ -3062,35 +3062,61 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                     }
                     function _tk(u) { return String(u.takeDate || '') + ' ' + String(u.takeTime || ''); }
                     function _rd(u) { return String(u.readDate || '') + ' ' + String(u.readTime || ''); }
+                    function _lbl(b) { return b.type === 'bab' ? 'Bab' : 'Sayfa'; }
+                    function _rng(a, c, b) {
+                        return a === c ? (a + '. ' + _lbl(b)) : (a + '-' + c + '. ' + _lbl(b));
+                    }
+                    // Birimleri bitisik bloklara ayirir (indeks sirasina gore)
+                    function _runs(items) {
+                        var out = [], cur = [];
+                        items.sort(function (x, y) { return x.no - y.no; });
+                        items.forEach(function (it) {
+                            if (!cur.length || it.no === cur[cur.length - 1].no + 1) { cur.push(it); }
+                            else { out.push(cur); cur = [it]; }
+                        });
+                        if (cur.length) out.push(cur);
+                        return out;
+                    }
 
-                    // Veri kaynagi: appData.bookPages — uyenin hisseleri (tarih sirasina gore son alinan/okunan)
                     var lines = [];
                     (appData.books || []).forEach(function (b) {
                         var units = (appData.bookPages || {})[b.id] || [];
                         var mine = [];
                         units.forEach(function (u, ix) {
-                            if (u && u.owner === loggedInMember) {
-                                mine.push({ u: u, no: ix + 1 });
-                            }
+                            if (u && u.owner === loggedInMember) mine.push({ no: ix + 1, u: u });
                         });
                         if (!mine.length) return;
 
-                        mine.sort(function (a, c) { return _tk(a.u) < _tk(c.u) ? -1 : (_tk(a.u) > _tk(c.u) ? 1 : 0); });
-                        var lastTake = mine[mine.length - 1];
-
-                        var reads = mine.filter(function (x) { return x.u.isRead; });
-                        reads.sort(function (a, c) { return _rd(a.u) < _rd(c.u) ? -1 : (_rd(a.u) > _rd(c.u) ? 1 : 0); });
-                        var lastRead = reads.length ? reads[reads.length - 1] : null;
-
-                        var ln = "\u{1F4D6} " + b.name + ":\n"
-                            + "   Al\u0131nan: " + lastTake.no + ". b\u00f6l\u00fcm";
-                        var _ta = _wt(lastTake.u.takeDate, lastTake.u.takeTime);
+                        // 1) Son alinan blok: en gec take tarihine sahip bitisik blok
+                        var runs = _runs(mine.slice());
+                        var lastTakeRun = runs[0], best = '';
+                        runs.forEach(function (r) {
+                            var mx = '';
+                            r.forEach(function (it) { if (_tk(it.u) > mx) mx = _tk(it.u); });
+                            if (mx >= best) { best = mx; lastTakeRun = r; }
+                        });
+                        var ln = "\u{1F4D6} " + b.name + ":\n   Al\u0131nan: "
+                            + _rng(lastTakeRun[0].no, lastTakeRun[lastTakeRun.length - 1].no, b);
+                        var _ta = _wt(lastTakeRun[lastTakeRun.length - 1].u.takeDate, lastTakeRun[lastTakeRun.length - 1].u.takeTime);
                         if (_ta) ln += " (" + _ta + ")";
-                        ln += "\n   Okunan: " + (lastRead ? (lastRead.no + ". b\u00f6l\u00fcm") : '--');
-                        if (lastRead) {
-                            var _ro = _wt(lastRead.u.readDate, lastRead.u.readTime);
-                            if (_ro) ln += " (" + _ro + ")";
+
+                        // 2) Son okunan blok: son alinan blok icindeki okunanlar (yoksa eserin tamami)
+                        var insRun = lastTakeRun.filter(function (it) { return it.u.isRead; });
+                        var readSrc = insRun.length ? insRun : mine.filter(function (it) { return it.u.isRead; });
+                        var rTxt = '--', rDate = '';
+                        if (readSrc.length) {
+                            var rruns = _runs(readSrc.slice());
+                            var lastReadRun = rruns[0], rbest = '';
+                            rruns.forEach(function (r) {
+                                var mx = '';
+                                r.forEach(function (it) { if (_rd(it.u) > mx) mx = _rd(it.u); });
+                                if (mx >= rbest) { rbest = mx; lastReadRun = r; }
+                            });
+                            rTxt = _rng(lastReadRun[0].no, lastReadRun[lastReadRun.length - 1].no, b);
+                            var li = lastReadRun[lastReadRun.length - 1].u;
+                            rDate = _wt(li.readDate, li.readTime);
                         }
+                        ln += "\n   Okunan: " + rTxt + (rDate ? " (" + rDate + ")" : '');
                         lines.push(ln);
                     });
 
