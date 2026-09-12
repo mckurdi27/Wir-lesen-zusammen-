@@ -553,8 +553,8 @@
         #zikirmatikSection .zk-actions button { padding: 3px 4px; border-radius: 7px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--text-main); font-size: 14px; line-height: 1.3; cursor: pointer; min-height: 0; margin-left: 0; white-space: nowrap; flex: 0 0 auto; }
         #zikirmatikSection .zk-actions button.on { background: var(--gold-primary); color: #fff; }
         #zikirmatikSection .zk-ar { font-size: 26px; line-height: 1.9; text-align: center; color: #000000; font-weight: 800; margin: 2px 0 8px; font-family: "Traditional Arabic", "Amiri", "Times New Roman", serif; }
-        #zikirmatikSection .zk-oku { text-align: center; font-size: 16px; font-weight: 400; color: var(--gold-primary); margin-bottom: 6px; }
-        #zikirmatikSection .zk-anlam { text-align: center; font-size: 13px; color: #0e6b3a; font-weight: 800; margin-bottom: 12px; }
+        #zikirmatikSection .zk-oku { text-align: center; font-size: 14px; font-weight: 400; color: var(--gold-primary); margin-bottom: 6px; }
+        #zikirmatikSection .zk-anlam { text-align: center; font-size: 15px; color: #0e6b3a; font-weight: 800; margin-bottom: 12px; }
         #zikirmatikSection .zk-kayit-wrap { margin-top: 7px; max-height: 182px; overflow: auto; border: 1px solid var(--gold-primary); border-radius: 8px; background: var(--card-bg); }
 #zikirmatikSection .zk-kayit-tablo { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 430px; }
 #zikirmatikSection .zk-kayit-tablo th, #zikirmatikSection .zk-kayit-tablo td { padding: 3px 6px; text-align: left; white-space: nowrap; border-bottom: 1px solid rgba(0,0,0,.08); }
@@ -1172,7 +1172,15 @@
     // Listeler AKTIF KAYNAGA gore kurulur (Tumu / Esma / Zikir)
     function tumZikirler(){ return zkAktifAdlar().concat(s.ozel); }
     function varsayilanMi(z){ return zkAktifAdlar().indexOf(z) !== -1; }
-    function siraNo(z){ var i = tumZikirler().indexOf(z); return i === -1 ? 1 : i + 1; }
+    function zkNumara(z){
+        var gruplar = [ZK_ESMA_ADLAR, ZK_ZIKIR_ADLAR, ZK_KURAN_ADLAR, ZK_RABBENA_ADLAR, s.ozel];
+        for (var g = 0; g < gruplar.length; g++) {
+            var ix = (gruplar[g] || []).indexOf(z);
+            if (ix !== -1) return ix + 1;
+        }
+        return 1;
+    }
+    function siraNo(z){ return zkNumara(z); }
     if (!s.serbest) s.serbest = 33;   // "Bos (elle yaz)" icin uyenin girdigi sayi
 
     function $(id){ return document.getElementById(id); }
@@ -1473,9 +1481,13 @@
         if (yerelMi && s.sesYerelAd && $('zkSesYerel')) $('zkSesYerel').textContent = s.sesYerelAd;
         var sel = $('zkZikir');
         if (sel) {
-            var opt = '', sonKat = null, _no = 0;
+            var opt = '', sonKat = null;
+            var _numara = {};
+            [ZK_ESMA_ADLAR, ZK_ZIKIR_ADLAR, ZK_KURAN_ADLAR, ZK_RABBENA_ADLAR, s.ozel].forEach(function(list){
+                (list || []).forEach(function(nm, ix){ _numara[nm] = ix + 1; });
+            });
             tumZikirler().forEach(function(z){
-                _no++;
+                var _no = _numara[z] || 1;
                 var kt = ZK_KATEGORI[z] || null;
                 if (kt && kt !== sonKat) { if (sonKat !== null) opt += '</optgroup>'; opt += '<optgroup label="' + kt.replace(/"/g,'&quot;') + '">'; sonKat = kt; }
                 var b = ZK_BILGI[z] || {};
