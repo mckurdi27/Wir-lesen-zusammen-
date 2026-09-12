@@ -3052,48 +3052,57 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                         showToast('L\u00fctfen \u00f6nce isminizi se\u00e7in.', 'error');
                         return;
                     }
-                    function _trTarih(dt, tm) {
+                    function _wt(dt, tm) {
                         if (!dt) return '';
                         var d = String(dt).split('T')[0].split(' ')[0].trim();
-                        var p = d.split('.');
-                        if (p.length === 3 && p[0].length <= 2) d = p[0] + '.' + p[1] + '.' + p[2];
+                        var p = d.split('-');
+                        if (p.length === 3) d = p[2] + '.' + p[1] + '.' + p[0];
                         var t = (tm || '').toString().slice(0, 5);
                         return d + (t ? ' ' + t : '');
                     }
-                    function _trTs(dt, tm) {
-                        if (!dt) return 0;
-                        var d = String(dt).split('T')[0].split(' ')[0].trim();
-                        var p = d.split('.');
-                        if (p.length === 3 && p[0].length <= 2) d = p[2] + '-' + p[1] + '-' + p[0];
-                        var x = new Date(d + 'T' + ((tm || '00:00').toString().slice(0, 5)));
-                        return isNaN(x.getTime()) ? 0 : x.getTime();
+                    function _wk(l) { return String(l.takeDate || '') + ' ' + String(l.takeTime || ''); }
+                    function _wr(l) { return String(l.readDate || '') + ' ' + String(l.readTime || ''); }
+
+                    // Veri kaynagi: Okuma Gunlugu (Analiz) — uyenin giris ve tarih sirasina gore
+                    var _det = getMemberDetailData(loggedInMember, currentGroup, 'all');
+                    var _logs = (_det && _det.readingLogs) ? _det.readingLogs.slice() : [];
+                    if (!_logs.length) {
+                        showToast('\u00dczerinizde hisse bulunmuyor.', 'info');
+                        return;
                     }
-                    let lines = [];
-                    (appData.books || []).forEach(book => {
-                        let units = (appData.bookPages || {})[book.id] || [];
-                        let taken = units.filter(u => u && u.owner === loggedInMember);
-                        if (!taken.length) return;
-                        let read = taken.filter(u => u.isRead);
-                        let lastTake = taken.reduce((mx, u) =>
-                            _trTs(u.takeDate, u.takeTime) > _trTs(mx.takeDate, mx.takeTime) ? u : mx, taken[0]);
-                        let lastRead = read.length ? read.reduce((mx, u) =>
-                            _trTs(u.readDate, u.readTime) > _trTs(mx.readDate, mx.readTime) ? u : mx, read[0]) : null;
-                        let ln = "\u{1F4D6} " + book.name + ":\n"
-                            + "   Al\u0131nan: " + taken.length + " hisse";
-                        let _ta = _trTarih(lastTake.takeDate, lastTake.takeTime);
+
+                    var _by = {};
+                    var _order = [];
+                    _logs.forEach(function (l) {
+                        var bn = l.bookName || '';
+                        if (!_by[bn]) { _by[bn] = []; _order.push(bn); }
+                        _by[bn].push(l);
+                    });
+
+                    var lines = [];
+                    _order.forEach(function (bn) {
+                        var arr = _by[bn].slice();
+                        // son alinan hisse: tarih/saat sirasina gore en sonuncu
+                        arr.sort(function (a, b) { return _wk(a) < _wk(b) ? -1 : (_wk(a) > _wk(b) ? 1 : 0); });
+                        var lastTake = arr[arr.length - 1];
+                        // son okunan hisse
+                        var rd = arr.filter(function (l) { return l.isRead; });
+                        rd.sort(function (a, b) { return _wr(a) < _wr(b) ? -1 : (_wr(a) > _wr(b) ? 1 : 0); });
+                        var lastRead = rd.length ? rd[rd.length - 1] : null;
+
+                        var ln = "\u{1F4D6} " + bn + ":\n"
+                            + "   Al\u0131nan: " + (lastTake.range || (lastTake.unit + '. b\u00f6l\u00fcm'));
+                        var _ta = _wt(lastTake.takeDate, lastTake.takeTime);
                         if (_ta) ln += " (" + _ta + ")";
-                        ln += "\n   Okunan: " + read.length + " hisse";
+                        ln += "\n   Okunan: " + (lastRead ? (lastRead.range || (lastRead.unit + '. b\u00f6l\u00fcm')) : '--');
                         if (lastRead) {
-                            let _ro = _trTarih(lastRead.readDate, lastRead.readTime);
+                            var _ro = _wt(lastRead.readDate, lastRead.readTime);
                             if (_ro) ln += " (" + _ro + ")";
                         }
                         lines.push(ln);
                     });
-                    if (lines.length === 0) {
-                        showToast('\u00dczerinizde hisse bulunmuyor.', 'info');
-                        return;
-                    }
-                    let msg = "*[" + currentGroup.replace(/_/g, ' ').toUpperCase() + "] " + loggedInMember + " Hisseleri*\n\n" + lines.join("\n\n");
+
+                    var msg = "*[" + currentGroup.replace(/_/g, ' ').toUpperCase() + "] " + loggedInMember + " Hisseleri*\n\n" + lines.join("\n\n");
                     window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
                 }
             });
