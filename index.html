@@ -5261,9 +5261,21 @@ window.infoSortTable = function infoSortTable(col) {
                     <textarea id="admin-msg-input" placeholder="Mesajınızı yazın..." style="width: 100%; height: 60px; padding: 12px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; margin-bottom: 10px; font-size: 14px; box-sizing: border-box; resize: vertical;"></textarea>
                     <div style="display: flex; gap: 8px; align-items: center;">
                         <button id="send-admin-msg-btn" style="flex: 1.4; min-width: 0; padding: 10px 12px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">💬 WhatsApp ile Gönder</button>
-                        <button id="wa-app-btn" class="wa-app-btn" title="Uygulamayı WhatsApp'ta paylaş" style="flex: 1; min-width: 0; padding: 10px 12px; background: #128C7E; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">📱 Uygulamayı Paylaş</button>
+                        <select id="app-share-sel" title="Uygulamayı paylaş" style="flex: 1; min-width: 0; padding: 10px 8px; background: #128C7E; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">
+                            <option value="">&#128241; Uygulamayı Paylaş</option>
+                            <option value="whatsapp">WhatsApp</option>
+                            <option value="telegram">Telegram</option>
+                            <option value="twitter">X (Twitter)</option>
+                            <option value="facebook">Facebook</option>
+                            <option value="linkedin">LinkedIn</option>
+                            <option value="reddit">Reddit</option>
+                            <option value="discord">Discord</option>
+                            <option value="email">E-posta</option>
+                            <option value="sms">SMS</option>
+                            <option value="copy">Bağlantıyı Kopyala</option>
+                        </select>
                     </div>
-                    <div style="font-size: 11px; color: #777; text-align: left; margin-top: 6px;">Arkadaşlarını bu uygulamaya WhatsApp ile davet et</div>
+                    <div style="font-size: 11px; color: #777; text-align: left; margin-top: 6px;">Arkadaşlarını bu uygulamaya davet et</div>
                 `;
 
                 let adminPanelHtml = "";
@@ -6406,12 +6418,39 @@ var _cg = selVal || '';
                     if (!text) { showToast('Mesaj yazın!', 'error'); return; }
                     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
                 });
-            document.addEventListener('click', function(we){
-                if (we.target && we.target.id === 'wa-app-btn') {
-                    var _appMsg = '*Wir Lesen Zusammen*\n\nOrtak Hatim ve Dua takibi uygulamas\u0131. Birlikte okumak i\u00e7in kat\u0131l\u0131n:';
-                    var _link = 'https://mckurdi27.github.io/Wir-lesen-zusammen-/';
-                    window.open('https://wa.me/?text=' + encodeURIComponent(_appMsg + ' ' + _link), '_blank');
+            document.addEventListener('change', function(we){
+                if (!we.target || we.target.id !== 'app-share-sel') return;
+                var plat = we.target.value;
+                we.target.value = '';
+                if (!plat) return;
+                var _appMsg = 'Wir Lesen Zusammen\n\nOrtak Hatim ve Dua takibi uygulaması. Birlikte okumak için katılın:';
+                var _link = 'https://mckurdi27.github.io/Wir-lesen-zusammen-/';
+                var _full = _appMsg + ' ' + _link;
+                var _t = encodeURIComponent(_appMsg), _u = encodeURIComponent(_link), _tu = encodeURIComponent(_full);
+                var urls = {
+                    whatsapp: 'https://wa.me/?text=' + _tu,
+                    telegram: 'https://t.me/share/url?url=' + _u + '&text=' + _t,
+                    twitter:  'https://twitter.com/intent/tweet?text=' + _t + '&url=' + _u,
+                    facebook: 'https://www.facebook.com/sharer/sharer.php?u=' + _u + '&quote=' + _t,
+                    linkedin: 'https://www.linkedin.com/sharing/share-offsite/?url=' + _u,
+                    reddit:   'https://www.reddit.com/submit?url=' + _u + '&title=' + _t,
+                    email:    'mailto:?subject=' + _t + '&body=' + _tu,
+                    sms:      'sms:?&body=' + _tu
+                };
+                if (plat === 'copy') {
+                    var _done = function(){ if (typeof showToast === 'function') showToast('Bağlantı kopyalandı', 'info'); };
+                    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(_full).then(_done, _done);
+                    else { var ta = document.createElement('textarea'); ta.value = _full; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch(e){} document.body.removeChild(ta); _done(); }
+                    return;
                 }
+                if (plat === 'discord') {
+                    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(_full);
+                    if (typeof showToast === 'function') showToast('Metin kopyalandı — Discord’a yapıştırın', 'info');
+                    window.open('https://discord.com/app', '_blank');
+                    return;
+                }
+                var _url = urls[plat];
+                if (_url) window.open(_url, '_blank');
             });
             }
 
