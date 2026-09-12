@@ -572,6 +572,50 @@
         #zikirmatikSection .zk-mini:active { background: var(--gold-primary); color: #fff; }
         </style>
 <!-- ===================== </head> / <body> BASLANGICI ===================== -->
+
+<style>
+  /* ===== Panel Yardim (? butonu + popup) ===== */
+  .phelp-wrap { display: flex; justify-content: flex-end; margin-top: 10px; }
+  .phelp-btn {
+    width: 30px; height: 30px; border-radius: 50%;
+    border: 2px solid var(--gold-primary, #d4af37);
+    background: #fff; color: var(--gold-dark, #8a6d3b);
+    font-weight: 900; font-size: 16px; line-height: 1; cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,.12); flex: 0 0 auto;
+  }
+  .phelp-btn:hover { background: var(--gold-primary, #d4af37); color: #fff; }
+  .phelp-pop {
+    display: none; position: fixed; inset: 0; z-index: 100000;
+    background: rgba(0,0,0,.45); align-items: center; justify-content: center; padding: 16px;
+  }
+  .phelp-pop.on { display: flex; }
+  .phelp-box {
+    background: var(--card-bg, #fff); color: var(--text-main, #222);
+    width: 100%; max-width: 560px; max-height: 84vh; overflow-y: auto;
+    border-radius: 14px; border: 2px solid var(--gold-primary, #d4af37);
+    box-shadow: 0 10px 40px rgba(0,0,0,.35);
+  }
+  .phelp-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 14px 16px; border-bottom: 1px solid var(--border-color, #e5e0d5);
+    background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); position: sticky; top: 0;
+  }
+  .phelp-head h3 { margin: 0; font-size: 16px; color: var(--gold-dark, #8a6d3b); }
+  .phelp-x {
+    border: none; background: #e74c3c; color: #fff; width: 30px; height: 30px;
+    border-radius: 8px; font-weight: 900; cursor: pointer; flex: 0 0 auto;
+  }
+  .phelp-body { padding: 14px 16px 18px; font-size: 14px; line-height: 1.55; }
+  .phelp-body h4 { margin: 14px 0 6px; font-size: 14px; color: var(--gold-dark, #8a6d3b); }
+  .phelp-body h4:first-child { margin-top: 0; }
+  .phelp-body ul { margin: 0; padding-left: 20px; }
+  .phelp-body li { margin-bottom: 5px; }
+  .phelp-body b { color: #16a085; }
+  .phelp-tip {
+    background: #f6f2e6; border-left: 3px solid var(--gold-primary, #d4af37);
+    padding: 8px 10px; border-radius: 6px; margin-top: 10px; font-size: 13px;
+  }
+</style>
 </head>
 <body>
 <!-- ----- <body><.container> basi ----- -->
@@ -7228,5 +7272,155 @@ _sbMemberDetail = function (name, groupKey) {
       }
     </script>
 <!-- ===================== </body> / </html> SON ===================== -->
+
+<!-- ===== Panel Yardim Popup (tek ornek, tum paneller kullanir) ===== -->
+<div id="phelp-pop" class="phelp-pop" role="dialog" aria-modal="true">
+  <div class="phelp-box">
+    <div class="phelp-head">
+      <h3>&#10067; Yard&#305;m</h3>
+      <button type="button" class="phelp-x" title="Kapat">&#10005;</button>
+    </div>
+    <div class="phelp-body"></div>
+  </div>
+</div>
+
+<script>
+/* ===== Panel Yardim Sistemi (? butonu -> popup) ===== */
+var PANEL_YARDIM = {
+  login: {
+    baslik: 'Giri\u015f Paneli',
+    icerik: '<h4>Bu panel ne yapar?</h4><ul>'
+      + '<li>Grubunu se\u00e7ip <b>Kat\u0131l</b> d\u00fc\u011fmesiyle sisteme giri\u015f yapars\u0131n.</li>'
+      + '<li>\u015eifreni girdikten sonra sadece <b>senin g\u00f6rd\u00fc\u011f\u00fcn</b> takip panelin a\u00e7\u0131l\u0131r.</li></ul>'
+      + '<h4>Nas\u0131l kullan\u0131l\u0131r?</h4><ul>'
+      + '<li>\u00dcstteki listeden <b>grubunu</b> se\u00e7 (tek ba\u015f\u0131na okuyorsan tek ki\u015filik grubunu se\u00e7).</li>'
+      + '<li>\u0130smini yaz, grup \u015fifresini gir.</li>'
+      + '<li><b>Beni hat\u0131rla</b> kutusunu i\u015faretlersen bu cihazda tekrar giri\u015f istemez.</li></ul>'
+      + '<div class="phelp-tip">\u015eifreni bilmiyorsan grup y\u00f6neticisine sor \u2014 okuma kaydetti\u011fin i\u00e7in \u015fifre herkese a\u00e7\u0131k de\u011fildir.</div>'
+  },
+  uye: {
+    baslik: '\u00dcye Takip Paneli',
+    icerik: '<h4>Bu panel ne yapar?</h4><ul>'
+      + '<li>Giri\u015f yapt\u0131ktan sonra <b>senin</b> okuma durumunu g\u00f6sterir.</li>'
+      + '<li>Hangi eserden ka\u00e7 hisse ald\u0131n, ne zaman ald\u0131n, ne kadar\u0131n\u0131 okudun \u2014 hepsi burada.</li></ul>'
+      + '<h4>Buradaki alanlar</h4><ul>'
+      + '<li><b>Al\u0131nd\u0131</b> \u2014 hisseyi ald\u0131\u011f\u0131n tarih ve saat.</li>'
+      + '<li><b>Okundu</b> \u2014 okundu olarak i\u015faretledi\u011fin tarih ve saat.</li>'
+      + '<li><b>Tamamlanan</b> \u2014 bitirdi\u011fin eser/hisse say\u0131s\u0131.</li></ul>'
+      + '<div class="phelp-tip">Okudu\u011fun b\u00f6l\u00fcm\u00fc i\u015faretlemeyi unutma \u2014 grup listesinde ancak o zaman g\u00f6r\u00fcn\u00fcr.</div>'
+  },
+  grup: {
+    baslik: 'Grup Takip Paneli',
+    icerik: '<h4>Bu panel ne yapar?</h4><ul>'
+      + '<li>Se\u00e7ili grubun <b>t\u00fcm \u00fcyelerinin</b> okuma durumunu g\u00f6sterir.</li>'
+      + '<li>Kim hangi eseri alm\u0131\u015f, ne kadar\u0131n\u0131 okumu\u015f \u2014 topluca g\u00f6r\u00fcrs\u00fcn.</li></ul>'
+      + '<h4>Nas\u0131l kullan\u0131l\u0131r?</h4><ul>'
+      + '<li>\u00dcye kartlar\u0131na bakarak eksi\u011fi olan \u00fcyeyi g\u00f6r\u00fcrs\u00fcn.</li>'
+      + '<li>Y\u00f6neticiysen bu \u00fcyeleri <b>Y\u00f6netici Kontrol Paneli</b> b\u00f6l\u00fcm\u00fcnden d\u00fczenleyebilirsin.</li></ul>'
+  },
+  eserler: {
+    baslik: 'Eserler (Kitap Listesi)',
+    icerik: '<h4>Bu panel ne yapar?</h4><ul>'
+      + '<li>Okunacak eserleri ve her eserdeki <b>b\u00f6l\u00fcmleri</b> g\u00f6sterir.</li>'
+      + '<li>Renkler hissenin durumunu s\u00f6yler: <b>bo\u015f</b> (al\u0131nabilir), <b>al\u0131nd\u0131</b> (okunmad\u0131), <b>okundu</b>.</li></ul>'
+      + '<h4>Nas\u0131l kullan\u0131l\u0131r?</h4><ul>'
+      + '<li>Bo\u015f bir b\u00f6l\u00fcme dokun \u2014 hisse senin ad\u0131na kaydedilir.</li>'
+      + '<li>Okudu\u011fun b\u00f6l\u00fcm\u00fc i\u015faretle \u2014 grup arkada\u015flar\u0131n durumu g\u00f6rs\u00fcn.</li>'
+      + '<li>Kuran\u2019da b\u00f6l\u00fcmler sayfa, Cev\u015fen gibi eserlerde <b>bab</b> olarak say\u0131l\u0131r.</li></ul>'
+      + '<div class="phelp-tip">Hisse ald\u0131\u011f\u0131n anda tarih-saat kayd\u0131 otomatik tutulur; ayr\u0131ca bir \u015fey yapman gerekmez.</div>'
+  },
+  zikirmatik: {
+    baslik: 'Zikirmatik',
+    icerik: '<h4>Bu panel ne yapar?</h4><ul>'
+      + '<li>Zikir \u00e7ekmeni sayar \u2014 K\u00e2be etraf\u0131nda tavaf eden ikonlar say\u0131y\u0131 g\u00f6sterir.</li>'
+      + '<li>Zikir se\u00e7imi, b\u00f6l\u00fcm (T\u00fcm\u00fc / Esm\u00e2\u00fcl H\u00fcsn\u00e2 / Zikir ...) ve hedef belirleyebilirsin.</li></ul>'
+      + '<h4>Nas\u0131l kullan\u0131l\u0131r?</h4><ul>'
+      + '<li>\u00dcstteki <b>B\u00f6l\u00fcm</b> kutusundan zikir grubunu se\u00e7, alt\u0131ndaki listeden zikri se\u00e7.</li>'
+      + '<li>Hedefi yaz (33 / 99 / 100 ...) \u2014 saya\u00e7 o hedefe g\u00f6re tur sayar.</li>'
+      + '<li>Arap\u00e7a metin, okunu\u015f ve anlam\u0131 ayn\u0131 ekranda g\u00f6r\u00fcn\u00fcr.</li>'
+      + '<li><b>Tur S\u0131f\u0131rla</b> tur sayac\u0131n\u0131, <b>S\u0131f\u0131rla</b> t\u00fcm\u00fcn\u00fc temizler.</li></ul>'
+      + '<div class="phelp-tip">Sa\u011f \u00fcstteki <b>di\u015fli</b> ikonundan ses, titre\u015fim ve zikir kay\u0131tlar\u0131n\u0131 y\u00f6netebilirsin.</div>'
+  },
+  admin: {
+    baslik: 'Y\u00f6netici Kontrol Paneli',
+    icerik: '<h4>Bu panel ne yapar?</h4><ul>'
+      + '<li>Admin olarak grup, \u00fcye ve eserleri y\u00f6netti\u011fin yerdir. Sadece y\u00f6netici modunda g\u00f6r\u00fcn\u00fcr.</li></ul>'
+      + '<h4>B\u00f6l\u00fcmler</h4><ul>'
+      + '<li><b>Grup ve \u00dcye Y\u00f6netimi</b> \u2014 grup ekle/d\u00fczenle/sil, \u00fcye ekle, \u015fifre ver.</li>'
+      + '<li><b>Eser Y\u00f6netimi</b> \u2014 eser ekle/d\u00fczenle, b\u00f6l\u00fcm say\u0131s\u0131n\u0131 ve t\u00fcr\u00fcn\u00fc (Sayfa/Bab) belirle.</li>'
+      + '<li><b>\u00dcye ve Grup Bilgi Paneli</b> \u2014 t\u00fcm \u00fcyelerin \u00f6zet durumu, s\u0131ralanabilir tablo.</li>'
+      + '<li><b>Toplu Atama / Silme</b> \u2014 birden \u00e7ok esere ayn\u0131 anda e\u015fit hisse da\u011f\u0131t veya topluca sil.</li>'
+      + '<li><b>Y\u00f6neticiye Mesaj</b> \u2014 \u00fcyelerin sana g\u00f6nderdi\u011fi mesajlar.</li></ul>'
+      + '<div class="phelp-tip">Bir i\u015flemi yapmadan \u00f6nce ilgili sat\u0131rdaki grubu se\u00e7ti\u011finden emin ol; i\u015flem se\u00e7ili gruba uygulan\u0131r.</div>'
+  },
+  analiz: {
+    baslik: 'Detayl\u0131 Analiz Paneli',
+    icerik: '<h4>Bu panel ne yapar?</h4><ul>'
+      + '<li>Okuma verilerini tablolar halinde \u00f6zetler: kim, neyi, ne zaman ald\u0131/okudu.</li>'
+      + '<li>Ko\u015fullu say\u0131m, \u00fcye kar\u015f\u0131la\u015ft\u0131rma ve <b>Okuma G\u00fcnl\u00fc\u011f\u00fc</b> sekmelerini i\u00e7erir.</li></ul>'
+      + '<h4>Nas\u0131l kullan\u0131l\u0131r?</h4><ul>'
+      + '<li>\u00dcstteki <b>filtrelerle</b> grup, \u00fcye, b\u00f6lge, \u015fehir ve eser se\u00e7.</li>'
+      + '<li>S\u00fctun ba\u015fl\u0131\u011f\u0131na t\u0131klayarak tabloyu s\u0131rala.</li>'
+      + '<li><b>Excel</b> ile indir, <b>Yazd\u0131r</b> ile ka\u011f\u0131da al.</li></ul>'
+  }
+};
+
+function panelYardimAc(id) {
+  var d = PANEL_YARDIM[id];
+  if (!d) return;
+  var box = document.getElementById('phelp-pop');
+  if (!box) return;
+  box.querySelector('.phelp-head h3').textContent = '\u2753 ' + d.baslik;
+  box.querySelector('.phelp-body').innerHTML = d.icerik;
+  box.classList.add('on');
+}
+function panelYardimKapat() {
+  var box = document.getElementById('phelp-pop');
+  if (box) box.classList.remove('on');
+}
+document.addEventListener('click', function (e) {
+  var t = e.target;
+  if (t && t.classList && t.classList.contains('phelp-btn')) { panelYardimAc(t.getAttribute('data-help')); return; }
+  if (t && (t.id === 'phelp-pop' || (t.classList && t.classList.contains('phelp-x')))) panelYardimKapat();
+});
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') panelYardimKapat(); });
+</script>
+
+<script>
+/* ===== Yardim butonlarini panel sonlarina ekle ===== */
+(function () {
+  var PANELLER = [
+    { id: 'simple-login-panel', k: 'login' },
+    { id: 'bireysel-takip-panel', k: 'uye' },
+    { id: 'grup-takip-panel', k: 'grup' },
+    { id: 'books-grid', k: 'eserler' },
+    { id: 'zikirmatikSection', k: 'zikirmatik' },
+    { id: 'admin-bottom-section', k: 'admin' },
+    { id: 'dtabs-1-content', k: 'analiz' },
+    { id: 'dtabs-2-content', k: 'analiz' },
+    { id: 'dtabs-3-content', k: 'analiz' },
+    { id: 'dtabs-4-content', k: 'analiz' },
+    { id: 'dtabs-5-content', k: 'analiz' },
+    { id: 'dtabs-6-content', k: 'analiz' }
+  ];
+  function ekle() {
+    PANELLER.forEach(function (p) {
+      var el = document.getElementById(p.id);
+      if (!el) return;
+      if (el.querySelector('.phelp-wrap')) return;
+      var w = document.createElement('div');
+      w.className = 'phelp-wrap';
+      w.innerHTML = '<button type="button" class="phelp-btn" data-help="' + p.k
+        + '" title="Bu panel ne i\u015fe yarar?">?</button>';
+      el.appendChild(w);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ekle);
+  else ekle();
+  setInterval(ekle, 1200);
+  window.panelYardimEkle = ekle;
+})();
+</script>
+
 </body>
 </html>
