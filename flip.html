@@ -251,6 +251,35 @@ button{font-family:inherit;cursor:pointer}
   #printArea .pp:last-child{page-break-after:auto}
   #printArea img{max-width:210mm;max-height:297mm;object-fit:contain;margin:0}
 }
+
+/* ===== Kutuphane Yardim (? butonu -> popup) ===== */
+.khelp-btn{
+  width:30px;height:30px;border-radius:50%;padding:0;overflow:hidden;
+  border:2px solid var(--gold1);background:var(--card);color:var(--gold-d);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;
+  box-shadow:0 2px 8px var(--shadow);
+}
+.khelp-btn svg{display:block;width:30px;height:30px}
+.khelp-btn:active{transform:scale(.96)}
+.khelp-pop{display:none;position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.45);
+  align-items:center;justify-content:center;padding:16px}
+.khelp-pop.on{display:flex}
+.khelp-box{background:var(--card);color:var(--text);width:100%;max-width:560px;max-height:84vh;
+  overflow-y:auto;border-radius:14px;border:2px solid var(--gold1);box-shadow:0 10px 40px var(--shadow)}
+.khelp-head{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:14px 16px;border-bottom:1px solid var(--panelb);
+  background:linear-gradient(135deg,var(--card),var(--bg2));position:sticky;top:0}
+.khelp-head h3{margin:0;font-size:16px;color:var(--gold-d)}
+.khelp-x{border:none;background:#e74c3c;color:#fff;width:30px;height:30px;border-radius:8px;
+  font-weight:900;cursor:pointer;flex:0 0 auto}
+.khelp-body{padding:14px 16px 18px;font-size:14px;line-height:1.55}
+.khelp-body h4{margin:14px 0 6px;font-size:14px;color:var(--gold-d)}
+.khelp-body h4:first-child{margin-top:0}
+.khelp-body ul{margin:0;padding-left:20px}
+.khelp-body li{margin-bottom:5px}
+.khelp-body b{color:var(--gold-d)}
+.khelp-tip{background:var(--bg2);border-left:3px solid var(--gold1);padding:8px 10px;
+  border-radius:6px;margin-top:10px;font-size:13px}
 </style>
 </head>
 <body>
@@ -263,6 +292,7 @@ button{font-family:inherit;cursor:pointer}
       <h1><span>📖</span>Flip Kitaplık</h1>
     </div>
     <div class="acts">
+      <button type="button" class="khelp-btn" id="khelpB" title="K&#252;t&#252;phane ne i&#351;e yarar?"><svg viewBox="0 0 30 30" aria-hidden="true"><path id="khelpArc" d="M 2.6 22.4 A 13.4 13.4 0 0 1 27.4 22.4" fill="none"/><text font-size="6.6" font-weight="900" fill="currentColor" letter-spacing="0.1"><textPath href="#khelpArc" startOffset="50%" text-anchor="middle">YARDIM</textPath></text></svg></button>
       <button class="ib" id="sndB" title="Sayfa sesi aç/kapat">🔊</button>
       <button class="ib" id="themeB" title="Tema değiştir">🌙</button>
       <button class="ib" id="fullB" title="Tam ekran">⛶</button>
@@ -898,5 +928,47 @@ document.addEventListener('click',function(e){var w=document.getElementById('ayC
 loadPdfList();
 </script>
 <div id="toast"></div>
+
+<!-- ===== Kutuphane yardim popup ===== -->
+<div id="khelp-pop" class="khelp-pop" role="dialog" aria-modal="true">
+  <div class="khelp-box">
+    <div class="khelp-head">
+      <h3>&#10067; Yard&#305;m</h3>
+      <button type="button" class="khelp-x" title="Kapat">&#10005;</button>
+    </div>
+    <div class="khelp-body"></div>
+  </div>
+</div>
+
+<script>
+var KUTUPHANE_YARDIM =
+  '<h4>K\u00fct\u00fcphane nedir?</h4><ul>'
++ '<li>pdf/ klas\u00f6r\u00fcndeki t\u00fcm eserleri raflar halinde g\u00f6sterir.</li>'
++ '<li>Bir esere dokunup okuyabilir, sayfa \u00e7evirebilirsin.</li></ul>'
++ '<h4>Nas\u0131l kullan\u0131l\u0131r?</h4><ul>'
++ '<li>Raftaki kitaba dokun \u2014 okuyucu a\u00e7\u0131l\u0131r.</li>'
++ '<li>Alt sat\u0131rdaki oklarla sayfa \u00e7evir, ortadaki kutudan sayfa numaras\u0131na git.</li>'
++ '<li><b>&#8635;</b> sayfa gelmediyse yeniler; <b>&#8801;</b> sayfa \u015feridini a\u00e7ar.</li>'
++ '<li><b>&#10133; Derle</b> sayfay\u0131 derlemene ekler; <b>Ayra\u00e7</b> kald\u0131\u011f\u0131n sayfay\u0131 i\u015faretler.</li></ul>'
++ '<h4>Di\u011fer d\u00fc\u011fmeler</h4><ul>'
++ '<li><b>&#128266;</b> sayfa sesi, <b>&#127769;</b> tema, <b>&#9974;</b> tam ekran.</li>'
++ '<li><b>Anasayfa</b> ile takip sayfas\u0131na d\u00f6nersin.</li></ul>'
++ '<div class="khelp-tip">Ses simgesi kapal\u0131ysa sayfa \u00e7evirme sesi \u00e7almaz \u2014 tek dokunu\u015fla a\u00e7abilirsin.</div>';
+
+function khelpAc(){
+  var b=document.getElementById('khelp-pop'); if(!b) return;
+  b.querySelector('.khelp-body').innerHTML = KUTUPHANE_YARDIM;
+  b.classList.add('on');
+}
+function khelpKapat(){ var b=document.getElementById('khelp-pop'); if(b) b.classList.remove('on'); }
+document.addEventListener('click', function(e){
+  var t=e.target;
+  if(!t) return;
+  if(t.id==='khelpB' || (t.closest && t.closest('#khelpB'))){ khelpAc(); return; }
+  if(t.id==='khelp-pop' || (t.classList && t.classList.contains('khelp-x'))) khelpKapat();
+});
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') khelpKapat(); });
+</script>
+
 </body>
 </html>
