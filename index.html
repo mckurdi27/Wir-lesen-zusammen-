@@ -5369,9 +5369,11 @@ window.infoSortTable = function infoSortTable(col) {
                         <h3 style="font-size: 15px; margin: 0;">📢 Yöneticiye Mesaj</h3>
                         
                     </div>
-                    <textarea id="admin-msg-input" placeholder="Mesajınızı yazın..." style="width: 100%; height: 60px; padding: 12px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; margin-bottom: 10px; font-size: 14px; box-sizing: border-box; resize: vertical;"></textarea>
+                    <textarea id="admin-msg-input" placeholder="Dilek, temenni, istek veya hatan&#305; buraya yaz..." style="width: 100%; height: 60px; padding: 12px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; margin-bottom: 6px; font-size: 14px; box-sizing: border-box; resize: vertical;"></textarea>
+                    <div style="font-size: 12px; color: var(--muted, #777); line-height: 1.45; margin: 0 0 10px; padding: 0 2px;">Y&#246;neticiye dilek, temenni ve isteklerini buradan do&#287;rudan g&#246;nderebilirsin. Sana <b>DM</b>&#8217;den cevap verilmesini istiyorsan mesaj&#305;n&#305;n i&#231;ine <b>e-posta</b> veya <b>telefon</b> numaran&#305; yaz.</div>
                     <div style="display: flex; gap: 8px; align-items: center;">
-                        <button id="send-admin-msg-btn" style="flex: 1.4; min-width: 0; padding: 10px 12px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">💬 WhatsApp ile Gönder</button>
+                        <button id="send-site-msg-btn" style="flex: 1.4; min-width: 0; padding: 10px 12px; background: #2980b9; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">&#128228; Siteye G&#246;nder</button>
+                        <button id="send-admin-msg-btn" style="flex: 1; min-width: 0; padding: 10px 12px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">💬 WhatsApp ile Gönder</button>
                         <select id="app-share-sel" title="Uygulamayı paylaş" style="flex: 1; min-width: 0; padding: 10px 8px; background: #128C7E; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">
                             <option value="">&#128241; Uygulamayı Paylaş</option>
                             <option value="whatsapp">WhatsApp</option>
@@ -5407,6 +5409,15 @@ window.infoSortTable = function infoSortTable(col) {
                                 ${bulkSectionHtml}
                                 ${infoSectionHtml}
                             </div>
+                            <div style="margin-top:18px; border-top:1px dashed var(--border-color); padding-top:14px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                                    <h3 style="font-size:15px; margin:0; color:var(--gold-dark);">&#128229; Gelen Mesajlar <span id="gelen-msg-sayi" style="font-size:12px; color:var(--muted); font-weight:normal;"></span></h3>
+                                    <button id="gelen-msg-yenile" style="padding:6px 12px; background:var(--gold-primary); color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:12px; font-weight:bold;">&#8635; Yenile</button>
+                                </div>
+                                <div id="gelen-msg-liste" style="display:flex; flex-direction:column; gap:8px;">
+                                    <div style="font-size:12.5px; color:var(--muted);">Y&#252;kleniyor...</div>
+                                </div>
+                            </div>
                         </div>
                     `;
                 }
@@ -5416,6 +5427,83 @@ window.infoSortTable = function infoSortTable(col) {
                 // 'Beni hatırla' kutusunun durumunu kayıtlı bayrağa göre yansıt
                 var _ar2 = document.getElementById('admin-remember');
                 if (_ar2) _ar2.checked = (localStorage.getItem('hatim_admin_remember') === '1');
+                // ===== Gelen Mesajlar: yukle + ciz =====
+                function _gelenMsgTarih(v) {
+                    if (!v) return '';
+                    var d = String(v).split('T')[0].split(' ')[0];
+                    var p = d.split('-');
+                    var t = String(v).split('T')[1];
+                    t = t ? t.slice(0, 5) : '';
+                    return (p.length === 3 ? p[2] + '.' + p[1] + '.' + p[0] : d) + (t ? ' ' + t : '');
+                }
+                function gelenMesajlariYukle() {
+                    var kap = document.getElementById('gelen-msg-liste');
+                    if (!kap) return;
+                    var sayEl = document.getElementById('gelen-msg-sayi');
+                    var _api = (typeof window._sbApi === 'function') ? window._sbApi : window.api;
+                    if (typeof _api !== 'function') { kap.innerHTML = '<div style="font-size:12.5px; color:#c0392b;">Baglanti yok.</div>'; return; }
+                    if (_gelenMsgYukleniyor) return;
+                    _gelenMsgYukleniyor = true;
+                    _api('/messages?select=*&order=created_at.desc&limit=200')
+                        .then(function (rows) {
+                            _gelenMsgData = Array.isArray(rows) ? rows : [];
+                            gelenMesajlariCiz();
+                        })
+                        .catch(function (e) {
+                            kap.innerHTML = '<div style="font-size:12.5px; color:#c0392b;">Yuklenemedi: ' + (e && e.message ? e.message : e) + '</div>';
+                        })
+                        .then(function () { _gelenMsgYukleniyor = false; });
+                }
+                function gelenMesajlariCiz() {
+                    var kap = document.getElementById('gelen-msg-liste');
+                    if (!kap) return;
+                    var sayEl = document.getElementById('gelen-msg-sayi');
+                    var d = _gelenMsgData || [];
+                    if (sayEl) sayEl.textContent = d.length ? '(' + d.length + ')' : '';
+                    if (!d.length) { kap.innerHTML = '<div style="font-size:12.5px; color:var(--muted);">Hen&#252;z mesaj yok.</div>'; return; }
+                    var html = '';
+                    d.forEach(function (m) {
+                        var okundu = !!m.is_read;
+                        var kim = m.member_name || 'Bilinmeyen';
+                        var grup = m.group_key ? ' &middot; Grup ' + m.group_key : '';
+                        var iletisim = m.contact ? '<div style="font-size:12px; color:#c0392b; margin-top:4px;"><b>&#128231; ' + m.contact + '</b></div>' : '';
+                        var body = String(m.body || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+                        html += '<div data-msgid="' + m.id + '" style="border:1px solid var(--border-color); border-left:4px solid ' + (okundu ? '#27ae60' : '#e67e22') + '; border-radius:8px; padding:10px 12px; background:' + (okundu ? 'var(--card-bg)' : 'rgba(230,126,34,.06)') + ';">'
+                            + '<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px;">'
+                            + '<div style="font-size:12.5px; color:var(--muted);"><b style="color:var(--text-main);">' + kim + '</b>' + grup + ' &middot; ' + _gelenMsgTarih(m.created_at) + '</div>'
+                            + '<div style="display:flex; gap:6px;">'
+                            + '<button class="gmsg-oku" data-id="' + m.id + '" data-v="' + (okundu ? '0' : '1') + '" style="padding:4px 9px; border:none; border-radius:5px; cursor:pointer; font-size:11px; font-weight:bold; background:' + (okundu ? '#95a5a6' : '#27ae60') + '; color:#fff;">' + (okundu ? '&#8634; Okunmad&#305;' : '&#10003; Okundu') + '</button>'
+                            + '<button class="gmsg-sil" data-id="' + m.id + '" style="padding:4px 9px; border:none; border-radius:5px; cursor:pointer; font-size:11px; font-weight:bold; background:#e74c3c; color:#fff;">&#128465;</button>'
+                            + '</div></div>'
+                            + '<div style="font-size:13.5px; line-height:1.5; white-space:normal;">' + body + '</div>'
+                            + '</div>';
+                    });
+                    kap.innerHTML = html;
+                }
+                var _gelenMsgData = [], _gelenMsgYukleniyor = false;
+                var _gyBtn = document.getElementById('gelen-msg-yenile');
+                if (_gyBtn && !_gyBtn._sb) { _gyBtn._sb = true; _gyBtn.addEventListener('click', gelenMesajlariYukle); }
+                var _glKap = document.getElementById('gelen-msg-liste');
+                if (_glKap && !_glKap._sb) {
+                    _glKap._sb = true;
+                    _glKap.addEventListener('click', function (ev) {
+                        var t = ev.target;
+                        if (!t) return;
+                        var _api = (typeof window._sbApi === 'function') ? window._sbApi : window.api;
+                        if (t.classList && t.classList.contains('gmsg-oku')) {
+                            var id = t.getAttribute('data-id'), v = t.getAttribute('data-v') === '1';
+                            _api('/messages?id=eq.' + id, { method: 'PATCH', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify({ is_read: v }) })
+                                .then(function () { gelenMesajlariYukle(); });
+                        } else if (t.classList && t.classList.contains('gmsg-sil')) {
+                            var id2 = t.getAttribute('data-id');
+                            if (!confirm('Bu mesaj silinsin mi?')) return;
+                            _api('/messages?id=eq.' + id2, { method: 'DELETE', headers: { 'Prefer': 'return=minimal' } })
+                                .then(function () { gelenMesajlariYukle(); });
+                        }
+                    });
+                }
+                if (bottomContainer.style.display !== 'none') setTimeout(gelenMesajlariYukle, 60);
+
                 // Yöneticiye mesaj bölümü: admin panelden ayrı, sayfanın en altında
                 let msgContainer = document.getElementById("admin-message-section");
                 if (!msgContainer) {
@@ -6523,6 +6611,33 @@ var _cg = selVal || '';
                 if (_loginAdmin) _loginAdmin.addEventListener("click", () => triggerAdminToggle());
                 var _loginLock = document.getElementById("login-admin-lock");
                 if (_loginLock && !_loginLock._sbLock) { _loginLock._sbLock = true; _loginLock.addEventListener("click", function(){ if (typeof window.triggerAdminToggle==='function') window.triggerAdminToggle(); }); }
+                // ---- Siteye Gonder: mesaji Supabase messages tablosuna yazar ----
+                var _siteBtn = document.getElementById("send-site-msg-btn");
+                if (_siteBtn && !_siteBtn._sbMsg) {
+                    _siteBtn._sbMsg = true;
+                    _siteBtn.addEventListener("click", function () {
+                        var ta = document.getElementById("admin-msg-input");
+                        var metin = (ta && ta.value || "").trim();
+                        if (!metin) { showToast('Mesaj yazın!', 'error'); return; }
+                        var gonderen = (typeof loggedInMember !== 'undefined' && loggedInMember) ? loggedInMember : '';
+                        var grup = (typeof currentGroup !== 'undefined' && currentGroup) ? currentGroup : '';
+                        var eskiMetin = _siteBtn.textContent;
+                        _siteBtn.disabled = true;
+                        _siteBtn.textContent = 'Gönderiliyor...';
+                        var _api = (typeof window._sbApi === 'function') ? window._sbApi : window.api;
+                        if (typeof _api !== 'function') { showToast('Bağlantı yok.', 'error'); _siteBtn.disabled = false; _siteBtn.textContent = eskiMetin; return; }
+                        _api("/messages", { method: "POST", body: JSON.stringify([{ member_name: gonderen, group_key: grup, contact: '', body: metin }]) })
+                            .then(function (r) {
+                                if (r && !Array.isArray(r) && (r.message || r.code)) throw new Error(r.message || r.code);
+                                showToast('Mesajınız yöneticiye iletildi.', 'success');
+                                if (ta) ta.value = '';
+                            })
+                            .catch(function (e) {
+                                showToast('Gönderilemedi: ' + (e && e.message ? e.message : e), 'error');
+                            })
+                            .then(function () { _siteBtn.disabled = false; _siteBtn.textContent = eskiMetin; });
+                    });
+                }
                 document.getElementById("send-admin-msg-btn").addEventListener("click", () => {
                     let text = document.getElementById("admin-msg-input").value.trim();
                     if (!text) { showToast('Mesaj yazın!', 'error'); return; }
