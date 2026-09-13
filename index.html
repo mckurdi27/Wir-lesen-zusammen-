@@ -661,8 +661,8 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
   border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .paylas-dd[data-select="app-share-sel"] > .paylas-dd-btn { background: #128C7E; }
-.paylas-dd-panel { display: none; position: absolute; bottom: calc(100% + 4px); left: 0; right: 0;
-  z-index: 99999; background: var(--card-bg, #fff); border: 1px solid var(--border-color, #ccc);
+.paylas-dd-panel { display: none; position: fixed; z-index: 2147483000;
+  min-width: 190px; background: var(--card-bg, #fff); border: 1px solid var(--border-color, #ccc);
   border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.25); max-height: 260px; overflow-y: auto; }
 .paylas-dd.acik .paylas-dd-panel { display: block; }
 .paylas-dd-panel > .paylas-dd-item { display: flex; align-items: center; gap: 8px; width: 100%;
@@ -7815,32 +7815,51 @@ _sbMemberDetail = function (name, groupKey) {
 </script>
 <script>
 (function () {
-  function hepsiniKapat() {
+  function kapat() {
     Array.prototype.forEach.call(document.querySelectorAll('.paylas-dd.acik'), function (d) {
       d.classList.remove('acik');
     });
   }
-  var listeler = Array.prototype.slice.call(document.querySelectorAll('.paylas-dd'));
-  listeler.forEach(function (dd) {
+  function yerlestir(dd) {
     var btn = dd.querySelector('.paylas-dd-btn');
-    var sel = document.getElementById(dd.getAttribute('data-select'));
-    if (!btn || !sel) return;
-    btn.addEventListener('click', function (e) {
+    var panel = dd.querySelector('.paylas-dd-panel');
+    if (!btn || !panel) return;
+    var r = btn.getBoundingClientRect();
+    panel.style.left = Math.max(4, Math.min(r.left, window.innerWidth - 200)) + 'px';
+    panel.style.width = Math.max(190, r.width) + 'px';
+    panel.style.bottom = (window.innerHeight - r.top + 6) + 'px';
+    panel.style.top = 'auto';
+  }
+
+  document.addEventListener('click', function (e) {
+    var hedef = e.target;
+    var dd = hedef.closest ? hedef.closest('.paylas-dd') : null;
+
+    if (!dd) { kapat(); return; }
+
+    var btn = hedef.closest('.paylas-dd-btn');
+    if (btn && dd.contains(btn)) {
       e.stopPropagation();
       var acikti = dd.classList.contains('acik');
-      hepsiniKapat();
-      if (!acikti) dd.classList.add('acik');
-    });
-    Array.prototype.forEach.call(dd.querySelectorAll('.paylas-dd-item'), function (it) {
-      it.addEventListener('click', function (e) {
-        e.stopPropagation();
+      kapat();
+      if (!acikti) { dd.classList.add('acik'); yerlestir(dd); }
+      return;
+    }
+
+    var it = hedef.closest('.paylas-dd-item');
+    if (it && dd.contains(it)) {
+      e.stopPropagation();
+      var sel = document.getElementById(dd.getAttribute('data-select'));
+      kapat();
+      if (sel) {
         sel.value = it.getAttribute('data-val');
-        hepsiniKapat();
         sel.dispatchEvent(new Event('change'));
-      });
-    });
-  });
-  document.addEventListener('click', hepsiniKapat);
+      }
+    }
+  }, true);
+
+  window.addEventListener('scroll', kapat, true);
+  window.addEventListener('resize', kapat);
 })();
 </script>
 </body>
