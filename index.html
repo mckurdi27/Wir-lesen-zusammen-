@@ -575,18 +575,21 @@
 
 <style>
   /* ===== Panel Yardim (? butonu + popup) ===== */
-  .phelp-wrap { display: flex; justify-content: flex-end; margin-top: 10px; }
-  .phelp-btn {
-    width: 30px; height: 30px; border-radius: 50%;
-    border: 2px solid var(--gold-primary, #d4af37);
-    background: #fff; color: var(--gold-dark, #8a6d3b);
-    font-weight: 900; font-size: 16px; line-height: 1; cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0,0,0,.12); flex: 0 0 auto;
-    padding: 0; display: flex; align-items: center; justify-content: center;
-    overflow: hidden;
+  .phelp-wrap {
+    display: flex; justify-content: center;
+    margin: 6px 0 0; padding: 0; width: 100%;
   }
-  .phelp-btn svg { display: block; width: 30px; height: 30px; }
-  .phelp-btn:hover { background: var(--gold-primary, #d4af37); color: #fff; }
+  .phelp-btn {
+    width: auto; height: auto; min-width: 0;
+    border: none; background: none; box-shadow: none;
+    color: var(--gold-dark, #8a6d3b);
+    font-weight: 700; font-size: 12.5px; line-height: 1;
+    letter-spacing: .06em; cursor: pointer;
+    padding: 4px 6px; display: inline-flex; align-items: center; justify-content: center;
+    opacity: .85;
+  }
+  .phelp-btn svg { display: block; width: 58px; height: 24px; }
+  .phelp-btn:hover, .phelp-btn:active { opacity: 1; color: var(--gold-primary, #d4af37); }
   .phelp-pop {
     display: none; position: fixed; inset: 0; z-index: 100000;
     background: rgba(0,0,0,.45); align-items: center; justify-content: center; padding: 16px;
@@ -7427,9 +7430,9 @@ document.addEventListener('keydown', function (e) { if (e.key === 'Escape') pane
   function _buton(k, pid) {
     return '<button type="button" class="phelp-btn" data-help="' + k
       + '" title="Bu panel ne i\u015fe yarar?">'
-      + '<svg viewBox="0 0 30 30" aria-hidden="true">'
-      + '<path id="' + pid + '" d="M 2.6 22.4 A 13.4 13.4 0 0 1 27.4 22.4" fill="none"/>'
-      + '<text font-size="6.6" font-weight="900" fill="currentColor" letter-spacing="0.1">'
+      + '<svg viewBox="0 0 58 24" aria-hidden="true">'
+      + '<path id="' + pid + '" d="M 4 18 A 24 24 0 0 1 54 18" fill="none"/>'
+      + '<text font-size="9.5" font-weight="700" fill="currentColor" letter-spacing="0.4">'
       + '<textPath href="#' + pid + '" startOffset="50%" text-anchor="middle">YARDIM</textPath>'
       + '</text></svg></button>';
   }
@@ -7459,25 +7462,20 @@ document.addEventListener('keydown', function (e) { if (e.key === 'Escape') pane
   else ekle();
 
   // 2) Panel icerigi degistiginde (innerHTML ile yeniden render) aninda geri ekle
-  var _zaman = null;
-  function _gecikmeli() {
-    if (_zaman) clearTimeout(_zaman);
-    _zaman = setTimeout(ekle, 60);
-  }
   try {
     var mo = new MutationObserver(function (kayitlar) {
       for (var i = 0; i < kayitlar.length; i++) {
         var t = kayitlar[i].target;
         if (t && t.classList && t.classList.contains('phelp-wrap')) continue;
-        _gecikmeli();
+        ekle();   // beklemeden, ayni karede
         return;
       }
     });
     mo.observe(document.documentElement, { childList: true, subtree: true });
   } catch (e) { /* eski tarayici: asagidaki aralik devrede kalir */ }
 
-  // 3) Emniyet agi: observer kacirirsa
-  setInterval(ekle, 1500);
+  // 3) Emniyet agi: observer kacirirsa (250 ms - goze gorunmez)
+  setInterval(ekle, 250);
   window.panelYardimEkle = ekle;
 })();
 </script>
