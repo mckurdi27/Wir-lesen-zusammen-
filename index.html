@@ -724,14 +724,14 @@
 
 <!-- ----- BOLUM C : GIRIS PANELI (login) ----- -->
         <!-- BÖLÜM 5 - GİRİŞ PANELİ -->
-        <div style="text-align:center; margin:0 0 2px; line-height:1;">
+        <div style="text-align:center; margin:0; padding:0; line-height:1;">
             <button id="klv-open-btn" type="button" title="Kılavuz — tüm sayfa bilgisi"
-                style="background:none; border:none; box-shadow:none; padding:2px 0; margin:0; cursor:pointer;
+                style="background:none; border:none; box-shadow:none; padding:0; margin:0; cursor:pointer;
                        color:#8a6d3b; font-size:13px; font-weight:700; letter-spacing:.08em; line-height:1;
                        white-space:nowrap; -webkit-tap-highlight-color:transparent;">KULLANIM KILAVUZU</button>
         </div>
-        <div style="display:flex; justify-content:center; margin:0 0 2px;">
-            <button id="app-fs-btn" onclick="toggleAppFullscreen()" title="Tam ekran" style="display:flex; align-items:center; gap:6px; background:transparent; border:none; color:#8a6d3b; padding:0; cursor:pointer; font-size:15px; font-weight:bold; white-space:nowrap; line-height:1;">
+        <div style="display:flex; justify-content:center; margin:0; padding:0;">
+            <button id="app-fs-btn" onclick="toggleAppFullscreen()" title="Tam ekran" style="display:flex; align-items:center; gap:6px; background:transparent; border:none; color:#8a6d3b; padding:0; margin:0; cursor:pointer; font-size:15px; font-weight:bold; white-space:nowrap; line-height:1;">
                 <img src="fs-icon.png" alt="" style="height:18px;width:auto;display:inline-block;">
                 <span id="app-fs-label">&#x26F6; Uygulamay&#x131; Tam Ekran A&#xE7;</span>
                 <img src="fs-icon.png" alt="" style="height:18px;width:auto;display:inline-block;">
@@ -7302,7 +7302,6 @@ _sbMemberDetail = function (name, groupKey) {
         <li><b>Tek / Grup</b> &#8212; giri&#351; tipini belirler. Tek se&#231;ilirse bireysel &#252;ye, Grup se&#231;ilirse gruba &#252;ye olarak girersin.</li>
         <li><b>Kat&#305;l</b> &#8212; ismini yaz&#305;p &#351;ifreyi girdikten sonra basars&#305;n; yeniysen kay&#305;t da olur.</li>
         <li><b>Beni Hat&#305;rla</b> &#8212; isim, &#351;ifre ve grup bilgisini kaydeder; sayfa yenilenince tekrar giri&#351; istemez.</li>
-        <li><b>Kilit simgesi</b> &#8212; y&#246;netici modunu a&#231;ar/kapat&#305;r (&#351;ifre: 1234).</li>
       </ul>
       <div class="klv-tip">&#350;ifreni bilmiyorsan grup y&#246;neticisine sor &#8212; okuma kaydetti&#287;in i&#231;in &#351;ifre herkese a&#231;&#305;k de&#287;ildir.</div>
 
@@ -7317,10 +7316,7 @@ _sbMemberDetail = function (name, groupKey) {
         <li><b>Ad / &#350;ifre / B&#246;lge / &#350;ehir De&#287;i&#351;tir</b> &#8212; kendi bilgilerini g&#252;nceller.</li>
       </ul>
 
-      <h2>&#128101; 3. Grup Takip Paneli</h2>
-      <p>Se&#231;ili grubun <b>t&#252;m &#252;yelerinin</b> okuma durumunu topluca g&#246;sterir &#8212; kim hangi eseri alm&#305;&#351;, ne kadar&#305;n&#305; okumu&#351;.</p>
-
-      <h2>&#128218; 4. Eserler (Kitap Listesi)</h2>
+      <h2>&#128218; 3. Eserler (Kitap Listesi)</h2>
       <p>Okunacak eserleri ve her eserdeki b&#246;l&#252;mleri g&#246;sterir. Renkler hissenin durumunu s&#246;yler: <b>bo&#351;</b> (al&#305;nabilir), <b>al&#305;nd&#305;</b> (okunmad&#305;), <b>okundu</b>.</p>
       <h4>Butonlar</h4>
       <ul>
@@ -7332,7 +7328,7 @@ _sbMemberDetail = function (name, groupKey) {
       </ul>
       <div class="klv-tip">Kur&#8217;an&#8217;da b&#246;l&#252;mler <b>sayfa</b>, Cev&#351;en gibi eserlerde <b>bab</b> olarak say&#305;l&#305;r.</div>
 
-      <h2>&#128255; 5. Zikirmatik</h2>
+      <h2>&#128255; 4. Zikirmatik</h2>
       <p>Zikir &#231;ekmeni sayar &#8212; K&#226;be etraf&#305;nda tavaf eden ikonlar say&#305;y&#305; g&#246;sterir.</p>
       <h4>Nas&#305;l kullan&#305;l&#305;r?</h4>
       <ul>
@@ -7343,35 +7339,7 @@ _sbMemberDetail = function (name, groupKey) {
       </ul>
       <div class="klv-tip">Sa&#287; &#252;stteki <b>di&#351;li</b> ikonundan ses, titre&#351;im ve zikir kay&#305;tlar&#305;n&#305; y&#246;netebilirsin.</div>
 
-      <h2>&#128736;&#65039; 6. Y&#246;netici Kontrol Paneli</h2>
-      <p>Admin olarak grup, &#252;ye ve eserleri y&#246;netti&#287;in yerdir. Sadece y&#246;netici modunda g&#246;r&#252;n&#252;r.</p>
-      <ul>
-        <li><b>Grup ve &#220;ye Y&#246;netimi</b> &#8212; grup ekle/d&#252;zenle/sil; gruba veya bireysel havuza &#252;ye ekle.</li>
-        <li><b>Eser Y&#246;netimi</b> &#8212; yeni eser ekle, PDF yolunu ve b&#246;l&#252;m say&#305;s&#305;n&#305; belirle.</li>
-        <li><b>&#220;ye ve Grup Bilgi Paneli</b> &#8212; arama, s&#305;ralanabilir tablo, al&#305;nan hisseleri g&#246;r ve d&#252;zenle.</li>
-        <li><b>Toplu Atama / Silme</b> &#8212; birden &#231;ok esere adet girerek hisse ata, se&#231;ili &#252;yenin hisselerini sil.</li>
-        <li><b>Y&#246;neticiye Mesaj</b> &#8212; &#252;yelerin sana g&#246;nderdi&#287;i mesajlar.</li>
-        <li><b>&#220;st bar</b> &#8212; <b>Beni Hat&#305;rla</b> panelin a&#231;&#305;k kalmas&#305;n&#305; sa&#287;lar; <b>Mod Kapal&#305;</b> paneli gizler.</li>
-      </ul>
-
-      <h2>&#128202; 7. Detayl&#305; Analiz Paneli</h2>
-      <p>Okuma verilerini tablolar halinde &#246;zetler; a&#231;&#305;lmadan &#246;nce taze veri &#231;eker.</p>
-      <h4>Sekmeler</h4>
-      <ul>
-        <li><b>Genel &#214;zet</b> &#8212; grup bazl&#305; &#252;ye say&#305;s&#305;, al&#305;nan, okunan ve % ilerleme.</li>
-        <li><b>Grup S&#305;ralama</b> &#8212; gruplar&#305; okuma durumuna g&#246;re s&#305;ralar.</li>
-        <li><b>&#220;ye Analizi</b> &#8212; &#252;ye bazl&#305; analiz; ayn&#305; isimliler grup etiketiyle ayr&#305;l&#305;r.</li>
-        <li><b>Eser Detay</b> &#8212; eser bazl&#305; analiz; s&#252;tun ba&#351;l&#305;&#287;&#305;na t&#305;klay&#305;nca s&#305;ralan&#305;r.</li>
-        <li><b>Okuma G&#252;nl&#252;&#287;&#252;</b> &#8212; t&#252;m okuma kay&#305;tlar&#305;n&#305; tarih s&#305;ras&#305;yla g&#246;sterir.</li>
-      </ul>
-      <h4>Ara&#231;lar</h4>
-      <ul>
-        <li><b>Filtreler</b> &#8212; Grup / &#220;ye / Eser se&#231;icileri analizi daralt&#305;r.</li>
-        <li><b>Excel</b> &#8212; analizi .xlsx olarak indirir.</li>
-        <li><b>Yazd&#305;r</b> &#8212; analizi yazd&#305;r&#305;r veya PDF kaydeder.</li>
-      </ul>
-
-      <h2>&#128196; 8. PDF Okuyucu ve K&#252;t&#252;phane</h2>
+      <h2>&#128196; 5. PDF Okuyucu ve K&#252;t&#252;phane</h2>
       <ul>
         <li><b>Sayfa / Sayfa &#9654;</b> &#8212; &#246;nceki / sonraki sayfaya gider; RTL a&#231;&#305;kken y&#246;n tersine d&#246;ner.</li>
         <li><b>Sayfa numaras&#305; kutusu</b> &#8212; sayfa girip Enter&#8217;a bas&#305;nca o sayfaya atlar.</li>
