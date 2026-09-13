@@ -83,6 +83,10 @@
             --color-free: #f39c12;
             --touch-target: 48px;
         }
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
         body {
             background-color: var(--bg-primary);
             color: var(--text-main);
@@ -90,7 +94,9 @@
             margin: 0;
             padding: 10px;
             font-size: 16px;
+            width: 100%;
         }
+        img, table, .admin-section, #admin-bottom-section { max-width: 100%; }
         .container {
             max-width: 800px;
             margin: 0 auto;
