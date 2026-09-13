@@ -655,6 +655,23 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
 </style>
 </head> / <body> BASLANGICI ===================== -->
 
+<style>
+.paylas-dd { position: relative; flex: 1; min-width: 0; }
+.paylas-dd > .paylas-dd-btn { width: 100%; padding: 10px 8px; background: #25D366; color: #fff;
+  border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.paylas-dd[data-select="app-share-sel"] > .paylas-dd-btn { background: #128C7E; }
+.paylas-dd-panel { display: none; position: absolute; bottom: calc(100% + 4px); left: 0; right: 0;
+  z-index: 99999; background: var(--card-bg, #fff); border: 1px solid var(--border-color, #ccc);
+  border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.25); max-height: 260px; overflow-y: auto; }
+.paylas-dd.acik .paylas-dd-panel { display: block; }
+.paylas-dd-panel > .paylas-dd-item { display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 9px 10px; background: var(--card-bg, #fff); border: none; cursor: pointer;
+  font-size: 13px; color: var(--text-main, #222); text-align: left; }
+.paylas-dd-panel > .paylas-dd-item:hover { background: rgba(37,211,102,.16); }
+.paylas-dd-item > img { width: 16px; height: 16px; flex: 0 0 16px; display: block; }
+.paylas-dd-item > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+</style>
 </head>
 <body>
 <!-- ----- <body><.container> basi ----- -->
@@ -5534,29 +5551,29 @@ window.infoSortTable = function infoSortTable(col) {
                     <textarea id="admin-msg-input" rows="3" placeholder="Dilek, temenni, şikayet ve hatalarımızı buraya yazın ... Emeği geçenlere bir hayır dua ve Efendimize Salavat getirmeyi UNUTMAYIN" style="width: 100%; height: auto; min-height: 76px; padding: 8px 10px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; margin-bottom: 6px; font-size: 11px; line-height: 1.35; box-sizing: border-box; resize: vertical; overflow: hidden;"></textarea>
                                         <div style="display: flex; gap: 8px; align-items: center;">
                         <button id="send-site-msg-btn" style="flex: 1.4; min-width: 0; padding: 10px 12px; background: #2980b9; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">&#128228; Siteye G&#246;nder</button>
-                        <select id="send-admin-msg-sel" title="Mesajı paylaş" style="flex: 1; min-width: 0; padding: 10px 8px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">
+                        <div class="paylas-dd" data-select="send-admin-msg-sel"><button type="button" class="paylas-dd-btn">💬 Mesajı Paylaş</button><div class="paylas-dd-panel"><button type="button" class="paylas-dd-item" data-val="whatsapp"><img src="img/whatsapp.svg" width="16" height="16" alt=""><span>WhatsApp</span></button><button type="button" class="paylas-dd-item" data-val="telegram"><img src="img/telegram.svg" width="16" height="16" alt=""><span>Telegram</span></button><button type="button" class="paylas-dd-item" data-val="twitter"><img src="img/x.svg" width="16" height="16" alt=""><span>X</span></button><button type="button" class="paylas-dd-item" data-val="facebook"><img src="img/facebook.svg" width="16" height="16" alt=""><span>Facebook</span></button><button type="button" class="paylas-dd-item" data-val="instagram"><img src="img/instagram.svg" width="16" height="16" alt=""><span>Instagram</span></button><button type="button" class="paylas-dd-item" data-val="email"><img src="img/email.svg" width="16" height="16" alt=""><span>E-posta</span></button><button type="button" class="paylas-dd-item" data-val="sms"><img src="img/sms.svg" width="16" height="16" alt=""><span>SMS</span></button><button type="button" class="paylas-dd-item" data-val="copy"><img src="img/copy.svg" width="16" height="16" alt=""><span>Bağlantıyı Kopyala</span></button></div></div><select style="display:none" id="send-admin-msg-sel" title="Mesajı paylaş">
                             <option value="">&#128172; Mesajı Paylaş</option>
-                            <option value="whatsapp"><img src="img/whatsapp.svg" width="16" height="16" alt="" style="vertical-align:-3px;margin-right:6px;display:inline-block;">WhatsApp</option>
-                            <option value="telegram"><img src="img/telegram.svg" width="16" height="16" alt="" style="vertical-align:-3px;margin-right:6px;display:inline-block;">Telegram</option>
-                            <option value="twitter"><img src="img/x.svg" width="16" height="16" alt="" style="vertical-align:-3px;margin-right:6px;display:inline-block;">X</option>
-                            <option value="facebook"><img src="img/facebook.svg" width="16" height="16" alt="" style="vertical-align:-3px;margin-right:6px;display:inline-block;">Facebook</option>
-                            <option value="instagram"><img src="img/instagram.svg" width="16" height="16" alt="" style="vertical-align:-3px;margin-right:6px;display:inline-block;">Instagram</option>
-                            <option value="email"><img src="img/email.svg" width="16" height="16" alt="" style="vertical-align:-3px;margin-right:6px;display:inline-block;">E-posta</option>
-                            <option value="sms"><img src="img/sms.svg" width="16" height="16" alt="" style="vertical-align:-3px;margin-right:6px;display:inline-block;">SMS</option>
-                            <option value="copy"><img src="img/copy.svg" width="16" height="16" alt="" style="vertical-align:-3px;margin-right:6px;display:inline-block;">Bağlantıyı Kopyala</option>
+                            <option value="whatsapp"><img src="img/whatsapp.svg" width="16" height="16" alt="">WhatsApp</option>
+                            <option value="telegram"><img src="img/telegram.svg" width="16" height="16" alt="">Telegram</option>
+                            <option value="twitter"><img src="img/x.svg" width="16" height="16" alt="">X</option>
+                            <option value="facebook"><img src="img/facebook.svg" width="16" height="16" alt="">Facebook</option>
+                            <option value="instagram"><img src="img/instagram.svg" width="16" height="16" alt="">Instagram</option>
+                            <option value="email"><img src="img/email.svg" width="16" height="16" alt="">E-posta</option>
+                            <option value="sms"><img src="img/sms.svg" width="16" height="16" alt="">SMS</option>
+                            <option value="copy"><img src="img/copy.svg" width="16" height="16" alt="">Bağlantıyı Kopyala</option>
                         </select>
-                        <select id="app-share-sel" title="Uygulamayı paylaş" style="flex: 1; min-width: 0; padding: 10px 8px; background: #128C7E; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">
+                        <div class="paylas-dd" data-select="app-share-sel"><button type="button" class="paylas-dd-btn">📱 Uygulamayı Paylaş</button><div class="paylas-dd-panel"><button type="button" class="paylas-dd-item" data-val="whatsapp"><img src="img/whatsapp.svg" width="16" height="16" alt=""><span>WhatsApp</span></button><button type="button" class="paylas-dd-item" data-val="telegram"><img src="img/telegram.svg" width="16" height="16" alt=""><span>Telegram</span></button><button type="button" class="paylas-dd-item" data-val="twitter"><img src="img/x.svg" width="16" height="16" alt=""><span>X</span></button><button type="button" class="paylas-dd-item" data-val="facebook"><img src="img/facebook.svg" width="16" height="16" alt=""><span>Facebook</span></button><button type="button" class="paylas-dd-item" data-val="instagram"><img src="img/instagram.svg" width="16" height="16" alt=""><span>Instagram</span></button><button type="button" class="paylas-dd-item" data-val="reddit"><img src="img/reddit.svg" width="16" height="16" alt=""><span>Reddit</span></button><button type="button" class="paylas-dd-item" data-val="discord"><img src="img/discord.svg" width="16" height="16" alt=""><span>Discord</span></button><button type="button" class="paylas-dd-item" data-val="email"><img src="img/email.svg" width="16" height="16" alt=""><span>E-posta</span></button><button type="button" class="paylas-dd-item" data-val="sms"><img src="img/sms.svg" width="16" height="16" alt=""><span>SMS</span></button><button type="button" class="paylas-dd-item" data-val="copy"><img src="img/copy.svg" width="16" height="16" alt=""><span>Bağlantıyı Kopyala</span></button></div></div><select style="display:none" id="app-share-sel" title="Uygulamayı paylaş">
                             <option value="">&#128241; Uygulamayı Paylaş</option>
-                            <option value="whatsapp"><img src="img/whatsapp.svg" width="16" height="16" alt="" style="vertical-align:-3px;margin-right:6px;display:inline-block;">WhatsApp</option>
-                            <option value="telegram"><img src="img/telegram.svg" width="16" height="16" alt="" style="vertical-align:-3px;margin-right:6px;display:inline-block;">Telegram</option>
-                            <option value="twitter"><img src="img/x.svg" width="16" height="16" alt="" style="vertical-align:-3px;margin-right:6px;display:inline-block;">X</option>
-                            <option value="facebook"><img src="img/facebook.svg" width="16" height="16" alt="" style="vertical-align:-3px;margin-right:6px;display:inline-block;">Facebook</option>
-                            <option value="instagram"><img src="img/instagram.svg" width="16" height="16" alt="" style="vertical-align:-3px;margin-right:6px;display:inline-block;">Instagram</option>
-                            <option value="reddit"><img src="img/reddit.svg" width="16" height="16" alt="" style="vertical-align:-3px;margin-right:6px;display:inline-block;">Reddit</option>
-                            <option value="discord"><img src="img/discord.svg" width="16" height="16" alt="" style="vertical-align:-3px;margin-right:6px;display:inline-block;">Discord</option>
-                            <option value="email"><img src="img/email.svg" width="16" height="16" alt="" style="vertical-align:-3px;margin-right:6px;display:inline-block;">E-posta</option>
-                            <option value="sms"><img src="img/sms.svg" width="16" height="16" alt="" style="vertical-align:-3px;margin-right:6px;display:inline-block;">SMS</option>
-                            <option value="copy"><img src="img/copy.svg" width="16" height="16" alt="" style="vertical-align:-3px;margin-right:6px;display:inline-block;">Bağlantıyı Kopyala</option>
+                            <option value="whatsapp"><img src="img/whatsapp.svg" width="16" height="16" alt="">WhatsApp</option>
+                            <option value="telegram"><img src="img/telegram.svg" width="16" height="16" alt="">Telegram</option>
+                            <option value="twitter"><img src="img/x.svg" width="16" height="16" alt="">X</option>
+                            <option value="facebook"><img src="img/facebook.svg" width="16" height="16" alt="">Facebook</option>
+                            <option value="instagram"><img src="img/instagram.svg" width="16" height="16" alt="">Instagram</option>
+                            <option value="reddit"><img src="img/reddit.svg" width="16" height="16" alt="">Reddit</option>
+                            <option value="discord"><img src="img/discord.svg" width="16" height="16" alt="">Discord</option>
+                            <option value="email"><img src="img/email.svg" width="16" height="16" alt="">E-posta</option>
+                            <option value="sms"><img src="img/sms.svg" width="16" height="16" alt="">SMS</option>
+                            <option value="copy"><img src="img/copy.svg" width="16" height="16" alt="">Bağlantıyı Kopyala</option>
                         </select>
                     </div>
 
@@ -7794,6 +7811,36 @@ _sbMemberDetail = function (name, groupKey) {
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bagla);
   else bagla();
+})();
+</script>
+<script>
+(function () {
+  function hepsiniKapat() {
+    Array.prototype.forEach.call(document.querySelectorAll('.paylas-dd.acik'), function (d) {
+      d.classList.remove('acik');
+    });
+  }
+  var listeler = Array.prototype.slice.call(document.querySelectorAll('.paylas-dd'));
+  listeler.forEach(function (dd) {
+    var btn = dd.querySelector('.paylas-dd-btn');
+    var sel = document.getElementById(dd.getAttribute('data-select'));
+    if (!btn || !sel) return;
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var acikti = dd.classList.contains('acik');
+      hepsiniKapat();
+      if (!acikti) dd.classList.add('acik');
+    });
+    Array.prototype.forEach.call(dd.querySelectorAll('.paylas-dd-item'), function (it) {
+      it.addEventListener('click', function (e) {
+        e.stopPropagation();
+        sel.value = it.getAttribute('data-val');
+        hepsiniKapat();
+        sel.dispatchEvent(new Event('change'));
+      });
+    });
+  });
+  document.addEventListener('click', hepsiniKapat);
 })();
 </script>
 </body>
