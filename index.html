@@ -616,7 +616,33 @@
   }
 
         </style>
-<!-- ===================== </head> / <body> BASLANGICI ===================== -->
+<!-- ===================== 
+<style>
+/* ===== Butonlarda metin secimi kapali (resim gibi davranir) ===== */
+button, .zk-tap, .zk-actions button, .zk-mini, .zk-sesopt,
+.zk-hedef, .zk-ayar-btn, .klv-btn, .phelp-btn {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Sayma butonu ve uzerindeki yazilar */
+.zk-tap, .zk-tap * , .zk-count, .zk-count * , .zk-sub, .zk-dots * {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  -webkit-touch-callout: none;
+}
+/* Tiklama sonrasi secim vurgusunu da kapat */
+button::selection, .zk-tap::selection, .zk-tap *::selection { background: transparent; }
+button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { background: transparent; }
+/* Uzun basmada metin secimi / buyutme menusu cikmasin */
+.zk-tap { -webkit-touch-callout: none !important; }
+</style>
+</head> / <body> BASLANGICI ===================== -->
 
 </head>
 <body>
@@ -1659,6 +1685,13 @@
         if ($('zkKaynak')) $('zkKaynak').addEventListener('change', function(){ zkKaynakUygula(this.value); });
 
         var sel = $('zkZikir');
+        var _zkTapEl = $('zkTap');
+        if (_zkTapEl) {
+            ['selectstart','contextmenu'].forEach(function(ev){
+                _zkTapEl.addEventListener(ev, function(e){ e.preventDefault(); });
+            });
+            _zkTapEl.setAttribute('unselectable','on');
+        }
         if ($('zkTap')) $('zkTap').addEventListener('click', tik);
         if (sel) sel.addEventListener('change', function(){
             // Her zikrin hedefi ve sayaci kendi kaydinda saklanir; zikir degisince
