@@ -226,6 +226,8 @@
                 --color-free: #fcc419;
             }
             body { background-color: #0b1329 !important; color: #f1f5f9 !important; }
+            .zk-full, .zk-ar, .zk-oku, .zk-anlam { color: #f1f5f9; }
+            .zk-anlam { color: #7ee2a8; }
         }
 
         
@@ -552,7 +554,7 @@
         #zikirmatikSection .zk-ses-menu button.on { background: var(--gold-primary); color: #fff; }
         #zikirmatikSection .zk-actions button { padding: 3px 4px; border-radius: 7px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--text-main); font-size: 14px; line-height: 1.3; cursor: pointer; min-height: 0; margin-left: 0; white-space: nowrap; flex: 0 0 auto; }
         #zikirmatikSection .zk-actions button.on { background: var(--gold-primary); color: #fff; }
-        #zikirmatikSection .zk-ar { font-size: 26px; line-height: 1.9; text-align: center; color: #000000; font-weight: 800; margin: 2px 0 8px; font-family: "Traditional Arabic", "Amiri", "Times New Roman", serif; }
+        #zikirmatikSection .zk-ar { font-size: 26px; line-height: 1.9; text-align: center; color: var(--text-main); font-weight: 800; margin: 2px 0 8px; font-family: "Traditional Arabic", "Amiri", "Times New Roman", serif; }
         #zikirmatikSection .zk-oku { text-align: center; font-size: 14px; font-weight: 400; color: var(--gold-primary); margin-bottom: 6px; }
         #zikirmatikSection .zk-anlam { text-align: center; font-size: 15px; color: #0e6b3a; font-weight: 800; margin-bottom: 12px; }
         #zikirmatikSection .zk-kayit-wrap { margin-top: 7px; max-height: 182px; overflow: auto; border: 1px solid var(--gold-primary); border-radius: 8px; background: var(--card-bg); }
@@ -5402,22 +5404,32 @@ window.infoSortTable = function infoSortTable(col) {
                         <h3 style="font-size: 15px; margin: 0;">📢 Yöneticiye Mesaj</h3>
                         
                     </div>
-                    <textarea id="admin-msg-input" placeholder="Dilek, temenni, şikayet ve hatalarımızı buraya yazın ... Emeği geçenlere bir hayır dua ve Efendimize Salavat getirmeyi UNUTMAYIN" style="width: 100%; height: 60px; padding: 12px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; margin-bottom: 6px; font-size: 14px; box-sizing: border-box; resize: vertical;"></textarea>
+                    <textarea id="admin-msg-input" rows="3" placeholder="Dilek, temenni, şikayet ve hatalarımızı buraya yazın ... Emeği geçenlere bir hayır dua ve Efendimize Salavat getirmeyi UNUTMAYIN" style="width: 100%; height: auto; min-height: 76px; padding: 8px 10px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; margin-bottom: 6px; font-size: 11px; line-height: 1.35; box-sizing: border-box; resize: vertical; overflow: hidden;"></textarea>
                                         <div style="display: flex; gap: 8px; align-items: center;">
                         <button id="send-site-msg-btn" style="flex: 1.4; min-width: 0; padding: 10px 12px; background: #2980b9; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">&#128228; Siteye G&#246;nder</button>
-                        <button id="send-admin-msg-btn" style="flex: 1; min-width: 0; padding: 10px 12px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">💬 WhatsApp ile Gönder</button>
+                        <select id="send-admin-msg-sel" title="Mesajı paylaş" style="flex: 1; min-width: 0; padding: 10px 8px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">
+                            <option value="">&#128172; Mesajı Paylaş</option>
+                            <option value="whatsapp">&#128172; WhatsApp</option>
+                            <option value="telegram">&#9992;&#65039; Telegram</option>
+                            <option value="twitter">&#120143; X (Twitter)</option>
+                            <option value="facebook">&#128216; Facebook</option>
+                            <option value="instagram">&#128247; Instagram</option>
+                            <option value="email">&#9993;&#65039; E-posta</option>
+                            <option value="sms">&#128241; SMS</option>
+                            <option value="copy">&#128279; Metni Kopyala</option>
+                        </select>
                         <select id="app-share-sel" title="Uygulamayı paylaş" style="flex: 1; min-width: 0; padding: 10px 8px; background: #128C7E; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">
                             <option value="">&#128241; Uygulamayı Paylaş</option>
-                            <option value="whatsapp">WhatsApp</option>
-                            <option value="telegram">Telegram</option>
-                            <option value="twitter">X (Twitter)</option>
-                            <option value="facebook">Facebook</option>
-                            <option value="linkedin">LinkedIn</option>
-                            <option value="reddit">Reddit</option>
-                            <option value="discord">Discord</option>
-                            <option value="email">E-posta</option>
-                            <option value="sms">SMS</option>
-                            <option value="copy">Bağlantıyı Kopyala</option>
+                            <option value="whatsapp">&#128172; WhatsApp</option>
+                            <option value="telegram">&#9992;&#65039; Telegram</option>
+                            <option value="twitter">&#120143; X (Twitter)</option>
+                            <option value="facebook">&#128216; Facebook</option>
+                            <option value="instagram">&#128247; Instagram</option>
+                            <option value="reddit">&#128172; Reddit</option>
+                            <option value="discord">&#127918; Discord</option>
+                            <option value="email">&#9993;&#65039; E-posta</option>
+                            <option value="sms">&#128241; SMS</option>
+                            <option value="copy">&#128279; Bağlantıyı Kopyala</option>
                         </select>
                     </div>
 
@@ -6753,10 +6765,34 @@ var _cg = selVal || '';
                             .then(function () { _siteBtn.disabled = false; _siteBtn.textContent = eskiMetin; });
                     });
                 }
-                document.getElementById("send-admin-msg-btn").addEventListener("click", () => {
-                    let text = document.getElementById("admin-msg-input").value.trim();
-                    if (!text) { showToast('Mesaj yazın!', 'error'); return; }
-                    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+                document.getElementById("send-admin-msg-sel").addEventListener("change", function () {
+                    var sel = this, plat = sel.value;
+                    sel.value = '';
+                    if (!plat) return;
+                    var _txt = (document.getElementById("admin-msg-input").value || '').trim();
+                    if (!_txt) { showToast('Mesaj yazın!', 'error'); return; }
+                    var _e = encodeURIComponent(_txt);
+                    if (plat === 'copy') {
+                        var _ok = function(){ if (typeof showToast === 'function') showToast('Mesaj kopyalandı', 'info'); };
+                        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(_txt).then(_ok, _ok);
+                        else { var _t = document.createElement('textarea'); _t.value = _txt; document.body.appendChild(_t); _t.select(); try { document.execCommand('copy'); } catch(e){} document.body.removeChild(_t); _ok(); }
+                        return;
+                    }
+                    if (plat === 'email') { window.location.href = 'mailto:?subject=' + _e + '&body=' + _e; return; }
+                    if (plat === 'sms') { window.location.href = 'sms:?&body=' + _e; return; }
+                    if (plat === 'instagram') {
+                        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(_txt);
+                        if (typeof showToast === 'function') showToast('Mesaj kopyalandı — Instagram’a yapıştırın', 'info');
+                        window.location.href = 'https://www.instagram.com/';
+                        return;
+                    }
+                    var _m = {
+                        whatsapp: 'https://wa.me/?text=' + _e,
+                        telegram: 'https://t.me/share/url?url=' + encodeURIComponent('https://mckurdi27.github.io/Wir-lesen-zusammen-/') + '&text=' + _e,
+                        twitter:  'https://twitter.com/intent/tweet?text=' + _e,
+                        facebook: 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent('https://mckurdi27.github.io/Wir-lesen-zusammen-/') + '&quote=' + _e
+                    };
+                    if (_m[plat]) window.open(_m[plat], '_blank');
                 });
             document.addEventListener('change', function(we){
                 if (!we.target || we.target.id !== 'app-share-sel') return;
@@ -6772,7 +6808,7 @@ var _cg = selVal || '';
                     telegram: 'https://t.me/share/url?url=' + _u + '&text=' + _t,
                     twitter:  'https://twitter.com/intent/tweet?text=' + _t + '&url=' + _u,
                     facebook: 'https://www.facebook.com/sharer/sharer.php?u=' + _u + '&quote=' + _t,
-                    linkedin: 'https://www.linkedin.com/sharing/share-offsite/?url=' + _u,
+                    instagram: 'https://www.instagram.com/',
                     reddit:   'https://www.reddit.com/submit?url=' + _u + '&title=' + _t,
                     email:    'mailto:?subject=' + _t + '&body=' + _tu,
                     sms:      'sms:?&body=' + _tu
@@ -6789,8 +6825,16 @@ var _cg = selVal || '';
                     window.open('https://discord.com/app', '_blank');
                     return;
                 }
+                if (plat === 'instagram') {
+                    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(_full);
+                    if (typeof showToast === 'function') showToast('Bağlantı kopyalandı — Instagram biyografi/gönderiye yapıştırın', 'info');
+                    window.location.href = 'https://www.instagram.com/';
+                    return;
+                }
                 var _url = urls[plat];
-                if (_url) window.open(_url, '_blank');
+                if (!_url) return;
+                if (plat === 'email' || plat === 'sms') { window.location.href = _url; return; }
+                window.open(_url, '_blank');
             });
             }
 
