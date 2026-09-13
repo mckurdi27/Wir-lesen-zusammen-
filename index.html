@@ -656,21 +656,24 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
 </head> / <body> BASLANGICI ===================== -->
 
 <style>
-.paylas-dd { position: relative; flex: 1; min-width: 0; }
+.paylas-dd { flex: 1; min-width: 0; }
 .paylas-dd > .paylas-dd-btn { width: 100%; padding: 10px 8px; background: #25D366; color: #fff;
   border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .paylas-dd[data-select="app-share-sel"] > .paylas-dd-btn { background: #128C7E; }
-.paylas-dd-panel { display: none; position: fixed; z-index: 2147483000;
-  min-width: 190px; background: var(--card-bg, #fff); border: 1px solid var(--border-color, #ccc);
-  border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.25); max-height: 260px; overflow-y: auto; }
-.paylas-dd.acik .paylas-dd-panel { display: block; }
-.paylas-dd-panel > .paylas-dd-item { display: flex; align-items: center; gap: 8px; width: 100%;
-  padding: 9px 10px; background: var(--card-bg, #fff); border: none; cursor: pointer;
-  font-size: 13px; color: var(--text-main, #222); text-align: left; }
-.paylas-dd-panel > .paylas-dd-item:hover { background: rgba(37,211,102,.16); }
-.paylas-dd-item > img { width: 16px; height: 16px; flex: 0 0 16px; display: block; }
-.paylas-dd-item > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+#pdd-pop { position: fixed; z-index: 2147483000; display: none; box-sizing: border-box;
+  background: #fff; border: 1px solid #ccc; border-radius: 8px;
+  box-shadow: 0 8px 22px rgba(0,0,0,.28); max-height: 60vh; overflow-y: auto;
+  -webkit-overflow-scrolling: touch; }
+#pdd-pop.on { display: block; }
+#pdd-pop .pdd-item { display: flex; align-items: center; gap: 10px; width: 100%; box-sizing: border-box;
+  padding: 11px 12px; background: #fff; border: 0; border-bottom: 1px solid #eee; cursor: pointer;
+  font-size: 14px; color: #222; text-align: left; line-height: 1.2; }
+#pdd-pop .pdd-item:last-child { border-bottom: 0; }
+#pdd-pop .pdd-item:active { background: #eaf9f0; }
+#pdd-pop .pdd-item img { width: 20px; height: 20px; flex: 0 0 20px; display: block; }
+#pdd-pop .pdd-item span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; }
 </style>
 </head>
 <body>
@@ -7815,51 +7818,103 @@ _sbMemberDetail = function (name, groupKey) {
 </script>
 <script>
 (function () {
+  var pop = document.createElement('div');
+  pop.id = 'pdd-pop';
+  document.body.appendChild(pop);
+
+  var IKON = {
+    whatsapp: 'img/whatsapp.svg',
+    telegram: 'img/telegram.svg',
+    twitter:  'img/x.svg',
+    facebook: 'img/facebook.svg',
+    instagram:'img/instagram.svg',
+    reddit:   'img/reddit.svg',
+    discord:  'img/discord.svg',
+    email:    'img/email.svg',
+    sms:      'img/sms.svg',
+    copy:     'img/copy.svg'
+  };
+
+  var aktif = null;   // { dd, sel }
+
   function kapat() {
-    Array.prototype.forEach.call(document.querySelectorAll('.paylas-dd.acik'), function (d) {
-      d.classList.remove('acik');
-    });
+    pop.classList.remove('on');
+    pop.innerHTML = '';
+    aktif = null;
   }
-  function yerlestir(dd) {
-    var btn = dd.querySelector('.paylas-dd-btn');
-    var panel = dd.querySelector('.paylas-dd-panel');
-    if (!btn || !panel) return;
+
+  function yerlestir(btn) {
     var r = btn.getBoundingClientRect();
-    panel.style.left = Math.max(4, Math.min(r.left, window.innerWidth - 200)) + 'px';
-    panel.style.width = Math.max(190, r.width) + 'px';
-    panel.style.bottom = (window.innerHeight - r.top + 6) + 'px';
-    panel.style.top = 'auto';
+    var w = Math.max(210, r.width);
+    var left = r.left + (r.width - w) / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
+    pop.style.width = w + 'px';
+    pop.style.left = left + 'px';
+
+    var yuk = r.top;
+    var asa = window.innerHeight - r.bottom;
+    var tah = Math.min(320, window.innerHeight * 0.6);
+
+    if (yuk >= asa) { pop.style.bottom = (window.innerHeight - r.top + 6) + 'px'; pop.style.top = 'auto'; }
+    else { pop.style.top = (r.bottom + 6) + 'px'; pop.style.bottom = 'auto'; }
+
+    var h = pop.getBoundingClientRect().height || 0;
+    if (h > tah) { pop.style.maxHeight = tah + 'px'; }
+  }
+
+  function ac(dd) {
+    var sel = document.getElementById(dd.getAttribute('data-select'));
+    var btn = dd.querySelector('.paylas-dd-btn');
+    if (!sel || !btn) return;
+
+    pop.innerHTML = '';
+    Array.prototype.forEach.call(sel.options, function (o) {
+      if (!o.value) return;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'pdd-item';
+      b.setAttribute('data-val', o.value);
+      var yol = IKON[o.value] || ('img/' + o.value + '.svg');
+      var i2 = document.createElement('img');
+      i2.src = yol;
+      i2.alt = '';
+      i2.onerror = function () { this.style.display = 'none'; };
+      b.appendChild(i2);
+      var sp = document.createElement('span');
+      sp.textContent = (o.textContent || '').trim();
+      b.appendChild(sp);
+      b.addEventListener('click', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        var deger = o.value;
+        kapat();
+        sel.value = deger;
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      pop.appendChild(b);
+    });
+
+    pop.classList.add('on');
+    aktif = { dd: dd, sel: sel };
+    yerlestir(btn);
   }
 
   document.addEventListener('click', function (e) {
     var hedef = e.target;
-    var dd = hedef.closest ? hedef.closest('.paylas-dd') : null;
-
-    if (!dd) { kapat(); return; }
-
-    var btn = hedef.closest('.paylas-dd-btn');
-    if (btn && dd.contains(btn)) {
-      e.stopPropagation();
-      var acikti = dd.classList.contains('acik');
-      kapat();
-      if (!acikti) { dd.classList.add('acik'); yerlestir(dd); }
+    if (pop.contains(hedef)) return;
+    var btn = hedef.closest ? hedef.closest('.paylas-dd-btn') : null;
+    if (btn) {
+      e.preventDefault();
+      var dd = btn.closest('.paylas-dd');
+      if (aktif && aktif.dd === dd) { kapat(); } else { kapat(); ac(dd); }
       return;
     }
-
-    var it = hedef.closest('.paylas-dd-item');
-    if (it && dd.contains(it)) {
-      e.stopPropagation();
-      var sel = document.getElementById(dd.getAttribute('data-select'));
-      kapat();
-      if (sel) {
-        sel.value = it.getAttribute('data-val');
-        sel.dispatchEvent(new Event('change'));
-      }
-    }
+    kapat();
   }, true);
 
   window.addEventListener('scroll', kapat, true);
   window.addEventListener('resize', kapat);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') kapat(); });
 })();
 </script>
 </body>
