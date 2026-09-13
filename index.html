@@ -233,6 +233,8 @@
             }
             body { background-color: #0b1329 !important; color: #f1f5f9 !important; }
             .zk-full, .zk-ar, .zk-oku, .zk-anlam { color: #f1f5f9; }
+            #main-title-ornate-section { background: var(--card-bg) !important; border-color: var(--gold-dark) !important; border-top-color: var(--gold-dark) !important; }
+            #main-title-ornate-section .hdr-mid div { color: var(--text-main) !important; }
             .zk-anlam { color: #7ee2a8; }
         }
 
@@ -485,6 +487,7 @@
 #zikirmatikSection .zk-kk input { width: 15px; height: 15px; margin: 0; accent-color: #0e6b3a; }
 #zikirmatikSection .zk-picker { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
         #zikirmatikSection .zk-select { flex: 1; min-width: 130px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 14px; }
+        #zikirmatikSection { overflow-x: clip; }
         #zikirmatikSection .zk-tavaf { position: relative; width: 290px; height: 290px; margin: 10px auto 8px; }
         #zikirmatikSection .zk-kaaba { position: absolute; left: 50%; top: 50%; width: 99px; height: 99px; margin: -49.5px 0 0 -49.5px; object-fit: contain; display: block; background: none; border-radius: 0; box-shadow: none; filter: drop-shadow(0 6px 12px rgba(0,0,0,.28)); pointer-events: none; }
         #zikirmatikSection .zk-dots { position: absolute; inset: 0; }
@@ -1068,16 +1071,29 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
     var ZK_KATEGORI = {};
     var ZK_KAYNAK = 'hepsi';   // 'hepsi' | 'esma' | 'zikir' | 'kuran' | 'rabbena'  (tek secim)
     var ZK_ESMA_ADLAR = [], ZK_ZIKIR_ADLAR = [], ZK_KURAN_ADLAR = [], ZK_RABBENA_ADLAR = [];
+    var ZK_DOSYA = {};          // otomatik bulunan json dosyalari: anahtar -> { adlar: [], kategori }
+    var ZK_DOSYA_SIRA = [];     // dosya adina gore alfabetik sira
+    var ZK_JSON_BILINEN = ['esmaulhusna.json','zikir.json','peygamberler.json','rabbena.json','index.json'];
+    var ZK_JSON_REPO = 'https://api.github.com/repos/mckurdi27/Wir-lesen-zusammen-/contents/json';
     var zkJsonYuklendi = false;
 
     // Kaynak -> o kaynagin sirasinda adlar (id sirasi)
+    function zkDynamicListeler(){
+        return ZK_DOSYA_SIRA.map(function(k){ return (ZK_DOSYA[k] && ZK_DOSYA[k].adlar) ? ZK_DOSYA[k].adlar : []; });
+    }
     function zkKaynakAdlar(kaynak){
         if (kaynak === 'esma') return ZK_ESMA_ADLAR.slice();
         if (kaynak === 'zikir') return ZK_ZIKIR_ADLAR.slice();
         if (kaynak === 'kuran') return ZK_KURAN_ADLAR.slice();
         if (kaynak === 'rabbena') return ZK_RABBENA_ADLAR.slice();
-        // TUMU: her dosya kendi JSON sirasinda, dosyalar sirayla
-        return ZK_ESMA_ADLAR.concat(ZK_ZIKIR_ADLAR, ZK_KURAN_ADLAR, ZK_RABBENA_ADLAR);
+        if (kaynak && kaynak.indexOf('dyn:') === 0) {
+            var d = ZK_DOSYA[kaynak.slice(4)];
+            return d ? d.adlar.slice() : [];
+        }
+        // TUMU: once bilinen dosyalar, sonra otomatik bulunanlar (dosya adi alfabetik)
+        var out = ZK_ESMA_ADLAR.concat(ZK_ZIKIR_ADLAR, ZK_KURAN_ADLAR, ZK_RABBENA_ADLAR);
+        zkDynamicListeler().forEach(function(l){ out = out.concat(l); });
+        return out;
     }
     // Aktif kaynak listesi (ozel zikirler her zaman sonda)
     function zkAktifAdlar(){ return zkKaynakAdlar(ZK_KAYNAK); }
@@ -1182,6 +1198,91 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
         if (adlar.indexOf(s.zikir) === -1) { s.zikir = adlar[0] || s.zikir; return true; }
         return false;
     }
+    // --- Otomatik json dosyalari: herhangi bir dizi alani okunur, adlar alfabetik siralanir ---
+    function zkDosyaUygula(dosya, d){
+        var dizi = null, baslik = '';
+        if (Array.isArray(d)) { dizi = d; }
+        else if (d && typeof d === 'object') {
+            baslik = d.baslik || d.kategori || d.ad || '';
+            for (var k in d) {
+                if (Object.prototype.hasOwnProperty.call(d, k) && Array.isArray(d[k]) && d[k].length) {
+                    dizi = d[k]; if (!baslik) baslik = k; break;
+                }
+            }
+        }
+        if (!dizi || !dizi.length) return false;
+        var adlar = [];
+        for (var i = 0; i < dizi.length; i++) {
+            var it = dizi[i];
+            if (!it || typeof it !== 'object') continue;
+            var ad = String(it.isim || it.baslik || it.ad || it.dua || it.zikir || '').trim();
+            if (!ad) continue;
+            ad = zkTekilAd(ad);
+            ZK_BILGI[ad] = { ar: it.arapca || '', ok: it.okunus || ad, anlam: it.anlam || '',
+                             gun: it.gun || '', kaynak: it.kaynak || '',
+                             hedef: parseInt(it.hedef, 10) || 0,
+                             kategori: it.kategori || baslik || dosya, tur: 'dyn' };
+            ZK_KATEGORI[ad] = it.kategori || baslik || dosya;
+            adlar.push(ad);
+        }
+        if (!adlar.length) return false;
+        // Kullanici istegi: bu dosyalardaki zikirler alfabetik siralanir
+        adlar.sort(function(a, b){ return a.localeCompare(b, 'tr'); });
+        ZK_DOSYA[dosya] = { adlar: adlar, kategori: baslik || dosya, dosya: dosya };
+        if (ZK_DOSYA_SIRA.indexOf(dosya) === -1) {
+            ZK_DOSYA_SIRA.push(dosya);
+            ZK_DOSYA_SIRA.sort(function(a, b){ return a.localeCompare(b, 'tr'); });
+        }
+        return true;
+    }
+    // json klasorundeki dosya listesi: once json/index.json, yoksa GitHub klasor API'si
+    function zkJsonListe(){
+        function _jsonAdlar(arr, key){
+            var a = Array.isArray(arr) ? arr : ((arr && (arr[key] || arr.dosyalar || arr.files)) || []);
+            return a.map(function(x){ return (typeof x === 'string') ? x : (x && x.name); })
+                    .filter(function(n){ return n && /\.json$/i.test(n); });
+        }
+        return fetch('json/index.json', { cache: 'no-store' })
+            .then(function(r){ if (!r.ok) throw new Error('yok'); return r.json(); })
+            .then(function(d){ return _jsonAdlar(d, 'dosyalar'); })
+            .catch(function(){
+                return fetch(ZK_JSON_REPO, { cache: 'no-store' })
+                    .then(function(r){ if (!r.ok) throw new Error('api'); return r.json(); })
+                    .then(function(arr){ return _jsonAdlar(arr, 'name'); })
+                    .catch(function(){ return []; });
+            })
+            .then(function(liste){
+                var uniq = [];
+                (liste || []).forEach(function(n){ n = String(n).replace(/^.*\//, '');
+                    if (uniq.indexOf(n) === -1) uniq.push(n); });
+                uniq.sort(function(a, b){ return a.localeCompare(b, 'tr'); });
+                return uniq.filter(function(n){ return ZK_JSON_BILINEN.indexOf(n.toLowerCase()) === -1; });
+            });
+    }
+    function zkJsonDosyalari(){
+        return zkJsonListe().then(function(liste){
+            return Promise.all((liste || []).map(function(ad){
+                return fetch('json/' + ad, { cache: 'no-store' })
+                    .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+                    .then(function(d){ zkDosyaUygula(ad, d); })
+                    .catch(function(){});
+            }));
+        });
+    }
+    // dinamik kaynaklar icin secim menusune baslik ekle
+    function zkKaynakMenuCiz(){
+        var sel = $('zkKaynak');
+        if (!sel) return;
+        var dyn = sel.querySelectorAll('option[data-dyn]');
+        for (var i = 0; i < dyn.length; i++) dyn[i].parentNode.removeChild(dyn[i]);
+        ZK_DOSYA_SIRA.forEach(function(dosya){
+            var d = ZK_DOSYA[dosya]; if (!d) return;
+            var o = document.createElement('option');
+            o.value = 'dyn:' + dosya; o.setAttribute('data-dyn', '1');
+            o.textContent = d.kategori || dosya;
+            sel.appendChild(o);
+        });
+    }
     function zkYukle(){
         return Promise.all([
             fetch(ZK_JSON_ESMA, { cache: 'no-store' })
@@ -1201,8 +1302,12 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
                 .then(function(d){ if (!zkRabbenaUygula(d)) throw new Error('bos'); })
                 .catch(function(){})
         ]).then(function(){
+            return zkJsonDosyalari();
+        }).then(function(){
+            zkKaynakMenuCiz();
             zkJsonYuklendi = (ZK_ESMA_ADLAR.length > 0 || ZK_ZIKIR_ADLAR.length > 0
-                              || ZK_KURAN_ADLAR.length > 0 || ZK_RABBENA_ADLAR.length > 0);
+                              || ZK_KURAN_ADLAR.length > 0 || ZK_RABBENA_ADLAR.length > 0
+                              || ZK_DOSYA_SIRA.length > 0);
             if (!zkJsonYuklendi) return;
             VARSAYILAN_ZIKIRLER = zkAktifAdlar();
             zkSecimDuzelt();
@@ -1220,7 +1325,8 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
     if (s.sesYerelData && typeof s.sesYerelData !== 'string') s.sesYerelData = '';
     if (!Array.isArray(s.ozel)) s.ozel = [];
     if (!s.zk || typeof s.zk !== 'object') s.zk = {};
-    if (['esma','zikir','kuran','rabbena'].indexOf(s.kaynak) !== -1) ZK_KAYNAK = s.kaynak;
+    if (['esma','zikir','kuran','rabbena'].indexOf(s.kaynak) !== -1 ||
+        (s.kaynak && String(s.kaynak).indexOf('dyn:') === 0)) ZK_KAYNAK = s.kaynak;
 
     // --- HER ZIKIR KENDI SAYACINI TUTAR ---
     // s.zk[zikir] = { sayi, tur, toplam, gun:{}, hedef, serbest }
@@ -1259,7 +1365,7 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
     function tumZikirler(){ return zkAktifAdlar().concat(s.ozel); }
     function varsayilanMi(z){ return zkAktifAdlar().indexOf(z) !== -1; }
     function zkNumara(z){
-        var gruplar = [ZK_ESMA_ADLAR, ZK_ZIKIR_ADLAR, ZK_KURAN_ADLAR, ZK_RABBENA_ADLAR, s.ozel];
+        var gruplar = [ZK_ESMA_ADLAR, ZK_ZIKIR_ADLAR, ZK_KURAN_ADLAR, ZK_RABBENA_ADLAR].concat(zkDynamicListeler(), [s.ozel]);
         for (var g = 0; g < gruplar.length; g++) {
             var ix = (gruplar[g] || []).indexOf(z);
             if (ix !== -1) return ix + 1;
@@ -1569,7 +1675,7 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
         if (sel) {
             var opt = '', sonKat = null;
             var _numara = {};
-            [ZK_ESMA_ADLAR, ZK_ZIKIR_ADLAR, ZK_KURAN_ADLAR, ZK_RABBENA_ADLAR, s.ozel].forEach(function(list){
+            [ZK_ESMA_ADLAR, ZK_ZIKIR_ADLAR, ZK_KURAN_ADLAR, ZK_RABBENA_ADLAR].concat(zkDynamicListeler(), [s.ozel]).forEach(function(list){
                 (list || []).forEach(function(nm, ix){ _numara[nm] = ix + 1; });
             });
             tumZikirler().forEach(function(z){
@@ -1671,8 +1777,11 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
         // Zikirmatik sayfanin EN SONUNDA kalir; zaten son elemansa DOKUNMA
         // (aksi halde her 1.5 sn'de tasinip acik secim kutusunu kapatir)
         if (sec.parentNode === document.body && document.body.lastElementChild === sec) return;
-        var sy = window.scrollY || window.pageYOffset || 0;   // tasima sirasinda kaydirma konumunu koru
+        var _se = document.scrollingElement || document.documentElement;
+        var sy = _se ? _se.scrollTop : (window.scrollY || window.pageYOffset || 0);
         document.body.appendChild(sec);
+        // Panel tasinirken sayfa kaymasin: hem pencere hem de scrollingElement konumu geri alinir
+        if (_se && _se.scrollTop !== sy) _se.scrollTop = sy;
         if ((window.scrollY || window.pageYOffset || 0) !== sy) window.scrollTo(0, sy);
     }
 
@@ -5415,24 +5524,24 @@ window.infoSortTable = function infoSortTable(col) {
                         <button id="send-site-msg-btn" style="flex: 1.4; min-width: 0; padding: 10px 12px; background: #2980b9; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">&#128228; Siteye G&#246;nder</button>
                         <select id="send-admin-msg-sel" title="Mesajı paylaş" style="flex: 1; min-width: 0; padding: 10px 8px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">
                             <option value="">&#128172; Mesajı Paylaş</option>
-                            <option value="whatsapp"><img src="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmZmIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTcuNDcyIDE0LjM4MmMtLjI5Ny0uMTQ5LTEuNzU4LS44NjctMi4wMy0uOTY3LS4yNzMtLjA5OS0uNDcxLS4xNDgtLjY3LjE1LS4xOTcuMjk3LS43NjcuOTY2LS45NCAxLjE2NC0uMTczLjE5OS0uMzQ3LjIyMy0uNjQ0LjA3NS0uMjk3LS4xNS0xLjI1NS0uNDYzLTIuMzktMS40NzUtLjg4My0uNzg4LTEuNDgtMS43NjEtMS42NTMtMi4wNTktLjE3My0uMjk3LS4wMTgtLjQ1OC4xMy0uNjA2LjEzNC0uMTMzLjI5OC0uMzQ3LjQ0Ni0uNTIuMTQ5LS4xNzQuMTk4LS4yOTguMjk4LS40OTcuMDk5LS4xOTguMDUtLjM3MS0uMDI1LS41Mi0uMDc1LS4xNDktLjY2OS0xLjYxMi0uOTE2LTIuMjA3LS4yNDItLjU3OS0uNDg3LS41LS42NjktLjUxLS4xNzMtLjAwOC0uMzcxLS4wMS0uNTctLjAxLS4xOTggMC0uNTIuMDc0LS43OTIuMzcyLS4yNzIuMjk3LTEuMDQgMS4wMTYtMS4wNCAyLjQ3OSAwIDEuNDYyIDEuMDY1IDIuODc1IDEuMjEzIDMuMDc0LjE0OS4xOTggMi4wOTYgMy4yIDUuMDc3IDQuNDg3LjcwOS4zMDYgMS4yNjIuNDg5IDEuNjk0LjYyNS43MTIuMjI3IDEuMzYuMTk1IDEuODcxLjExOC41NzEtLjA4NSAxLjc1OC0uNzE5IDIuMDA2LTEuNDEzLjI0OC0uNjk0LjI0OC0xLjI4OS4xNzMtMS40MTMtLjA3NC0uMTI0LS4yNzItLjE5OC0uNTctLjM0N20tNS40MjEgNy40MDNoLS4wMDRhOS44NyA5Ljg3IDAgMDEtNS4wMzEtMS4zNzhsLS4zNjEtLjIxNC0zLjc0MS45ODIuOTk4LTMuNjQ4LS4yMzUtLjM3NGE5Ljg2IDkuODYgMCAwMS0xLjUxLTUuMjZjLjAwMS01LjQ1IDQuNDM2LTkuODg0IDkuODg4LTkuODg0IDIuNjQgMCA1LjEyMiAxLjAzIDYuOTg4IDIuODk4YTkuODI1IDkuODI1IDAgMDEyLjg5MyA2Ljk5NGMtLjAwMyA1LjQ1LTQuNDM3IDkuODg0LTkuODg1IDkuODg0bTguNDEzLTE4LjI5N0ExMS44MTUgMTEuODE1IDAgMDAxMi4wNSAwQzUuNDk1IDAgLjE2IDUuMzM1LjE1NyAxMS44OTJjMCAyLjA5Ni41NDcgNC4xNDIgMS41ODggNS45NDVMLjA1NyAyNGw2LjMwNS0xLjY1NGExMS44ODIgMTEuODgyIDAgMDA1LjY4MyAxLjQ0OGguMDA1YzYuNTU0IDAgMTEuODktNS4zMzUgMTEuODkzLTExLjg5M2ExMS44MjEgMTEuODIxIDAgMDAtMy40OC04LjQxM1oiLz48L3N2Zz4=" alt="" style="width:15px;height:15px;vertical-align:-2px;margin-right:6px;display:inline-block;">WhatsApp</option>
-                            <option value="telegram"><img src="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmZmIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTEuOTQ0IDBBMTIgMTIgMCAwIDAgMCAxMmExMiAxMiAwIDAgMCAxMiAxMiAxMiAxMiAwIDAgMCAxMi0xMkExMiAxMiAwIDAgMCAxMiAwYTEyIDEyIDAgMCAwLS4wNTYgMHptNC45NjIgNy4yMjRjLjEtLjAwMi4zMjEuMDIzLjQ2NS4xNGEuNTA2LjUwNiAwIDAgMSAuMTcxLjMyNWMuMDE2LjA5My4wMzYuMzA2LjAyLjQ3Mi0uMTggMS44OTgtLjk2MiA2LjUwMi0xLjM2IDguNjI3LS4xNjguOS0uNDk5IDEuMjAxLS44MiAxLjIzLS42OTYuMDY1LTEuMjI1LS40Ni0xLjktLjkwMi0xLjA1Ni0uNjkzLTEuNjUzLTEuMTI0LTIuNjc4LTEuOC0xLjE4NS0uNzgtLjQxNy0xLjIxLjI1OC0xLjkxLjE3Ny0uMTg0IDMuMjQ3LTIuOTc3IDMuMzA3LTMuMjMuMDA3LS4wMzIuMDE0LS4xNS0uMDU2LS4yMTJzLS4xNzQtLjA0MS0uMjQ5LS4wMjRjLS4xMDYuMDI0LTEuNzkzIDEuMTQtNS4wNjEgMy4zNDUtLjQ4LjMzLS45MTMuNDktMS4zMDIuNDgtLjQyOC0uMDA4LTEuMjUyLS4yNDEtMS44NjUtLjQ0LS43NTItLjI0NS0xLjM0OS0uMzc0LTEuMjk3LS43ODkuMDI3LS4yMTYuMzI1LS40MzcuODkzLS42NjMgMy40OTgtMS41MjQgNS44My0yLjUyOSA2Ljk5OC0zLjAxNCAzLjMzMi0xLjM4NiA0LjAyNS0xLjYyNyA0LjQ3Ni0xLjYzNXoiLz48L3N2Zz4=" alt="" style="width:15px;height:15px;vertical-align:-2px;margin-right:6px;display:inline-block;">Telegram</option>
-                            <option value="twitter"><img src="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmZmIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTQuMjM0IDEwLjE2MiAyMi45NzcgMGgtMi4wNzJsLTcuNTkxIDguODI0TDcuMjUxIDBILjI1OGw5LjE2OCAxMy4zNDNMLjI1OCAyNEgyLjMzbDguMDE2LTkuMzE4TDE2Ljc0OSAyNGg2Ljk5M3ptLTIuODM3IDMuMjk5LS45MjktMS4zMjlMMy4wNzYgMS41NmgzLjE4Mmw1Ljk2NSA4LjUzMi45MjkgMS4zMjkgNy43NTQgMTEuMDloLTMuMTgyeiIvPjwvc3ZnPg==" alt="" style="width:15px;height:15px;vertical-align:-2px;margin-right:6px;display:inline-block;">X (Twitter)</option>
-                            <option value="facebook"><img src="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmZmIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNOS4xMDEgMjMuNjkxdi03Ljk4SDYuNjI3di0zLjY2N2gyLjQ3NHYtMS41OGMwLTQuMDg1IDEuODQ4LTUuOTc4IDUuODU4LTUuOTc4LjQwMSAwIC45NTUuMDQyIDEuNDY4LjEwM2E4LjY4IDguNjggMCAwIDEgMS4xNDEuMTk1djMuMzI1YTguNjIzIDguNjIzIDAgMCAwLS42NTMtLjAzNiAyNi44MDUgMjYuODA1IDAgMCAwLS43MzMtLjAwOWMtLjcwNyAwLTEuMjU5LjA5Ni0xLjY3NS4zMDlhMS42ODYgMS42ODYgMCAwIDAtLjY3OS42MjJjLS4yNTguNDItLjM3NC45OTUtLjM3NCAxLjc1MnYxLjI5N2gzLjkxOWwtLjM4NiAyLjEwMy0uMjg3IDEuNTY0aC0zLjI0NnY4LjI0NUMxOS4zOTYgMjMuMjM4IDI0IDE4LjE3OSAyNCAxMi4wNDRjMC02LjYyNy01LjM3My0xMi0xMi0xMnMtMTIgNS4zNzMtMTIgMTJjMCA1LjYyOCAzLjg3NCAxMC4zNSA5LjEwMSAxMS42NDdaIi8+PC9zdmc+" alt="" style="width:15px;height:15px;vertical-align:-2px;margin-right:6px;display:inline-block;">Facebook</option>
-                            <option value="instagram"><img src="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmZmIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNy4wMzAxLjA4NGMtMS4yNzY4LjA2MDItMi4xNDg3LjI2NC0yLjkxMS41NjM0LS43ODg4LjMwNzUtMS40NTc1LjcyLTIuMTIyOCAxLjM4NzctLjY2NTIuNjY3Ny0xLjA3NSAxLjMzNjgtMS4zODAyIDIuMTI3LS4yOTU0Ljc2MzgtLjQ5NTYgMS42MzY1LS41NTIgMi45MTQtLjA1NjQgMS4yNzc1LS4wNjg5IDEuNjg4Mi0uMDYyNiA0Ljk0Ny4wMDYyIDMuMjU4Ni4wMjA2IDMuNjY3MS4wODI1IDQuOTQ3My4wNjEgMS4yNzY1LjI2NCAyLjE0ODIuNTYzNSAyLjkxMDcuMzA4Ljc4ODkuNzIgMS40NTczIDEuMzg4IDIuMTIyOC42Njc5LjY2NTUgMS4zMzY1IDEuMDc0MyAyLjEyODUgMS4zOC43NjMyLjI5NSAxLjYzNjEuNDk2MSAyLjkxMzQuNTUyIDEuMjc3My4wNTYgMS42ODg0LjA2OSA0Ljk0NjIuMDYyNyAzLjI1NzgtLjAwNjIgMy42NjgtLjAyMDcgNC45NDc4LS4wODE0IDEuMjgtLjA2MDcgMi4xNDctLjI2NTIgMi45MDk4LS41NjMzLjc4ODktLjMwODYgMS40NTc4LS43MiAyLjEyMjgtMS4zODgxLjY2NS0uNjY4MiAxLjA3NDUtMS4zMzc4IDEuMzc5NS0yLjEyODQuMjk1Ny0uNzYzMi40OTY2LTEuNjM2LjU1Mi0yLjkxMjQuMDU2LTEuMjgwOS4wNjkyLTEuNjg5OC4wNjMtNC45NDgtLjAwNjMtMy4yNTgzLS4wMjEtMy42NjY4LS4wODE3LTQuOTQ2NS0uMDYwNy0xLjI3OTctLjI2NC0yLjE0ODctLjU2MzMtMi45MTE3LS4zMDg0LS43ODg5LS43Mi0xLjQ1NjgtMS4zODc2LTIuMTIyOEMyMS4yOTgyIDEuMzMgMjAuNjI4LjkyMDggMTkuODM3OC42MTY1IDE5LjA3NC4zMjEgMTguMjAxNy4xMTk3IDE2LjkyNDQuMDY0NSAxNS42NDcxLjAwOTMgMTUuMjM2LS4wMDUgMTEuOTc3LjAwMTQgOC43MTguMDA3NiA4LjMxLjAyMTUgNy4wMzAxLjA4MzltLjE0MDIgMjEuNjkzMmMtMS4xNy0uMDUwOS0xLjgwNTMtLjI0NTMtMi4yMjg3LS40MDgtLjU2MDYtLjIxNi0uOTYtLjQ3NzEtMS4zODE5LS44OTUtLjQyMi0uNDE3OC0uNjgxMS0uODE4Ni0uOS0xLjM3OC0uMTY0NC0uNDIzNC0uMzYyNC0xLjA1OC0uNDE3MS0yLjIyOC0uMDU5NS0xLjI2NDUtLjA3Mi0xLjY0NDItLjA3OS00Ljg0OC0uMDA3LTMuMjAzNy4wMDUzLTMuNTgzLjA2MDctNC44NDguMDUtMS4xNjkuMjQ1Ni0xLjgwNS40MDgtMi4yMjgyLjIxNi0uNTYxMy40NzYyLS45Ni44OTUtMS4zODE2LjQxODgtLjQyMTcuODE4NC0uNjgxNCAxLjM3ODMtLjkwMDMuNDIzLS4xNjUxIDEuMDU3NS0uMzYxNCAyLjIyNy0uNDE3MSAxLjI2NTUtLjA2IDEuNjQ0Ny0uMDcyIDQuODQ4LS4wNzkgMy4yMDMzLS4wMDcgMy41ODM1LjAwNSA0Ljg0OTUuMDYwOCAxLjE2OS4wNTA4IDEuODA1My4yNDQ1IDIuMjI4LjQwOC41NjA4LjIxNi45Ni40NzU0IDEuMzgxNi44OTUuNDIxNy40MTk0LjY4MTYuODE3Ni45MDA1IDEuMzc4Ny4xNjUzLjQyMTcuMzYxNyAxLjA1Ni40MTY5IDIuMjI2My4wNjAyIDEuMjY1NS4wNzM5IDEuNjQ1LjA3OTYgNC44NDguMDA1OCAzLjIwMy0uMDA1NSAzLjU4MzQtLjA2MSA0Ljg0OC0uMDUxIDEuMTctLjI0NSAxLjgwNTUtLjQwOCAyLjIyOTQtLjIxNi41NjA0LS40NzYzLjk2LS44OTU0IDEuMzgxNC0uNDE5LjQyMTUtLjgxODEuNjgxMS0xLjM3ODMuOS0uNDIyNC4xNjQ5LTEuMDU3Ny4zNjE3LTIuMjI2Mi40MTc0LTEuMjY1Ni4wNTk1LTEuNjQ0OC4wNzItNC44NDkzLjA3OS0zLjIwNDUuMDA3LTMuNTgyNS0uMDA2LTQuODQ4LS4wNjA4TTE2Ljk1MyA1LjU4NjRBMS40NCAxLjQ0IDAgMSAwIDE4LjM5IDQuMTQ0YTEuNDQgMS40NCAwIDAgMC0xLjQzNyAxLjQ0MjRNNS44Mzg1IDEyLjAxMmMuMDA2NyAzLjQwMzIgMi43NzA2IDYuMTU1NyA2LjE3MyA2LjE0OTMgMy40MDI2LS4wMDY1IDYuMTU3LTIuNzcwMSA2LjE1MDYtNi4xNzMzLS4wMDY1LTMuNDAzMi0yLjc3MS02LjE1NjUtNi4xNzQtNi4xNDk4LTMuNDAzLjAwNjctNi4xNTYgMi43NzEtNi4xNDk2IDYuMTczOE04IDEyLjAwNzdhNCA0IDAgMSAxIDQuMDA4IDMuOTkyMUEzLjk5OTYgMy45OTk2IDAgMCAxIDggMTIuMDA3NyIvPjwvc3ZnPg==" alt="" style="width:15px;height:15px;vertical-align:-2px;margin-right:6px;display:inline-block;">Instagram</option>
+                            <option value="whatsapp"><svg viewBox="0 0 24 24" width="15" height="15" fill="#fff" aria-hidden="true" style="vertical-align:-2px;margin-right:6px;display:inline-block;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>WhatsApp</option>
+                            <option value="telegram"><svg viewBox="0 0 24 24" width="15" height="15" fill="#fff" aria-hidden="true" style="vertical-align:-2px;margin-right:6px;display:inline-block;"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>Telegram</option>
+                            <option value="twitter"><svg viewBox="0 0 24 24" width="15" height="15" fill="#fff" aria-hidden="true" style="vertical-align:-2px;margin-right:6px;display:inline-block;"><path d="M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z"/></svg>X (Twitter)</option>
+                            <option value="facebook"><svg viewBox="0 0 24 24" width="15" height="15" fill="#fff" aria-hidden="true" style="vertical-align:-2px;margin-right:6px;display:inline-block;"><path d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"/></svg>Facebook</option>
+                            <option value="instagram"><svg viewBox="0 0 24 24" width="15" height="15" fill="#fff" aria-hidden="true" style="vertical-align:-2px;margin-right:6px;display:inline-block;"><path d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></svg>Instagram</option>
                             <option value="email">&#9993;&#65039; E-posta</option>
                             <option value="sms">&#128241; SMS</option>
                             <option value="copy">&#128279; Metni Kopyala</option>
                         </select>
                         <select id="app-share-sel" title="Uygulamayı paylaş" style="flex: 1; min-width: 0; padding: 10px 8px; background: #128C7E; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">
                             <option value="">&#128241; Uygulamayı Paylaş</option>
-                            <option value="whatsapp"><img src="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmZmIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTcuNDcyIDE0LjM4MmMtLjI5Ny0uMTQ5LTEuNzU4LS44NjctMi4wMy0uOTY3LS4yNzMtLjA5OS0uNDcxLS4xNDgtLjY3LjE1LS4xOTcuMjk3LS43NjcuOTY2LS45NCAxLjE2NC0uMTczLjE5OS0uMzQ3LjIyMy0uNjQ0LjA3NS0uMjk3LS4xNS0xLjI1NS0uNDYzLTIuMzktMS40NzUtLjg4My0uNzg4LTEuNDgtMS43NjEtMS42NTMtMi4wNTktLjE3My0uMjk3LS4wMTgtLjQ1OC4xMy0uNjA2LjEzNC0uMTMzLjI5OC0uMzQ3LjQ0Ni0uNTIuMTQ5LS4xNzQuMTk4LS4yOTguMjk4LS40OTcuMDk5LS4xOTguMDUtLjM3MS0uMDI1LS41Mi0uMDc1LS4xNDktLjY2OS0xLjYxMi0uOTE2LTIuMjA3LS4yNDItLjU3OS0uNDg3LS41LS42NjktLjUxLS4xNzMtLjAwOC0uMzcxLS4wMS0uNTctLjAxLS4xOTggMC0uNTIuMDc0LS43OTIuMzcyLS4yNzIuMjk3LTEuMDQgMS4wMTYtMS4wNCAyLjQ3OSAwIDEuNDYyIDEuMDY1IDIuODc1IDEuMjEzIDMuMDc0LjE0OS4xOTggMi4wOTYgMy4yIDUuMDc3IDQuNDg3LjcwOS4zMDYgMS4yNjIuNDg5IDEuNjk0LjYyNS43MTIuMjI3IDEuMzYuMTk1IDEuODcxLjExOC41NzEtLjA4NSAxLjc1OC0uNzE5IDIuMDA2LTEuNDEzLjI0OC0uNjk0LjI0OC0xLjI4OS4xNzMtMS40MTMtLjA3NC0uMTI0LS4yNzItLjE5OC0uNTctLjM0N20tNS40MjEgNy40MDNoLS4wMDRhOS44NyA5Ljg3IDAgMDEtNS4wMzEtMS4zNzhsLS4zNjEtLjIxNC0zLjc0MS45ODIuOTk4LTMuNjQ4LS4yMzUtLjM3NGE5Ljg2IDkuODYgMCAwMS0xLjUxLTUuMjZjLjAwMS01LjQ1IDQuNDM2LTkuODg0IDkuODg4LTkuODg0IDIuNjQgMCA1LjEyMiAxLjAzIDYuOTg4IDIuODk4YTkuODI1IDkuODI1IDAgMDEyLjg5MyA2Ljk5NGMtLjAwMyA1LjQ1LTQuNDM3IDkuODg0LTkuODg1IDkuODg0bTguNDEzLTE4LjI5N0ExMS44MTUgMTEuODE1IDAgMDAxMi4wNSAwQzUuNDk1IDAgLjE2IDUuMzM1LjE1NyAxMS44OTJjMCAyLjA5Ni41NDcgNC4xNDIgMS41ODggNS45NDVMLjA1NyAyNGw2LjMwNS0xLjY1NGExMS44ODIgMTEuODgyIDAgMDA1LjY4MyAxLjQ0OGguMDA1YzYuNTU0IDAgMTEuODktNS4zMzUgMTEuODkzLTExLjg5M2ExMS44MjEgMTEuODIxIDAgMDAtMy40OC04LjQxM1oiLz48L3N2Zz4=" alt="" style="width:15px;height:15px;vertical-align:-2px;margin-right:6px;display:inline-block;">WhatsApp</option>
-                            <option value="telegram"><img src="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmZmIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTEuOTQ0IDBBMTIgMTIgMCAwIDAgMCAxMmExMiAxMiAwIDAgMCAxMiAxMiAxMiAxMiAwIDAgMCAxMi0xMkExMiAxMiAwIDAgMCAxMiAwYTEyIDEyIDAgMCAwLS4wNTYgMHptNC45NjIgNy4yMjRjLjEtLjAwMi4zMjEuMDIzLjQ2NS4xNGEuNTA2LjUwNiAwIDAgMSAuMTcxLjMyNWMuMDE2LjA5My4wMzYuMzA2LjAyLjQ3Mi0uMTggMS44OTgtLjk2MiA2LjUwMi0xLjM2IDguNjI3LS4xNjguOS0uNDk5IDEuMjAxLS44MiAxLjIzLS42OTYuMDY1LTEuMjI1LS40Ni0xLjktLjkwMi0xLjA1Ni0uNjkzLTEuNjUzLTEuMTI0LTIuNjc4LTEuOC0xLjE4NS0uNzgtLjQxNy0xLjIxLjI1OC0xLjkxLjE3Ny0uMTg0IDMuMjQ3LTIuOTc3IDMuMzA3LTMuMjMuMDA3LS4wMzIuMDE0LS4xNS0uMDU2LS4yMTJzLS4xNzQtLjA0MS0uMjQ5LS4wMjRjLS4xMDYuMDI0LTEuNzkzIDEuMTQtNS4wNjEgMy4zNDUtLjQ4LjMzLS45MTMuNDktMS4zMDIuNDgtLjQyOC0uMDA4LTEuMjUyLS4yNDEtMS44NjUtLjQ0LS43NTItLjI0NS0xLjM0OS0uMzc0LTEuMjk3LS43ODkuMDI3LS4yMTYuMzI1LS40MzcuODkzLS42NjMgMy40OTgtMS41MjQgNS44My0yLjUyOSA2Ljk5OC0zLjAxNCAzLjMzMi0xLjM4NiA0LjAyNS0xLjYyNyA0LjQ3Ni0xLjYzNXoiLz48L3N2Zz4=" alt="" style="width:15px;height:15px;vertical-align:-2px;margin-right:6px;display:inline-block;">Telegram</option>
-                            <option value="twitter"><img src="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmZmIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTQuMjM0IDEwLjE2MiAyMi45NzcgMGgtMi4wNzJsLTcuNTkxIDguODI0TDcuMjUxIDBILjI1OGw5LjE2OCAxMy4zNDNMLjI1OCAyNEgyLjMzbDguMDE2LTkuMzE4TDE2Ljc0OSAyNGg2Ljk5M3ptLTIuODM3IDMuMjk5LS45MjktMS4zMjlMMy4wNzYgMS41NmgzLjE4Mmw1Ljk2NSA4LjUzMi45MjkgMS4zMjkgNy43NTQgMTEuMDloLTMuMTgyeiIvPjwvc3ZnPg==" alt="" style="width:15px;height:15px;vertical-align:-2px;margin-right:6px;display:inline-block;">X (Twitter)</option>
-                            <option value="facebook"><img src="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmZmIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNOS4xMDEgMjMuNjkxdi03Ljk4SDYuNjI3di0zLjY2N2gyLjQ3NHYtMS41OGMwLTQuMDg1IDEuODQ4LTUuOTc4IDUuODU4LTUuOTc4LjQwMSAwIC45NTUuMDQyIDEuNDY4LjEwM2E4LjY4IDguNjggMCAwIDEgMS4xNDEuMTk1djMuMzI1YTguNjIzIDguNjIzIDAgMCAwLS42NTMtLjAzNiAyNi44MDUgMjYuODA1IDAgMCAwLS43MzMtLjAwOWMtLjcwNyAwLTEuMjU5LjA5Ni0xLjY3NS4zMDlhMS42ODYgMS42ODYgMCAwIDAtLjY3OS42MjJjLS4yNTguNDItLjM3NC45OTUtLjM3NCAxLjc1MnYxLjI5N2gzLjkxOWwtLjM4NiAyLjEwMy0uMjg3IDEuNTY0aC0zLjI0NnY4LjI0NUMxOS4zOTYgMjMuMjM4IDI0IDE4LjE3OSAyNCAxMi4wNDRjMC02LjYyNy01LjM3My0xMi0xMi0xMnMtMTIgNS4zNzMtMTIgMTJjMCA1LjYyOCAzLjg3NCAxMC4zNSA5LjEwMSAxMS42NDdaIi8+PC9zdmc+" alt="" style="width:15px;height:15px;vertical-align:-2px;margin-right:6px;display:inline-block;">Facebook</option>
-                            <option value="instagram"><img src="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmZmIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNy4wMzAxLjA4NGMtMS4yNzY4LjA2MDItMi4xNDg3LjI2NC0yLjkxMS41NjM0LS43ODg4LjMwNzUtMS40NTc1LjcyLTIuMTIyOCAxLjM4NzctLjY2NTIuNjY3Ny0xLjA3NSAxLjMzNjgtMS4zODAyIDIuMTI3LS4yOTU0Ljc2MzgtLjQ5NTYgMS42MzY1LS41NTIgMi45MTQtLjA1NjQgMS4yNzc1LS4wNjg5IDEuNjg4Mi0uMDYyNiA0Ljk0Ny4wMDYyIDMuMjU4Ni4wMjA2IDMuNjY3MS4wODI1IDQuOTQ3My4wNjEgMS4yNzY1LjI2NCAyLjE0ODIuNTYzNSAyLjkxMDcuMzA4Ljc4ODkuNzIgMS40NTczIDEuMzg4IDIuMTIyOC42Njc5LjY2NTUgMS4zMzY1IDEuMDc0MyAyLjEyODUgMS4zOC43NjMyLjI5NSAxLjYzNjEuNDk2MSAyLjkxMzQuNTUyIDEuMjc3My4wNTYgMS42ODg0LjA2OSA0Ljk0NjIuMDYyNyAzLjI1NzgtLjAwNjIgMy42NjgtLjAyMDcgNC45NDc4LS4wODE0IDEuMjgtLjA2MDcgMi4xNDctLjI2NTIgMi45MDk4LS41NjMzLjc4ODktLjMwODYgMS40NTc4LS43MiAyLjEyMjgtMS4zODgxLjY2NS0uNjY4MiAxLjA3NDUtMS4zMzc4IDEuMzc5NS0yLjEyODQuMjk1Ny0uNzYzMi40OTY2LTEuNjM2LjU1Mi0yLjkxMjQuMDU2LTEuMjgwOS4wNjkyLTEuNjg5OC4wNjMtNC45NDgtLjAwNjMtMy4yNTgzLS4wMjEtMy42NjY4LS4wODE3LTQuOTQ2NS0uMDYwNy0xLjI3OTctLjI2NC0yLjE0ODctLjU2MzMtMi45MTE3LS4zMDg0LS43ODg5LS43Mi0xLjQ1NjgtMS4zODc2LTIuMTIyOEMyMS4yOTgyIDEuMzMgMjAuNjI4LjkyMDggMTkuODM3OC42MTY1IDE5LjA3NC4zMjEgMTguMjAxNy4xMTk3IDE2LjkyNDQuMDY0NSAxNS42NDcxLjAwOTMgMTUuMjM2LS4wMDUgMTEuOTc3LjAwMTQgOC43MTguMDA3NiA4LjMxLjAyMTUgNy4wMzAxLjA4MzltLjE0MDIgMjEuNjkzMmMtMS4xNy0uMDUwOS0xLjgwNTMtLjI0NTMtMi4yMjg3LS40MDgtLjU2MDYtLjIxNi0uOTYtLjQ3NzEtMS4zODE5LS44OTUtLjQyMi0uNDE3OC0uNjgxMS0uODE4Ni0uOS0xLjM3OC0uMTY0NC0uNDIzNC0uMzYyNC0xLjA1OC0uNDE3MS0yLjIyOC0uMDU5NS0xLjI2NDUtLjA3Mi0xLjY0NDItLjA3OS00Ljg0OC0uMDA3LTMuMjAzNy4wMDUzLTMuNTgzLjA2MDctNC44NDguMDUtMS4xNjkuMjQ1Ni0xLjgwNS40MDgtMi4yMjgyLjIxNi0uNTYxMy40NzYyLS45Ni44OTUtMS4zODE2LjQxODgtLjQyMTcuODE4NC0uNjgxNCAxLjM3ODMtLjkwMDMuNDIzLS4xNjUxIDEuMDU3NS0uMzYxNCAyLjIyNy0uNDE3MSAxLjI2NTUtLjA2IDEuNjQ0Ny0uMDcyIDQuODQ4LS4wNzkgMy4yMDMzLS4wMDcgMy41ODM1LjAwNSA0Ljg0OTUuMDYwOCAxLjE2OS4wNTA4IDEuODA1My4yNDQ1IDIuMjI4LjQwOC41NjA4LjIxNi45Ni40NzU0IDEuMzgxNi44OTUuNDIxNy40MTk0LjY4MTYuODE3Ni45MDA1IDEuMzc4Ny4xNjUzLjQyMTcuMzYxNyAxLjA1Ni40MTY5IDIuMjI2My4wNjAyIDEuMjY1NS4wNzM5IDEuNjQ1LjA3OTYgNC44NDguMDA1OCAzLjIwMy0uMDA1NSAzLjU4MzQtLjA2MSA0Ljg0OC0uMDUxIDEuMTctLjI0NSAxLjgwNTUtLjQwOCAyLjIyOTQtLjIxNi41NjA0LS40NzYzLjk2LS44OTU0IDEuMzgxNC0uNDE5LjQyMTUtLjgxODEuNjgxMS0xLjM3ODMuOS0uNDIyNC4xNjQ5LTEuMDU3Ny4zNjE3LTIuMjI2Mi40MTc0LTEuMjY1Ni4wNTk1LTEuNjQ0OC4wNzItNC44NDkzLjA3OS0zLjIwNDUuMDA3LTMuNTgyNS0uMDA2LTQuODQ4LS4wNjA4TTE2Ljk1MyA1LjU4NjRBMS40NCAxLjQ0IDAgMSAwIDE4LjM5IDQuMTQ0YTEuNDQgMS40NCAwIDAgMC0xLjQzNyAxLjQ0MjRNNS44Mzg1IDEyLjAxMmMuMDA2NyAzLjQwMzIgMi43NzA2IDYuMTU1NyA2LjE3MyA2LjE0OTMgMy40MDI2LS4wMDY1IDYuMTU3LTIuNzcwMSA2LjE1MDYtNi4xNzMzLS4wMDY1LTMuNDAzMi0yLjc3MS02LjE1NjUtNi4xNzQtNi4xNDk4LTMuNDAzLjAwNjctNi4xNTYgMi43NzEtNi4xNDk2IDYuMTczOE04IDEyLjAwNzdhNCA0IDAgMSAxIDQuMDA4IDMuOTkyMUEzLjk5OTYgMy45OTk2IDAgMCAxIDggMTIuMDA3NyIvPjwvc3ZnPg==" alt="" style="width:15px;height:15px;vertical-align:-2px;margin-right:6px;display:inline-block;">Instagram</option>
-                            <option value="reddit"><img src="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmZmIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMEM1LjM3MyAwIDAgNS4zNzMgMCAxMmMwIDMuMzE0IDEuMzQzIDYuMzE0IDMuNTE1IDguNDg1bC0yLjI4NiAyLjI4NkMuNzc1IDIzLjIyNSAxLjA5NyAyNCAxLjczOCAyNEgxMmM2LjYyNyAwIDEyLTUuMzczIDEyLTEyUzE4LjYyNyAwIDEyIDBabTQuMzg4IDMuMTk5YzEuMTA0IDAgMS45OTkuODk1IDEuOTk5IDEuOTk5IDAgMS4xMDUtLjg5NSAyLTEuOTk5IDItLjk0NiAwLTEuNzM5LS42NTctMS45NDctMS41Mzl2LjAwMmMtMS4xNDcuMTYyLTIuMDMyIDEuMTUtMi4wMzIgMi4zNDF2LjAwN2MxLjc3Ni4wNjcgMy40LjU2NyA0LjY4NiAxLjM2My40NzMtLjM2MyAxLjA2NC0uNTggMS43MDctLjU4IDEuNTQ3IDAgMi44MDIgMS4yNTQgMi44MDIgMi44MDIgMCAxLjExNy0uNjU1IDIuMDgxLTEuNjAxIDIuNTMxLS4wODggMy4yNTYtMy42MzcgNS44NzYtNy45OTcgNS44NzYtNC4zNjEgMC03LjkwNS0yLjYxNy03Ljk5OC01Ljg3LS45NTQtLjQ0Ny0xLjYxNC0xLjQxNS0xLjYxNC0yLjUzOCAwLTEuNTQ4IDEuMjU1LTIuODAyIDIuODAzLTIuODAyLjY0NSAwIDEuMjM5LjIxOCAxLjcxMi41ODUgMS4yNzUtLjc5IDIuODgxLTEuMjkxIDQuNjQtMS4zNjV2LS4wMWMwLTEuNjYzIDEuMjYzLTMuMDM0IDIuODgtMy4yMDcuMTg4LS45MTEuOTkzLTEuNTk1IDEuOTU5LTEuNTk1Wm0tOC4wODUgOC4zNzZjLS43ODQgMC0xLjQ1OS43OC0xLjUwNiAxLjc5Ny0uMDQ3IDEuMDE2LjY0IDEuNDI5IDEuNDI2IDEuNDI5Ljc4NiAwIDEuMzcxLS4zNjkgMS40MTgtMS4zODUuMDQ3LTEuMDE3LS41NTMtMS44NDEtMS4zMzgtMS44NDFabTcuNDA2IDBjLS43ODYgMC0xLjM4NS44MjQtMS4zMzggMS44NDEuMDQ3IDEuMDE3LjYzNCAxLjM4NSAxLjQxOCAxLjM4NS43ODUgMCAxLjQ3My0uNDEzIDEuNDI2LTEuNDI5LS4wNDYtMS4wMTctLjcyMS0xLjc5Ny0xLjUwNi0xLjc5N1ptLTMuNzAzIDQuMDEzYy0uOTc0IDAtMS45MDcuMDQ4LTIuNzcuMTM1LS4xNDcuMDE1LS4yNDEuMTY4LS4xODMuMzA1LjQ4MyAxLjE1NCAxLjYyMiAxLjk2NCAyLjk1MyAxLjk2NCAxLjMzIDAgMi40Ny0uODEgMi45NTMtMS45NjQuMDU3LS4xMzctLjAzNy0uMjktLjE4NC0uMzA1LS44NjMtLjA4Ny0xLjc5NS0uMTM1LTIuNzY5LS4xMzVaIi8+PC9zdmc+" alt="" style="width:15px;height:15px;vertical-align:-2px;margin-right:6px;display:inline-block;">Reddit</option>
-                            <option value="discord"><img src="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmZmIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMjAuMzE3IDQuMzY5OGExOS43OTEzIDE5Ljc5MTMgMCAwMC00Ljg4NTEtMS41MTUyLjA3NDEuMDc0MSAwIDAwLS4wNzg1LjAzNzFjLS4yMTEuMzc1My0uNDQ0Ny44NjQ4LS42MDgzIDEuMjQ5NS0xLjg0NDctLjI3NjItMy42OC0uMjc2Mi01LjQ4NjggMC0uMTYzNi0uMzkzMy0uNDA1OC0uODc0Mi0uNjE3Ny0xLjI0OTVhLjA3Ny4wNzcgMCAwMC0uMDc4NS0uMDM3IDE5LjczNjMgMTkuNzM2MyAwIDAwLTQuODg1MiAxLjUxNS4wNjk5LjA2OTkgMCAwMC0uMDMyMS4wMjc3Qy41MzM0IDkuMDQ1OC0uMzE5IDEzLjU3OTkuMDk5MiAxOC4wNTc4YS4wODI0LjA4MjQgMCAwMC4wMzEyLjA1NjFjMi4wNTI4IDEuNTA3NiA0LjA0MTMgMi40MjI4IDUuOTkyOSAzLjAyOTRhLjA3NzcuMDc3NyAwIDAwLjA4NDItLjAyNzZjLjQ2MTYtLjYzMDQuODczMS0xLjI5NTIgMS4yMjYtMS45OTQyYS4wNzYuMDc2IDAgMDAtLjA0MTYtLjEwNTdjLS42NTI4LS4yNDc2LTEuMjc0My0uNTQ5NS0xLjg3MjItLjg5MjNhLjA3Ny4wNzcgMCAwMS0uMDA3Ni0uMTI3N2MuMTI1OC0uMDk0My4yNTE3LS4xOTIzLjM3MTgtLjI5MTRhLjA3NDMuMDc0MyAwIDAxLjA3NzYtLjAxMDVjMy45Mjc4IDEuNzkzMyA4LjE4IDEuNzkzMyAxMi4wNjE0IDBhLjA3MzkuMDczOSAwIDAxLjA3ODUuMDA5NWMuMTIwMi4wOTkuMjQ2LjE5ODEuMzcyOC4yOTI0YS4wNzcuMDc3IDAgMDEtLjAwNjYuMTI3NiAxMi4yOTg2IDEyLjI5ODYgMCAwMS0xLjg3My44OTE0LjA3NjYuMDc2NiAwIDAwLS4wNDA3LjEwNjdjLjM2MDQuNjk4Ljc3MTkgMS4zNjI4IDEuMjI1IDEuOTkzMmEuMDc2LjA3NiAwIDAwLjA4NDIuMDI4NmMxLjk2MS0uNjA2NyAzLjk0OTUtMS41MjE5IDYuMDAyMy0zLjAyOTRhLjA3Ny4wNzcgMCAwMC4wMzEzLS4wNTUyYy41MDA0LTUuMTc3LS44MzgyLTkuNjczOS0zLjU0ODUtMTMuNjYwNGEuMDYxLjA2MSAwIDAwLS4wMzEyLS4wMjg2ek04LjAyIDE1LjMzMTJjLTEuMTgyNSAwLTIuMTU2OS0xLjA4NTctMi4xNTY5LTIuNDE5IDAtMS4zMzMyLjk1NTUtMi40MTg5IDIuMTU3LTIuNDE4OSAxLjIxMDggMCAyLjE3NTcgMS4wOTUyIDIuMTU2OCAyLjQxOSAwIDEuMzMzMi0uOTU1NSAyLjQxODktMi4xNTY5IDIuNDE4OXptNy45NzQ4IDBjLTEuMTgyNSAwLTIuMTU2OS0xLjA4NTctMi4xNTY5LTIuNDE5IDAtMS4zMzMyLjk1NTQtMi40MTg5IDIuMTU2OS0yLjQxODkgMS4yMTA4IDAgMi4xNzU3IDEuMDk1MiAyLjE1NjggMi40MTkgMCAxLjMzMzItLjk0NiAyLjQxODktMi4xNTY4IDIuNDE4OVoiLz48L3N2Zz4=" alt="" style="width:15px;height:15px;vertical-align:-2px;margin-right:6px;display:inline-block;">Discord</option>
+                            <option value="whatsapp"><svg viewBox="0 0 24 24" width="15" height="15" fill="#fff" aria-hidden="true" style="vertical-align:-2px;margin-right:6px;display:inline-block;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>WhatsApp</option>
+                            <option value="telegram"><svg viewBox="0 0 24 24" width="15" height="15" fill="#fff" aria-hidden="true" style="vertical-align:-2px;margin-right:6px;display:inline-block;"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>Telegram</option>
+                            <option value="twitter"><svg viewBox="0 0 24 24" width="15" height="15" fill="#fff" aria-hidden="true" style="vertical-align:-2px;margin-right:6px;display:inline-block;"><path d="M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z"/></svg>X (Twitter)</option>
+                            <option value="facebook"><svg viewBox="0 0 24 24" width="15" height="15" fill="#fff" aria-hidden="true" style="vertical-align:-2px;margin-right:6px;display:inline-block;"><path d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"/></svg>Facebook</option>
+                            <option value="instagram"><svg viewBox="0 0 24 24" width="15" height="15" fill="#fff" aria-hidden="true" style="vertical-align:-2px;margin-right:6px;display:inline-block;"><path d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></svg>Instagram</option>
+                            <option value="reddit"><svg viewBox="0 0 24 24" width="15" height="15" fill="#fff" aria-hidden="true" style="vertical-align:-2px;margin-right:6px;display:inline-block;"><path d="M12 0C5.373 0 0 5.373 0 12c0 3.314 1.343 6.314 3.515 8.485l-2.286 2.286C.775 23.225 1.097 24 1.738 24H12c6.627 0 12-5.373 12-12S18.627 0 12 0Zm4.388 3.199c1.104 0 1.999.895 1.999 1.999 0 1.105-.895 2-1.999 2-.946 0-1.739-.657-1.947-1.539v.002c-1.147.162-2.032 1.15-2.032 2.341v.007c1.776.067 3.4.567 4.686 1.363.473-.363 1.064-.58 1.707-.58 1.547 0 2.802 1.254 2.802 2.802 0 1.117-.655 2.081-1.601 2.531-.088 3.256-3.637 5.876-7.997 5.876-4.361 0-7.905-2.617-7.998-5.87-.954-.447-1.614-1.415-1.614-2.538 0-1.548 1.255-2.802 2.803-2.802.645 0 1.239.218 1.712.585 1.275-.79 2.881-1.291 4.64-1.365v-.01c0-1.663 1.263-3.034 2.88-3.207.188-.911.993-1.595 1.959-1.595Zm-8.085 8.376c-.784 0-1.459.78-1.506 1.797-.047 1.016.64 1.429 1.426 1.429.786 0 1.371-.369 1.418-1.385.047-1.017-.553-1.841-1.338-1.841Zm7.406 0c-.786 0-1.385.824-1.338 1.841.047 1.017.634 1.385 1.418 1.385.785 0 1.473-.413 1.426-1.429-.046-1.017-.721-1.797-1.506-1.797Zm-3.703 4.013c-.974 0-1.907.048-2.77.135-.147.015-.241.168-.183.305.483 1.154 1.622 1.964 2.953 1.964 1.33 0 2.47-.81 2.953-1.964.057-.137-.037-.29-.184-.305-.863-.087-1.795-.135-2.769-.135Z"/></svg>Reddit</option>
+                            <option value="discord"><svg viewBox="0 0 24 24" width="15" height="15" fill="#fff" aria-hidden="true" style="vertical-align:-2px;margin-right:6px;display:inline-block;"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>Discord</option>
                             <option value="email">&#9993;&#65039; E-posta</option>
                             <option value="sms">&#128241; SMS</option>
                             <option value="copy">&#128279; Bağlantıyı Kopyala</option>
