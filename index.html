@@ -570,61 +570,54 @@
         #zikirmatikSection .zk-input { flex: 1; min-width: 140px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 14px; box-sizing: border-box; }
         #zikirmatikSection .zk-mini { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--gold-primary); background: var(--card-bg); color: var(--text-main); font-size: 13px; cursor: pointer; min-height: 34px; margin-left: 0; white-space: nowrap; }
         #zikirmatikSection .zk-mini:active { background: var(--gold-primary); color: #fff; }
-        </style>
-<!-- ===================== </head> / <body> BASLANGICI ===================== -->
-
-<style>
-  /* ===== Panel Yardim (? butonu + popup) ===== */
-  /* Yerlesimi DEGISTIRMEZ: akisin disinda, panelin alt ortasinda durur. */
-  .phelp-wrap {
-    position: absolute; left: 0; right: 0; bottom: 2px;
-    display: flex; justify-content: center;
-    margin: 0; padding: 0; width: auto;
-    pointer-events: none; z-index: 3;
+  /* ===== KILAVUZ (tum sayfa bilgisi) ===== */
+  .klv-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: transparent; border: none; color: #8a6d3b;
+    padding: 0; margin: 0; cursor: pointer;
+    font-size: 13.5px; font-weight: 700; letter-spacing: .04em;
   }
-  .phelp-btn {
-    width: auto; height: auto; min-width: 0; min-height: 0;
-    border: none; background: none; box-shadow: none;
-    color: var(--gold-dark, #8a6d3b);
-    cursor: pointer;
-    padding: 0; margin: 0; display: inline-block;
-    line-height: 0; pointer-events: auto;
-    opacity: .9; -webkit-tap-highlight-color: transparent;
-  }
-  .phelp-btn svg { display: block; width: 56px; height: 22px; }
-  .phelp-btn:hover, .phelp-btn:active { opacity: 1; }
-  .phelp-pop {
+  .klv-btn:hover, .klv-btn:active { color: var(--gold-primary, #d4af37); }
+  .klv-pop {
     display: none; position: fixed; inset: 0; z-index: 100000;
-    background: rgba(0,0,0,.45); align-items: center; justify-content: center; padding: 16px;
+    background: rgba(0,0,0,.45); align-items: center; justify-content: center; padding: 14px;
   }
-  .phelp-pop.on { display: flex; }
-  .phelp-box {
+  .klv-pop.on { display: flex; }
+  .klv-box {
     background: var(--card-bg, #fff); color: var(--text-main, #222);
-    width: 100%; max-width: 560px; max-height: 84vh; overflow-y: auto;
+    width: 100%; max-width: 620px; max-height: 86vh; overflow-y: auto;
     border-radius: 14px; border: 2px solid var(--gold-primary, #d4af37);
     box-shadow: 0 10px 40px rgba(0,0,0,.35);
   }
-  .phelp-head {
+  .klv-head {
     display: flex; align-items: center; justify-content: space-between; gap: 10px;
-    padding: 14px 16px; border-bottom: 1px solid var(--border-color, #e5e0d5);
-    background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); position: sticky; top: 0;
+    padding: 13px 15px; border-bottom: 1px solid var(--border-color, #e5e0d5);
+    background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%);
+    position: sticky; top: 0; z-index: 2;
   }
-  .phelp-head h3 { margin: 0; font-size: 16px; color: var(--gold-dark, #8a6d3b); }
-  .phelp-x {
+  .klv-head h3 { margin: 0; font-size: 16px; color: var(--gold-dark, #8a6d3b); }
+  .klv-x {
     border: none; background: #e74c3c; color: #fff; width: 30px; height: 30px;
-    border-radius: 8px; font-weight: 900; cursor: pointer; flex: 0 0 auto;
+    border-radius: 8px; font-weight: 900; font-size: 15px; cursor: pointer; flex: 0 0 auto;
   }
-  .phelp-body { padding: 14px 16px 18px; font-size: 14px; line-height: 1.55; }
-  .phelp-body h4 { margin: 14px 0 6px; font-size: 14px; color: var(--gold-dark, #8a6d3b); }
-  .phelp-body h4:first-child { margin-top: 0; }
-  .phelp-body ul { margin: 0; padding-left: 20px; }
-  .phelp-body li { margin-bottom: 5px; }
-  .phelp-body b { color: #16a085; }
-  .phelp-tip {
+  .klv-body { padding: 14px 15px 18px; font-size: 14px; line-height: 1.55; }
+  .klv-body h2 {
+    font-size: 15px; color: #8a6d3b; margin: 18px 0 8px;
+    border-bottom: 2px solid var(--gold-primary, #d4af37); padding-bottom: 4px;
+  }
+  .klv-body h2:first-child { margin-top: 0; }
+  .klv-body h4 { margin: 12px 0 5px; font-size: 13.5px; color: #16a085; }
+  .klv-body ul { margin: 0; padding-left: 20px; }
+  .klv-body li { margin-bottom: 4px; }
+  .klv-body b { color: #8a6d3b; }
+  .klv-tip {
     background: #f6f2e6; border-left: 3px solid var(--gold-primary, #d4af37);
-    padding: 8px 10px; border-radius: 6px; margin-top: 10px; font-size: 13px;
+    padding: 8px 10px; border-radius: 6px; margin-top: 8px; font-size: 13px;
   }
-</style>
+
+        </style>
+<!-- ===================== </head> / <body> BASLANGICI ===================== -->
+
 </head>
 <body>
 <!-- ----- <body><.container> basi ----- -->
@@ -731,6 +724,12 @@
 
 <!-- ----- BOLUM C : GIRIS PANELI (login) ----- -->
         <!-- BÖLÜM 5 - GİRİŞ PANELİ -->
+        <div style="text-align:center; margin:0 0 2px; line-height:1;">
+            <button id="klv-open-btn" type="button" title="Kılavuz — tüm sayfa bilgisi"
+                style="background:none; border:none; box-shadow:none; padding:2px 0; margin:0; cursor:pointer;
+                       color:#8a6d3b; font-size:13px; font-weight:700; letter-spacing:.08em; line-height:1;
+                       white-space:nowrap; -webkit-tap-highlight-color:transparent;">KULLANIM KILAVUZU</button>
+        </div>
         <div style="display:flex; justify-content:center; margin:0 0 2px;">
             <button id="app-fs-btn" onclick="toggleAppFullscreen()" title="Tam ekran" style="display:flex; align-items:center; gap:6px; background:transparent; border:none; color:#8a6d3b; padding:0; cursor:pointer; font-size:15px; font-weight:bold; white-space:nowrap; line-height:1;">
                 <img src="fs-icon.png" alt="" style="height:18px;width:auto;display:inline-block;">
@@ -7287,204 +7286,150 @@ _sbMemberDetail = function (name, groupKey) {
 <!-- ===================== </body> / </html> SON ===================== -->
 
 <!-- ===== Panel Yardim Popup (tek ornek, tum paneller kullanir) ===== -->
-<div id="phelp-pop" class="phelp-pop" role="dialog" aria-modal="true">
-  <div class="phelp-box">
-    <div class="phelp-head">
-      <h3>&#10067; Yard&#305;m</h3>
-      <button type="button" class="phelp-x" title="Kapat">&#10005;</button>
+
+
+<!-- ===== KILAVUZ POPUP (sabit HTML, veri sabit) ===== -->
+<div id="klv-pop" class="klv-pop" role="dialog" aria-modal="true" aria-labelledby="klv-baslik">
+  <div class="klv-box">
+    <div class="klv-head">
+      <h3 id="klv-baslik">&#128214; KILAVUZ</h3>
+      <button type="button" class="klv-x" id="klv-x" aria-label="Kapat">&#10005;</button>
     </div>
-    <div class="phelp-body"></div>
+    <div class="klv-body">
+
+      <h2>&#128273; 1. Giri&#351; Paneli</h2>
+      <ul>
+        <li><b>Tek / Grup</b> &#8212; giri&#351; tipini belirler. Tek se&#231;ilirse bireysel &#252;ye, Grup se&#231;ilirse gruba &#252;ye olarak girersin.</li>
+        <li><b>Kat&#305;l</b> &#8212; ismini yaz&#305;p &#351;ifreyi girdikten sonra basars&#305;n; yeniysen kay&#305;t da olur.</li>
+        <li><b>Beni Hat&#305;rla</b> &#8212; isim, &#351;ifre ve grup bilgisini kaydeder; sayfa yenilenince tekrar giri&#351; istemez.</li>
+        <li><b>Kilit simgesi</b> &#8212; y&#246;netici modunu a&#231;ar/kapat&#305;r (&#351;ifre: 1234).</li>
+      </ul>
+      <div class="klv-tip">&#350;ifreni bilmiyorsan grup y&#246;neticisine sor &#8212; okuma kaydetti&#287;in i&#231;in &#351;ifre herkese a&#231;&#305;k de&#287;ildir.</div>
+
+      <h2>&#128100; 2. Ki&#351;i Kart&#305; (&#220;ye Takip Paneli)</h2>
+      <p>Giri&#351; yapt&#305;ktan sonra <b>senin</b> okuma durumunu g&#246;sterir: hangi eserden ka&#231; hisse ald&#305;n, ne zaman ald&#305;n, ne kadar&#305;n&#305; okudun.</p>
+      <h4>Butonlar</h4>
+      <ul>
+        <li><b>Hisse Al</b> &#8212; se&#231;ili blo&#287;u kendi hissen yapar; tarih-saat otomatik kaydedilir.</li>
+        <li><b>Okundu</b> / <b>Okunmad&#305;</b> &#8212; hissenin okunma durumunu de&#287;i&#351;tirir.</li>
+        <li><b>Vazge&#231;</b> &#8212; hissenden vazge&#231;er, hisse silinir.</li>
+        <li><b>PDF</b> &#8212; o eseri okuyucuda a&#231;ar.</li>
+        <li><b>Ad / &#350;ifre / B&#246;lge / &#350;ehir De&#287;i&#351;tir</b> &#8212; kendi bilgilerini g&#252;nceller.</li>
+      </ul>
+
+      <h2>&#128101; 3. Grup Takip Paneli</h2>
+      <p>Se&#231;ili grubun <b>t&#252;m &#252;yelerinin</b> okuma durumunu topluca g&#246;sterir &#8212; kim hangi eseri alm&#305;&#351;, ne kadar&#305;n&#305; okumu&#351;.</p>
+
+      <h2>&#128218; 4. Eserler (Kitap Listesi)</h2>
+      <p>Okunacak eserleri ve her eserdeki b&#246;l&#252;mleri g&#246;sterir. Renkler hissenin durumunu s&#246;yler: <b>bo&#351;</b> (al&#305;nabilir), <b>al&#305;nd&#305;</b> (okunmad&#305;), <b>okundu</b>.</p>
+      <h4>Butonlar</h4>
+      <ul>
+        <li><b>20 / 10 / 5 / 1</b> &#8212; eserin ka&#231; birimlik bloklara b&#246;l&#252;nece&#287;ini se&#231;er.</li>
+        <li><b>Hisse Al</b> &#8212; bo&#351; blo&#287;u giri&#351; yapm&#305;&#351; &#252;yenin hissesi yapar.</li>
+        <li><b>Okundu</b> / <b>Okunmad&#305;</b> &#8212; hissenin okunma durumunu de&#287;i&#351;tirir.</li>
+        <li><b>PDF</b> &#8212; o sayfa/bab aral&#305;&#287;&#305;n&#305; okuyucuda a&#231;ar.</li>
+        <li><b>Sil / Vazge&#231;</b> &#8212; hissesi olan &#252;ye hissesini b&#305;rak&#305;r.</li>
+      </ul>
+      <div class="klv-tip">Kur&#8217;an&#8217;da b&#246;l&#252;mler <b>sayfa</b>, Cev&#351;en gibi eserlerde <b>bab</b> olarak say&#305;l&#305;r.</div>
+
+      <h2>&#128255; 5. Zikirmatik</h2>
+      <p>Zikir &#231;ekmeni sayar &#8212; K&#226;be etraf&#305;nda tavaf eden ikonlar say&#305;y&#305; g&#246;sterir.</p>
+      <h4>Nas&#305;l kullan&#305;l&#305;r?</h4>
+      <ul>
+        <li><b>B&#246;l&#252;m</b> kutusundan zikir grubunu se&#231; (T&#252;m&#252; / Esm&#226;&#252;l H&#252;sn&#226; / Zikir ...), alt&#305;ndaki listeden zikri se&#231;.</li>
+        <li>Hedefi yaz (33 / 99 / 100 ...) &#8212; saya&#231; o hedefe g&#246;re tur sayar.</li>
+        <li>Arap&#231;a metin, okunu&#351; ve anlam&#305; ayn&#305; ekranda g&#246;r&#252;n&#252;r.</li>
+        <li><b>Tur S&#305;f&#305;rla</b> tur sayac&#305;n&#305;, <b>S&#305;f&#305;rla</b> t&#252;m&#252;n&#252; temizler.</li>
+      </ul>
+      <div class="klv-tip">Sa&#287; &#252;stteki <b>di&#351;li</b> ikonundan ses, titre&#351;im ve zikir kay&#305;tlar&#305;n&#305; y&#246;netebilirsin.</div>
+
+      <h2>&#128736;&#65039; 6. Y&#246;netici Kontrol Paneli</h2>
+      <p>Admin olarak grup, &#252;ye ve eserleri y&#246;netti&#287;in yerdir. Sadece y&#246;netici modunda g&#246;r&#252;n&#252;r.</p>
+      <ul>
+        <li><b>Grup ve &#220;ye Y&#246;netimi</b> &#8212; grup ekle/d&#252;zenle/sil; gruba veya bireysel havuza &#252;ye ekle.</li>
+        <li><b>Eser Y&#246;netimi</b> &#8212; yeni eser ekle, PDF yolunu ve b&#246;l&#252;m say&#305;s&#305;n&#305; belirle.</li>
+        <li><b>&#220;ye ve Grup Bilgi Paneli</b> &#8212; arama, s&#305;ralanabilir tablo, al&#305;nan hisseleri g&#246;r ve d&#252;zenle.</li>
+        <li><b>Toplu Atama / Silme</b> &#8212; birden &#231;ok esere adet girerek hisse ata, se&#231;ili &#252;yenin hisselerini sil.</li>
+        <li><b>Y&#246;neticiye Mesaj</b> &#8212; &#252;yelerin sana g&#246;nderdi&#287;i mesajlar.</li>
+        <li><b>&#220;st bar</b> &#8212; <b>Beni Hat&#305;rla</b> panelin a&#231;&#305;k kalmas&#305;n&#305; sa&#287;lar; <b>Mod Kapal&#305;</b> paneli gizler.</li>
+      </ul>
+
+      <h2>&#128202; 7. Detayl&#305; Analiz Paneli</h2>
+      <p>Okuma verilerini tablolar halinde &#246;zetler; a&#231;&#305;lmadan &#246;nce taze veri &#231;eker.</p>
+      <h4>Sekmeler</h4>
+      <ul>
+        <li><b>Genel &#214;zet</b> &#8212; grup bazl&#305; &#252;ye say&#305;s&#305;, al&#305;nan, okunan ve % ilerleme.</li>
+        <li><b>Grup S&#305;ralama</b> &#8212; gruplar&#305; okuma durumuna g&#246;re s&#305;ralar.</li>
+        <li><b>&#220;ye Analizi</b> &#8212; &#252;ye bazl&#305; analiz; ayn&#305; isimliler grup etiketiyle ayr&#305;l&#305;r.</li>
+        <li><b>Eser Detay</b> &#8212; eser bazl&#305; analiz; s&#252;tun ba&#351;l&#305;&#287;&#305;na t&#305;klay&#305;nca s&#305;ralan&#305;r.</li>
+        <li><b>Okuma G&#252;nl&#252;&#287;&#252;</b> &#8212; t&#252;m okuma kay&#305;tlar&#305;n&#305; tarih s&#305;ras&#305;yla g&#246;sterir.</li>
+      </ul>
+      <h4>Ara&#231;lar</h4>
+      <ul>
+        <li><b>Filtreler</b> &#8212; Grup / &#220;ye / Eser se&#231;icileri analizi daralt&#305;r.</li>
+        <li><b>Excel</b> &#8212; analizi .xlsx olarak indirir.</li>
+        <li><b>Yazd&#305;r</b> &#8212; analizi yazd&#305;r&#305;r veya PDF kaydeder.</li>
+      </ul>
+
+      <h2>&#128196; 8. PDF Okuyucu ve K&#252;t&#252;phane</h2>
+      <ul>
+        <li><b>Sayfa / Sayfa &#9654;</b> &#8212; &#246;nceki / sonraki sayfaya gider; RTL a&#231;&#305;kken y&#246;n tersine d&#246;ner.</li>
+        <li><b>Sayfa numaras&#305; kutusu</b> &#8212; sayfa girip Enter&#8217;a bas&#305;nca o sayfaya atlar.</li>
+        <li><b>RTL (&#1575;&#1604;&#1593;&#1585;&#1576;&#1610;&#1577;)</b> &#8212; Arap&#231;a i&#231;in i&#231;eri&#287;i sa&#287;dan sola &#231;evirir.</li>
+        <li><b>Yatay / S&#305;&#287;d&#305;r</b> &#8212; sayfay&#305; b&#252;y&#252;t&#252;p dikey kayd&#305;rma veya ekrana s&#305;&#287;d&#305;rma.</li>
+        <li><b>Ayra&#231;</b> &#8212; sayfa k&#246;&#351;esinden bir ayra&#231; ekler; kitap tekrar a&#231;&#305;l&#305;nca o sayfadan ba&#351;lar.</li>
+        <li><b>Derlemeye Ekle</b> &#8212; sayfay&#305; derlemeye se&#231;er (buton k&#305;rm&#305;z&#305;ya d&#246;ner).</li>
+        <li><b>K&#252;t&#252;phane</b> &#8212; Eserler b&#246;l&#252;m&#252;ndeki <b>K&#252;t&#252;phane</b> butonundan t&#252;m kitaplar&#305;n&#305;z&#305; a&#231;abilirsiniz.</li>
+      </ul>
+
+      <h2>&#9989; H&#305;zl&#305; Ba&#351;lang&#305;&#231;</h2>
+      <ul>
+        <li><b>1.</b> Grubunu se&#231;, &#351;ifreni yaz, <b>Kat&#305;l</b>&#8217;a bas.</li>
+        <li><b>2.</b> Eserler b&#246;l&#252;m&#252;nden ye&#351;il (bo&#351;) bir blo&#287;a dokun &#8594; <b>Hisse Al</b>.</li>
+        <li><b>3.</b> Okuyunca <b>Okundu</b> i&#351;aretle &#8212; grup listesinde g&#246;r&#252;n&#252;r.</li>
+      </ul>
+    </div>
   </div>
 </div>
 
 <script>
-/* ===== Panel Yardim Sistemi (? butonu -> popup) ===== */
-var PANEL_YARDIM = {
-  login: {
-    baslik: 'Giri\u015f Paneli',
-    icerik: '<h4>Bu panel ne yapar?</h4><ul>'
-      + '<li>Grubunu se\u00e7ip <b>Kat\u0131l</b> d\u00fc\u011fmesiyle sisteme giri\u015f yapars\u0131n.</li>'
-      + '<li>Giri\u015f yapt\u0131ktan sonra sadece sana ait takip paneli a\u00e7\u0131l\u0131r.</li></ul>'
-      + '<h4>Buradaki alanlar</h4><ul>'
-      + '<li><b>Tek / Grup</b> \u2014 giri\u015f tipini belirler. Tek se\u00e7ilirse bireysel \u00fcye, Grup se\u00e7ilirse gruba \u00fcye olarak girersin.</li>'
-      + '<li><b>Kat\u0131l</b> \u2014 ismini yaz\u0131p grup (ve gerekiyorsa grup) \u015fifresini girdikten sonra basars\u0131n; yeniysen kay\u0131t da olur.</li>'
-      + '<li><b>Beni Hat\u0131rla</b> \u2014 isim, \u015fifre ve grup bilgisini kaydeder; sayfa yenilenince tekrar giri\u015f istemez.</li>'
-      + '<li><b>Kilit simgesi</b> \u2014 y\u00f6netici modunu a\u00e7ar/kapat\u0131r; sadece yetkili ki\u015filer kullan\u0131r.</li></ul>'
-      + '<div class="phelp-tip">\u015eifreni bilmiyorsan grup y\u00f6neticisine sor \u2014 okuma kaydetti\u011fin i\u00e7in \u015fifre herkese a\u00e7\u0131k de\u011fildir.</div>'
-  },
-  uye: {
-    baslik: '\u00dcye Takip Paneli',
-    icerik: '<h4>Bu panel ne yapar?</h4><ul>'
-      + '<li>Giri\u015f yapt\u0131ktan sonra <b>senin</b> okuma durumunu g\u00f6sterir.</li>'
-      + '<li>Hangi eserden ka\u00e7 hisse ald\u0131n, ne zaman ald\u0131n, ne kadar\u0131n\u0131 okudun \u2014 hepsi burada.</li></ul>'
-      + '<h4>Butonlar</h4><ul>'
-      + '<li><b>Hisse Al</b> \u2014 se\u00e7ili blo\u011fu kendi hissen yapar.</li>'
-      + '<li><b>Okundu</b> / <b>Okunmad\u0131</b> \u2014 hissenin okunma durumunu de\u011fi\u015ftirir; tarih ve saat kaydedilir.</li>'
-      + '<li><b>Vazge\u00e7</b> \u2014 hissenden vazge\u00e7er, hisse silinir.</li>'
-      + '<li><b>PDF</b> \u2014 o eseri okuyucuda a\u00e7ar.</li>'
-      + '<li><b>Ad / \u015eifre / B\u00f6lge / \u015eehir De\u011fi\u015ftir</b> \u2014 kendi bilgilerini g\u00fcnceller.</li></ul>'
-      + '<div class="phelp-tip">Okudu\u011fun b\u00f6l\u00fcm\u00fc i\u015faretlemeyi unutma \u2014 grup listesinde ancak o zaman g\u00f6r\u00fcn\u00fcr.</div>'
-  },
-  grup: {
-    baslik: 'Grup Takip Paneli',
-    icerik: '<h4>Bu panel ne yapar?</h4><ul>'
-      + '<li>Se\u00e7ili grubun <b>t\u00fcm \u00fcyelerinin</b> okuma durumunu g\u00f6sterir.</li>'
-      + '<li>Kim hangi eseri alm\u0131\u015f, ne kadar\u0131n\u0131 okumu\u015f \u2014 topluca g\u00f6r\u00fcrs\u00fcn.</li></ul>'
-      + '<h4>Nas\u0131l kullan\u0131l\u0131r?</h4><ul>'
-      + '<li>\u00dcye kartlar\u0131na bakarak eksi\u011fi olan \u00fcyeyi g\u00f6r\u00fcrs\u00fcn.</li>'
-      + '<li>Y\u00f6neticiysen \u00fcyeleri <b>Y\u00f6netici Kontrol Paneli</b> b\u00f6l\u00fcm\u00fcnden d\u00fczenlersin.</li></ul>'
-  },
-  eserler: {
-    baslik: 'Eserler (Kitap Listesi)',
-    icerik: '<h4>Bu panel ne yapar?</h4><ul>'
-      + '<li>Okunacak eserleri ve her eserdeki <b>b\u00f6l\u00fcmleri</b> g\u00f6sterir.</li>'
-      + '<li>Renkler hissenin durumunu s\u00f6yler: <b>bo\u015f</b> (al\u0131nabilir), <b>al\u0131nd\u0131</b> (okunmad\u0131), <b>okundu</b>.</li></ul>'
-      + '<h4>Butonlar</h4><ul>'
-      + '<li><b>20 / 10 / 5 / 1</b> \u2014 eserin ka\u00e7 birimlik bloklara b\u00f6l\u00fcnece\u011fini se\u00e7er.</li>'
-      + '<li><b>Hisse Al</b> \u2014 bo\u015f blo\u011fu giri\u015f yapm\u0131\u015f \u00fcyenin hissesi yapar.</li>'
-      + '<li><b>Okundu</b> / <b>Okunmad\u0131</b> \u2014 hissenin okunma durumunu de\u011fi\u015ftirir; tarih ve saat kaydedilir.</li>'
-      + '<li><b>PDF</b> \u2014 o sayfa/bab aral\u0131\u011f\u0131n\u0131 okuyucuda a\u00e7ar.</li>'
-      + '<li><b>Sil / Vazge\u00e7</b> \u2014 hissesi olan \u00fcye hissesini b\u0131rak\u0131r.</li></ul>'
-      + '<div class="phelp-tip">Hisse ald\u0131\u011f\u0131n anda tarih-saat kayd\u0131 otomatik tutulur; ayr\u0131ca bir \u015fey yapman gerekmez.</div>'
-  },
-  zikirmatik: {
-    baslik: 'Zikirmatik',
-    icerik: '<h4>Bu panel ne yapar?</h4><ul>'
-      + '<li>Zikir \u00e7ekmeni sayar \u2014 K\u00e2be etraf\u0131nda tavaf eden ikonlar say\u0131y\u0131 g\u00f6sterir.</li>'
-      + '<li>Zikir se\u00e7imi, b\u00f6l\u00fcm (T\u00fcm\u00fc / Esm\u00e2\u00fcl H\u00fcsn\u00e2 / Zikir ...) ve hedef belirleyebilirsin.</li></ul>'
-      + '<h4>Nas\u0131l kullan\u0131l\u0131r?</h4><ul>'
-      + '<li>\u00dcstteki <b>B\u00f6l\u00fcm</b> kutusundan zikir grubunu se\u00e7, alt\u0131ndaki listeden zikri se\u00e7.</li>'
-      + '<li>Hedefi yaz (33 / 99 / 100 ...) \u2014 saya\u00e7 o hedefe g\u00f6re tur sayar.</li>'
-      + '<li>Arap\u00e7a metin, okunu\u015f ve anlam\u0131 ayn\u0131 ekranda g\u00f6r\u00fcn\u00fcr.</li>'
-      + '<li><b>Tur S\u0131f\u0131rla</b> tur sayac\u0131n\u0131, <b>S\u0131f\u0131rla</b> t\u00fcm\u00fcn\u00fc temizler.</li></ul>'
-      + '<div class="phelp-tip">Sa\u011f \u00fcstteki <b>di\u015fli</b> ikonundan ses, titre\u015fim ve zikir kay\u0131tlar\u0131n\u0131 y\u00f6netebilirsin.</div>'
-  },
-  admin: {
-    baslik: 'Y\u00f6netici Kontrol Paneli',
-    icerik: '<h4>Bu panel ne yapar?</h4><ul>'
-      + '<li>Admin olarak grup, \u00fcye ve eserleri y\u00f6netti\u011fin yerdir. Sadece y\u00f6netici modunda g\u00f6r\u00fcn\u00fcr.</li></ul>'
-      + '<h4>B\u00f6l\u00fcmler</h4><ul>'
-      + '<li><b>Grup ve \u00dcye Y\u00f6netimi</b> \u2014 grup ekle/d\u00fczenle/sil; gruba veya bireysel havuza \u00fcye ekle.</li>'
-      + '<li><b>Eser Y\u00f6netimi</b> \u2014 yeni eser ekle, PDF yolunu ve b\u00f6l\u00fcm say\u0131s\u0131n\u0131 belirle.</li>'
-      + '<li><b>\u00dcye ve Grup Bilgi Paneli</b> \u2014 arama, s\u0131ralanabilir tablo (S\u0131ra/Grup/\u0130sim/\u015eifre/B\u00f6lge/\u015eehir), al\u0131nan hisseleri g\u00f6r ve d\u00fczenle.</li>'
-      + '<li><b>Toplu Atama / Silme</b> \u2014 birden \u00e7ok esere adet girerek hisse ata, se\u00e7ili \u00fcyenin hisselerini sil, se\u00e7imleri s\u0131f\u0131rla.</li>'
-      + '<li><b>Y\u00f6neticiye Mesaj</b> \u2014 \u00fcyelerin sana g\u00f6nderdi\u011fi mesajlar.</li>'
-      + '<li><b>\u00dcst bar</b> \u2014 <b>Beni Hat\u0131rla</b> panelin a\u00e7\u0131k kalmas\u0131n\u0131 sa\u011flar; <b>Mod Kapal\u0131</b> paneli gizler.</li></ul>'
-      + '<div class="phelp-tip">Bir i\u015flemi yapmadan \u00f6nce ilgili sat\u0131rdaki grubu se\u00e7ti\u011finden emin ol; i\u015flem se\u00e7ili gruba uygulan\u0131r.</div>'
-  },
-  analiz: {
-    baslik: 'Detayl\u0131 Analiz Paneli',
-    icerik: '<h4>Bu panel ne yapar?</h4><ul>'
-      + '<li>Okuma verilerini tablolar halinde \u00f6zetler; a\u00e7\u0131lmadan \u00f6nce taze veri \u00e7eker.</li></ul>'
-      + '<h4>Sekmeler</h4><ul>'
-      + '<li><b>Genel \u00d6zet</b> \u2014 grup bazl\u0131 \u00fcye say\u0131s\u0131, al\u0131nan, okunan ve % ilerleme.</li>'
-      + '<li><b>Grup S\u0131ralama</b> \u2014 gruplar\u0131 okuma durumuna g\u00f6re s\u0131ralar.</li>'
-      + '<li><b>\u00dcye Analizi</b> \u2014 \u00fcye bazl\u0131 analiz; ayn\u0131 isimliler grup etiketiyle ayr\u0131l\u0131r.</li>'
-      + '<li><b>Eser Detay</b> \u2014 eser bazl\u0131 analiz; s\u00fctun ba\u015fl\u0131\u011f\u0131na t\u0131klay\u0131nca s\u0131ralan\u0131r.</li>'
-      + '<li><b>Okuma G\u00fcnl\u00fc\u011f\u00fc</b> \u2014 t\u00fcm okuma kay\u0131tlar\u0131n\u0131 tarih s\u0131ras\u0131yla g\u00f6sterir.</li></ul>'
-      + '<h4>Ara\u00e7lar</h4><ul>'
-      + '<li><b>Filtreler</b> \u2014 Grup / \u00dcye / Eser se\u00e7icileri analizi daralt\u0131r.</li>'
-      + '<li><b>Excel</b> \u2014 analizi .xlsx olarak indirir.</li>'
-      + '<li><b>Yazd\u0131r</b> \u2014 analizi yazd\u0131r\u0131r veya PDF kaydeder.</li></ul>'
-  }
-};
-
-function panelYardimAc(id) {
-  var d = PANEL_YARDIM[id];
-  if (!d) return;
-  var box = document.getElementById('phelp-pop');
-  if (!box) return;
-  box.querySelector('.phelp-head h3').textContent = '\u2753 ' + d.baslik;
-  box.querySelector('.phelp-body').innerHTML = d.icerik;
-  box.classList.add('on');
-}
-function panelYardimKapat() {
-  var box = document.getElementById('phelp-pop');
-  if (box) box.classList.remove('on');
-}
-document.addEventListener('click', function (e) {
-  var t = e.target;
-  if (t && t.classList && t.classList.contains('phelp-btn')) { panelYardimAc(t.getAttribute('data-help')); return; }
-  if (t && (t.id === 'phelp-pop' || (t.classList && t.classList.contains('phelp-x')))) panelYardimKapat();
-});
-document.addEventListener('keydown', function (e) { if (e.key === 'Escape') panelYardimKapat(); });
-</script>
-
-<script>
-/* ===== Yardim butonlarini panel sonlarina ekle =====
-   Paneller JS ile yeniden uretildigi icin hem MutationObserver hem kisa aralikli
-   kontrol kullanilir; boylece buton her render'da geri gelir. */
+/* ===== KILAVUZ: sabit buton + sabit popup (dinamik uretim yok) ===== */
 (function () {
-  var PANELLER = [
-    { id: 'simple-login-panel', k: 'login' },
-    { id: 'bireysel-takip-panel', k: 'uye' },
-    { id: 'grup-takip-panel', k: 'grup' },
-    { id: 'books-grid', k: 'eserler' },
-    { id: 'zikirmatikSection', k: 'zikirmatik' },
-    { id: 'admin-bottom-section', k: 'admin' },
-    { id: 'dtabs-1-content', k: 'analiz' },
-    { id: 'dtabs-2-content', k: 'analiz' },
-    { id: 'dtabs-3-content', k: 'analiz' },
-    { id: 'dtabs-4-content', k: 'analiz' },
-    { id: 'dtabs-5-content', k: 'analiz' },
-    { id: 'dtabs-6-content', k: 'analiz' }
-  ];
-
-  function _buton(k, pid) {
-    return '<button type="button" class="phelp-btn" data-help="' + k
-      + '" title="Bu panel ne i\u015fe yarar?">'
-      + '<svg viewBox="0 0 56 22" aria-hidden="true">'
-      + '<path id="' + pid + '" d="M 5 17.5 A 30 30 0 0 1 51 17.5" fill="none"/>'
-      + '<text font-size="7.6" font-weight="700" fill="#8a6d3b" letter-spacing="0.3">'
-      + '<textPath href="#' + pid + '" startOffset="50%" text-anchor="middle">YARDIM</textPath>'
-      + '</text></svg></button>';
+  function ac() {
+    var p = document.getElementById('klv-pop');
+    if (!p) return;
+    p.classList.add('on');
+    try { document.body.style.overflow = 'hidden'; } catch (e) {}
   }
-
-  function ekle() {
-    var degisti = false;
-    PANELLER.forEach(function (p, i) {
-      var el = document.getElementById(p.id);
-      if (!el) return;
-      var var_ = el.querySelector('.phelp-wrap');
-      if (var_) {
-        // Panel yeniden uretilmis ve buton yerinde -> dokunma
-        if (var_.firstChild) return;
-        var_.parentNode.removeChild(var_);
-      }
-      var w = document.createElement('div');
-      w.className = 'phelp-wrap';
-      w.innerHTML = _buton(p.k, 'phelpArc' + i);
-      try {
-        if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
-      } catch (e) { el.style.position = 'relative'; }
-      el.appendChild(w);
-      degisti = true;
-    });
-    return degisti;
+  function kapat() {
+    var p = document.getElementById('klv-pop');
+    if (!p) return;
+    p.classList.remove('on');
+    try { document.body.style.overflow = ''; } catch (e) {}
   }
-
-  // 1) Aninda: DOM hazirsa simdi, degilse yuklendiginde
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ekle);
-  else ekle();
-
-  // 2) Panel icerigi degistiginde (innerHTML ile yeniden render) aninda geri ekle
-  try {
-    var mo = new MutationObserver(function (kayitlar) {
-      for (var i = 0; i < kayitlar.length; i++) {
-        var t = kayitlar[i].target;
-        if (t && t.classList && t.classList.contains('phelp-wrap')) continue;
-        ekle();   // beklemeden, ayni karede
-        return;
-      }
+  function bagla() {
+    var btn = document.getElementById('klv-open-btn');
+    if (btn && !btn._klvBound) {
+      btn._klvBound = true;
+      btn.addEventListener('click', ac);
+    }
+    var x = document.getElementById('klv-x');
+    if (x && !x._klvBound) {
+      x._klvBound = true;
+      x.addEventListener('click', kapat);
+    }
+    var pop = document.getElementById('klv-pop');
+    if (pop && !pop._klvBound) {
+      pop._klvBound = true;
+      pop.addEventListener('click', function (e) { if (e.target === pop) kapat(); });
+    }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') kapat();
     });
-    mo.observe(document.documentElement, { childList: true, subtree: true });
-  } catch (e) { /* eski tarayici: asagidaki aralik devrede kalir */ }
-
-  // 3) Emniyet agi: observer kacirirsa (250 ms - goze gorunmez)
-  setInterval(ekle, 250);
-  window.panelYardimEkle = ekle;
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bagla);
+  else bagla();
 })();
 </script>
-
 </body>
 </html>
