@@ -5388,6 +5388,14 @@ window.infoSortTable = function infoSortTable(col) {
                             <option value="copy">Bağlantıyı Kopyala</option>
                         </select>
                     </div>
+
+                    <div id="mesajlarim-kutu" style="display:none; margin-top:14px; border-top:1px dashed var(--border-color); padding-top:12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px;">
+                            <h4 style="font-size:14px; margin:0; color:var(--gold-dark);">&#128172; Mesajlar&#305;m <span id="mesajlarim-sayi" style="font-size:12px; color:var(--muted); font-weight:normal;"></span></h4>
+                            <button id="mesajlarim-yenile" style="padding:5px 11px; background:var(--gold-primary); color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:12px; font-weight:bold;">&#8635; Yenile</button>
+                        </div>
+                        <div id="mesajlarim-liste" style="display:flex; flex-direction:column; gap:8px;"></div>
+                    </div>
                 `;
 
                 let adminPanelHtml = "";
@@ -5468,14 +5476,29 @@ window.infoSortTable = function infoSortTable(col) {
                         var grup = m.group_key ? ' &middot; Grup ' + m.group_key : '';
                         var iletisim = m.contact ? '<div style="font-size:12px; color:#c0392b; margin-top:4px;"><b>&#128231; ' + m.contact + '</b></div>' : '';
                         var body = String(m.body || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+                        var cevapVar = !!(m.reply && String(m.reply).trim());
+                        var cevap = cevapVar ? String(m.reply).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') : '';
+                        var cevapBlogu = cevapVar
+                            ? '<div style="margin-top:8px; border-left:3px solid #27ae60; background:rgba(39,174,96,.08); border-radius:6px; padding:8px 10px;">'
+                              + '<div style="font-size:11.5px; color:#27ae60; font-weight:bold; margin-bottom:3px;">&#9989; Y&#246;netici cevab&#305;'
+                              + (m.replied_at ? ' &middot; ' + _gelenMsgTarih(m.replied_at) : '') + '</div>'
+                              + '<div style="font-size:13px; line-height:1.45;">' + cevap + '</div></div>'
+                            : '';
+                        var cevapForm = '<div class="gmsg-cevap-alan" style="display:' + (m._cevapAcik ? 'block' : 'none') + '; margin-top:8px;">'
+                            + '<textarea class="gmsg-cevap-metin" data-id="' + m.id + '" placeholder="Cevab&#305;n&#305; yaz..." style="width:100%; height:54px; padding:8px 10px; border:1px solid var(--border-color); border-radius:6px; font-size:13px; box-sizing:border-box; resize:vertical; background:var(--card-bg); color:var(--text-main);">' + (cevapVar ? String(m.reply).replace(/</g, '&lt;').replace(/>/g, '&gt;') : '') + '</textarea>'
+                            + '<button class="gmsg-cevap-gonder" data-id="' + m.id + '" style="margin-top:6px; padding:6px 14px; background:#27ae60; color:#fff; border:none; border-radius:5px; cursor:pointer; font-size:12px; font-weight:bold;">&#128228; Cevab&#305; G&#246;nder</button>'
+                            + '</div>';
                         html += '<div data-msgid="' + m.id + '" style="border:1px solid var(--border-color); border-left:4px solid ' + (okundu ? '#27ae60' : '#e67e22') + '; border-radius:8px; padding:10px 12px; background:' + (okundu ? 'var(--card-bg)' : 'rgba(230,126,34,.06)') + ';">'
                             + '<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px;">'
                             + '<div style="font-size:12.5px; color:var(--muted);"><b style="color:var(--text-main);">' + kim + '</b>' + grup + ' &middot; ' + _gelenMsgTarih(m.created_at) + '</div>'
                             + '<div style="display:flex; gap:6px;">'
+                            + '<button class="gmsg-cevap-ac" data-id="' + m.id + '" style="padding:4px 9px; border:none; border-radius:5px; cursor:pointer; font-size:11px; font-weight:bold; background:' + (cevapVar ? '#2980b9' : '#8e44ad') + '; color:#fff;">' + (cevapVar ? '&#9998; Cevab&#305; D&#252;zenle' : '&#8617; Cevap Yaz') + '</button>'
                             + '<button class="gmsg-oku" data-id="' + m.id + '" data-v="' + (okundu ? '0' : '1') + '" style="padding:4px 9px; border:none; border-radius:5px; cursor:pointer; font-size:11px; font-weight:bold; background:' + (okundu ? '#95a5a6' : '#27ae60') + '; color:#fff;">' + (okundu ? '&#8634; Okunmad&#305;' : '&#10003; Okundu') + '</button>'
                             + '<button class="gmsg-sil" data-id="' + m.id + '" style="padding:4px 9px; border:none; border-radius:5px; cursor:pointer; font-size:11px; font-weight:bold; background:#e74c3c; color:#fff;">&#128465;</button>'
                             + '</div></div>'
                             + '<div style="font-size:13.5px; line-height:1.5; white-space:normal;">' + body + '</div>'
+                            + cevapBlogu
+                            + cevapForm
                             + '</div>';
                     });
                     kap.innerHTML = html;
@@ -5490,7 +5513,25 @@ window.infoSortTable = function infoSortTable(col) {
                         var t = ev.target;
                         if (!t) return;
                         var _api = (typeof window._sbApi === 'function') ? window._sbApi : window.api;
-                        if (t.classList && t.classList.contains('gmsg-oku')) {
+                        if (t.classList && t.classList.contains('gmsg-cevap-ac')) {
+                            var idc = t.getAttribute('data-id');
+                            for (var _i = 0; _i < _gelenMsgData.length; _i++) {
+                                if (String(_gelenMsgData[_i].id) === String(idc)) { _gelenMsgData[_i]._cevapAcik = !_gelenMsgData[_i]._cevapAcik; break; }
+                            }
+                            gelenMesajlariCiz();
+                            var _f = document.querySelector('.gmsg-cevap-metin[data-id="' + idc + '"]');
+                            if (_f && _f.parentNode && _f.parentNode.style.display !== 'none') _f.focus();
+                        } else if (t.classList && t.classList.contains('gmsg-cevap-gonder')) {
+                            var idg = t.getAttribute('data-id');
+                            var ta = document.querySelector('.gmsg-cevap-metin[data-id="' + idg + '"]');
+                            var cvp = (ta && ta.value || '').trim();
+                            if (!cvp) { showToast('Cevap yaz\u0131n!', 'error'); return; }
+                            var eskiT = t.textContent;
+                            t.disabled = true; t.textContent = 'G\u00f6nderiliyor...';
+                            _api('/messages?id=eq.' + idg, { method: 'PATCH', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify({ reply: cvp, replied_at: new Date().toISOString(), is_read: true }) })
+                                .then(function () { showToast('Cevap kaydedildi.', 'success'); gelenMesajlariYukle(); })
+                                .catch(function (e) { showToast('Kaydedilemedi: ' + (e && e.message ? e.message : e), 'error'); t.disabled = false; t.textContent = eskiT; });
+                        } else if (t.classList && t.classList.contains('gmsg-oku')) {
                             var id = t.getAttribute('data-id'), v = t.getAttribute('data-v') === '1';
                             _api('/messages?id=eq.' + id, { method: 'PATCH', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify({ is_read: v }) })
                                 .then(function () { gelenMesajlariYukle(); });
@@ -5503,6 +5544,47 @@ window.infoSortTable = function infoSortTable(col) {
                     });
                 }
                 if (bottomContainer.style.display !== 'none') setTimeout(gelenMesajlariYukle, 60);
+
+                // ===== Mesajlarim: uyenin kendi gonderdigi mesajlar + yonetici cevaplari =====
+                function mesajlarimiYukle() {
+                    var kap = document.getElementById('mesajlarim-liste');
+                    var kutu = document.getElementById('mesajlarim-kutu');
+                    if (!kap || !kutu) return;
+                    var uye = (typeof loggedInMember !== 'undefined' && loggedInMember) ? loggedInMember : '';
+                    if (!uye) { kutu.style.display = 'none'; return; }
+                    kutu.style.display = '';
+                    var _api = (typeof window._sbApi === 'function') ? window._sbApi : window.api;
+                    if (typeof _api !== 'function') return;
+                    var q = '/messages?select=*&member_name=eq.' + encodeURIComponent(uye) + '&order=created_at.desc&limit=50';
+                    _api(q).then(function (rows) {
+                        var d = Array.isArray(rows) ? rows : [];
+                        var sayEl = document.getElementById('mesajlarim-sayi');
+                        var cevapli = d.filter(function (m) { return m.reply && String(m.reply).trim(); }).length;
+                        if (sayEl) sayEl.textContent = d.length ? ('(' + d.length + (cevapli ? ' &middot; ' + cevapli + ' cevap' : '') + ')') : '';
+                        if (!d.length) { kap.innerHTML = '<div style="font-size:12.5px; color:var(--muted);">Hen&#252;z mesaj g&#246;ndermediniz.</div>'; return; }
+                        var html = '';
+                        d.forEach(function (m) {
+                            var body = String(m.body || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').split('\n').join('<br>');
+                            var cvp = (m.reply && String(m.reply).trim());
+                            var cvpHtml = cvp
+                                ? '<div style="margin-top:7px; border-left:3px solid #27ae60; background:rgba(39,174,96,.08); border-radius:6px; padding:7px 9px;">'
+                                  + '<div style="font-size:11.5px; color:#27ae60; font-weight:bold; margin-bottom:2px;">&#9989; Y&#246;netici cevab&#305;</div>'
+                                  + '<div style="font-size:13px; line-height:1.45;">' + String(m.reply).replace(/</g, '&lt;').replace(/>/g, '&gt;').split('\n').join('<br>') + '</div></div>'
+                                : '<div style="margin-top:6px; font-size:11.5px; color:var(--muted);">&#8987; Cevap bekleniyor</div>';
+                            html += '<div style="border:1px solid var(--border-color); border-radius:8px; padding:9px 11px; background:var(--card-bg);">'
+                                + '<div style="font-size:11.5px; color:var(--muted); margin-bottom:4px;">' + _gelenMsgTarih(m.created_at) + '</div>'
+                                + '<div style="font-size:13px; line-height:1.45;">' + body + '</div>'
+                                + cvpHtml
+                                + '</div>';
+                        });
+                        kap.innerHTML = html;
+                    }).catch(function (e) {
+                        kap.innerHTML = '<div style="font-size:12.5px; color:#c0392b;">Y&#252;klenemedi: ' + (e && e.message ? e.message : e) + '</div>';
+                    });
+                }
+                var _myBtn = document.getElementById('mesajlarim-yenile');
+                if (_myBtn && !_myBtn._sb) { _myBtn._sb = true; _myBtn.addEventListener('click', mesajlarimiYukle); }
+                setTimeout(mesajlarimiYukle, 120);
 
                 // Yöneticiye mesaj bölümü: admin panelden ayrı, sayfanın en altında
                 let msgContainer = document.getElementById("admin-message-section");
@@ -6631,6 +6713,7 @@ var _cg = selVal || '';
                                 if (r && !Array.isArray(r) && (r.message || r.code)) throw new Error(r.message || r.code);
                                 showToast('Mesajınız yöneticiye iletildi.', 'success');
                                 if (ta) ta.value = '';
+                                if (typeof mesajlarimiYukle === 'function') setTimeout(mesajlarimiYukle, 150);
                             })
                             .catch(function (e) {
                                 showToast('Gönderilemedi: ' + (e && e.message ? e.message : e), 'error');
