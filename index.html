@@ -4657,7 +4657,7 @@ function _anlRenderAll(){
 // Kitapları flip.html üzerinden okuma butonu (tek satır)
 var _readBtn = document.createElement("a");
 _readBtn.href = "flip.html";
-_readBtn.textContent = "📖 Günlük EVRADI EZKAR Eserler 📖 <br>Kütüphanedeki diğer eserler için burayı tıka.";
+_readBtn.innerHTML = "📖 Günlük EVRADI EZKAR Eserler 📖<br>Kütüphanedeki diğer eserler için burayı tıka.";
 _readBtn.style.cssText = "display:block; text-align:center; background:linear-gradient(135deg,#d4af37,#9c7a1e); color:#fff; text-decoration:none; font-weight:bold; font-size:16px; padding:14px 16px; border-radius:10px; margin:0 0 15px; cursor:pointer; box-shadow:0 3px 10px rgba(0,0,0,.15); letter-spacing:.3px;";
 _readBtn.addEventListener("click", function(e){ e.preventDefault(); window.location.href="flip.html"; });
 booksGrid.appendChild(_readBtn);
@@ -5402,9 +5402,8 @@ window.infoSortTable = function infoSortTable(col) {
                         <h3 style="font-size: 15px; margin: 0;">📢 Yöneticiye Mesaj</h3>
                         
                     </div>
-                    <textarea id="admin-msg-input" placeholder="Dilek, temenni, istek veya hatan&#305; buraya yaz..." style="width: 100%; height: 60px; padding: 12px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; margin-bottom: 6px; font-size: 14px; box-sizing: border-box; resize: vertical;"></textarea>
-                    <div style="font-size: 12px; color: var(--muted, #777); line-height: 1.45; margin: 0 0 10px; padding: 0 2px;">Y&#246;neticiye dilek, temenni ve isteklerini buradan do&#287;rudan g&#246;nderebilirsin. Sana <b>DM</b>&#8217;den cevap verilmesini istiyorsan mesaj&#305;n&#305;n i&#231;ine <b>e-posta</b> veya <b>telefon</b> numaran&#305; yaz.</div>
-                    <div style="display: flex; gap: 8px; align-items: center;">
+                    <textarea id="admin-msg-input" placeholder="Dilek, temenni, şikayet ve hatalarımızı buraya yazın ... Emeği geçenlere bir hayır dua ve Efendimize Salavat getirmeyi UNUTMAYIN" style="width: 100%; height: 60px; padding: 12px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 6px; margin-bottom: 6px; font-size: 14px; box-sizing: border-box; resize: vertical;"></textarea>
+                                        <div style="display: flex; gap: 8px; align-items: center;">
                         <button id="send-site-msg-btn" style="flex: 1.4; min-width: 0; padding: 10px 12px; background: #2980b9; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">&#128228; Siteye G&#246;nder</button>
                         <button id="send-admin-msg-btn" style="flex: 1; min-width: 0; padding: 10px 12px; background: #25D366; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">💬 WhatsApp ile Gönder</button>
                         <select id="app-share-sel" title="Uygulamayı paylaş" style="flex: 1; min-width: 0; padding: 10px 8px; background: #128C7E; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">
