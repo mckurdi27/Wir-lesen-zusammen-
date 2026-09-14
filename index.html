@@ -661,19 +661,30 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
   border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .paylas-dd[data-select="app-share-sel"] > .paylas-dd-btn { background: #128C7E; }
+
 #pdd-pop { position: fixed; z-index: 2147483000; display: none; box-sizing: border-box;
+  width: max-content; min-width: 0; max-width: calc(100vw - 16px);
   background: #fff; border: 1px solid #ccc; border-radius: 8px;
-  box-shadow: 0 8px 22px rgba(0,0,0,.28); max-height: 60vh; overflow-y: auto;
-  -webkit-overflow-scrolling: touch; }
+  box-shadow: 0 8px 22px rgba(0,0,0,.28);
+  max-height: 62vh; overflow-y: auto; overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: auto; }
 #pdd-pop.on { display: block; }
-#pdd-pop .pdd-item { display: flex; align-items: center; gap: 10px; width: 100%; box-sizing: border-box;
-  padding: 11px 12px; background: #fff; border: 0; border-bottom: 1px solid #eee; cursor: pointer;
-  font-size: 14px; color: #222; text-align: left; line-height: 1.2; }
+#pdd-pop::-webkit-scrollbar { width: 14px; }
+#pdd-pop::-webkit-scrollbar-track { background: #f0f0f0; border-radius: 8px; }
+#pdd-pop::-webkit-scrollbar-thumb { background: #9aa0a6; border-radius: 8px;
+  border: 3px solid #f0f0f0; min-height: 40px; }
+#pdd-pop::-webkit-scrollbar-thumb:hover { background: #6b7075; }
+
+#pdd-pop .pdd-item { display: flex; align-items: center; gap: 12px;
+  width: 100%; box-sizing: border-box; padding: 14px 18px 14px 14px;
+  background: #fff; border: 0; border-bottom: 1px solid #eee; cursor: pointer;
+  font-size: 16px; font-weight: 700; color: #222; text-align: left;
+  line-height: 1.25; white-space: nowrap; }
 #pdd-pop .pdd-item:last-child { border-bottom: 0; }
 #pdd-pop .pdd-item:active { background: #eaf9f0; }
-#pdd-pop .pdd-item img { width: 20px; height: 20px; flex: 0 0 20px; display: block; }
-#pdd-pop .pdd-item span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden;
-  text-overflow: ellipsis; }
+#pdd-pop .pdd-item img { width: 24px; height: 24px; flex: 0 0 24px; display: block; }
+#pdd-pop .pdd-item span { flex: 0 0 auto; }
 </style>
 </head>
 <body>
@@ -7845,10 +7856,12 @@ _sbMemberDetail = function (name, groupKey) {
 
   function yerlestir(btn) {
     var r = btn.getBoundingClientRect();
-    var w = Math.max(210, r.width);
+    pop.style.width = 'max-content';
+    pop.style.left = '0px';
+    var w = pop.getBoundingClientRect().width || 0;
+    if (w > window.innerWidth - 16) { w = window.innerWidth - 16; pop.style.width = w + 'px'; }
     var left = r.left + (r.width - w) / 2;
     left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
-    pop.style.width = w + 'px';
     pop.style.left = left + 'px';
 
     var yuk = r.top;
