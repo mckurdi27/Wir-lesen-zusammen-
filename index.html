@@ -3270,6 +3270,12 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                             if (!parsed.cities) parsed.cities = {};
                             if (loginRegion) parsed.regions[userName] = loginRegion;
                             if (loginCity) parsed.cities[userName] = loginCity;
+                            // SUPABASE-ONCE (kural 8a): uyeyi once Supabase'e yaz,
+                            // onaylaninca yerel cache'i guncelle ve panele yansit.
+                            var _katW = (typeof window._sbJoinGroupMember === 'function')
+                                ? window._sbJoinGroupMember(userName, groupKey, userPassword, groupName, groupPassword)
+                                : Promise.resolve(null);
+                            _katW.then(function () {
                             localStorage.setItem(`hatim_group_${groupKey}`, JSON.stringify(parsed));
                             currentGroup = groupKey;
                             loggedInMember = userName;
@@ -3284,6 +3290,9 @@ window._refreshGrpDd = function(){ var _in=document.getElementById('login-group-
                             showToast(`✅ ${userName}, "${groupKey.replace(/_/g, ' ').toUpperCase()}" grubuna katıldı!`, 'success');
                             updateUserInterface();
                             loadGroupData();
+                            }).catch(function (err) {
+                                showToast('❌ Üye kaydedilemedi (Supabase): ' + ((err && err.message) ? err.message : err), 'error');
+                            });
                         } catch(e) {
                             showToast('❌ Grup verisi okunamadı.', 'error');
                         }
@@ -7302,6 +7311,32 @@ window._origSetItem = origSetItem;
 /* replaceMembers / syncHatimToSB / replaceShares (yazim islemleri) */
   // Bireysel uye upsert: hedefli Supabase yazimi (kural 8a). Bireysel uyeler
   // group_key = ad.toLowerCase() ile tek-kisilik grup olarak tutulur.
+  // Var olan gruba katilan uyeyi Supabase'e yaz (kural 8a).
+  // members.group_key -> groups.key FK'si vardir: once grup satiri garanti edilir,
+  // sonra uye yazilir. Grup zaten varsa adi/sifresi EZILMEZ.
+  window._sbJoinGroupMember = function (name, groupKey, pwd, grupAdi, grupSifre) {
+    var key = String(groupKey || '').trim();
+    var ad = String(name || '').trim();
+    if (!key || !ad) return Promise.resolve(null);
+    return rest.select("groups", "?select=key&key=eq." + encodeURIComponent(key))
+      .then(function (rows) {
+        if (rows && rows.length) return null;   // grup var -> dokunma
+        return rest.insert("groups", [{ key: key, name: String(grupAdi || key), password: grupSifre || '' }]);
+      })
+      .then(function () {
+        var pw = {}; pw[ad] = pwd || '';
+        return replaceMembers([ad], key, pw);
+      })
+      .then(function () {
+        return api("/members?select=id,name,group_key&name=eq." + encodeURIComponent(ad) +
+                   "&group_key=eq." + encodeURIComponent(key));
+      })
+      .then(function (rows) {
+        if (!rows || !rows.length) throw new Error("uye Supabase e yazilamadi");
+        return rows[0].id;
+      });
+  };
+
   window._sbUpsertIndividual = function (name, pwd) {
     var key = String(name || '').toLowerCase();
     if (!key) return Promise.resolve();
