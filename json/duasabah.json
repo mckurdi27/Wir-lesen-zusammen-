@@ -1,0 +1,154 @@
+{
+  "sabah_dualari": [
+    {
+      "id": 1,
+      "isim": "Sabah Uyanınca",
+      "gun": "Her gün",
+      "arapca": "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ",
+      "okunus": "Elhamdülillâhillezî ahyânâ ba'de mâ emâtenâ ve ileyhin-nüşûr",
+      "anlam": "Bizi öldürdükten sonra dirilten Allah'a hamd olsun. Dönüş de O'nadır.",
+      "hedef": 1,
+      "kaynak": "Buhârî, Deavât 7; Müslim, Zikir 59"
+    },
+    {
+      "id": 2,
+      "isim": "Sabah Erişince",
+      "gun": "Her gün",
+      "arapca": "اللَّهُمَّ بِكَ أَصْبَحْنَا وَبِكَ أَمْسَيْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ",
+      "okunus": "Allâhümme bike asbahnâ ve bike emseynâ ve bike nahyâ ve bike nemûtü ve ileyken-nüşûr",
+      "anlam": "Allah'ım! Senin yardımınla sabahlar ve yine senin yardımınla akşamlarız. Senin yardımınla yaşar ve senin yardımınla ölürüz. Dönüş de yalnızca sanadır.",
+      "hedef": 1,
+      "kaynak": "Tirmizî, Deavât 13"
+    },
+    {
+      "id": 3,
+      "isim": "Mülk Allah'a Ait Olduğu Halde Sabahlamak",
+      "gun": "Her gün",
+      "arapca": "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ وَالْحَمْدُ لِلَّهِ لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+      "okunus": "Asbahnâ ve asbahal-mülkü lillâhi vel-hamdü lillâhi lâ ilâhe illallâhü vahdehû lâ şerîke leh lehül-mülkü ve lehül-hamdü ve hüve alâ külli şey'in kadîr",
+      "anlam": "Mülk, Allah'a âit olduğu halde sabahladık. Hamd Allah'adır. Allah'tan başka hakkıyla ibâdete lâyık hiçbir ilah yoktur. O, tektir ve ortağı yoktur. Mülk O'nundur. Hamd, O'nadır. Onun her şeye gücü yeter.",
+      "hedef": 1,
+      "kaynak": "Müslim, Zikir 75"
+    },
+    {
+      "id": 4,
+      "isim": "İslam Fıtratı Üzere Sabahlamak",
+      "gun": "Her gün",
+      "arapca": "أَصْبَحْنَا عَلَى فِطْرَةِ الْإِسْلَامِ وَعَلَى كَلِمَةِ الْإِخْلَاصِ وَعَلَى دِينِ نَبِيِّنَا مُحَمَّدٍ وَعَلَى مِلَّةِ أَبِينَا إِبْرَاهِيمَ حَنِيفًا مُسْلِمًا وَمَا كَانَ مِنَ الْمُشْرِكِينَ",
+      "okunus": "Asbahnâ alâ fıtratil-İslâmi ve alâ kelimetil-ihlâsi ve alâ dîni nebiyyinâ Muhammedin ve alâ milleti ebînâ İbrâhîme hanîfen müslimen ve mâ kâne minel-müşrikîn",
+      "anlam": "İslâm fıtratı, ihlas (tevhîd) kelimesi ve Peygamberimiz Muhammed'in dîni üzere; hanif ve müslüman olan, müşriklerden olmayan babamız İbrahim'in milleti üzere sabaha eriştik.",
+      "hedef": 1,
+      "kaynak": "Ahmed b. Hanbel, Müsned, III/406"
+    },
+    {
+      "id": 5,
+      "isim": "Af ve Afiyet Duası",
+      "gun": "Her gün",
+      "arapca": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي دِينِي وَدُنْيَايَ وَأَهْلِي وَمَالِي اللَّهُمَّ اسْتُرْ عَوْرَاتِي وَآمِنْ رَوْعَاتِي",
+      "okunus": "Allâhümme innî es'elükel-afve vel-âfiyete fî dînî ve dünyâye ve ehlî ve mâlî Allâhümmestür avrâtî ve emmin rev'âtî",
+      "anlam": "Allah'ım! Senden afv diliyorum. Dinim, dünyam, ailem ve malımda bana afiyet vermeni diliyorum. Allah'ım! Kusur ve ayıplarımı ört. Korku ve endişelerimi gider.",
+      "hedef": 1,
+      "kaynak": "Ebû Dâvûd, Edeb 110; İbn Mâce, Dua 14"
+    },
+    {
+      "id": 6,
+      "isim": "Koruma Duası (Ön-Arka-Sağ-Sol-Üst-Alt)",
+      "gun": "Her gün",
+      "arapca": "اللَّهُمَّ احْفَظْنِي مِنْ بَيْنِ يَدَيَّ وَمِنْ خَلْفِي وَعَنْ يَمِينِي وَعَنْ شِمَالِي وَمِنْ فَوْقِي وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي",
+      "okunus": "Allâhümmehfaznî min beyni yedeyye ve min halfî ve an yemînî ve an şimâlî ve min fevkî ve eûzü bi azametike en uğtâle min tahtî",
+      "anlam": "Allah'ım! Önümden, arkamdan, sağımdan, solumdan, üstümden beni koru. Altımdan tuzağa düşmekten senin yüce kudretine sığınırım.",
+      "hedef": 1,
+      "kaynak": "Hâkim, Müstedrek, 1/518; Ebû Dâvûd, Edeb 110"
+    },
+    {
+      "id": 7,
+      "isim": "Korunma Duası (3 Kez)",
+      "gun": "Her gün",
+      "arapca": "بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
+      "okunus": "Bismillâhillezî lâ yedurru measmihî şey'ün fil-ardı ve lâ fis-semâi ve hüves-Semîul-Alîm",
+      "anlam": "İsmini zikredince yerde ve gökte hiçbir şeyin zarar veremeyeceği Allah'ın isminden yardım talep eder, onunla korunurum. O her şeyi işitir ve bilir.",
+      "hedef": 3,
+      "kaynak": "Ebû Dâvûd, Edeb 101; Tirmizî, Deavât 13"
+    },
+    {
+      "id": 8,
+      "isim": "Sığınma Duası (Hemm, Hazen, Acizlik, Tembellik)",
+      "gun": "Her gün",
+      "arapca": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ وَأَعُوذُ بِكَ مِنَ الْعَجْزِ وَالْكَسَلِ وَأَعُوذُ بِكَ مِنَ الْجُبْنِ وَالْبُخْلِ وَأَعُوذُ بِكَ مِنْ غَلَبَةِ الدَّيْنِ وَقَهْرِ الرِّجَالِ",
+      "okunus": "Allâhümme innî e'ûzü bike minel-hemmi vel-hazeni ve e'ûzü bike minel-aczi vel-keseli ve e'ûzü bike minel-cübni vel-buhli ve e'ûzü bike min galebetid-deyni ve kahrir-ricâl",
+      "anlam": "Allah'ım! Kederden ve üzüntüden sana sığınırım. Acizlikten ve tembellikten sana sığınırım. Korkaklıktan ve cimrilikten sana sığınırım. Borç altında ezilmekten ve insanların baskısına maruz kalmaktan sana sığınırım.",
+      "hedef": 1,
+      "kaynak": "Buhârî, Deavât 38; Ebû Dâvûd, Salât 367"
+    },
+    {
+      "id": 9,
+      "isim": "Sığınma Duası (Küfür ve Fakirlik)",
+      "gun": "Her gün",
+      "arapca": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ وَالْفَقْرِ",
+      "okunus": "Allâhümme innî e'ûzü bike minel-küfri vel-fakr",
+      "anlam": "Allah'ım! Küfürden ve fakirlikten sana sığınırım.",
+      "hedef": 1,
+      "kaynak": "Ebû Dâvûd, Vitr 32"
+    },
+    {
+      "id": 10,
+      "isim": "Hayy ve Kayyûm ile Yardım Dileme",
+      "gun": "Her gün",
+      "arapca": "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ أَصْلِحْ لِي شَأْنِي كُلَّهُ وَلَا تَكِلْنِي إِلَى نَفْسِي",
+      "okunus": "Yâ Hayyu yâ Kayyûmü bi rahmetike estağîsü aslih lî şe'nî küllehû ve lâ tekilnî ilâ nefsî",
+      "anlam": "Ey Hayy ve Kayyûm olan Allah'ım! Senin rahmetine iltica ediyor ve Sen'den yardım diliyorum. Benim bütün işlerimi düzelt ve beni nefsimle baş başa bırakma.",
+      "hedef": 1,
+      "kaynak": "Hâkim, Müstedrek, 1/730; Tirmizî, Deavât 91"
+    },
+    {
+      "id": 11,
+      "isim": "Rızık Duası",
+      "gun": "Her gün",
+      "arapca": "اللَّهُمَّ إِنِّي أَسْأَلُكَ رِزْقًا طَيِّبًا وَعِلْمًا نَافِعًا وَعَمَلًا مُتَقَبَّلًا",
+      "okunus": "Allâhümme innî es'elüke rizkan tayyiben ve ilmen nâfian ve amelen mütekabbelâ",
+      "anlam": "Allah'ım! Senden helal ve güzel rızık, faydalı ilim ve kabul buyuracağın amel isterim.",
+      "hedef": 1,
+      "kaynak": "İbn Mâce, İkâmet 78"
+    },
+    {
+      "id": 12,
+      "isim": "Hasbünallah Duası",
+      "gun": "Her gün",
+      "arapca": "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ",
+      "okunus": "Hasbünallâhü ve ni'mel vekîl",
+      "anlam": "Allah bize yeter; O ne güzel vekildir.",
+      "hedef": 7,
+      "kaynak": "Âl-i İmrân Suresi 173"
+    },
+    {
+      "id": 13,
+      "isim": "Sübhanallahi ve Bihamdihi",
+      "gun": "Her gün",
+      "arapca": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
+      "okunus": "Sübhânallâhi ve bihamdihî",
+      "anlam": "Allah'ı hamd ile tüm noksanlıklardan tenzih ederek tesbih ederim.",
+      "hedef": 100,
+      "kaynak": "Müslim, Zikir 31"
+    },
+    {
+      "id": 14,
+      "isim": "Sabah Namazı Sonrası Selam Duası",
+      "gun": "Her gün",
+      "arapca": "اللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ",
+      "okunus": "Allâhümme entes-Selâmü ve minkes-selâm tebârekte yâ zel-celâli vel-ikrâm",
+      "anlam": "Allah'ım! Sen selâmsın. Selâm Senden gelir. Ey Celâl ve İkram Sahibi, Sen bereketlisin.",
+      "hedef": 1,
+      "kaynak": "Müslim, Mesâcid 135"
+    },
+    {
+      "id": 15,
+      "isim": "Ayetel Kürsi (Sabah Koruma)",
+      "gun": "Her gün",
+      "arapca": "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ",
+      "okunus": "Allâhü lâ ilâhe illâ hüvel-Hayyül-Kayyûm lâ te'huzühû sinetün ve lâ nevm lehû mâ fis-semâvâti ve mâ fil-ard",
+      "anlam": "Allah, kendisinden başka hiçbir ilah olmayandır. Diridir, kayyumdur. O'nu ne bir uyuklama tutabilir, ne de bir uyku. Göklerdeki her şey, yerdeki her şey O'nundur.",
+      "hedef": 1,
+      "kaynak": "Bakara Suresi 255"
+    }
+  ]
+}
