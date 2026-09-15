@@ -567,6 +567,22 @@ Kullanıcının gördüğü sıra:
 
 ## 🔄 Veri Akışı
 
+**Sayfa açılış**
+↓
+**doInit() → pullAll()** [Supabase'ten TÜM veri]
+↓
+**localStorage'a yaz** (origSetItem ile, push YOK)
+↓
+**refreshUI() → loadGroupData()** → renderBooks() + renderAdminSectionAtBottom() + ...
+↓
+**Her 3 sn:** pullAll() → loadGroupData(silent) → renderBooks()
+↓
+**Kullanıcı tıklama** → HEDEFLİ Supabase yazımı
+↓
+**Onay** → localStorage güncelle (cache) → renderBooks()
+↓
+**Onay yok (409)** → geri al + toast
+
 
 
 ### Kural (dosya başı)
