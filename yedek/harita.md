@@ -567,25 +567,61 @@ Kullanıcının gördüğü sıra:
 
 ## 🔄 Veri Akışı
 
-**Sayfa açılış**
-↓
-**doInit() → pullAll()** [Supabase'ten TÜM veri]
-↓
-**localStorage'a yaz** (origSetItem ile, push YOK)
-↓
-**refreshUI() → loadGroupData()** → renderBooks() + renderAdminSectionAtBottom() + ...
-↓
-**Her 3 sn:** pullAll() → loadGroupData(silent) → renderBooks()
-↓
-**Kullanıcı tıklama** → HEDEFLİ Supabase yazımı
-↓
-**Onay** → localStorage güncelle (cache) → renderBooks()
-↓
-**Onay yok (409)** → geri al + toast
+### 🎯 Temel Kural
+- **Supabase = gerçek kaynak** (canlı, paylaşımlı, kalıcı)
+- **localStorage = salt cache** (hız için, aracı)
+- Ekrandaki anlık veri **Supabase'ten gelir**
+- Ama render fonksiyonları **localStorage üzerinden okur** (çünkü Supabase verisi önce oraya yazılır)
 
+### 📊 1. Sayfa Açılışı
+- Kullanıcı sayfayı açar
+- localStorage'daki ESKİ veri HEMEN gösterilir (hızlı açılış)
+- `doInit()` → `pullAll()` → Supabase'ten TÜM güncel veri çekilir
+- `origSetItem()` → Supabase verisi localStorage'a yazılır (cache güncellenir)
+- `loadGroupData()` → localStorage'dan okur → `appData` güncellenir
+- `refreshUI()` → `renderBooks()` + `renderAdminSectionAtBottom()` + ... → ekran çizilir
 
+### 📊 2. Periyodik Güncelleme (her 3 saniye)
+- `setInterval(3000)`
+- `if (!_myPush) pullAll()`
+- Supabase'ten taze veri çekilir
+- localStorage güncellenir (origSetItem)
+- `loadGroupData(false, true)` → `appData` yenilenir (silent)
+- `renderBooks()` → ekran güncellenir (scroll korunur)
 
-### Kural (dosya başı)
+### 📊 3. Kullanıcı Eylemi (hisse al / okundu / sil)
+- Kullanıcı tıklar (örn. "Hisse Al")
+- ÖNCE hedefli Supabase yazımı: `POST /shares` (on_conflict=member_id,book_id,unit_index)
+- Supabase ONAYLARSA:
+  - `saveGroupData()` → localStorage'a yaz (cache)
+  - `renderBooks()` → ekran güncelle
+  - Toast: "✅ Hisse alındı"
+- Supabase REDDEDERSE (409 / çakışma):
+  - yerel değişikliği GERİ AL
+  - Toast: "⚠️ Bu hisse başkası tarafından alındı"
+
+### 🚫 Yasaklar
+- ❌ Tam-grup snapshot push (kural 8d)
+- ❌ Bayat localStorage verisini Supabase'e gönderme
+- ❌ Supabase onayı olmadan localStorage'ı güncelleme
+- ❌ pullAll sırasında push yapma (döngü riski)
+
+### ✅ Doğru Davranış
+- ✅ Önce Supabase'e yaz (hedefli)
+- ✅ Onay sonrası localStorage'ı güncelle (cache)
+- ✅ Reddedilirse geri al + kullanıcıya bildir
+- ✅ Her gösterim Supabase'ten güncel veriye dayansın
+
+### ⚙️ Kritik Değişkenler
+| Değişken | Rol |
+|----------|-----|
+| `_pulling` | pullAll çalışırken true → çift çekmeyi engeller |
+| `_myPush` | push sırasında true → polling'i durdurur |
+| `_queue` | Yazma kuyruğu → eşzamanlı yazımı serileştirir |
+| `origSetItem` | Orijinal setItem → override içinde kullanılır |
+| `appData` | Aktif grup verisi (localStorage'dan okunur) |
+
+### 📌 Kural (dosya başı)
 1. Supabase = tek kaynak
 2. localStorage = salt cache
 3. Hedefli yazım (tam-grup push YASAK)
@@ -623,6 +659,7 @@ Ctrl+F ile ara:
 - ✅ Değişiklik yaparken **hedefli Supabase yazımı** kuralına uy.
 - ✅ Tam-grup snapshot push **YASAK** (kural 8d).
 - ✅ Sadece **ilgili kısmı** değiştir, tüm dosyayı yeniden yazma.
+- ✅ **Supabase = tek doğruluk kaynağı**, localStorage sadece hız için.
 
 ---
 
