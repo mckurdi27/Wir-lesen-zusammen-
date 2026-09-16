@@ -60,12 +60,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Ortak Hatim ve Dua Takip Sistemi</title>
     <!-- ===== SURUM BILGISI (her duzenlemede APP_SURUM artirilir) ===== -->
-    <meta name="app-version" content="v1.0.0">
+    <meta name="app-version" content="v1.0.1">
     <script>
       /* SURUM BILGISI - HER DUZENLEMEDE ARTIR (kural 10) */
-      window.APP_SURUM        = "v1.0.0";
+      window.APP_SURUM        = "v1.0.1";
       window.APP_SURUM_TARIH  = "2026-09-16";
-      window.APP_SURUM_COMMIT = "2c01e38";   /* bu surumun dayandigi commit */
+      window.APP_SURUM_COMMIT = "zip-2026-09-16";   /* bu surumun dayandigi commit */
     </script>
     <meta name="theme-color" content="#d4af37">
     <link rel="manifest" href="manifest.json">
@@ -6334,7 +6334,7 @@ function bulkBookIds() {
                                     }
                                 });
                                 if (cnt > 0 || remCnt > 0 || readChanged > 0) {
-                                    bulkSave(targetData);
+                                    var _saveP = bulkSave(targetData);
                                     // Geri alinan (tik kaldirilan) hisseleri Supabase'ten de sil - yoksa sayfa yenilenince geri gelir
                                     if (_remRanges.length && typeof window.api === 'function') {
                                         var _gk = (targetData && targetData.gKey) ? String(targetData.gKey) : (t === 'bireysel' ? String(m).toLowerCase() : (data && data.gKey ? String(data.gKey) : String(currentGroup||'')));
@@ -6354,7 +6354,12 @@ function bulkBookIds() {
                                     else if (cnt > 0) showToast('\u2705 ' + cnt + ' hisse ' + m + ' \u00fcyesine atand\u0131.', 'success');
                                     else if (remCnt > 0) showToast('\u21a9\ufe0f ' + remCnt + ' hisse ' + m + ' \u00fcyesinden geri al\u0131nd\u0131.', 'success');
                                     else showToast('\u2705 Okundu durumu g\u00fcncellendi.', 'success');
-                                    renderUnits();
+                                    /* FIX: Supabase onayi gelmeden yeniden cizme. Aksi halde localStorage
+                                       onbellegi hala ESKI oldugu icin secimler sifirlanir ve kayit ancak
+                                       ikinci denemede gorunur. Cizim, kayit tamamlaninca yapilir. */
+                                    if (_saveP && typeof _saveP.then === 'function') {
+                                        _saveP.then(function(){ renderUnits(); }).catch(function(){ renderUnits(); });
+                                    } else { renderUnits(); }
                                 } else { showToast('İşaretli hisse yok.', 'info'); }
                             });
                             document.getElementById('bv-clear-owner').addEventListener('click', () => {
@@ -6370,7 +6375,14 @@ function bulkBookIds() {
                                 for (let i = 0; i < tpages2.length; i++) {
                                     if (tpages2[i].owner === m2) { tpages2[i].owner = ''; tpages2[i].isRead = false; cnt++; }
                                 }
-                                if (cnt > 0) { bulkSave(targetData2); showToast('🗑️ ' + cnt + ' hisse temizlendi.', 'info'); renderUnits(); }
+                                if (cnt > 0) {
+                                    /* FIX: ayni erken-cizim sorunu - temizlik de Supabase onayi sonrasi cizilir */
+                                    var _saveP2 = bulkSave(targetData2);
+                                    showToast('🗑️ ' + cnt + ' hisse temizlendi.', 'info');
+                                    if (_saveP2 && typeof _saveP2.then === 'function') {
+                                        _saveP2.then(function(){ renderUnits(); }).catch(function(){ renderUnits(); });
+                                    } else { renderUnits(); }
+                                }
                             });
                         });
                     }
