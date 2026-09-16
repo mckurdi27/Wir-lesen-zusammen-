@@ -60,12 +60,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Ortak Hatim ve Dua Takip Sistemi</title>
     <!-- ===== SURUM BILGISI (her duzenlemede APP_SURUM artirilir) ===== -->
-    <meta name="app-version" content="v1.0.2">
+    <meta name="app-version" content="v1.0.3">
     <script>
       /* SURUM BILGISI - HER DUZENLEMEDE ARTIR (kural 10) */
-      window.APP_SURUM        = "v1.0.2";
+      window.APP_SURUM        = "v1.0.3";
       window.APP_SURUM_TARIH  = "2026-09-17";
-      window.APP_SURUM_COMMIT = "yerel+istikamet-halkam";   /* bu surumun dayandigi commit */
+      window.APP_SURUM_COMMIT = "istakamet-halkam-ui";   /* bu surumun dayandigi commit */
     </script>
     <meta name="theme-color" content="#d4af37">
     <link rel="manifest" href="manifest.json">
@@ -360,9 +360,9 @@
         }
         .login-join-btn:hover { background: #1e8f4e; }
         .bulk-share-area {
-            margin-top: 14px;
-            padding-top: 14px;
-            border-top: 1px dashed var(--border-color);
+            margin-top: 2px;
+            padding-top: 0;
+            border-top: none;
         }
         .bulk-whatsapp-btn {
             width: 100%;
@@ -698,13 +698,16 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
        font:13px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
        padding-bottom:18px;}
 #ih-scope .panel{background:var(--card-bg);border:1px solid var(--border-color);border-radius:13px;
-         margin:10px;padding:9px 8px 8px;position:relative;overflow:hidden}
+         margin:10px 10px 6px;padding:9px 8px 8px;position:relative;overflow:hidden}
 #ih-scope .panel::before{content:'';position:absolute;left:0;right:0;top:0;height:3px;
                  background:linear-gradient(90deg,var(--gre),var(--yel),var(--red))}
-#ih-scope .p-head{display:flex;align-items:center;gap:6px;padding-top:3px}
-#ih-scope .ttl{flex:1 1 auto;min-width:0;display:flex;align-items:baseline;gap:7px}
+#ih-scope .p-head{display:flex;align-items:center;gap:6px;padding-top:3px;
+          overflow:hidden;min-width:0}
+#ih-scope .ttl{flex:1 1 auto;min-width:0;display:flex;align-items:baseline;gap:7px;
+         overflow:hidden}
 #ih-scope .ttl h1{font-size:15px;font-weight:900;letter-spacing:.2px;line-height:1.15;
-          color:var(--gold-dark);display:flex;align-items:center;gap:4px}
+          color:var(--gold-dark);display:flex;align-items:center;gap:4px;
+          white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 #ih-scope .ttl h1 em{font-style:normal;color:var(--gold-primary)}
 #ih-scope .ttl p{flex:1 1 auto;min-width:0;text-align:right;padding-right:2px;
          font-size:10px;font-weight:700;color:var(--gold-dark);opacity:.85;
@@ -715,10 +718,11 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
 #ih-scope .fold{font-size:15px}
 #ih-scope /* ---- hafta: sadece halkalar, #ih-scope altinda yazi yok ---- */
   .week{display:flex;justify-content:space-between;gap:0;margin-top:9px}
-#ih-scope .day{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;position:relative}
-#ih-scope .ring{position:relative;width:56px;height:56px;max-width:100%}
+#ih-scope .day{flex:1 1 auto;min-width:56px;display:flex;align-items:center;justify-content:center;position:relative}
+#ih-scope .ring{position:relative;width:56px;height:56px;flex:0 0 56px;aspect-ratio:1/1}
 #ih-scope .core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-        width:30px;height:30px;border-radius:50%;border:1.5px solid var(--border-color);
+        width:32px;height:32px;flex:0 0 32px;aspect-ratio:1/1;border-radius:50%;
+        border:1.5px solid var(--border-color);
         background:#fbf7ee;color:var(--text-main);cursor:pointer;padding:0;
         display:flex;flex-direction:column;align-items:center;justify-content:center}
 #ih-scope .core .dnum{font-size:12px;font-weight:900;line-height:12px}
@@ -799,29 +803,33 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
 #ih-scope .hbtn .bell{font-size:9px;opacity:.8}
 #ih-scope .heat{display:none;margin-top:11px;border-top:1px solid var(--border-color);padding-top:11px}
 #ih-scope .heat.ih-show{display:block}
-#ih-scope .heat .hl{font-size:10px;font-weight:800;color:var(--gold-dark);margin-bottom:7px;
+#ih-scope .heat .hl{font-size:10px;font-weight:800;color:var(--gold-dark);margin-bottom:8px;
             display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
-#ih-scope .heat .hmonths{display:grid;grid-auto-flow:column;gap:2px;width:max-content;
-                 margin:0 0 3px 15px;font-size:8px;font-weight:800;color:var(--gold-dark)}
-#ih-scope .heat .hmonths span{width:11px;text-align:left;overflow:visible;white-space:nowrap}
-#ih-scope .heat .hmain{display:flex;gap:3px;align-items:flex-start}
-#ih-scope .heat .hweek{display:grid;grid-template-rows:repeat(52,4.5px);gap:1px;
-               font-size:7px;font-weight:800;color:var(--gold-dark);text-align:right}
-#ih-scope .heat .hweek b{line-height:4.5px;height:4.5px;overflow:hidden;display:block}
-#ih-scope .heat .hwrap{overflow-x:auto;padding-bottom:4px;flex:1 1 auto;min-width:0}
-#ih-scope .heat .hgrid{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,10px);gap:2px;width:max-content}
-#ih-scope .heat .hgrid i{width:10px;height:10px;border-radius:2.5px;background:#e6ded1;display:block;
-                 border:1px solid rgba(62,39,35,.07)}
-#ih-scope .heat .hgrid i.l1{background:#a8e0ba}
-#ih-scope .heat .hgrid i.l2{background:#5cc47e}
-#ih-scope .heat .hgrid i.l3{background:#1e8f4e}
-#ih-scope .heat .hgrid i.l4{background:#0b5c30;border-color:#0b5c30}
-#ih-scope .heat .hgrid i.brk{background:#b06ad0;border-color:#9b59b6}
-#ih-scope .heat .hgrid i.fut{background:#f3efe8;border-color:transparent}
-#ih-scope .heat .hkey{display:flex;align-items:center;gap:5px;margin-top:7px;justify-content:flex-end;
+#ih-scope .heat .hweeks{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#ih-scope .heat .wk{border:1px solid var(--border-color);border-radius:8px;padding:3px 3px 4px;
+               background:#fffdf8;min-width:0}
+#ih-scope .heat .wk-n{font-size:7px;font-weight:900;color:var(--gold-dark);text-align:center;
+                 line-height:9px;letter-spacing:.3px}
+#ih-scope .heat .wk-d{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-top:2px}
+#ih-scope .heat .wk-d i{display:block;border-radius:3px;text-align:center;font-style:normal;
+                   padding:1px 0;background:#e6ded1;border:1px solid rgba(62,39,35,.07);min-width:0}
+#ih-scope .heat .wk-d i b{display:block;font-size:5px;font-weight:800;line-height:6px;
+                     color:rgba(62,39,35,.55);letter-spacing:-.2px}
+#ih-scope .heat .wk-d i em{display:block;font-style:normal;font-size:6.5px;font-weight:900;
+                    line-height:8px;color:#4a3a30}
+#ih-scope .heat .wk-d i.l1{background:#a8e0ba}
+#ih-scope .heat .wk-d i.l2{background:#5cc47e}
+#ih-scope .heat .wk-d i.l3{background:#1e8f4e}
+#ih-scope .heat .wk-d i.l4{background:#0b5c30;border-color:#0b5c30}
+#ih-scope .heat .wk-d i.l3 b,#ih-scope .heat .wk-d i.l3 em,
+            #ih-scope .heat .wk-d i.l4 b,#ih-scope .heat .wk-d i.l4 em{color:#fff}
+#ih-scope .heat .wk-d i.brk{background:#b06ad0;border-color:#9b59b6}
+#ih-scope .heat .wk-d i.brk b,#ih-scope .heat .wk-d i.brk em{color:#fff}
+#ih-scope .heat .wk-d i.fut{background:#f5f1ea;border-color:transparent;opacity:.55}
+#ih-scope .heat .hkey{display:flex;align-items:center;gap:5px;margin-top:9px;justify-content:flex-end;
               font-size:9px;font-weight:700;color:var(--gold-dark)}
 #ih-scope .heat .hkey em{font-style:normal}
-#ih-scope .heat .hkey .sq{width:10px;height:10px;border-radius:2.5px;display:inline-block;
+#ih-scope .heat .hkey .sq{width:10px;height:10px;border-radius:3px;display:inline-block;
                   border:1px solid rgba(62,39,35,.07)}
 #ih-scope .sheet{position:fixed;inset:0;background:rgba(62,39,35,.45);display:none;z-index:50}
 #ih-scope .sheet.ih-show{display:block}
@@ -8677,16 +8685,14 @@ function detay(){
 function isi(){
   var el = document.getElementById('heat');
   if(!heatOn){ el.className = 'heat'; el.innerHTML = ''; return; }
-  var t = bugun(), p = pzt();
-  /* bu yilin 1. haftasinin pazartesisi */
-  var yil = t.getFullYear();
+  var t = bugun(), yil = t.getFullYear();
+  /* yilin 1. haftasinin pazartesisi */
   var birinci = pzt(); birinci.setDate(1); birinci.setMonth(0);
   if((birinci.getDay()+6)%7 !== 0){ birinci = gunEkle(birinci, -((birinci.getDay()+6)%7)); }
-  var m = aktifAna(), cells = '', hafta = '', aySatir = [];
-  var oncekiAy = -1;
+  var m = aktifAna(), satirlar = '', iki = '';
 
   for(var w2=0; w2<52; w2++){
-    hafta += '<b>'+(w2+1)+'</b>';
+    var gunler = '';
     for(var d2=0; d2<7; d2++){
       var g = gunEkle(birinci, w2*7+d2);
       var yap = 0;
@@ -8698,25 +8704,24 @@ function isi(){
       else if(r >= 0.33) cls = 'l2';
       else if(r > 0) cls = 'l1';
       else cls = 'brk';
-      cells += '<i class="'+cls+'" title="'+iso(g)+'"></i>';
+      var kis = (typeof GUN !== 'undefined' && GUN[d2]) ? GUN[d2] : '';
+      gunler += '<i class="'+cls+'" title="'+iso(g)+'">'
+              +   '<b>'+kis+'</b><em>'+g.getDate()+'</em></i>';
     }
-    /* ay etiketi: haftanin pazartesi gunu yeni ay ise */
-    var gm = gunEkle(birinci, w2*7).getMonth();
-    if(gm !== oncekiAy){
-      aySatir.push('<span>'+AYLAR[gm].substring(0,3)+'</span>');
-      oncekiAy = gm;
-    } else { aySatir.push('<span></span>'); }
+    /* satirda 2 hafta: kutulari ciftler halinde grupla */
+    iki += '<div class="wk"><div class="wk-n">'+(w2+1)+'. hafta</div>'
+         + '<div class="wk-d">'+gunler+'</div></div>';
+    if(w2 % 2 === 1){
+      satirlar += '<div class="hweeks">' + iki + '</div>';
+      iki = '';
+    }
   }
 
   el.className = 'heat ih-show';
   el.innerHTML =
       '<div class="hl"><span>'+yil+' \u2014 52 hafta</span>'
     + '<span>koyu = halka kapand\u0131 &middot; mor = ka&ccedil;&#305;r&#305;ld&#305;</span></div>'
-    + '<div class="hmonths">'+aySatir.join('')+'</div>'
-    + '<div class="hmain">'
-    +   '<div class="hweek">'+hafta+'</div>'
-    +   '<div class="hwrap"><div class="hgrid">'+cells+'</div></div>'
-    + '</div>'
+    + satirlar
     + '<div class="hkey"><em>az</em>'
     +   '<span class="sq" style="background:#e6ded1"></span>'
     +   '<span class="sq" style="background:#a8e0ba"></span>'
