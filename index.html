@@ -2085,6 +2085,25 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
             window._sbSetAdmin = function(v){ isAdmin = !!v; };
             window.renderAdminSectionAtBottom = (typeof renderAdminSectionAtBottom === 'function') ? renderAdminSectionAtBottom : function(){};
             window.showToast = (typeof showToast === 'function') ? showToast : function(){};
+            // Supabase tarih kolonlari ISO (YYYY-MM-DD) ister; ekranda tr-TR gosterilir.
+            window._sbDateISO = function (d) {
+                if (d == null) return null;
+                var s = String(d).trim();
+                if (!s || s === 'Tarih yok' || s === '--' || s === 'undefined') return null;
+                var m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+                if (m) return m[1] + '-' + m[2] + '-' + m[3];
+                m = s.match(/^(\d{1,2})[.\/](\d{1,2})[.\/](\d{4})/);
+                if (m) return m[3] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[1]).slice(-2);
+                var dt = new Date(s);
+                if (!isNaN(dt.getTime())) return dt.getFullYear() + '-' + ('0' + (dt.getMonth() + 1)).slice(-2) + '-' + ('0' + dt.getDate()).slice(-2);
+                return null;
+            };
+            // ISO (veya herhangi bir tarih) degerini ekran formatina cevirir: GG.AA.YYYY
+            window._sbTrDate = function (v) {
+                if (!v) return null;
+                var m = String(v).match(/^(\d{4})-(\d{2})-(\d{2})/);
+                return m ? (m[3] + '.' + m[2] + '.' + m[1]) : String(v);
+            };
             window.triggerAdminToggle = (typeof triggerAdminToggle === 'function') ? triggerAdminToggle : function(){ alert('Yönetici modu yüklenemedi.'); };
             let analysisSortKey = "name"; let analysisSortDir = "az"; let activeAnalysisTab = "dtabs-1";
             let analysisBooks = []; // empty = all
@@ -5078,7 +5097,7 @@ booksGrid.appendChild(_readBtn);
                         // DOGRUDAN Supabase'e hedefli yaz (tam-grup snapshot degil). Supabase onaylayinca yerel guncellenir.
                         var _gk_ = (currentGroup && String(currentGroup).trim()) ? String(currentGroup) : String(loggedInMember).toLowerCase().trim();
                         var _rows_ = [];
-                        for (var _k_ = start; _k_ < end; _k_++) { _rows_.push({ group_key: _gk_, book_id: bId, unit_index: _k_, is_read: false, take_date: takeNow, take_time: takeClock }); }
+                        for (var _k_ = start; _k_ < end; _k_++) { _rows_.push({ group_key: _gk_, book_id: bId, unit_index: _k_, is_read: false, take_date: (typeof window._sbDateISO === 'function' ? window._sbDateISO(takeNow) : takeNow), take_time: takeClock }); }
                         var _doSB_ = function(){
                           if (typeof window.api !== 'function') return Promise.reject(new Error('api yok'));
                           return window.api('/members?select=id&group_key=eq.'+encodeURIComponent(_gk_)+'&name=eq.'+encodeURIComponent(loggedInMember)).then(function(mm){
@@ -7455,7 +7474,7 @@ window._origSetItem = origSetItem;
               if (!seen[slot]) { seen[slot] = true; conflicts.push({ ownerName: idName[cur] || "baska uye", book_id: bid, unit_index: idx }); }
               return;
             }
-            rows.push({ group_key: String(groupKey), member_id: nameId[p.owner], book_id: bid, unit_index: idx, is_read: !!p.isRead, read_date: p.readDate || null, read_time: p.readTime || null, take_date: p.takeDate || null, take_time: p.takeTime || null });
+            rows.push({ group_key: String(groupKey), member_id: nameId[p.owner], book_id: bid, unit_index: idx, is_read: !!p.isRead, read_date: (typeof window._sbDateISO === 'function' ? window._sbDateISO(p.readDate) : (p.readDate || null)), read_time: p.readTime || null, take_date: (typeof window._sbDateISO === 'function' ? window._sbDateISO(p.takeDate) : (p.takeDate || null)), take_time: p.takeTime || null });
           });
         });
         if (conflicts.length) { try { if (typeof window.showToast === 'function') { var _ow = conflicts.map(function(c){ return c.ownerName; }).filter(function(v,i,a){ return a.indexOf(v)===i; }).join(", "); window.showToast('⚠️ ' + conflicts.length + ' hisse zaten alınmış (' + _ow + '): ilk alan korundu.', 'error'); } } catch(_e){ console.warn('conflict toast', _e); } }
@@ -7537,7 +7556,7 @@ window._origSetItem = origSetItem;
           gm.forEach(function (m) { g.memberTypes[m.name] = m.type || "grup"; g.passwords[m.name] = m.password || ""; });
           bookDef.forEach(function (b) { g.bookPages[b.id] = Array(b.total_units).fill(null).map(function () { return { owner: "", isRead: false }; }); });
           var mIdName = {}; gm.forEach(function (m) { mIdName[m.id] = m.name; });
-          shares.forEach(function (s) { var owner = mIdName[s.member_id]; if (!owner) return; if (!g.bookPages[s.book_id]) g.bookPages[s.book_id] = []; g.bookPages[s.book_id][s.unit_index] = { owner: owner, isRead: !!s.is_read, readDate: s.read_date || null, readTime: s.read_time || null, takeDate: s.take_date || null, takeTime: s.take_time || null }; });
+          shares.forEach(function (s) { var owner = mIdName[s.member_id]; if (!owner) return; if (!g.bookPages[s.book_id]) g.bookPages[s.book_id] = []; g.bookPages[s.book_id][s.unit_index] = { owner: owner, isRead: !!s.is_read, readDate: (typeof window._sbTrDate === 'function' ? window._sbTrDate(s.read_date) : s.read_date) || null, readTime: s.read_time || null, takeDate: (typeof window._sbTrDate === 'function' ? window._sbTrDate(s.take_date) : s.take_date) || null, takeTime: s.take_time || null }; });
           try { origSetItem("hatim_group_" + gk, JSON.stringify(g)); } catch (e) {}
         });
         var pool = { members: Array.from(poolNames), memberTypes: poolTypes, passwords: poolPass };
@@ -7602,9 +7621,9 @@ _sbMemberDetail = function (name, groupKey) {
         if (!byBook[s.book_id]) byBook[s.book_id] = { taken: 0, read: 0, dates: [], takeDates: [], readDates: [] };
         byBook[s.book_id].taken++;
         if (s.is_read) byBook[s.book_id].read++;
-        if (s.read_date) byBook[s.book_id].dates.push(s.read_date);
-        if (s.read_date) byBook[s.book_id].readDates.push(s.read_date + (s.read_time ? ' ' + s.read_time : ''));
-        if (s.take_date) byBook[s.book_id].takeDates.push(s.take_date + (s.take_time ? ' ' + s.take_time : ''));
+        if (s.read_date) byBook[s.book_id].dates.push((typeof window._sbTrDate === 'function' ? window._sbTrDate(s.read_date) : s.read_date));
+        if (s.read_date) byBook[s.book_id].readDates.push((typeof window._sbTrDate === 'function' ? window._sbTrDate(s.read_date) : s.read_date) + (s.read_time ? ' ' + s.read_time : ''));
+        if (s.take_date) byBook[s.book_id].takeDates.push((typeof window._sbTrDate === 'function' ? window._sbTrDate(s.take_date) : s.take_date) + (s.take_time ? ' ' + s.take_time : ''));
       });
       var bookRows = Object.keys(byBook).map(function (bid) {
         var b = null;
@@ -7666,7 +7685,7 @@ _sbMemberDetail = function (name, groupKey) {
     return window.api('/members?select=id&group_key=eq.' + encodeURIComponent(gk) + '&name=eq.' + encodeURIComponent(loggedInMember)).then(function (mm) {
       mm = mm || []; var mid = mm.length ? mm[0].id : null;
       if (!mid) throw new Error('Uye Supabase`te yok');
-      var body = { is_read: !!isRead, read_date: isRead ? now : null, read_time: isRead ? time : null };
+      var body = { is_read: !!isRead, read_date: isRead ? (typeof window._sbDateISO === 'function' ? window._sbDateISO(now) : now) : null, read_time: isRead ? time : null };
       return window.api('/shares?member_id=eq.' + mid + '&book_id=eq.' + encodeURIComponent(bId) + '&unit_index=gte.' + start + '&unit_index=lt.' + end, { method: 'PATCH', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify(body) });
     });
   };
