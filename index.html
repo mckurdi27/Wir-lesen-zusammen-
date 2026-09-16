@@ -36,6 +36,19 @@
          (localStorage.setItem koprusu karar veren degil, salt cache'tir).
    9) Gecersiz cihaz localStorage'i asla Supabase'in dogru kaydini ezemez.
       Sayfa yenilendiginde gorunen veri her zaman Supabase'ten gelir.
+   10) SURUMLEME: Bu dosyanin surum numarasi APP_SURUM sabitidir
+      (asagida, <head> icindeki "SURUM BILGISI" blogu). HER duzenlemede
+      APP_SURUM'un minor hanesi bir artirilir (v1.0.0 -> v1.0.1 -> ...),
+      APP_SURUM_TARIH o gunun tarihiyle guncellenir ve APP_SURUM_COMMIT
+      degisiklikten ONCEKI commit kisaltmasi olarak yazilir.
+   11) DUZENLEME KURALI (yeni agent sohbetleri dahil): Duzenleme HER ZAMAN
+      en son surumun (repo main'deki guncel index.html) uzerine yapilir.
+      Once uzak main'den son surumu cek, onun uzerinde degisiklik yap; eski
+      bir kopya/yedek uzerinden degisiklik yazmak YASAKTIR.
+   12) VERI KAYNAGI: Goruntulenen ve analiz edilen TUM anlik veriler Supabase
+      esas alinir. localStorage yalnizca onbellektir, karar verici degildir.
+      Bu sohbet degisse de yeni gelen agent bu kural blogunu ve APP_SURUM'u
+      okuyup ayni sekilde hareket eder.
 -->
 
 <!-- ===================== BELGE BASI (DOCTYPE / <html>) ===================== -->
@@ -46,6 +59,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Ortak Hatim ve Dua Takip Sistemi</title>
+    <!-- ===== SURUM BILGISI (her duzenlemede APP_SURUM artirilir) ===== -->
+    <meta name="app-version" content="v1.0.0">
+    <script>
+      /* SURUM BILGISI - HER DUZENLEMEDE ARTIR (kural 10) */
+      window.APP_SURUM        = "v1.0.0";
+      window.APP_SURUM_TARIH  = "2026-09-16";
+      window.APP_SURUM_COMMIT = "2c01e38";   /* bu surumun dayandigi commit */
+    </script>
     <meta name="theme-color" content="#d4af37">
     <link rel="manifest" href="manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
@@ -8011,6 +8032,23 @@ _sbMemberDetail = function (name, groupKey) {
   window.addEventListener('resize', kapat);
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') kapat(); });
 })();
+</script>
+<!-- ===== SURUM ETIKETI (gorunur) ===== -->
+<div id="app-surum-etiket" style="text-align:center; font-size:11px; color:#8a6d3b; opacity:0.75; padding:10px 0 14px;">
+  Surum <span id="app-surum-deger">v1.0.0</span>
+  &middot; <span id="app-surum-tarih">2026-09-16</span>
+  &middot; veri kaynagi: Supabase (canli)
+</div>
+<script>
+  (function () {
+    function yaz() {
+      var d = document.getElementById('app-surum-deger');
+      var t = document.getElementById('app-surum-tarih');
+      if (d && window.APP_SURUM) d.textContent = window.APP_SURUM;
+      if (t && window.APP_SURUM_TARIH) t.textContent = window.APP_SURUM_TARIH;
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', yaz); else yaz();
+  })();
 </script>
 </body>
 </html>
