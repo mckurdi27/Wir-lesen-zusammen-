@@ -6135,7 +6135,13 @@ function bulkBookIds() {
                             </div>`;
                             h += `<div style="margin-bottom:8px;">
                                 <label style="font-size:12px; font-weight:bold;">🔢 Sayfa Modu:</label>
-                                <select id="bv-mode" style="width:100%; padding:10px; border-radius:6px; border:1px solid var(--border-color); background:var(--card-bg); font-size:13px; min-height:44px;">
+                                <div id="bv-mode-row" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
+                                    ${['20','10','5','1'].map(v => `<label class="bv-mode-opt" style="display:flex; align-items:center; gap:5px; padding:7px 12px; border:1px solid var(--border-color); border-radius:6px; background:var(--card-bg); font-size:13px; font-weight:bold; cursor:pointer; user-select:none;">
+                                        <input type="checkbox" class="bv-mode-cb" value="${v}" ${v==='20'?'checked':''} style="width:15px; height:15px; margin:0; accent-color:#27ae60;">
+                                        <span>${v}</span>
+                                    </label>`).join('')}
+                                </div>
+                                <select id="bv-mode" style="display:none;">
                                     <option value="20">20</option>
                                     <option value="10">10</option>
                                     <option value="5">5</option>
@@ -6206,6 +6212,18 @@ function bulkBookIds() {
                             memberSel.addEventListener('change', renderUnits);
                             bookSel.addEventListener('change', renderUnits);
                             modeSel.addEventListener('change', renderUnits);
+                            let modeCbs = panel.querySelectorAll('.bv-mode-cb');
+                            for (let mi = 0; mi < modeCbs.length; mi++) {
+                                modeCbs[mi].addEventListener('change', function() {
+                                    let v = this.value;
+                                    for (let mj = 0; mj < modeCbs.length; mj++) {
+                                        if (modeCbs[mj] !== this) modeCbs[mj].checked = false;
+                                    }
+                                    this.checked = true;
+                                    modeSel.value = v;
+                                    renderUnits();
+                                });
+                            }
                             renderUnits();
 
                             document.getElementById('bv-clear-sel').addEventListener('click', () => {
