@@ -60,12 +60,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Ortak Hatim ve Dua Takip Sistemi</title>
     <!-- ===== SURUM BILGISI (her duzenlemede APP_SURUM artirilir) ===== -->
-    <meta name="app-version" content="v1.0.6">
+    <meta name="app-version" content="v1.0.7">
     <script>
       /* SURUM BILGISI - HER DUZENLEMEDE ARTIR (kural 10) */
-      window.APP_SURUM        = "v1.0.6";
+      window.APP_SURUM        = "v1.0.7";
       window.APP_SURUM_TARIH  = "2026-09-17";
-      window.APP_SURUM_COMMIT = "ih-core-min-sifir";   /* bu surumun dayandigi commit */
+      window.APP_SURUM_COMMIT = "ih-yildiz-8px";   /* bu surumun dayandigi commit */
     </script>
     <meta name="theme-color" content="#d4af37">
     <link rel="manifest" href="manifest.json">
@@ -676,7 +676,7 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
 </style>
 <!-- ===== ISTIKAMET HALKAM : stiller (kapsamli, #ih-scope) ===== -->
 <style id="ih-style">
-#ih-scope{display:block;-webkit-tap-highlight-color:transparent;--st-r:22px;--st-s:14px}
+#ih-scope{display:block;-webkit-tap-highlight-color:transparent;--st-r:20px;--st-s:8px}
 #ih-scope *{box-sizing:border-box}
 #ih-scope{
     --bg-primary:#fdfbf7; --card-bg:#ffffff; --gold-primary:#d4af37; --gold-dark:#8a6d3b;
@@ -895,7 +895,7 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
 
 /* ===== MOBIL (<=430px): kompakt halka, kucuk buton, sigan yazi ===== */
 @media (max-width:430px){
-  #ih-scope{--st-r:15px;--st-s:10px}
+  #ih-scope{--st-r:14px;--st-s:7px}
   #ih-scope .panel{margin:8px;padding:8px 7px 7px;border-radius:11px}
   /* sadece ORTADAKI yazi alta insin; butonlar baslik hizasinda kalsin */
   #ih-scope .p-head{flex-wrap:nowrap;gap:5px;align-items:flex-start}
