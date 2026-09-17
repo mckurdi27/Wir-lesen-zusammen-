@@ -60,12 +60,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Ortak Hatim ve Dua Takip Sistemi</title>
     <!-- ===== SURUM BILGISI (her duzenlemede APP_SURUM artirilir) ===== -->
-    <meta name="app-version" content="v1.0.8">
+    <meta name="app-version" content="v1.0.9">
     <script>
       /* SURUM BILGISI - HER DUZENLEMEDE ARTIR (kural 10) */
-      window.APP_SURUM        = "v1.0.8";
+      window.APP_SURUM        = "v1.0.9";
       window.APP_SURUM_TARIH  = "2026-09-17";
-      window.APP_SURUM_COMMIT = "ih-secim-alt-bolum";   /* bu surumun dayandigi commit */
+      window.APP_SURUM_COMMIT = "ih-aliskanlik-gun-detay";   /* bu surumun dayandigi commit */
     </script>
     <meta name="theme-color" content="#d4af37">
     <link rel="manifest" href="manifest.json">
@@ -1198,7 +1198,10 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
 
     <div class="heat" id="heat"></div>
 
-<div class="ih-ayar">
+  </div>
+
+  <div class="detail" id="detail"><div id="detailBody"></div>
+<div class="ih-ayar" id="ihAyar">
     <h4>Al&#305;&#351;kanl&#305;klar</h4>
     <p>Takip edilecek al&#305;&#351;kanl&#305;klar&#305; se&ccedil;. <b>ANA</b> halkalar zinciri belirler.</p>
     <div id="sheetList"></div>
@@ -1225,8 +1228,6 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
 
 </div>
   </div>
-
-  <div class="detail" id="detail"></div>
 </div>
 
 <div class="pop" id="pop">
@@ -8666,10 +8667,12 @@ function grup(g, tp, etiket, sinif){
 }
 function detay(){
   var d = document.getElementById('detail');
-  if(secili === null){ d.className='detail'; d.innerHTML=''; return; }
+  var db = document.getElementById('detailBody');
+  if(secili === null){ d.className='detail'; db.innerHTML=''; return; }
   var g = gunEkle(pzt(), secili);
   d.className = 'detail ih-show';
-  d.innerHTML = '<div class="d-head">'
+  sheetCiz();
+  db.innerHTML = '<div class="d-head">'
     +   '<b>'+GUNUZ[secili]+' '+g.getDate()+' '+AYLAR[g.getMonth()]+'</b>'
     +   '<em>'+(tamGun(g) ? 'halka kapand\u0131 \u2713' : 'ana al\u0131\u015Fkanl\u0131k eksik')+'</em>'
     +   '<button id="tumGun">t\u00FCm\u00FCn\u00FC i\u015Faretle</button>'
