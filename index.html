@@ -60,12 +60,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Ortak Hatim ve Dua Takip Sistemi</title>
     <!-- ===== SURUM BILGISI (her duzenlemede APP_SURUM artirilir) ===== -->
-    <meta name="app-version" content="v1.0.4">
+    <meta name="app-version" content="v1.0.5">
     <script>
       /* SURUM BILGISI - HER DUZENLEMEDE ARTIR (kural 10) */
-      window.APP_SURUM        = "v1.0.4";
+      window.APP_SURUM        = "v1.0.5";
       window.APP_SURUM_TARIH  = "2026-09-17";
-      window.APP_SURUM_COMMIT = "ih-yildiz-mobil";   /* bu surumun dayandigi commit */
+      window.APP_SURUM_COMMIT = "ih-halka-yildiz-mobil";   /* bu surumun dayandigi commit */
     </script>
     <meta name="theme-color" content="#d4af37">
     <link rel="manifest" href="manifest.json">
@@ -676,7 +676,7 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
 </style>
 <!-- ===== ISTIKAMET HALKAM : stiller (kapsamli, #ih-scope) ===== -->
 <style id="ih-style">
-#ih-scope{display:block;-webkit-tap-highlight-color:transparent;--st-k:1}
+#ih-scope{display:block;-webkit-tap-highlight-color:transparent;--st-r:22px;--st-s:14px}
 #ih-scope *{box-sizing:border-box}
 #ih-scope{
     --bg-primary:#fdfbf7; --card-bg:#ffffff; --gold-primary:#d4af37; --gold-dark:#8a6d3b;
@@ -716,25 +716,26 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
         border-radius:9px;background:#fff;color:var(--gold-dark);cursor:pointer;
         line-height:1;font-size:15px;font-weight:900}
 #ih-scope .fold{font-size:15px}
-#ih-scope /* ---- hafta: sadece halkalar, #ih-scope altinda yazi yok ---- */
-  .week{display:flex;justify-content:space-between;gap:0;margin-top:9px}
-#ih-scope .day{flex:1 1 auto;min-width:56px;display:flex;align-items:center;justify-content:center;position:relative}
-#ih-scope .ring{position:relative;width:56px;height:56px;flex:0 0 56px;aspect-ratio:1/1}
+/* ---- hafta: sadece halkalar; gun kutusu sabit, sikismaz ---- */
+#ih-scope .week{display:flex;justify-content:space-between;align-items:flex-start;gap:4px;margin-top:10px}
+#ih-scope .day{flex:0 0 auto;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible}
+#ih-scope .ring{position:relative;width:64px;height:64px;flex:0 0 64px;aspect-ratio:1/1;border-radius:50%;overflow:visible}
 #ih-scope .core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-        width:32px;height:32px;flex:0 0 32px;aspect-ratio:1/1;border-radius:50%;
+        width:26px;height:26px;aspect-ratio:1/1;border-radius:50%;box-sizing:border-box;z-index:2;
         border:1.5px solid var(--border-color);
         background:#fbf7ee;color:var(--text-main);cursor:pointer;padding:0;
         display:flex;flex-direction:column;align-items:center;justify-content:center}
-#ih-scope .core .dnum{font-size:12px;font-weight:900;line-height:12px}
-#ih-scope .core .ddd{font-size:7px;font-weight:800;line-height:8px;color:var(--gold-dark);letter-spacing:.2px}
+#ih-scope .core .dnum{font-size:11px;font-weight:900;line-height:11px}
+#ih-scope .core .ddd{font-size:6.5px;font-weight:800;line-height:7px;color:var(--gold-dark);letter-spacing:0}
 #ih-scope .day.today .core{border-color:var(--gold-primary);background:#fff8e1;box-shadow:0 0 0 2px rgba(212,175,55,.3)}
 #ih-scope .day.broken .core{border-color:#d9c9e8;background:#faf6fc}
 #ih-scope .day.ih-open .core{background:var(--gold-primary);border-color:var(--gold-primary)}
 #ih-scope .day.ih-open .core .dnum, #ih-scope .day.ih-open .core .ddd{color:#fff}
-#ih-scope .stwrap{position:absolute;left:50%;top:50%;width:0;height:0}
-#ih-scope .st{position:absolute;left:-5px;top:-5px;width:10px;height:10px;line-height:10px;
-      text-align:center;font-size:10px;font-weight:700;color:#b9ab95;
-      text-shadow:0 0 1px rgba(62,39,35,.45);pointer-events:none}
+#ih-scope .stwrap{position:absolute;left:50%;top:50%;width:0;height:0;z-index:6}
+#ih-scope .st{position:absolute;left:calc(var(--st-s) / -2);top:calc(var(--st-s) / -2);
+      width:var(--st-s);height:var(--st-s);line-height:var(--st-s);
+      text-align:center;font-size:var(--st-s);font-weight:700;color:#b9ab95;
+      text-shadow:0 1px 1px rgba(62,39,35,.5);pointer-events:none}
 #ih-scope .st.ih-on{text-shadow:0 0 2px rgba(0,0,0,.28)}
 #ih-scope .st.miss{color:var(--miss)}
 #ih-scope /* ---- altta acilan bolum ---- */
@@ -892,21 +893,22 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
 
 /* ===== MOBIL (<=430px): kompakt halka, kucuk buton, sigan yazi ===== */
 @media (max-width:430px){
-  #ih-scope{--st-k:.78}
+  #ih-scope{--st-r:15px;--st-s:10px}
   #ih-scope .panel{margin:8px;padding:8px 7px 7px;border-radius:11px}
-  #ih-scope .p-head{flex-wrap:wrap;gap:5px;row-gap:3px}
-  #ih-scope .ttl{flex:1 1 100%;flex-wrap:wrap;gap:4px}
-  #ih-scope .ttl h1{font-size:13px;letter-spacing:0}
-  #ih-scope .ttl p{flex:1 1 100%;text-align:left;font-size:9px;opacity:.75;padding:0}
+  /* sadece ORTADAKI yazi alta insin; butonlar baslik hizasinda kalsin */
+  #ih-scope .p-head{flex-wrap:nowrap;gap:5px;align-items:flex-start}
+  #ih-scope .ttl{flex-wrap:wrap;gap:2px 4px}
+  #ih-scope .ttl h1{font-size:13px;letter-spacing:0;flex:1 1 auto}
+  #ih-scope .ttl p{flex:1 1 100%;order:3;text-align:left;font-size:9px;
+        opacity:.75;padding:0}
   #ih-scope .fold,#ih-scope .gear{width:26px;height:26px;flex:0 0 26px;
               font-size:13px;border-radius:8px}
-  #ih-scope .week{gap:2px}
-  #ih-scope .day{min-width:0;flex:1 1 0}
-  #ih-scope .ring{width:44px;height:44px;flex:0 0 44px}
-  #ih-scope .core{width:26px;height:26px;flex:0 0 26px;border-width:1px}
-  #ih-scope .core .dnum{font-size:10px;line-height:10px}
-  #ih-scope .core .ddd{font-size:6px;line-height:7px;letter-spacing:0}
-  #ih-scope .st{left:-4px;top:-4px;width:8px;height:8px;line-height:8px;font-size:8px}
+  #ih-scope .week{gap:1px;margin-top:8px}
+  #ih-scope .day{flex:0 0 auto}
+  #ih-scope .ring{width:46px;height:46px;flex:0 0 46px}
+  #ih-scope .core{width:21px;height:21px;border-width:1px}
+  #ih-scope .core .dnum{font-size:9px;line-height:9px}
+  #ih-scope .core .ddd{font-size:5.5px;line-height:6px;letter-spacing:0}
   #ih-scope .heat .wk-d i b{font-size:4.5px}
   #ih-scope .heat .wk-d i em{font-size:6px}
 }
@@ -8503,18 +8505,19 @@ var secili = null;
 
 function yildizlar(g){
   var a = aktifHepsi(), n = a.length, out = '', gecmis = g < bugun();
-  /* ayni saati paylasan aliskanlik -> dis halka (yaricap +7px) */
+  /* ayni saati paylasan aliskanliklar icin ayri aci takibi */
   var gorulen = {};
   for(var i=0;i<n;i++){
     var h = a[i], on = yapildi(g,h.id);
     var aci = yildizAcisi(h);
     if(aci === null){ aci = -90 + i*360/Math.max(n,1); }
     var s = (h.saat || 0);
-    var yaricap = 21;
-    if(s){ if(gorulen[s]){ yaricap = 28; } else { gorulen[s] = 1; } }
+    /* ayni saati paylasan aliskanlik: yaricap yerine ACI kaydirilir
+       (boylece hicbir yildiz halkanin disina tasmaz) */
+    if(s){ if(gorulen[s]){ aci += 13; } else { gorulen[s] = 1; } }
     var renk = yildizRengi(h, on, gecmis);
     var glif = (on || gecmis) ? '\u2605' : '\u2606';
-    out += '<span class="stwrap" style="transform:rotate('+aci+'deg) translate(0,calc(-'+yaricap+'px * var(--st-k))) rotate('+(-aci)+'deg)">'
+    out += '<span class="stwrap" style="transform:rotate('+aci+'deg) translate(0,calc(-1 * var(--st-r))) rotate('+(-aci)+'deg)">'
          +   '<span class="st'+(on?' ih-on':'')+'" style="color:'+renk+'" title="'+h.ad+'">'+glif+'</span>'
          + '</span>';
   }
