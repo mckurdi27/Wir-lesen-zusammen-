@@ -60,12 +60,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Ortak Hatim ve Dua Takip Sistemi</title>
     <!-- ===== SURUM BILGISI (her duzenlemede APP_SURUM artirilir) ===== -->
-    <meta name="app-version" content="v1.0.5">
+    <meta name="app-version" content="v1.0.6">
     <script>
       /* SURUM BILGISI - HER DUZENLEMEDE ARTIR (kural 10) */
-      window.APP_SURUM        = "v1.0.5";
+      window.APP_SURUM        = "v1.0.6";
       window.APP_SURUM_TARIH  = "2026-09-17";
-      window.APP_SURUM_COMMIT = "ih-halka-yildiz-mobil";   /* bu surumun dayandigi commit */
+      window.APP_SURUM_COMMIT = "ih-core-min-sifir";   /* bu surumun dayandigi commit */
     </script>
     <meta name="theme-color" content="#d4af37">
     <link rel="manifest" href="manifest.json">
@@ -712,7 +712,8 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
 #ih-scope .ttl p{flex:1 1 auto;min-width:0;text-align:right;padding-right:2px;
          font-size:10px;font-weight:700;color:var(--gold-dark);opacity:.85;
          overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#ih-scope .fold, #ih-scope .gear{width:30px;height:30px;flex:0 0 30px;border:1px solid var(--border-color);
+#ih-scope .fold, #ih-scope .gear{width:30px;height:30px;min-width:0;min-height:0;flex:0 0 30px;
+        padding:0;border:1px solid var(--border-color);
         border-radius:9px;background:#fff;color:var(--gold-dark);cursor:pointer;
         line-height:1;font-size:15px;font-weight:900}
 #ih-scope .fold{font-size:15px}
@@ -721,7 +722,8 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
 #ih-scope .day{flex:0 0 auto;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible}
 #ih-scope .ring{position:relative;width:64px;height:64px;flex:0 0 64px;aspect-ratio:1/1;border-radius:50%;overflow:visible}
 #ih-scope .core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-        width:26px;height:26px;aspect-ratio:1/1;border-radius:50%;box-sizing:border-box;z-index:2;
+        width:26px;height:26px;min-width:0;min-height:0;max-width:26px;max-height:26px;
+        padding:0;aspect-ratio:1/1;border-radius:50%;box-sizing:border-box;z-index:3;
         border:1.5px solid var(--border-color);
         background:#fbf7ee;color:var(--text-main);cursor:pointer;padding:0;
         display:flex;flex-direction:column;align-items:center;justify-content:center}
@@ -731,7 +733,7 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
 #ih-scope .day.broken .core{border-color:#d9c9e8;background:#faf6fc}
 #ih-scope .day.ih-open .core{background:var(--gold-primary);border-color:var(--gold-primary)}
 #ih-scope .day.ih-open .core .dnum, #ih-scope .day.ih-open .core .ddd{color:#fff}
-#ih-scope .stwrap{position:absolute;left:50%;top:50%;width:0;height:0;z-index:6}
+#ih-scope .stwrap{position:absolute;left:50%;top:50%;width:0;height:0;z-index:2}
 #ih-scope .st{position:absolute;left:calc(var(--st-s) / -2);top:calc(var(--st-s) / -2);
       width:var(--st-s);height:var(--st-s);line-height:var(--st-s);
       text-align:center;font-size:var(--st-s);font-weight:700;color:#b9ab95;
@@ -901,12 +903,13 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
   #ih-scope .ttl h1{font-size:13px;letter-spacing:0;flex:1 1 auto}
   #ih-scope .ttl p{flex:1 1 100%;order:3;text-align:left;font-size:9px;
         opacity:.75;padding:0}
-  #ih-scope .fold,#ih-scope .gear{width:26px;height:26px;flex:0 0 26px;
-              font-size:13px;border-radius:8px}
+  #ih-scope .fold,#ih-scope .gear{width:26px;height:26px;min-width:0;min-height:0;flex:0 0 26px;
+              padding:0;font-size:13px;border-radius:8px}
   #ih-scope .week{gap:1px;margin-top:8px}
   #ih-scope .day{flex:0 0 auto}
   #ih-scope .ring{width:46px;height:46px;flex:0 0 46px}
-  #ih-scope .core{width:21px;height:21px;border-width:1px}
+  #ih-scope .core{width:21px;height:21px;min-width:0;min-height:0;max-width:21px;max-height:21px;
+        padding:0;border-width:1px}
   #ih-scope .core .dnum{font-size:9px;line-height:9px}
   #ih-scope .core .ddd{font-size:5.5px;line-height:6px;letter-spacing:0}
   #ih-scope .heat .wk-d i b{font-size:4.5px}
