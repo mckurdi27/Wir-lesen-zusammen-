@@ -60,12 +60,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Ortak Hatim ve Dua Takip Sistemi</title>
     <!-- ===== SURUM BILGISI (her duzenlemede APP_SURUM artirilir) ===== -->
-    <meta name="app-version" content="v1.0.9">
+    <meta name="app-version" content="v1.1.0">
     <script>
       /* SURUM BILGISI - HER DUZENLEMEDE ARTIR (kural 10) */
-      window.APP_SURUM        = "v1.0.9";
+      window.APP_SURUM        = "v1.1.0";
       window.APP_SURUM_TARIH  = "2026-09-17";
-      window.APP_SURUM_COMMIT = "ih-aliskanlik-gun-detay";   /* bu surumun dayandigi commit */
+      window.APP_SURUM_COMMIT = "bolum-araliklari-10px";   /* bu surumun dayandigi commit */
     </script>
     <meta name="theme-color" content="#d4af37">
     <link rel="manifest" href="manifest.json">
@@ -155,7 +155,7 @@
             border: 2px solid var(--gold-primary);
             border-radius: 12px;
             overflow: hidden;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             background: var(--card-bg);
         }
         .book-header {
@@ -261,7 +261,7 @@
 
         
         .login-panel {
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             padding: 20px 22px;
             background: var(--card-bg);
             border-radius: 12px;
@@ -494,7 +494,7 @@
     }
         /* ===== ZIKIRMATIK PANELI (eklenti) ===== */
         #zikirmatikSection {
-            margin: 20px 0; padding: 18px; border-radius: 12px;
+            margin: 10px 0; padding: 18px; border-radius: 12px;
             border: 2px solid var(--gold-primary); background: var(--card-bg);
             color: var(--text-main); box-sizing: border-box;
         }
@@ -809,7 +809,7 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
 #ih-scope .hbtn.miss{border-color:#d9c9e8;background:#faf6fc}
 #ih-scope .hbtn.miss .s{color:var(--miss);font-weight:400}
 #ih-scope .hbtn .bell{font-size:9px;opacity:.8}
-#ih-scope .heat{display:none;margin-top:11px;border-top:1px solid var(--border-color);padding-top:11px}
+#ih-scope .heat{display:none;margin-top:10px;border-top:1px solid var(--border-color);padding-top:11px}
 #ih-scope .heat.ih-show{display:block}
 #ih-scope .heat .hl{font-size:10px;font-weight:800;color:var(--gold-dark);margin-bottom:8px;
             display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
@@ -962,7 +962,7 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
     <div class="container">
         <!-- BÖLÜM 4 - ÜST BAŞLIK VE GÖRSEL ALANI -->
 <!-- ----- BOLUM A : UST BASLIK + GORSEL ALANI (main-title) ----- -->
-        <div id="main-title-ornate-section" style="margin-bottom: 2px; padding: 10px 15px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border: 2px solid #d4af37; border-top: 6px solid #8a6d3b; border-radius: 12px; box-shadow: 0 4px 15px rgba(138, 109, 59, 0.2);">
+        <div id="main-title-ornate-section" style="margin-bottom: 10px; padding: 10px 15px; background: linear-gradient(135deg, #fdfbf7 0%, #f4ebd0 100%); border: 2px solid #d4af37; border-top: 6px solid #8a6d3b; border-radius: 12px; box-shadow: 0 4px 15px rgba(138, 109, 59, 0.2);">
             <script>
             function toggleAppFullscreen(){
                 var el = document.documentElement;
@@ -1131,8 +1131,8 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
 
         <!-- GRUP TAKIP KARTI: admin secili grupta, her uye icin eser tablosu -->
 <!--      - C1: Grup takip paneli (gizli) ----- -->
-        <div id="grup-takip-panel" style="display: none; margin-bottom: 20px; padding: 16px 20px; max-width:100%; box-sizing:border-box; overflow-x:hidden; background: var(--card-bg); border-radius: 12px; border: 2px solid #16a085; box-shadow: 0 4px 15px rgba(22,160,133,0.18);">
-            <h3 style="margin: 0 0 4px; color: #16a085; font-size: 18px;">&#128101; Grup Takip</h3>
+        <div id="grup-takip-panel" style="display: none; margin-bottom: 10px; padding: 16px 20px; max-width:100%; box-sizing:border-box; overflow-x:hidden; background: var(--card-bg); border-radius: 12px; border: 2px solid #16a085; box-shadow: 0 4px 15px rgba(22,160,133,0.18);">
+            <h3 style="margin: 0 0 10px; color: #16a085; font-size: 18px;">&#128101; Grup Takip</h3>
             <div id="gt-group-name" style="font-size:12px; color:#555; margin-bottom:12px;"></div>
             <div id="gt-content" style="overflow-x:auto;"></div>
         </div>
@@ -1140,8 +1140,8 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
 
 <!-- BİREYSEL TAKİP PANELİ -->
 <!--      - C2: Bireysel (kisisel) takip paneli (gizli) ----- -->
-        <div id="bireysel-takip-panel" style="display: none; margin-bottom: 20px; padding: 16px 20px; max-width:100%; box-sizing:border-box; overflow-x:hidden; background: var(--card-bg); border-radius: 12px; border: 2px solid var(--gold-primary); box-shadow: 0 4px 15px rgba(138,109,59,0.2);">
-            <h3 style="margin: 0 0 12px; color: #8a6d3b; font-size: 18px;">👤 Üye Takip</h3>
+        <div id="bireysel-takip-panel" style="display: none; margin-bottom: 10px; padding: 16px 20px; max-width:100%; box-sizing:border-box; overflow-x:hidden; background: var(--card-bg); border-radius: 12px; border: 2px solid var(--gold-primary); box-shadow: 0 4px 15px rgba(138,109,59,0.2);">
+            <h3 style="margin: 0 0 10px; color: #8a6d3b; font-size: 18px;">👤 Üye Takip</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; margin-bottom: 14px;">
                 <div>
                     <label style="font-weight:bold; font-size:13px; display:block; margin-bottom:4px;">Üye Adı</label>
@@ -1248,7 +1248,7 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
 
 <div class="ih-toast" id="ih-toast"></div>
 </div>
-<div id="bulk-share-area" class="bulk-share-area" style="display: none; margin-top:6px;">
+<div id="bulk-share-area" class="bulk-share-area" style="display: none; margin-top:10px;">
             <button id="bulk-whatsapp-btn" class="bulk-whatsapp-btn">&#128172; Tüm Seçtiklerimi WhatsApp'ta Paylaş</button>
         </div>
 
@@ -1351,7 +1351,7 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
             <!-- ESER YÖNETİMİ MODAL -->
     <div id="book-edit-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center;">
         <div style="background:#fff; width:92%; max-width:460px; max-height:90vh; overflow-y:auto; border-radius:12px; padding:16px; box-sizing:border-box;">
-            <h3 id="book-modal-title" style="margin:0 0 12px; color:#27ae60; font-size:16px;">📚 Yeni Eser Ekle</h3>
+            <h3 id="book-modal-title" style="margin:0 0 10px; color:#27ae60; font-size:16px;">📚 Yeni Eser Ekle</h3>
             <input type="hidden" id="book-modal-id">
             <div style="display:flex; gap:8px; align-items:flex-end; margin-bottom:10px;">
                 <div style="flex:1;"><label style="font-size:12px; color:#555; display:block;">Eser adı</label><input type="text" id="book-modal-name" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;"></div>
@@ -2989,7 +2989,7 @@ button::-moz-selection, .zk-tap::-moz-selection, .zk-tap *::-moz-selection { bac
                     }
                 }
                 inspirationContainer.style.cssText = `
-                    margin-bottom: 20px;
+                    margin-bottom: 10px;
                     padding: 16px;
                     border: 1px solid #e3dcd2;
                     border-left: 4px solid #27ae60;
@@ -5223,7 +5223,7 @@ booksGrid.appendChild(_readBtn);
                     let card = document.createElement("div");
                     card.className = `book-card ${isOpen ? "open" : ""}`;
                     card.setAttribute("data-book-id", book.id);
-                    card.style.cssText = "border: 2px solid var(--gold-primary); border-radius: 12px; overflow: hidden; margin-bottom: 15px; background: var(--card-bg);";
+                    card.style.cssText = "border: 2px solid var(--gold-primary); border-radius: 12px; overflow: hidden; margin-bottom: 10px; background: var(--card-bg);";
 
                     let modeButtonsHtml = modeKeys.map(mk => {
                         let mObj = defModes[mk];
@@ -5979,8 +5979,8 @@ window.infoSortTable = function infoSortTable(col) {
                 let adminPanelHtml = "";
                 if (isAdmin) {
                     adminPanelHtml = `
-                        <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid var(--gold-primary); padding: 18px; border-radius: 12px; margin-bottom: 20px;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:15px;">
+                        <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid var(--gold-primary); padding: 18px; border-radius: 12px; margin-bottom: 10px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px;">
                                 <h3 style="color: var(--gold-dark); font-size: 17px; margin:0;">🛠️ Yönetici Kontrol Paneli</h3>
                                 <label style="font-size:13px; color:#555; display:flex; align-items:center; gap:6px; cursor:pointer; white-space:nowrap;">
                                     <input type="checkbox" id="admin-remember" style="width:15px;height:15px;cursor:pointer;accent-color:#27ae60;" onchange="localStorage.setItem('hatim_admin_remember', this.checked?'1':'0');">
